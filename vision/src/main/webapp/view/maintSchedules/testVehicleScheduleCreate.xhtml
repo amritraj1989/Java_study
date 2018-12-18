@@ -1,0 +1,63 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	template="../../templates/ui.xhtml">
+
+	<ui:define name="content">
+			<h:form id="breadCrumbForm" prependId="false">
+				<p:breadCrumb model="#{testVSCreateBean.breadCrumbTrail}"
+					style="min-width:1000px;max-width:100%;width:auto" ajax="false"
+					immediate="true" styleClass="ui-layout" />
+			</h:form>
+			<!-- Error message display -->
+			<p:scrollPanel style="height:50px;max-width:100%;width:auto;"
+				mode="native" styleClass="ui-layout">
+				<p:messages id="messages" showSummary="false" showDetail="true"
+					autoUpdate="true" />
+			</p:scrollPanel>
+
+			<h:form id="mainForm" prependId="false">
+
+				<p:panel id="mainPanel" header="Test Vehicle Schedule Create page" >
+				
+					<p:panelGrid columns="2">
+						<p:outputLabel styleClass="ui-label" value = "Unit#:" for="unit"/>
+						<p:inputText id="unit" value="#{testVSCreateBean.unit}" /> 
+						<p:outputLabel styleClass="ui-label" value = "Master Schedule Name:" for="masterScheduleName"/>
+						<p:inputText id="masterScheduleName" value="#{testVSCreateBean.masterScheduleName}" /> 
+					</p:panelGrid>
+					
+					<p:commandButton id="createButton" value="Create"
+								action="#{testVSCreateBean.create}" ajax="false"
+								onclick="lockScreen();" />
+					
+					
+				
+
+				</p:panel>
+
+
+
+			</h:form>
+
+
+
+
+
+
+			
+			
+			
+        
+		<script type="text/javascript">
+		
+
+		
+		
+		</script>
+
+	</ui:define>
+</ui:composition>

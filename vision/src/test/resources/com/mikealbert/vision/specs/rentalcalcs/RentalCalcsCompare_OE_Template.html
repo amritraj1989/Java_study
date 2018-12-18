@@ -1,0 +1,99 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Rental Calcs Automated Compare</title>
+    <body>
+    	
+    		<table>
+    			<tr>
+    				<th><h2>Open End Rental Calcs Comparison</h2> </th>    				
+    			</tr>
+    			<tr>
+    				<td>
+    					<table>
+    						<tr>
+								<th>Quote Id</th>
+    							<th>QMD_ID</th>
+    							<th>Steps Info</th>
+    							<th>Client Cost</th>
+    							<th>MikeAlbert Cost</th>
+    							<th>Invoice-Adj</th>
+								<th>Int-Rate</th>
+								<th>Int-Adj</th>
+								<th>Adm-Factor</th>
+								<th>Depr-Factor</th>
+    							<th>Step-1</th>
+								<th>Step-2</th>
+								<th>Step-3</th>
+								<th>Step-4</th>
+								<th>Step-5</th>
+								<th>IRR</th>
+    							
+    						</tr>
+    						<tr class="calcItem" concordion:execute="#result = testCalculateRental(#qmdId,#inRate,#intAdj,#depFac)">
+								
+								<td> </td>
+								<td concordion:set="#qmdId"> </td>
+								<td> </td>
+								<td> </td>
+								<td> </td>
+								<td> </td>
+    							<td concordion:set="#inRate" ></td>
+    							
+    							<td concordion:set="#intAdj"> </td>
+								
+								
+								<td> </td>
+								<td concordion:set="#depFac"> </td>
+    							<td>
+    								<span>Rent(WL): </span><span concordion:assertEquals="#result.step1Rental"></span><br/>
+									<span>NBV(WL): </span><span concordion:assertEquals="#result.step1NBV"></span><br/>
+									<span>------------------</span><br/>
+									<span>Rent(RS): </span><span concordion:assertEquals="#result.step1Rental"></span><br/>
+									<span>NBV(RS): </span><span concordion:assertEquals="#result.step1NBV"></span><br/>
+																											
+    							</td>
+    							<td>
+    								<span>Rent(WL): </span><span concordion:assertEquals="#result.step2Rental"></span><br/>
+									<span>NBV(WL): </span><span concordion:assertEquals="#result.step2NBV"></span><br/>
+									<span>------------------</span><br/>
+									<span>Rent(RS): </span><span concordion:assertEquals="#result.step2Rental"></span><br/>
+									<span>NBV(RS): </span><span concordion:assertEquals="#result.step2NBV"></span><br/>
+																											
+    							</td>
+    							<td>
+    								<span>Rent(WL): </span><span concordion:assertEquals="#result.step3Rental"></span><br/>
+									<span>NBV(WL): </span><span concordion:assertEquals="#result.step3NBV"></span><br/>
+									<span>------------------</span><br/>
+									<span>Rent(RS): </span><span concordion:assertEquals="#result.step3Rental"></span><br/>
+									<span>NBV(RS): </span><span concordion:assertEquals="#result.step3NBV"></span><br/>
+																											
+    							</td>
+    							<td>
+    								<span>Rent(WL): </span><span concordion:assertEquals="#result.step4Rental"></span><br/>
+									<span>NBV(WL): </span><span concordion:assertEquals="#result.step4NBV"></span><br/>
+									<span>------------------</span><br/>
+									<span>Rent(RS): </span><span concordion:assertEquals="#result.step4Rental"></span><br/>
+									<span>NBV(RS): </span><span concordion:assertEquals="#result.step4NBV"></span><br/>																		
+    							</td>
+    							<td>
+    								<span>Rent(WL): </span><span concordion:assertEquals="#result.step5Rental"></span><br/>
+									<span>NBV(WL): </span><span concordion:assertEquals="#result.step5NBV"></span><br/>
+									<span>------------------</span><br/>
+									<span>Rent(RS): </span><span concordion:assertEquals="#result.step5Rental"></span><br/>
+									<span>NBV(RS): </span><span concordion:assertEquals="#result.step5NBV"></span><br/>																		
+    							</td>
+    							<td>
+    								<span>Rent(WL): </span><span concordion:assertEquals="#result.irr"></span><br/>	
+    								<span>------------------</span><br/>
+									<span>Rent(RS): </span><span concordion:assertEquals="#result.irr"></span><br/>																
+    							</td>
+								
+    							
+    						</tr>
+    					</table>
+    				</td>   				
+    				
+    			</tr>
+    		</table>
+    </body>
+</html>

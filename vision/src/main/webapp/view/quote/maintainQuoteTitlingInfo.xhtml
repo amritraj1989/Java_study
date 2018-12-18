@@ -1,0 +1,129 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	template="../../templates/ui.xhtml">
+	
+	<ui:define name="content">
+			<h:form id="breadCrumbForm" prependId="false">
+				<p:breadCrumb model="#{maintainQuoteTitlingInfoBean.breadCrumbTrail}"  
+				 style="min-width:900px;max-width:100%;width:auto" 
+				ajax="false" immediate="true" styleClass="ui-layout"/>
+			</h:form>
+		
+			<!-- Error message display -->
+			<p:scrollPanel style="height:50px;max-width:100%;width:auto;" 
+				mode="native" styleClass="ui-layout">
+				<p:messages id="messages" showSummary="false" showDetail="true"	autoUpdate="true" />
+			</p:scrollPanel>			
+			
+			<h:form id="mainForm" prependId="false">
+	    		<p:panel id="resultsPanel" >
+	    			
+		    		<f:facet name="header" >
+	    				<h:outputText value="Titling list for #{maintainQuoteTitlingInfoBean.clientInfo}"/>
+		    		</f:facet>
+	    			 
+	                <p:dataTable  id="resultsTable" var="result" 
+	                	widgetVar="resultVar"
+	                	value="#{maintainQuoteTitlingInfoBean.rowList}" 
+	                	scrollable="true"  
+	                	scrollHeight="#{maintainQuoteTitlingInfoBean.dataTable.height}"
+						paginator= "true"
+						rows="500"
+						paginatorPosition="bottom" 
+						rowIndexVar="selectedRowIndex"
+						selection="#{maintainQuoteTitlingInfoBean.selectedExtAccAffiliate}" 
+						sortBy="#{result.affiliateName}"
+						sortOrder="ascending"
+						rowKey="#{result.extAccAffilId}" 
+						selectionMode="single">
+
+					
+	                   	<p:column width="19%" sortBy="#{result.affiliateName}">
+	                    	<f:facet name="header">
+								<h:outputText value="Name" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputText value="#{result.affiliateName}" />
+	                   	</p:column> 
+	                   	<p:column width="19%" sortBy="#{result.externalAccountAddress.addressLine1}">
+	                    	<f:facet name="header">
+								<h:outputText value="Address Line 1" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputText value="#{result.externalAccountAddress.addressLine1}" />
+	                   	</p:column> 
+	                   	<p:column width="19%" sortBy="#{result.externalAccountAddress.addressLine2}">
+	                    	<f:facet name="header">
+								<h:outputText value="Address Line 2" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputText value="#{result.externalAccountAddress.addressLine2}" />
+	                   	</p:column> 
+	                   	<p:column width="19%" sortBy="#{result.externalAccountAddress.cityDescription}">
+	                    	<f:facet name="header">
+								<h:outputText value="City" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputText value="#{result.externalAccountAddress.cityDescription}" />
+	                   	</p:column> 
+	                   	<p:column width="7%" sortBy="#{result.externalAccountAddress.regionAbbreviation}">
+	                    	<f:facet name="header">
+								<h:outputText value="State" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputText value="#{result.externalAccountAddress.regionAbbreviation}" />
+	                   	</p:column> 
+	                   	<p:column width="7%" sortBy="#{result.externalAccountAddress.postcode}">
+	                    	<f:facet name="header">
+								<h:outputText value="Zip" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputText value="#{result.externalAccountAddress.postcode}" />
+	                   	</p:column> 
+	                   	<p:column width="10%" sortBy="#{result.taxRegNo}">
+	                    	<f:facet name="header">
+								<h:outputText value="EIN" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputText value="#{result.taxRegNo}" />
+	                   	</p:column> 
+						<f:facet name="footer" >
+							<h:outputText value="Total Records: #{maintainQuoteTitlingInfoBean.totalRecords}" />
+						</f:facet>
+	                </p:dataTable>
+
+              	</p:panel>
+
+	    		<p:panel id="buttonsPanel">	    			
+					<h:panelGrid id="buttons">
+						<f:facet name="footer">
+							<p:commandButton disabled="#{maintainQuoteTitlingInfoBean.saveDisabled}" 
+								id="saveButton" tabindex="30" value="Save"
+								action="#{maintainQuoteTitlingInfoBean.save}" ajax="false"
+								onclick="lockScreen();" />
+   							<p:spacer width="10" />
+							<p:commandButton disabled="#{maintainQuoteTitlingInfoBean.saveDisabled}" 
+								id="clearButton" tabindex="40" value="Clear Selection"
+								action="#{maintainQuoteTitlingInfoBean.clear}" process="@this" update="resultsTable"
+								onclick="lockScreen();" />
+   							<p:spacer width="10" />
+							<p:commandButton id="cancelButton" value="Cancel" action="#{maintainQuoteTitlingInfoBean.cancel}" ajax="false" 
+								tabindex="50" onclick="lockScreen();" immediate="true" />
+						</f:facet>
+					</h:panelGrid>
+              	</p:panel>
+
+			</h:form>
+
+			<script>
+			
+            $(window).load(function(){
+            	if($('#saveButton').is(':disabled')) {
+                	document.getElementById("cancelButton").focus();             		
+            	} else {
+            		document.getElementById("saveButton").focus();
+            	}
+            	
+		  	});
+			</script>
+			
+			
+	</ui:define>
+</ui:composition>

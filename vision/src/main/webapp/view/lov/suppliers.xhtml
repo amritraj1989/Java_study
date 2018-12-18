@@ -1,0 +1,151 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	
+		<p:dialog header="#{supplierLovBean.dialogHeader}"  widgetVar="vendorLOV"
+			id="SUPPLIER_GRID" dynamic="true" resizable="false" width="800" appendTo="@(body)"
+			height="355" modal="true"
+			onShow="setFirstPageVenDataTableWidget();setFocus('vendorSelectButton');disableSelectBtn();tabIndexDev();">
+
+		<h:form id="vendLovForm" name="vendLovForm" prependId="false"
+		onkeydown="body_onkeydown(event,'vendorSelectButton','vendorLOV');">
+
+			<p:hotkey immediate="true" bind="esc" handler="PF('vendorLOV').hide();"/>
+				        
+			<p:dataTable widgetVar="vendDataTableWidget" var="vendor"
+				scrollable="true" scrollHeight="270" resizableColumns="true"
+				value="#{supplierLovBean.vendors}" rows="#{supplierLovBean.rowsPerPage}"
+				paginator="true" paginatorPosition="bottom" lazy="true"
+				selection="#{supplierLovBean.lovSelectedVendor}" selectionMode="single"
+				tabindex="-1" >
+
+
+				<p:ajax event="page" onstart="clearDataTableSelection('vendDataTableWidget');" oncomplete="setScrollDivAtTop();disableSelectBtn();" />
+				<p:ajax event="rowDblselect" listener="#{supplierLovBean.onRowSelect}"
+					update=":vendLovForm:lovVendorCode,:vendLovForm:lovVendorName,:vendLovForm:lovVendorId,:vendLovForm:lovVendorEmail"
+					oncomplete="hideVendorLov();setVendorValues();" />
+				<p:ajax event="rowSelect" listener="#{supplierLovBean.onRowSelect}"
+					update=":vendLovForm:lovVendorCode,:vendLovForm:lovVendorName,:vendLovForm:lovVendorId,:vendLovForm:lovVendorEmail" oncomplete="enableSelectBtn();setFocus('vendorSelectButton');"/>
+				<h:messages />
+				
+				<p:column width="200" tabindex="-1">
+					<f:facet name="header">
+						<h:outputText value="Vendor Name" style="font-weight:bold" />
+					</f:facet>
+					<h:outputText value="#{vendor.vendorName}"></h:outputText>
+				</p:column>
+				<p:column width="100" tabindex="-1">
+					<f:facet name="header">
+						<h:outputText value="Vendor Code" style="font-weight:bold" />
+					</f:facet>
+					<h:outputText value="#{vendor.vendorCode}"></h:outputText>
+				</p:column>
+				<p:column width="200" tabindex="-1">
+					<f:facet name="header">
+						<h:outputText value="Address" style="font-weight:bold" />
+					</f:facet>
+					<h:outputText value="#{vendor.addressLine1}"></h:outputText>
+					<h:outputText
+						value="#{not empty vendor.addressLine2 ? '&lt;br /&gt;' : ''}"
+						escape="false" />
+					<h:outputText value="#{vendor.addressLine2}"></h:outputText>
+					<br />
+					<h:outputText value="#{vendor.townCity}"></h:outputText>
+					<h:outputText
+						value="#{not empty vendor.region ? ', ' : ''}"
+						escape="false" />
+					<h:outputText
+						value="#{vendor.region}
+                                                    #{vendor.postCode}"></h:outputText>
+				</p:column>				
+				
+				<p:column width="100" tabindex="-1">
+					<f:facet name="header">
+						<h:outputText value="Vendor Phone" style="font-weight:bold" />
+					</f:facet>
+					<h:outputText value="#{vendor.phoneNumber}"></h:outputText>
+				</p:column>
+				
+				
+			</p:dataTable>
+			<div style="text-align: center;">
+
+				<h:outputText style="font-weight:bold;" 
+										value="Record Count: #{supplierLovBean.vendors.rowCount}">
+									</h:outputText>
+				<p:commandButton style="float:right;" value="Select"
+					id="vendorSelectButton" name="vendorSelectButton" widgetVar="vendorSelectButtonWidgetVar"
+					update=":vendLovForm:lovVendorCode,:vendLovForm:lovVendorName,:vendLovForm:lovVendorId" actionListener="#{supplierLovBean.performLovSelection}"
+					oncomplete="hideVendorLov();setVendorValues();"
+					>
+				</p:commandButton>
+
+			</div>
+			<h:inputHidden id="selectedVendorIndex" />
+		<h:inputHidden id="suppliersTargetInputName" value="vendorLOV" />
+		<h:inputHidden id="lovVendorCode" value="#{supplierLovBean.lovSelectedVendor.vendorCode}" />
+		<h:inputHidden id="lovVendorName" value="#{supplierLovBean.lovSelectedVendor.vendorName}" />
+		<h:inputHidden id="lovVendorId" value="#{supplierLovBean.lovSelectedVendor.rowId}" />
+		<h:inputHidden id="lovVendorEmail" value="#{supplierLovBean.lovSelectedVendor.email}" />
+			
+			</h:form>
+		</p:dialog>										
+
+		
+	
+	<script type="text/javascript">
+		
+	function tabIndexDev(){
+		//alert();
+		var tabvalue = -1;
+		$('.ui-paginator a').attr('tabindex',tabvalue);
+		$('.ui-dialog-titlebar .ui-dialog-titlebar-close').attr('tabindex',tabvalue);
+	}
+	
+		function setVendorValues(){
+			var lovNameArray = new Array();
+			var lovValueArray = new Array()
+			var lovIdArray = new Array()
+			lovNameArray[0]='VENDOR_CODE';
+			lovValueArray[0]=document.getElementById('lovVendorCode').value;
+			
+			lovNameArray[1]='VENDOR_NAME';
+			lovValueArray[1]=document.getElementById('lovVendorName').value;
+			
+			lovNameArray[2]='VENDOR_ID';
+			lovValueArray[2]=document.getElementById('lovVendorId').value;
+			
+			lovNameArray[3]='VENDOR_EMAIL';
+			lovValueArray[3]=document.getElementById('lovVendorEmail').value;
+			<!-- This method need to implement in parent page to populate LOV seletion-->
+			setSelection(document.getElementById('suppliersTargetInputName').value,lovNameArray,lovValueArray);
+			enableSelectBtn();
+		}
+		
+		function showVendorLov(){
+			showDialog('vendorLOV');
+		}	
+		
+		function hideVendorLov(){
+			hideDialog('vendorLOV');
+		}
+				
+		function enableSelectBtn() {
+			PF('vendorSelectButtonWidgetVar').enable();
+		}
+				
+		function disableSelectBtn() {
+			PF('vendorSelectButtonWidgetVar').disable();
+		}
+		
+		function setFirstPageVenDataTableWidget(){
+			setDataTableToFirstPage('vendDataTableWidget');
+			// also select the first row, but only if we have data
+			setDataTableToFirstRow('vendDataTableWidget');
+		}
+		
+		</script>
+</ui:composition>

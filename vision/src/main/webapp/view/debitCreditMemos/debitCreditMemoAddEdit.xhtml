@@ -1,0 +1,732 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"   
+	xmlns:pe="http://primefaces.org/ui/extensions"	  
+    template="../../templates/ui.xhtml" >
+
+	<ui:define name="content">
+			<h:form id="debitCreditBreadCrumbForm" prependId="false">
+				<p:breadCrumb model="#{debitCreditMemoAddEditBean.breadCrumbTrail}"
+					ajax="false" immediate="true" styleClass="ui-layout" />
+			</h:form> 
+			
+			<p:growl id="growl" for="warnings" severity="warn" escape="false" redisplay="true" showDetail="true" sticky="true" /> 
+
+			<h:form id="debitCreditForm" prependId="false">
+
+				<!-- Error message display -->
+				<p:scrollPanel style="height:50px;" mode="native"
+					styleClass="ui-layout">
+					<p:messages id="messages" showSummary="false"
+						severity="info,error,fatal" showDetail="true" autoUpdate="true" />
+				</p:scrollPanel>
+				<p:panel id="debitCreditPanelMain" header="" styleClass="ui-layout">
+					<p:focus context="debitCreditPanelMain" />
+					<!-- Top -->					
+					<p:panelGrid cellpadding="5">
+						<p:row>
+							<p:column>
+								<p:outputLabel for="memoType" value = "Type:*" styleClass="ui-label" />
+							</p:column>
+							<p:column>
+								<p:selectOneMenu id="memoType" widgetVar="memoType" styleClass="ui-select-dropdown trackDirtySelect" style="width: 100px;"
+										value="#{debitCreditMemoAddEditBean.selectedMemoType}"
+										converter="DebitCreditMemoTypeConverter"
+										disabled="#{!debitCreditMemoAddEditBean.hasGeneralEditPermission}" >
+									<f:selectItem itemLabel="--Select One--" itemValue=""/>
+									<f:selectItems value="#{debitCreditMemoAddEditBean.debitCreditMemo.debitCreditMemoTypes}" 
+										var="dcType"
+										itemLabel="#{dcType.typeDescription}"
+										itemValue="#{dcType}"/>	
+									<p:ajax listener="#{debitCreditMemoAddEditBean.handleMemoTypeSelect}" 
+											process="@this" 
+											update="netAmount taxAmount totalAmountOutput totalAmountHidden" />
+								</p:selectOneMenu>
+							</p:column>						
+							<p:column>
+								<p:outputLabel value="Status:" styleClass="ui-label" 
+									rendered="#{!debitCreditMemoAddEditBean.isAddMode()}" />	
+							</p:column>
+							<p:column>
+								<h:outputText  value = "#{debitCreditMemoAddEditBean.status}"   
+									rendered="#{!debitCreditMemoAddEditBean.isAddMode()}" />
+							</p:column>
+							<p:column rowspan="3">
+								<p:panelGrid>
+									<p:row>
+										<p:column>
+											<p:outputLabel  value = "Submitted:" styleClass="ui-label"  rendered="#{!debitCreditMemoAddEditBean.isAddMode()}" />
+										</p:column>
+										<p:column>
+											<h:outputText  value = "#{debitCreditMemoAddEditBean.debitCreditMemo.debitCreditMemoTransaction.submitter}"   
+												rendered="#{!debitCreditMemoAddEditBean.isAddMode()}" />
+										</p:column>
+										<p:column>
+											<h:outputText  value = "#{debitCreditMemoAddEditBean.debitCreditMemo.debitCreditMemoTransaction.submittedDate}"   
+												rendered="#{!debitCreditMemoAddEditBean.isAddMode()}">
+												<f:convertDateTime type="date" pattern="MM/dd/yy" /> 
+											</h:outputText>
+										</p:column>
+										<p:column>
+											<p:spacer width="10" />
+										</p:column>
+										<p:column>
+											<p:outputLabel  value = "Alerts:" styleClass="ui-label"  rendered="#{!debitCreditMemoAddEditBean.isAddMode()}" />
+										</p:column>
+										<p:column>
+											<h:outputText  value = "#{debitCreditMemoAddEditBean.debitCreditMemo.debitCreditMemoTransaction.warningInd == 'Y' ? 'Yes' : 'No'}"   
+												rendered="#{!debitCreditMemoAddEditBean.isAddMode()}" />
+										</p:column>
+
+
+									</p:row>
+									<p:row>
+										<p:column>
+											<p:outputLabel  value = "Approved:" styleClass="ui-label"  rendered="#{!debitCreditMemoAddEditBean.isAddMode()}" />
+										</p:column>
+										<p:column>
+											<h:outputText  value = "#{debitCreditMemoAddEditBean.debitCreditMemo.debitCreditMemoTransaction.approver}"   
+												rendered="#{!debitCreditMemoAddEditBean.isAddMode()}" />
+										</p:column>
+										<p:column>
+											<h:outputText  value = "#{debitCreditMemoAddEditBean.debitCreditMemo.debitCreditMemoTransaction.approvedDate}"   
+												rendered="#{!debitCreditMemoAddEditBean.isAddMode()}">
+												<f:convertDateTime type="date" pattern="MM/dd/yy" /> 
+											</h:outputText>
+										</p:column>										
+									</p:row>
+									<p:row>
+										<p:column>
+											<p:outputLabel  value = "Processed:" styleClass="ui-label"  rendered="#{!debitCreditMemoAddEditBean.isAddMode()}" />
+										</p:column>
+										<p:column>
+											<h:outputText  value = "#{debitCreditMemoAddEditBean.debitCreditMemo.debitCreditMemoTransaction.processor}"   
+												rendered="#{!debitCreditMemoAddEditBean.isAddMode()}" />
+										</p:column>
+										<p:column>
+											<h:outputText  value = "#{debitCreditMemoAddEditBean.debitCreditMemo.debitCreditMemoTransaction.processedDate}"   
+												rendered="#{!debitCreditMemoAddEditBean.isAddMode()}">
+												<f:convertDateTime type="date" pattern="MM/dd/yy" /> 
+											</h:outputText>
+										</p:column>										
+									</p:row>
+									<p:row>
+										<p:column>
+											<p:outputLabel  value = "Allocated:" styleClass="ui-label"  rendered="#{!debitCreditMemoAddEditBean.isAddMode()}" />
+										</p:column>
+										<p:column>
+											<h:outputText  value = "#{debitCreditMemoAddEditBean.debitCreditMemo.debitCreditMemoTransaction.allocator}"   
+												rendered="#{!debitCreditMemoAddEditBean.isAddMode()}" />
+										</p:column>
+										<p:column>
+											<h:outputText  value = "#{debitCreditMemoAddEditBean.debitCreditMemo.debitCreditMemoTransaction.allocatedDate}"   
+												rendered="#{!debitCreditMemoAddEditBean.isAddMode()}">
+												<f:convertDateTime type="date" pattern="MM/dd/yy" /> 
+											</h:outputText>
+										</p:column>										
+									</p:row>
+								
+								</p:panelGrid>
+							</p:column>
+
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel for="ticket" value="Ticket No:" styleClass="ui-label" />	
+							</p:column>
+							<p:column>
+								<p:inputText id="ticket" title="Ticket No"  styleClass="trackDirtyValue"
+									value="#{debitCreditMemoAddEditBean.debitCreditMemo.debitCreditMemoTransaction.ticketNo}" size="25" maxlength="25"
+									disabled="#{!debitCreditMemoAddEditBean.hasGeneralEditPermission}" />
+							</p:column>	
+							<p:column>
+									<p:outputLabel  value = "DC No:" styleClass="ui-label"  rendered="#{!debitCreditMemoAddEditBean.isAddMode()}" />
+							</p:column>
+							<p:column>
+									<p:outputLabel  value = "#{debitCreditMemoAddEditBean.debitCreditMemo.debitCreditMemoTransaction.dcNo}"   rendered="#{!debitCreditMemoAddEditBean.isAddMode()}" />
+							</p:column>
+								
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel for="reason" value="Reason:*" styleClass="ui-label" />
+							</p:column>
+							<p:column>	
+                           		<p:inputTextarea id="reason" styleClass="trackDirtyValue"
+                                     escape="false" 
+                                     value="#{debitCreditMemoAddEditBean.debitCreditMemo.debitCreditMemoTransaction.reason}" 
+                                     rows="2" cols="45" maxlength="300"
+                                     autoResize="false"
+                                     onkeydown="preventNewLine(event);"
+                                     disabled="#{!debitCreditMemoAddEditBean.hasGeneralEditPermission}" />							
+							</p:column>	
+							<p:column>
+								<p:outputLabel for="lineDescription" value="Line Description :" styleClass="ui-label" />
+							</p:column>
+							<p:column>	
+                           		<p:inputTextarea id="lineDescription" styleClass="trackDirtyValue"
+                                     escape="false" 
+                                     value="#{debitCreditMemoAddEditBean.debitCreditMemo.debitCreditMemoTransaction.lineDescription}" 
+                                     rows="2" cols="45" maxlength="80"
+                                     autoResize="false"
+                                     onkeydown="preventNewLine(event);"
+                                     disabled="#{!debitCreditMemoAddEditBean.hasProcessorEditPermission || debitCreditMemoAddEditBean.isAddMode()}" />							
+							</p:column>								
+						</p:row>
+					</p:panelGrid>	
+					<p:panel id="clientDetailsSelectionPanel" header="Client Details" style ="min-width:1200px;max-width:100%;width:auto;white-space:nowrap;" >							
+						<p:panelGrid cellpadding="5">
+							<p:row>
+								<p:column>
+									<p:outputLabel id="clientIdLabel" for="clientId" value="Client:*" styleClass="ui-label"  />
+								</p:column>
+								<p:column>
+									<h:panelGroup style="white-space:nowrap;">		
+										<f:validateBean disabled="true">
+											<p:inputText id="clientId" title="Client" styleClass="trackDirtyValue" 
+															value="#{debitCreditMemoAddEditBean.customerLOVParam}" 
+															onkeydown="setTargetKeyCode(event);" 
+															onchange="clearLabels(['accountNameOut','accountCode','accountName']);"
+															disabled="#{!debitCreditMemoAddEditBean.hasGeneralEditPermission}" >
+												<p:ajax event="change" onstart="return proceedAjax();"
+																listener="#{debitCreditMemoAddEditBean.decodeAccountByNameOrCode}"
+																process="@this" 
+																oncomplete="setFocusOnLOV('clientId', 'clientLOVId')"
+																update="clientIdLabel accountName accountCode accountNameOut clientId">
+												</p:ajax>				
+											</p:inputText>
+										</f:validateBean>
+										<p:commandButton id='clientLOVId' icon="icon-lov" title="lov"
+											oncomplete="showCustomerLov();" immediate="true" 
+											actionListener="#{customerLovBean.fetchLOVDataByCustomerName}"
+											process="@this,clientId" dynamic="true" async="true"
+											onstart="return hasMinAlphaNumericCharacters($('#clientId'));"
+											update=":custLovForm:CUSTOMER_GRID">
+											<f:param name="CUSTOMER_LOV_INPUT" value="clientId" />
+										</p:commandButton>
+									</h:panelGroup>
+								</p:column>
+								<p:column>
+									<f:validateBean disabled="true">
+										<h:outputLabel id="accountNameOut"
+											value="#{debitCreditMemoAddEditBean.selectedExternalAccount.accountName}"
+											styleClass="ui-label" />	
+										<h:inputHidden id="accountCode"
+											value="#{debitCreditMemoAddEditBean.selectedExternalAccount.externalAccountPK.accountCode}" />
+										<h:inputHidden id="accountName"
+											value="#{debitCreditMemoAddEditBean.selectedExternalAccount.accountName}" />
+										<h:inputHidden id="accountType"
+												value="debitCreditMemoAddEditBean.customerAccountType" />
+										<h:inputHidden id="accountCid"
+												value="debitCreditMemoAddEditBean.customerAccountCid" />
+									</f:validateBean>
+								</p:column>									
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel for="unitNo" value="Unit No:*" styleClass="ui-label" />
+								</p:column>
+								<p:column>	
+									<p:inputText id="unitNo" title="Unit No" styleClass="trackDirtyValue"
+										onkeyup ="enableDisableControls();" onchange="enableDisableControls();"
+										value="#{debitCreditMemoAddEditBean.debitCreditMemo.debitCreditMemoTransaction.unitNo}" 
+										disabled="#{!debitCreditMemoAddEditBean.hasGeneralEditPermission}" />
+								</p:column>
+								<p:column>
+									<h:outputLabel for="clientUnit" value="Unit belongs to Client:" styleClass="ui-label" />
+									<p:spacer width="10" />
+									<h:selectBooleanCheckbox id="clientUnit"  styleClass = "trackDirtyCheckbox"
+										value="#{debitCreditMemoAddEditBean.clientUnit}"
+										disabled="#{!debitCreditMemoAddEditBean.hasGeneralEditPermission}"/>
+								</p:column>										
+							</p:row>
+						</p:panelGrid>
+					</p:panel>
+					<p:panel id="billingInformationSectionPanel" style ="min-width:1200px;max-width:100%;width:auto">							
+						<p:panelGrid columns="2" cellpadding="5">
+							<p:panel id="billingInformationPanel" header="Billing Information" style ="min-width:825px;max-width:100%;width:auto;height:295px;">	
+								<p:panelGrid>
+									<p:row>
+										<p:column>
+											<p:outputLabel for="analysisCategory" value = "Analysis Category:*" styleClass="ui-label"/>
+										</p:column>
+										<p:column  colspan="2">
+											<p:selectOneMenu id="analysisCategory" styleClass="ui-select-dropdown trackDirtySelect" style="width: 325px;" 
+													value="#{debitCreditMemoAddEditBean.selectedAnalysisCategory}"
+													converter="AnalysisCategoryConverter"
+													onchange="enableDisableControls();" 
+													disabled="#{!debitCreditMemoAddEditBean.hasGeneralEditPermission}" >
+												<f:selectItem itemLabel="--Select One--" itemValue=""/>
+												<f:selectItems value="#{debitCreditMemoAddEditBean.debitCreditMemo.analysisCategories}" 
+													var="category"
+													itemLabel="#{category.analysisCategory}"
+													itemValue="#{category}" />
+												<p:ajax listener="#{debitCreditMemoAddEditBean.handleAnalysisCategorySelect}"
+													process="@this"  oncomplete="enableDisableControls();"
+													update="analysisCategory,analysisCode,analysisCategoryOut,analysisCodeOut,analysisCategoryHidden" >
+												</p:ajax>
+											</p:selectOneMenu>
+										</p:column>	
+										<p:column>
+											<h:outputLabel id="analysisCategoryOut" styleClass="ui-label"  value="#{debitCreditMemoAddEditBean.selectedAnalysisCategory.description}" />
+											<h:inputHidden id="analysisCategoryHidden" value="#{debitCreditMemoAddEditBean.selectedAnalysisCategory != null ? debitCreditMemoAddEditBean.selectedAnalysisCategory.analysisCategory : debitCreditMemoAddEditBean.selectedAnalysisCategory}" />
+										</p:column>									
+									</p:row>	
+									<p:row>	
+										<p:column>
+											<p:outputLabel for="analysisCode" value = "Analysis Code:*" styleClass="ui-label" />
+										</p:column>
+										<p:column colspan="2">
+											<p:selectOneMenu id="analysisCode"  widgetVar="analysisCodeVar" styleClass="ui-select-dropdown trackDirtySelect" style="width: 325px;"
+													value="#{debitCreditMemoAddEditBean.selectedAnalysisCode}"
+													converter="AnalysisCodeConverter"
+													effect="fade"  
+													filter="true"
+													filterMatchMode="startsWith"
+													onchange="enableDisableControls();"
+													disabled="#{!debitCreditMemoAddEditBean.hasGeneralEditPermission}" >
+                                                <f:selectItem itemLabel="--Select One--" itemValue=""/>
+                                                <f:selectItems value="#{debitCreditMemoAddEditBean.debitCreditMemo.analysisCodes}" 
+													var="code"
+													itemLabel="#{code.description}"
+													itemValue="#{code}" />
+												<p:ajax process="@this" 
+													update="analysisCode,analysisCodeOut" >
+												</p:ajax>
+											</p:selectOneMenu>
+										</p:column>
+										<p:column>
+											<h:outputLabel id="analysisCodeOut" styleClass="ui-label" value="#{debitCreditMemoAddEditBean.selectedAnalysisCode.id.analysisCode}" />
+										</p:column>
+										<p:column></p:column>
+									</p:row>	
+									<p:row>
+									<p:column></p:column>
+									<p:column>
+										    <p:commandButton id="findInvoiceBtn" value="Find Invoice"
+										        widgetVar="findInvoiceWidgetVar" 
+										        process="@this,unitNo,analysisCategoryOut,analysisCodeOut,clientId ,clientUnit, analysisCategoryHidden"
+										        oncomplete="showDCMemoInvoiceLov();" 
+												actionListener="#{debitCreditMemoInvoiceLovBean.fetchLOVData}"
+												dynamic="true" async="true"
+												disabled="#{!debitCreditMemoAddEditBean.hasGeneralEditPermission}" 
+												update=":DC_MEMO_INVOICE_GRID">
+												<f:param name="UNIT_NO_INPUT_PARAM" value="unitNo" />
+												<f:param name="ANALYSIS_CATEGORY_ID_INPUT_PARAM" value="analysisCategory_input" />
+												<f:param name="ANALYSIS_CATEGORY_CODE_INPUT_PARAM" value="analysisCategoryHidden" />
+												<f:param name="ANALYSIS_CODE_INPUT_PARAM" value="analysisCode_input" />
+												<f:param name="ACCOUNT_CODE_INPUT_PARAM" value="clientId" />
+												<f:param name="IS_UNIT_BELONG_TO_ACCOUNT_INPUT_PARAM" value="clientUnit" />
+											</p:commandButton>
+											</p:column>
+								    </p:row>										
+									<p:row>											
+										<p:column>
+											<p:outputLabel for="netAmount" styleClass="ui-label"
+												value="Net Amount:*" />
+										</p:column>
+										<p:column>
+											<p:inputNumber id="netAmount" 
+												widgetVar="netAmountWidget"
+												value="#{debitCreditMemoAddEditBean.debitCreditMemo.debitCreditMemoTransaction.netAmount}" 
+												styleClass=" ui-text-align-right-dev trackDirtyChildValues"
+												symbol="$ "
+												decimalSeparator="." thousandSeparator="," maxValue="100000" minValue="0.00"
+												disabled="#{!(debitCreditMemoAddEditBean.hasGeneralEditPermission)}" 
+												onkeyup="calculateTotalAmount();" > 
+								            </p:inputNumber>
+										</p:column>	
+										<p:column colspan="3"></p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<p:outputLabel for="taxAmount" value="Tax Amount:" styleClass="ui-label" />
+										</p:column>
+										<p:column>
+											<p:inputNumber id="taxAmount" 
+												widgetVar="taxAmountWidget"
+												value="#{debitCreditMemoAddEditBean.debitCreditMemo.debitCreditMemoTransaction.taxAmount}" 
+												styleClass=" ui-text-align-right-dev trackDirtyChildValues"
+												symbol="$ "
+												decimalSeparator="." thousandSeparator="," maxValue="100000" minValue="0.00"
+												disabled="true" 
+												onkeyup="calculateTotalAmount();"> 
+								            </p:inputNumber>
+								            <h:inputHidden id="taxAmountHidden" value="#{debitCreditMemoAddEditBean.debitCreditMemo.debitCreditMemoTransaction.taxAmount}" />
+										</p:column>	
+										<p:column colspan="3"></p:column>								
+									</p:row>
+									<p:row>
+										<p:column>
+											<p:outputLabel for="totalAmountOutput" value="Total Amount:" styleClass="ui-label" />
+										</p:column>
+										<p:column >
+											<p:outputLabel  id="totalAmountOutput" value="#{debitCreditMemoAddEditBean.debitCreditMemo.debitCreditMemoTransaction.totalAmount}" 
+																	style="float:right; #{debitCreditMemoAddEditBean.creditDisplay ? 'color:red' : 'color:black'}">
+												<f:convertNumber type="currency" currencySymbol="$" />
+											</p:outputLabel>
+											<h:inputHidden id="totalAmountHidden" value="#{debitCreditMemoAddEditBean.debitCreditMemo.debitCreditMemoTransaction.totalAmount}" />										
+										</p:column>
+										<p:column> <p:spacer width="200" height="1"></p:spacer>  </p:column>	
+										<p:column colspan="2" ></p:column>							
+									</p:row>
+									<p:row>											
+										<p:column>
+											<p:outputLabel for="invoiceNote" value="Invoice Note:" styleClass="ui-label" />	
+										</p:column>
+										<p:column  colspan="4">
+			                           		<p:inputTextarea id="invoiceNote" styleClass="trackDirtyValue"
+			                                     escape="false" 
+			                                     value="#{debitCreditMemoAddEditBean.debitCreditMemo.debitCreditMemoTransaction.invoiceNote}" 
+			                                     rows="3" cols="55" maxlength="255" 
+			                                     autoResize="false"
+			                                     onkeydown="preventNewLine(event);"
+			                                     disabled="#{!debitCreditMemoAddEditBean.hasGeneralEditPermission}" />	
+                            			</p:column>                            			
+									</p:row>
+								</p:panelGrid>
+							</p:panel>
+							<p:panel id="additionalInformationPanel" header="Additional Information" style ="max-width:100%;width:auto;height:295px;">
+								<p:panelGrid>
+									<p:row>
+										<p:column>
+											<p:outputLabel for="transactionDate" value="Transaction Date:*" styleClass="ui-label" />
+										</p:column>
+										<p:column>		                  	
+											<p:calendar title="Transaction Date" id="transactionDate"
+													size="11" 
+													pattern="MM/dd/yyyy" 
+													value="#{debitCreditMemoAddEditBean.debitCreditMemo.debitCreditMemoTransaction.transactionDate}" 
+													showOn="button" 
+													readonly="false"
+													styleClass="ui-input-number-size-dev trackDirtyChildValues"
+													onchange="formatDate(this);"
+													disabled="#{!debitCreditMemoAddEditBean.hasGeneralEditPermission}" > 
+												<f:convertDateTime pattern="MM/dd/yyyy" />
+											</p:calendar>
+										</p:column>	
+									</p:row>
+									<p:row>
+										<p:column>
+											<p:outputLabel for="invoiceNo" value="Invoice No:" styleClass="ui-label" />
+										</p:column>
+										<p:column>	
+											<p:inputText id="invoiceNo" title="Invoice No"  styleClass="trackDirtyValue"
+												value="#{debitCreditMemoAddEditBean.debitCreditMemo.debitCreditMemoTransaction.invoiceNo}" size="20" maxlength="25"
+												disabled="#{!debitCreditMemoAddEditBean.hasGeneralEditPermission}" />
+										</p:column>	
+									</p:row>
+									<p:row>
+										<p:column>
+											<p:outputLabel for="rentApplicableDate" value="Rent Applicable Date:" styleClass="ui-label" />
+										</p:column>
+										<p:column>		                  	
+											<p:calendar title="Rent Applicable Date" id="rentApplicableDate"  widgetVar="rentApplicableDateVar"
+													size="11" 
+													pattern="MM/dd/yyyy" 
+													value="#{debitCreditMemoAddEditBean.debitCreditMemo.debitCreditMemoTransaction.rentApplicableDate}"    
+													showOn="button" 
+													readonly="false"
+													beforeShowDay="beforeShowDayCallback"
+													styleClass="ui-input-number-size-dev trackDirtyChildValues"
+													onchange="formatDate(this);"
+													disabled="#{!debitCreditMemoAddEditBean.hasGeneralEditPermission}" >  
+												<f:convertDateTime pattern="MM/dd/yyyy" />		    									
+											</p:calendar>
+										</p:column>										
+									</p:row>
+									<p:row>
+                            			<p:column>
+                            				<p:outputLabel for="approver" value="Requested Approver:" styleClass="ui-label" />
+                            			</p:column>
+										<p:column>
+											<p:selectOneMenu id="approver" styleClass="ui-select-dropdown trackDirtySelect" style="width: 185px;"
+													value="#{debitCreditMemoAddEditBean.selectedApproverName}"
+													disabled="#{!debitCreditMemoAddEditBean.hasGeneralEditPermission}" >
+												<f:selectItem itemLabel="--Select One--" itemValue=""/>
+								                <f:selectItems value="#{debitCreditMemoAddEditBean.debitCreditMemo.approverNamesList}" var="user"  itemLabel="#{user.firstName.concat(' '.concat(user.lastName))}" itemValue="#{user.employeeNo}" />																								
+											</p:selectOneMenu>
+										</p:column> 									
+									</p:row>									
+                                    <p:row>
+										<p:column>
+											<p:outputLabel for="glCode" value="GL Code:" styleClass="ui-label" />
+										</p:column>
+										<p:column>	
+											<p:inputText id="glCode" title="GL Code"  styleClass="trackDirtyValue"
+                                                disabled="#{!debitCreditMemoAddEditBean.hasProcessorEditPermission}" 										
+												value="#{debitCreditMemoAddEditBean.debitCreditMemo.debitCreditMemoTransaction.glCode}" size="20" maxlength="25"/>
+										</p:column>	
+									</p:row>									
+								</p:panelGrid>
+							</p:panel>
+						</p:panelGrid>
+					</p:panel>									
+				</p:panel>
+
+				<p:panel id="btnPanel">
+				 	<p:commandButton id="saveBtn" value="Save"
+				        widgetVar="saveWidgetVar" 
+				        action="#{debitCreditMemoAddEditBean.save}" 
+				        onstart="PF('saveWidgetVar').disable()"				        
+					    oncomplete="PF('saveWidgetVar').enable()"
+					    disabled="#{!debitCreditMemoAddEditBean.showSaveButton}"
+					    rendered="#{! debitCreditMemoAddEditBean.isAddMode() }"
+				        onclick="lockScreen();"
+				        ajax="false"/>	
+       				<p:spacer width="5" />	
+				    <p:commandButton id="saveStayBtn" value="Save and Stay"
+				        widgetVar="saveStayBtnWidgetVar" 
+				        action="#{debitCreditMemoAddEditBean.saveAndStay}" 
+				        onstart="PF('saveStayBtnWidgetVar').disable()"
+					    oncomplete="PF('saveStayBtnWidgetVar').enable()"
+					    rendered="#{debitCreditMemoAddEditBean.isAddMode()}"
+				        onclick="lockScreen();"
+				        ajax="false"/>	
+       				<p:spacer width="5" />			
+				    <p:commandButton id="saveRetainBtn" value="Save and Retain"
+				        widgetVar="saveRetainBtnWidgetVar" 	
+				        action="#{debitCreditMemoAddEditBean.saveAndRetain}" 
+				        onstart="PF('saveRetainBtnWidgetVar').disable()"
+					    oncomplete="PF('saveRetainBtnWidgetVar').enable()"
+					    rendered="#{debitCreditMemoAddEditBean.isAddMode()}"
+				        onclick="lockScreen();"
+				        ajax="false"/>
+					<p:spacer width="5" />				        	
+					<p:commandButton id="deleteButton" value="Delete" 
+					    disabled="#{!debitCreditMemoAddEditBean.showDeleteButton}"
+						rendered="#{!debitCreditMemoAddEditBean.isAddMode()}"
+						onclick="showDialog('deleteConfirmVar');"
+						ignoreAutoUpdate="true"/>		
+					<p:spacer width="5" />	
+					<p:commandButton id="processBtn" value="Process"  update="messages"
+				        widgetVar="processBtnWidgetVar" 
+				        action="#{debitCreditMemoAddEditBean.processDebitCreditMemos}"
+				        disabled="#{! debitCreditMemoAddEditBean.isEnableProcessBtn()}"
+				        rendered="#{! debitCreditMemoAddEditBean.isAddMode() and debitCreditMemoAddEditBean.jmsMessageId == null}"
+				        onclick="lockScreen();"
+				        ajax="false"/>	
+				    <p:spacer width="5" />	
+					<p:commandButton id="cancelBtn" value="Cancel" 
+					    widgetVar="cancelBtnWidgetVar" 
+					    action="#{debitCreditMemoAddEditBean.cancel}" ajax="false"
+					    onclick="lockScreen();" immediate="true"/>
+				</p:panel>				
+			</h:form>
+			
+		  	<p:confirmDialog id="deleteConfirmDialogId" message="Are you sure?" header="Confirm Delete" appendTo="@(body)"
+					widgetVar="deleteConfirmVar" resizable="false" width="200" height="50" update=":debitCreditForm:btnPanel">    
+	           <h:form prependId="false">
+        			<p:commandButton  value="No"  onclick="PF('deleteConfirmVar').hide();" ignoreAutoUpdate="true"/>	
+        			<p:spacer width="10" />        			           
+       				<p:commandButton id="confirmDeleteBtnId" value="Yes" ajax="false" process="@this"	
+       					onclick="hideDialog('deleteConfirmVar');lockScreen();saveDataForDirtyDetection()" onmousedown="setDirtyData(false);"
+       					action="#{debitCreditMemoAddEditBean.delete}" style="float:left;"/>				  
+         		</h:form>
+        	</p:confirmDialog>				
+			
+	  		<div id="CUSTOMER_LOV_DIV">
+				<ui:include src="../lov/customers.xhtml" />
+			</div>	
+			<div id="inputFieldChecks">
+				<ui:include src="../alert/inputFieldChecks.xhtml" />
+			</div>
+			<div id="DC_MEMO_INVOICES_LOV_DIV">
+				<ui:include src="../lov/debitCreditMemoInvoices.xhtml" />
+			</div>				
+	
+		<SCRIPT type="text/javascript">
+		var hasGeneralEditPermission;
+		$(window).load(function(){
+			initializeDirtyDetection();
+			if($('#findInvoiceBtn').is(':disabled')) {
+				hasGeneralEditPermission = false;				
+			} else {
+				hasGeneralEditPermission = true;
+			}
+			enableDisableControls();	
+		});		
+		
+		/**
+		* Detects the Enter key and programatically clicks
+		* the search button. The search button event handler
+		* will perform the min. alphanumeric check.
+		*/
+		function doKeypressSearch(event){
+			if (event.keyCode == 13) {
+				source = event.srcElement.id;
+			   $('#search').click();
+			   focus();
+			   return false;
+			}
+			return true;	
+		}	
+		
+	    /**
+	    * The LOV calls this function to pass back the selected
+	    * values to the view's controls.
+	    */
+ 		function setSelection( lovName, nameArray, valueArray){	
+ 			
+			if(lovName == 'customerLOV'){
+				for(var i=0; i  &lt; nameArray.length ; i++){
+					if(nameArray[i] == 'CUSTOMER_NAME'){
+						document.getElementById('accountName').value = valueArray[i];
+						$('[id$=accountNameOut]').text(valueArray[i]);
+					  	$("#accountNameOut").html(valueArray[i]);
+					}
+					if(nameArray[i] == "CUSTOMER_CODE") {
+						document.getElementById('accountCode').value = valueArray[i];
+ 					    document.getElementById('clientId').value = valueArray[i];
+					}
+					if(nameArray[i] == "CUSTOMER_TYPE") {
+ 					    document.getElementById('accountType').value = valueArray[i];	
+					}
+					if(nameArray[i] == "CUSTOMER_CID") {
+ 					    document.getElementById('accountCid').value = valueArray[i];	
+					}
+				}
+				setFocusPF('clientId');
+			}
+			
+			if(lovName == 'debitCreditMemoInvLOV'){
+				
+				var isTaxAmountDisabled = $('#taxAmount_input').prop('disabled');
+				var isRentApplicableDateDisabled = $('#rentApplicableDate_input').prop('disabled');
+				
+				for(var i=0; i  &lt; nameArray.length ; i++){
+					
+					if(nameArray[i] == 'ANAYSIS_CODE'){
+						$("#analysisCodeOut").html(valueArray[i]);
+					 	PF('analysisCodeVar').selectValue(valueArray[i]); 		
+					}
+					if( PF('memoType').getSelectedLabel()=='Full Credit'){
+						if(nameArray[i] == 'LINE_AMOUNT') {
+							 document.getElementById('netAmount_hinput').value = makePositive(valueArray[i].replace(/\,/g, ''));	
+	 					     document.getElementById('netAmount_input').value = '$' + makePositive(valueArray[i]);
+						}	
+						if(nameArray[i] == 'TAX_AMOUNT') {
+							document.getElementById('taxAmountHidden').value =  makePositive(valueArray[i].replace(/\,/g, ''));
+						    document.getElementById('taxAmount_input').value =  '$' + makePositive(valueArray[i]);
+						}
+						
+						if(nameArray[i] == 'TOTAL_AMOUNT') {
+							$("#totalAmountOutput").html('$' + makePositive(valueArray[i]));
+							$("#totalAmountHidden").val(makePositive(valueArray[i].replace(/\,/g, '')));
+							
+						}
+					}else{
+						if(nameArray[i] == 'LINE_AMOUNT') {
+							document.getElementById('netAmount_hinput').value =  makePositive(valueArray[i].replace(/\,/g, ''));
+	 					    document.getElementById('netAmount_input').value = '$' + makePositive(valueArray[i]);
+	 					    $("#totalAmountOutput").html('$' + makePositive(valueArray[i]));
+							$("#totalAmountHidden").val(makePositive(valueArray[i].replace(/\,/g, '')));
+						}	
+					}
+					
+					if(nameArray[i] == 'INVOICE_NO') {
+ 					    document.getElementById('invoiceNo').value = valueArray[i];	
+					}
+					if(nameArray[i] == 'TRANSACTION_DATE') {
+ 					    document.getElementById('transactionDate_input').value = valueArray[i];	
+					}
+					
+					if(nameArray[i] == 'BILLING_PERIOD_DATE') {
+						if( isRentApplicableDateDisabled == false){
+							var date = new Date(valueArray[i]);
+							if(!isNaN(date.getMonth())){
+								var finalDate = (date.getMonth() + 1) + '/01/' +  date.getFullYear();						
+ 					    		document.getElementById('rentApplicableDate_input').value = finalDate;	
+							}
+						}
+					}
+				}
+
+				setFocusPF('invoiceNo');
+			}
+	    }
+	    
+ 		function beforeShowDayCallback(date){
+		  if (date.getDate() == 1) {
+		    return [true, ''];
+		  }
+		  return [false, ''];
+		}
+ 		
+	    function calculateTotalAmount(){
+	    	
+	    	var preTax = PF('netAmountWidget').getValue();
+	   		var taxAmount = PF('taxAmountWidget').getValue();
+	
+	    	var preTaxVal = Number(preTax.replace(/\,/g, ''));
+	   	
+	    	var taxAmountVal = Number(taxAmount.replace(/\,/g, ''));
+	    	
+	    	var totalAmount = toFixed(preTaxVal + taxAmountVal, 2).toFixed(2);
+	    	
+	    	$('[id$=totalAmountOutput]').html('$' + totalAmount);
+	    	$('[id$=totalAmountHidden]').val(totalAmount);
+			
+	    }
+	   		
+		function setFirstPageInvoiceDataTableWidget(){
+			setDataTableToFirstPage('invoiceDataTableWidget');
+			// also select the first row, but only if we have data
+			setDataTableToFirstRow('invoiceDataTableWidget');
+		}
+		
+		function enableDisableControls(){
+			
+			var selectedAnalysisCategory = ($("#analysisCategory_input").find("option[value='" + $("#analysisCategory_input").val() + "']").text());
+			var selectedAnalysisCategoryId = $("#analysisCategory_input").val();
+			var selectedAnalysisCode = $("#analysisCode_input").val();
+			//enable-disable FindInvoiceBtn
+			if($('#unitNo').val().length == 0 || !hasGeneralEditPermission
+					|| ( 'FLBILLING' == selectedAnalysisCategory ?  selectedAnalysisCode.length == 0 : selectedAnalysisCategoryId.length == 0 ) 
+					|| ( 'FLINFORMAL' == selectedAnalysisCategory ?  selectedAnalysisCode.length == 0 : selectedAnalysisCategoryId.length == 0 ) ){        	
+        		PF('findInvoiceWidgetVar').disable();
+			}else{
+				PF('findInvoiceWidgetVar').enable();
+			}
+			
+			//enable-disable rent Applicable Date rentApplicableDateVar
+			
+			if('FLBILLING' == selectedAnalysisCategory 	||  'FLINFORMAL' == selectedAnalysisCategory){
+        		PF('rentApplicableDateVar').enable();
+			}else{
+				PF('rentApplicableDateVar').setDate(null);
+				PF('rentApplicableDateVar').disable();
+			}
+		}
+		
+		function makePositive(inputNum){
+			var outp = inputNum;
+			if(inputNum &lt; 0){				
+				outp = outp.substring(1,outp.length);
+			}			
+			return outp;
+		}
+		
+		function preventNewLine(event){
+		    if ((event.keyCode == 13)) {
+		    	event.preventDefault();
+		    }
+		}		
+		
+		function initializeDirtyDetection() {
+			registerIgnoreButton("saveBtn");
+			registerIgnoreButton("saveStayBtn");
+			registerIgnoreButton("saveRetainBtn");
+			registerIgnoreButton("deleteButton");
+			registerIgnoreButton("processBtn");
+			registerIgnoreButton("confirmDeleteBtnId");
+			saveDataForDirtyDetection();
+		}
+
+	
+ 		</SCRIPT>
+	</ui:define>
+</ui:composition>

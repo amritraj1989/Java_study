@@ -1,0 +1,970 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"   
+	xmlns:pe="http://primefaces.org/ui/extensions"	  
+    template="../../templates/ui.xhtml" >
+	
+    <ui:define name="content">
+    	    <h:form id="upfitterInServiceQueueBreadCrumbForm" prependId="false">
+   			    <p:breadCrumb model="#{upfitterInServiceQueueBean.breadCrumbTrail}" ajax="false" immediate="true" style="min-width:980px;max-width:100%;width:auto;"/>
+   		    </h:form>
+   		        
+    	    <!-- Message display -->
+		    <p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:980px;max-width:100%;width:auto;">
+			    <p:messages id="messages" showSummary="false" showDetail="true" autoUpdate="true" />
+		    </p:scrollPanel>   
+
+		    <h:form id="mainForm" prependId="false" rendered="#{!upfitterInServiceQueueBean.enquiryMode}">
+					
+	    		<p:panel id="inputPanel">
+	    			<h:panelGrid columns="10">
+	    			
+	    				<h:panelGrid columns="3" styleClass="panelGrid-top">
+		    				<p:outputLabel value="Looking For - " styleClass="ui-label"/>
+							<p:spacer width="50" height="1"/>
+							
+						</h:panelGrid>
+ 						<p:commandLink title="Purchase Order Release" action="#{upfitterInServiceQueueBean.navigateToPOReleaseQueue}" immediate="true" ajax="false" onclick="lockScreen()">	
+							 <h:outputText value="Purchase Order Release" rendered="true" />
+						</p:commandLink>
+						<p:spacer width="20" height="1"/>
+ 						<p:commandLink title="Third Party Progress" action="#{upfitterInServiceQueueBean.navigateToThirdPartyQueue}" immediate="true" ajax="false" onclick="lockScreen()">							
+							 <h:outputText value="Third Party Progress"  rendered="true" />
+						</p:commandLink>
+						<p:spacer width="20" height="1"/>
+ 						<p:commandLink title="Manufacturer Progress" action="#{upfitterInServiceQueueBean.navigateToManufacturerQueue}" immediate="true" ajax="false" onclick="lockScreen()">							
+							 <h:outputText value="Manufacturer Progress"  rendered="true" />
+						</p:commandLink>
+						<p:spacer width="20" height="1"/>
+	 					<p:commandLink title="Upfit Progress" action="#{upfitterInServiceQueueBean.loadTableWithoutData('1')}" immediate="true" ajax="false" onclick="lockScreen()">							
+							 <h:outputText value="Upfit Progress" styleClass="ui-label" rendered="#{upfitterInServiceQueueBean.searchType == 1 ? 'true' : 'false'}" />
+							 <h:outputText value="Upfit Progress"  rendered="#{upfitterInServiceQueueBean.searchType != 1 ? 'true' : 'false'}" />
+						</p:commandLink>
+						<p:spacer width="20" height="1"/>
+						<p:commandLink title="In Service Date Progress" action="#{upfitterInServiceQueueBean.loadTableWithoutData('2')}" immediate="true" ajax="false" onclick="lockScreen()">	
+							 <h:outputText value="In Service Date Progress" styleClass="ui-label" rendered="#{upfitterInServiceQueueBean.searchType == 2 ? 'true' : 'false'}" />
+							 <h:outputText value="In Service Date Progress" rendered="#{upfitterInServiceQueueBean.searchType != 2 ? 'true' : 'false'}" />
+						</p:commandLink>
+						
+						<p:spacer width="100" height="1"/>
+
+				
+					</h:panelGrid>
+						
+              	</p:panel>
+			</h:form>	
+			
+		   <comp:upfitProgress id="ccUpfitProgress"
+		            quotationModel="#{upfitterInServiceQueueBean.selectedQuotationModel}"
+		            mainPODocId = "#{upfitterInServiceQueueBean.selectedUnitProgress.docId}" 
+		            upfitPOStatuses="${upfitterInServiceQueueBean.upfitPOStatuses}" 
+		            enableStartEndDates="${upfitterInServiceQueueBean.hasPermission('maintainUpfit') or upfitterInServiceQueueBean.searchType == 2}"
+		            readOnly="${not upfitterInServiceQueueBean.hasPermission('maintainUpfit') or upfitterInServiceQueueBean.searchType == 2}"
+		            windowTitle="Vendor Sequence - " 
+		            onClose="upfitProgressOnClose(xhr, status, args)"/>		      
+		            				    
+		   <comp:logBook id="logBook" 
+		    		entities="#{upfitterInServiceQueueBean.getSelectedFleetMasterList()}" 
+		            logBookTypes="#{upfitterInServiceQueueBean.logBookType}" 
+		            combineLogBooks="true" 
+		            enableFollowUpDate="true" 
+		            enableAddAndClose="false" 
+		            onClose="callRefreshFollowUpDate()" />
+		            
+		   <comp:requestClientContact id="ccRequestClientContact" 
+		            processStageObjects="#{upfitterInServiceQueueBean.selectedProcessStageObjects}"   
+		            windowTitle="#{upfitterInServiceQueueBean.requestClientContactWindowTitle}"
+		            onClose="callRefreshRequestClientContact()" />	
+		            
+      		            
+		     
+		      <h:form id="RCForm" prependId="false">
+           	  	 <p:remoteCommand name="setSelectedVORC"  actionListener="#{upfitterInServiceQueueBean.setSelectedVORC()}" />
+           	  	 <p:remoteCommand name="setSelectedProcessStageObjectVORC"  actionListener="#{upfitterInServiceQueueBean.setSelectedProcessStageObjectVORC()}" />           	  	 
+           	  	 <p:remoteCommand name="setSelectedFleetMastersRC"  actionListener="#{upfitterInServiceQueueBean.setSelectedFleetMastersRC()}" />
+           	  	 <p:remoteCommand name="setSelectedQuotationModelRC"  actionListener="#{upfitterInServiceQueueBean.setSelectedQuotationModelRC()}" />           	  	 
+           	  	 <p:remoteCommand name="refreshFollowUpDate" actionListener="#{upfitterInServiceQueueBean.populateFollowUpDate()}" />
+           	     <p:remoteCommand name="refreshData" actionListener="#{upfitterInServiceQueueBean.refreshUpfitProgressRecord()}" />
+           	     <p:remoteCommand name="upfitProgressOnCloseRC" actionListener="#{upfitterInServiceQueueBean.upfitProgressOnCloseListener}" 
+           	      				   update=":maintainUpfitProgressForm:unitProgress" oncomplete="setScrollPosition(); adjustBtnState();" />
+           	      <p:remoteCommand name="refreshRequestClientContact" actionListener="#{upfitterInServiceQueueBean.refreshRequestClientContactListener()}" />       	
+           	      			   
+		     </h:form>                               
+           	 
+           	 <h:form id="maintainUpfitProgressForm" prependId="false">
+				<h:inputHidden id="hiddenScrollPosition"/>
+           	 	<p:panel id="unitUpfitsDataTablePanel" header="#{upfitterInServiceQueueBean.searchType == 1 ? 'Unit Upfits' : upfitterInServiceQueueBean.searchType == 2 ? 'Pending In Service Date' : ''}"> 
+            	<p:toolbar id="searchToolbar" rendered="#{!upfitterInServiceQueueBean.enquiryMode}">  
+				    <p:toolbarGroup align="left">  
+				    	 <p:focus context="searchToolbar"/>	
+				    		<p:separator></p:separator>	
+				    		
+				    		<p:outputLabel for="clientNameTxt" value="Client : " />								
+							<p:inputText id="clientNameTxt" style="#{upfitterInServiceQueueBean.searchType == 2 ? 'width:110px' : 'width:200px'}" title="Client" value="#{upfitterInServiceQueueBean.clientNameFilter}" onkeypress="return doKeypressFilter(event)" />
+							<p:separator></p:separator>
+							
+							<p:outputLabel for="manufacturerNameTxt" value="Manufacturer : " rendered="#{upfitterInServiceQueueBean.searchType == 2 ? 'true' : 'false'}" />								
+							<p:inputText id="manufacturerNameTxt" style="width:100px" title="Client" value="#{upfitterInServiceQueueBean.manufacturerNameFilter}"
+										rendered="#{upfitterInServiceQueueBean.searchType == 2 ? 'true' : 'false'}" onkeypress="return doKeypressFilter(event)" />
+							<p:separator rendered="#{upfitterInServiceQueueBean.searchType == 2 ? 'true' : 'false'}" ></p:separator>
+							
+							<p:outputLabel for="deliveringDealerNameTxt" value="Delivering Dlr : " />								
+							<p:inputText id="deliveringDealerNameTxt" style="#{upfitterInServiceQueueBean.searchType == 2 ? 'width:100px' : 'width:200px'}" value="#{upfitterInServiceQueueBean.delDealerNameFilter}" title="Delivering Dealer"  onkeypress="return doKeypressFilter(event)" />
+							<p:separator></p:separator>
+												
+							<p:outputLabel for="vendorNameTxt" value="Vendor : " rendered="#{upfitterInServiceQueueBean.searchType == 1 ? 'true' : 'false'}" />								
+							<p:inputText id="vendorNameTxt" style="width:200px" value="#{upfitterInServiceQueueBean.vendorNameFilter}" title="Vendor"   onkeypress="return doKeypressFilter(event)" rendered="#{upfitterInServiceQueueBean.searchType == 1 ? 'true' : 'false'}"/>
+							<p:separator rendered="#{upfitterInServiceQueueBean.searchType == 1 ? 'true' : 'false'}"></p:separator>	
+							
+							<p:outputLabel for="unitNoTxt" value="Unit No : " />								
+							<p:inputText id="unitNoTxt" style="#{upfitterInServiceQueueBean.searchType == 2 ? 'width:80px' : 'width:100px'}" title="Unit No" value="#{upfitterInServiceQueueBean.unitNoFilter}" onkeypress="return doKeypressFilter(event)"/>
+							<p:separator ></p:separator>
+							<p:outputLabel for="delayReasonList" value="Reason for Delay : " rendered="#{upfitterInServiceQueueBean.searchType == 2 ? 'true' : 'false'}"/>								
+							<p:selectOneMenu id="delayReasonList" rendered="#{upfitterInServiceQueueBean.searchType == 2 ? 'true' : 'false'}" style= "width:110px; vertical-align:-7px"
+									value="#{upfitterInServiceQueueBean.delayReasonFilter}" onkeypress="return doKeypressFilter(event)">
+		                       <f:selectItem itemLabel="" itemValue=""></f:selectItem>
+		                       <f:selectItems value="#{upfitterInServiceQueueBean.delayReasonList}" var="searchDelayReasons"
+		                       			itemLabel="#{searchDelayReasons.delayReasonDescription}" itemValue="#{searchDelayReasons.delayReasonDescription}"/>
+				            </p:selectOneMenu>
+				            
+				            <p:separator rendered="#{upfitterInServiceQueueBean.searchType == 2 ? 'true' : 'false'}"></p:separator>
+							<p:outputLabel for="orderTypeList" value="Order Type : " rendered="#{upfitterInServiceQueueBean.searchType == 2 ? 'true' : 'false'}"/>								
+							<p:selectOneMenu id="orderTypeList" rendered="#{upfitterInServiceQueueBean.searchType == 2 ? 'true' : 'false'}" style= "width:55px; vertical-align:-7px"
+									value="#{upfitterInServiceQueueBean.orderTypeFilter}" onkeypress="return doKeypressFilter(event)">
+		                       <f:selectItem itemLabel="" itemValue=""></f:selectItem>
+		                       <f:selectItem itemLabel="Factory" itemValue="F"></f:selectItem>
+		                       <f:selectItem itemLabel="Locate" itemValue="L"></f:selectItem>
+				            </p:selectOneMenu>
+				            
+							<p:separator rendered="#{upfitterInServiceQueueBean.searchType == 2 ? 'true' : 'false'}"></p:separator>
+							<p:commandButton  value="Search" id="filter" title="Filter" update="unitUpfitsDataTablePanel" process="maintainUpfitProgressForm" 
+									actionListener="#{upfitterInServiceQueueBean.performSearch()}" oncomplete="resetUIState();" /> 
+				    </p:toolbarGroup>  
+				</p:toolbar> 
+			   	<p:dataTable id="unitProgress" var="element" widgetVar="unitUpfitsTable"	editable="true"            	  
+				        value="#{upfitterInServiceQueueBean.filteredList}" 
+						scrollable="true" rowIndexVar="elementRowIndex" 
+						scrollHeight="#{upfitterInServiceQueueBean.dataTable.height}"
+						resizableColumns="true" 
+						rowKey="#{element.unitNo}"
+						rows="25"	
+						paginator="true" paginatorPosition="bottom" 
+						emptyMessage="#{upfitterInServiceQueueBean.emptyDataTableMessage}"
+						sortMode="multiple" sortBy="#{upfitterInServiceQueueBean.preSort}"
+						selection="#{upfitterInServiceQueueBean.selectedUnitProgressList}" >						
+						
+						<p:ajax event="toggleSelect" onstart="adjustBtnState();return false;"  ></p:ajax>						
+						<p:ajax event="rowSelectCheckbox" onstart="adjustBtnState();return false;"   />
+						<p:ajax event="rowUnselectCheckbox" onstart="adjustBtnState();return false;"  />
+						<p:ajax event="rowSelect" onstart="adjustBtnState();saveScrollPosition();return false;"  ></p:ajax>
+						<p:ajax event="rowUnselect" onstart="adjustBtnState();return false;"  ></p:ajax>
+					
+						<p:ajax event="page" listener="#{upfitterInServiceQueueBean.clearSelection}" oncomplete="resetUIState();moveScrollbarToTop();"></p:ajax>
+						<p:ajax event="sort" listener="#{upfitterInServiceQueueBean.clearSelection}" oncomplete="resetUIState();"></p:ajax>
+       					 
+       					<p:column selectionMode="multiple" style="width:8px;text-align:center"/>
+	                    <p:column width="24" sortBy="#{element.tolerance}" style="text-align:center;padding:0px;" exportable="false" rendered="#{upfitterInServiceQueueBean.searchType == 1 ? 'true' : 'false'}">               
+		            	   <p:graphicImage id="overdueImg" value="/images/overdue.png" title="Overdue" style="border-style: none; visibility: #{element.tolerance eq 'N' ? 'visible' : 'hidden'}"  onclick="selectCurrentRow('unitUpfitsTable',#{elementRowIndex});" />
+		                </p:column>  
+		                       					
+						<p:column id="unitNoCol" headerText="Unit No" sortBy="#{element.unitNo}" width="#{upfitterInServiceQueueBean.dataTable.col1}">				
+						    <h:panelGrid id="unitInfo" column="1" styleClass="ui-noBorder">	
+						   		 <h:panelGroup style="white-space:nowrap;">	
+									<p:commandLink id="noteLink"
+                               				oncomplete="selectCurrentRow('unitUpfitsTable',#{elementRowIndex});doShowNotes();"						                             
+			                                title="View Notes" immediate="true">
+									 <p:graphicImage value="/images/notes.png" title="Notes"  style="border-style: none" />
+									</p:commandLink>
+									<h:outputText value="&#160;" />								
+									<p:commandLink id="driverAccountInfoLink" rendered="#{upfitterInServiceQueueBean.searchType == 1 ? 'true' : 'false'}"
+			                                actionListener="#{upfitterInServiceQueueBean.showDriverAccountForUnitNumber(element)}"
+			                                oncomplete="PF('driverAccountInfoDialogWidget').show();selectCurrentRow('unitUpfitsTable',#{elementRowIndex});"
+			                                update=":driverAccountInfoDialog" 
+			                                title="View Driver/Account Info" immediate="true">
+										<p:graphicImage value="/images/custins.png" style="border-style: none" />
+									</p:commandLink>
+									<h:outputText value="&#160;" rendered="#{upfitterInServiceQueueBean.searchType == 1 ? 'true' : 'false'}" />
+									<p:graphicImage value="/images/p_icon.png" title="Client Purchase unit" onclick="selectCurrentRow('unitUpfitsTable',#{elementRowIndex});"
+													rendered="#{upfitterInServiceQueueBean.searchType == 2 and element.purchaseUnit ? 'true' : 'false'}"
+													style="border-style: none; vertical-align:baseline" />
+									<h:outputText value="&#160;" />
+									<h:outputText id="unitNo" value="#{element.unitNo}" />		<br/>	
+									<h:outputText id="vin" value="#{element.vin}" styleClass="textWrap"/>
+									
+									<p:tooltip id="hoverPanelUnitNo" for="unitNo" showEffect="blind" rendered="#{upfitterInServiceQueueBean.searchType == 2 ? 'true' : 'false'}" >  
+						        		<h:panelGrid columns="2"    >	
+											<h:outputLabel style="white-space:nowrap;" styleClass="ui-label" value="Trim:" />
+							 				<h:outputText  value="#{element.modelDesc}"  styleClass="alignmentLeft"  />
+							 				<h:outputLabel style="white-space:nowrap;" styleClass="ui-label" value="Exterior:"  />
+							 				<h:outputText  value="#{element.exteriorColour}" styleClass="alignmentLeft" />
+							 				<h:outputLabel style="white-space:nowrap;" styleClass="ui-label" value="Driver Name:"  />
+							 				<h:outputText  value="#{element.driver}"  styleClass="alignmentLeft"  />
+							 				<h:outputLabel style="white-space:nowrap;" styleClass="ui-label" value="Client Name:"  />
+							 				<h:outputText  value="#{element.accountName}" styleClass="alignmentLeft" />
+						 				</h:panelGrid>
+						    		</p:tooltip >
+									
+								 </h:panelGroup>								 
+							</h:panelGrid>
+						</p:column>
+						
+					    <p:column headerText="Delivering Dealer" sortBy="#{element.deliveringDealerName}" width="#{upfitterInServiceQueueBean.dataTable.col2}" >								
+							  <h:panelGroup style="white-space:nowrap;">							  			
+						  			<p:commandLink id="delDealerContactInfoLink" rendered="#{element.deliveringDealerName != null ? true : false}"
+                               				actionListener="#{upfitterInServiceQueueBean.getSelectedDeliveringDealerContact(element)}"		
+                               				oncomplete="PF('contactInfoWidget').show();selectCurrentRow('unitUpfitsTable',#{elementRowIndex});"					                              
+			                                update=":contactInfoDialog" 
+			                                title="View Delivering Dealer Contact Info" immediate="true">
+			                           
+										<p:graphicImage value="/images/custins.png" style="border-style: none" />	
+									</p:commandLink>
+									<h:outputText value="&#160;" />
+									<h:outputText id="deliveringDealerName" value="#{element.deliveringDealerName}" styleClass="textWrap" />
+							 </h:panelGroup>
+						</p:column>		
+						
+					   	<p:column width="#{upfitterInServiceQueueBean.dataTable.col3}" headerText="Lead Time - Vendor" exportable="false" rendered="#{upfitterInServiceQueueBean.searchType == 1 ? 'true' : 'false'}">
+					    	  <ui:repeat value="#{element.vendorInfoList}" var="unit">
+		                       	    <h:panelGroup style="white-space:nowrap;">		                       	    	
+		                       	    	<h:panelGroup rendered="#{unit.vendorTaskCompleted}">
+											<p:graphicImage title="Work complete" id="workCompleted"  value="/images/action_check.png" styleClass="ui-border-none"/>
+											<h:outputText value="&#160;" />
+										</h:panelGroup>
+										<p:spacer width="20" height="1" rendered="#{!unit.vendorTaskCompleted}"/>
+										<p:commandLink id="vendorContactInfoLink"
+		                               				actionListener="#{upfitterInServiceQueueBean.getSelectedVendorContactAccessories(element,unit)}"		
+		                               				oncomplete="PF('contactInfoWidget').show();selectCurrentRow('unitUpfitsTable',#{elementRowIndex});"					                              
+					                                update=":contactInfoDialog" 
+					                                title="View Vendor Contact and Upfit Info" immediate="true">
+											<p:graphicImage value="/images/custins.png" style="border-style: none" />	
+										</p:commandLink>
+										<h:outputText value="&#160;" />
+										<h:outputText value="#{unit.leadTime}" styleClass="textWrap" />
+										<h:outputText value="&#160;-&#160;" />
+										<h:outputText id="vendorName" value="#{unit.name}" styleClass="textWrap" />
+								  </h:panelGroup>									
+								 <p></p>						
+							</ui:repeat>                    				    
+						</p:column>	
+						
+					 	<p:column id="reqdByDate"  sortBy="#{element}" sortFunction="#{upfitterInServiceQueueBean.reqdByCustomSort}"   headerText="Reqd By" width="#{upfitterInServiceQueueBean.dataTable.col4}" exportable="false" >	
+						    <h:outputText value="#{element.reqdBy}">
+							</h:outputText>
+						</p:column>
+						
+						<p:column id="followUpDate" sortBy="#{not empty element.followUpDate ? element.followUpDate : upfitterInServiceQueueBean.emptyDate}"   headerText="Follow Up" width="#{upfitterInServiceQueueBean.dataTable.col5}" exportable="false">	
+						    <h:outputText id="cellFollupDateLbl" value="#{element.followUpDate}">
+						     <f:convertDateTime type="date" pattern="MM/dd/yy" /> 
+							</h:outputText>
+						</p:column>
+						
+						<p:column sortBy="#{element.plateExpirationDate}"  headerText="Plate Info" width="#{upfitterInServiceQueueBean.dataTable.col6}" rendered="#{upfitterInServiceQueueBean.searchType == 2 ? 'true' : 'false'}" >								
+						    <h:panelGrid id="plateInfo" column="1" styleClass="ui-noBorder">	
+						   		 <h:panelGroup style="white-space:nowrap;">	
+									<h:outputText  value="#{element.plateNo}"/>
+									<br/>	
+									<h:outputText  value="#{element.plateExpirationDate}">
+								     	<f:convertDateTime type="date" pattern="MM/dd/yy" /> 
+									</h:outputText>
+								 </h:panelGroup>								 
+							</h:panelGrid>
+						</p:column>
+						
+						<p:column id="clientETADate" sortBy="#{element.clientETADate}"  headerText="ETA" width="#{upfitterInServiceQueueBean.dataTable.col5}">								
+						    <h:outputText id="clientETADateLbl" value="#{element.clientETADate}" exportable="false">
+						     <f:convertDateTime type="date" pattern="MM/dd/yy" /> 
+							</h:outputText>
+						</p:column>
+						
+						<p:column id="readyDate" sortBy="#{element.vehicleReadyDate}" headerText="Ready at Dlr" width="#{upfitterInServiceQueueBean.dataTable.col5}" rendered="#{upfitterInServiceQueueBean.searchType == 2 ? 'true' : 'false'}">								
+						    <h:outputText id="readyDateLabel" value="#{element.vehicleReadyDate}" exportable="false">
+						     <f:convertDateTime type="date" pattern="MM/dd/yy" /> 
+							</h:outputText>
+						</p:column>
+						
+						<p:column sortBy="#{element.hasUpfit}"  headerText="Upfit" width="15" rendered="#{upfitterInServiceQueueBean.searchType == 2 ? 'true' : 'false'}">								
+						    <h:outputText  value="#{element.hasUpfit == 'true' ? 'Upfit' : '' }" exportable="false">
+						    </h:outputText>
+						</p:column>
+						
+					 	<p:column id="invoiceProcessedDate" sortBy="#{element.invoiceProcessedDate}"  headerText="Invoice Procd" width="#{upfitterInServiceQueueBean.dataTable.col7}" exportable="false">	
+						    <h:outputText id="invoiceProcessedDateLbl" value="#{element.invoiceProcessedDate}">
+						     <f:convertDateTime type="date" pattern="MM/dd/yy" /> 
+							</h:outputText>
+						</p:column>
+												
+						<p:column sortBy="#{element.factoryShipDate}"  headerText="Factory Ship" width="#{upfitterInServiceQueueBean.dataTable.col8}" exportable="false" rendered="#{upfitterInServiceQueueBean.searchType == 1 ? 'true' : 'false'}">	
+						    <h:outputText id="factShipDateLbl" value="#{element.factoryShipDate}">
+						     <f:convertDateTime type="date" pattern="MM/dd/yy" /> 
+							</h:outputText>
+						</p:column>
+						
+						<p:column id="dealerReceivedDate" sortBy="#{element.dealerReceivedDate}"  headerText="#{upfitterInServiceQueueBean.searchType == 1 ? 'Int Dlr Rcvd/ Stock Accept' : 'Dlr Rcvd/ Stock Accept'}" width="#{upfitterInServiceQueueBean.dataTable.col9}" exportable="false" >								
+						    <h:outputText id="dlrRecDateLbl" value="#{element.dealerReceivedDate}">
+						     <f:convertDateTime type="date" pattern="MM/dd/yy" /> 
+							</h:outputText>
+						</p:column>		
+						
+						<p:column sortBy="#{element.replacementUnitNo}" headerText="Returning Unit" width="#{upfitterInServiceQueueBean.dataTable.col10}" exportable="false">				
+							<h:panelGroup style="white-space:nowrap;">
+								<p:commandLink id="retUnitInfoLink"
+		                                actionListener="#{upfitterInServiceQueueBean.showReplacedUnitDetails(element)}"
+		                                oncomplete="PF('retUnitInfoDialogWidget').show();selectCurrentRow('unitUpfitsTable',#{elementRowIndex});"
+		                                update=":retUnitInfoDialog" 
+		                                title="View Unit Info" immediate="true" rendered="#{element.replacementUnitNo != null ? 'true' : 'false'}">
+									<p:graphicImage value="/images/custins.png" style="border-style: none" />
+								</p:commandLink>
+								<h:outputText value="&#160;" />
+								<h:outputText id="replacedUnitNo" value="#{element.replacementUnitNo}" />
+							</h:panelGroup>	
+						</p:column>
+
+						<p:column width="50" id="delayReasonColId" sortBy="#{element.delayReason}"  headerText="Reason for Delay" rendered="#{upfitterInServiceQueueBean.searchType == 2 ? 'true' : 'false'}">
+				       		<h:outputText id="delayReasonLblId" value="#{element.delayReason}" />				       		
+				       	</p:column>
+				       	
+				       	<p:column width="50" id="orderTypeColid" sortBy="#{element.orderType}"  headerText="Order Type" rendered="#{upfitterInServiceQueueBean.searchType == 2 ? 'true' : 'false'}">
+				       		<h:outputText id="orderTypelblid" value="#{element.orderType == 'L' ? 'Locate' : 'Factory'}" />				       		
+				       	</p:column>
+				       
+						<p:column width="20" exportable="false" rendered="#{upfitterInServiceQueueBean.searchType == 2 ? 'true' : 'false'}" >				
+							<h:outputText rendered="#{element.stockUnit == 'true'}" value='Stock'/>
+						</p:column>
+						
+						<p:column width="18" exportable="false" rendered="#{upfitterInServiceQueueBean.searchType == 2 ? 'true' : 'false'}" >				
+							<h:panelGroup>
+								<p:commandLink id="updateInServiceDateLink" rendered="#{upfitterInServiceQueueBean.hasPermission('maintainInService') ? (element.stockUnit and element.quoteStatus == '16' ? 'false' : 'true') : 'false'}"
+		                                actionListener="#{upfitterInServiceQueueBean.initPlaceInService(element)}"	
+		                                oncomplete="PF('updateInServiceDateWidget').show();selectCurrentRow('unitUpfitsTable',#{elementRowIndex});"
+		                                update=":updateInServiceDateDialog" 
+		                                title="Add In Service Date" immediate="true" >
+									<p:graphicImage value="/images/calendar_add_icon.png" style="border-style: none"  />
+								</p:commandLink>
+								<h:outputText rendered="#{element.stockUnit and element.quoteStatus == '16'}" value='Alloc to GRD'/>
+							</h:panelGroup>	
+						</p:column>
+						<p:column width="15" exportable="false" rendered="#{upfitterInServiceQueueBean.searchType == 1 ? 'true' : 'false'}" >				
+							<p:commandLink id="vehicleOrderStatus"
+                               				actionListener="#{upfitterInServiceQueueBean.setSelectedFleetMasterVO(element)}"	
+                               				oncomplete="showVehicleOrderStatus();selectCurrentRow('unitUpfitsTable',#{elementRowIndex});"						                             
+			                                title="Vehicle Order Status" immediate="true">
+			                          <p:graphicImage value="/images/calendar_add_icon.png" style="border-style: none"  />
+							</p:commandLink>
+						</p:column>
+
+						<f:facet  name="footer"  >
+							Record Count: <h:outputText value="#{upfitterInServiceQueueBean.filteredList.size()}" />
+							<div style= "text-align:right;">
+							     <h:commandLink title="Export Unit To Excel" onclick="monitorDownload('#{upfitterInServiceQueueBean.filteredList.size()}');"  rendered="#{!upfitterInServiceQueueBean.enquiryMode}">
+					               <p:graphicImage value="/images/excel.png" />	
+					                <p:dataExporter type="xls" target=":maintainUpfitProgressForm:unitUpfitDoanLoad" fileName="unit_progress" 
+					                preProcessor="#{upfitterInServiceQueueBean.preProcessDownloadXLS}" postProcessor="#{upfitterInServiceQueueBean.postProcessDownloadXLS}" />
+					            </h:commandLink>
+					        </div>
+						</f:facet>	
+					</p:dataTable>  
+				</p:panel>
+
+				<p:dataTable value="#{upfitterInServiceQueueBean.downloadableRowsData}" var="row"  id="unitUpfitDoanLoad"  rendered="false">
+				    <p:columns value="#{upfitterInServiceQueueBean.downloadableColumns}" var="column">		
+				   	 <f:facet name="header">
+                			<h:outputText value="#{column}" />
+            			</f:facet>		       
+				        <h:outputText value="#{row[column]}" />	
+				    </p:columns>
+				</p:dataTable>
+			   </h:form> 	
+				<p:panel>
+				 	<h:form>
+					   <p:commandButton id="requestClientContactBtn" widgetVar="requestClientContactBtnVar" value="Request Client Contact" oncomplete="doShowRequestClientContacts();" />
+					    <p:spacer width="10" />				 	 
+			        	<p:commandButton id="notesBtn" widgetVar="notesBtnWidgetVar" value="Notes" title="Notes"  oncomplete="doShowNotes();"  />	   
+						<p:spacer width="10" />
+						<p:commandButton id="vehicleOrderStatusBtn" widgetVar="vehicleOrderStatusBtnWidgetVar" value="Veh Status" title="Vehicle Order Status" 
+							onclick="doShowVehicleOrderStatus();" immediate="true" process="@none"
+							rendered="#{upfitterInServiceQueueBean.searchType == 2 ? 'true' : 'false'}" />	 
+			        	<p:spacer width="10" rendered="#{upfitterInServiceQueueBean.searchType == 2 ? 'true' : 'false'}"/>
+			        	<p:commandButton id="delarReasonBtn" widgetVar="delarReasonBtnBtnWidgetVar" value="Delay Reason" title="Delay Reason"  
+							action="#{upfitterInServiceQueueBean.onLoadDealyReason}" oncomplete="doShowDelayReason();" update=":delayReasonForm:delayReasonPanel"
+							rendered="#{upfitterInServiceQueueBean.searchType == 2 ? 'true' : 'false'}"   />
+					    <p:spacer width="10" />
+					    <p:commandButton id="upfitLogisticsBtn" 
+					            widgetVar="upfitProgressBtnVar" 
+					            value="Vendor Sequence" 
+					            actionListener="#{upfitterInServiceQueueBean.upfitLogisticsListener}" 
+					            oncomplete="doShowUpfitProgress();" 
+					            update=":ccUpfitProgress:ccUpfitProgressDialog" />					
+					    <p:spacer width="10" />								
+						<p:commandButton id="done" widgetVar="mainDoneBtnVar"  value="Cancel" action="#{upfitterInServiceQueueBean.cancel}" ajax="false" immediate="true" rendered="#{!upfitterInServiceQueueBean.enquiryMode}" onclick="lockScreen();" />
+					 </h:form> 	     
+	        	</p:panel>	
+	        
+                                            
+			
+			<p:dialog id="updateInServiceDateDialog" widgetVar="updateInServiceDateWidget" dynamic="true" modal="true"
+                header=" In Service Date Information - Unit #{upfitterInServiceQueueBean.selectedUnitProgress.unitNo}"  resizable="false" appendTo="@(body)" style="min-width: 500px; max-width: 600px;"
+                closeOnEscape="true" onShow="setFocus('InServiceDateCal');" >
+	            <h:form id="updateInServiceDateForm" prependId="false">
+	              <p:focus context="updateInServiceDateForm" />
+			      <p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:100%;max-width:100%;width:auto;">
+			      	  <p:outputPanel rendered="#{upfitterInServiceQueueBean.disableTransport}">
+			      	  	  <div class="ui-messages-info ui-corner-all">
+				      	  	<span class="ui-messages-info-icon"/>
+				      	  	<p:outputLabel value="An active transport request already exists for the returning unit" styleClass="ui-messages-info-summary"></p:outputLabel>
+				      	  </div>
+			      	  </p:outputPanel>	
+	                  <p:messages id="inServiceMessages" severity="info,error" showSummary="true" showDetail="false" autoUpdate="true" />
+	              </p:scrollPanel>
+					<p:panel id="updateInServiceDatePanel">  
+					    <h:panelGrid  columns="2" cellpadding="5" style="white-space:nowrap;">					                    	    
+								<p:column>	
+				    				<p:outputLabel for="InServiceDateCal" value="In Service Date:*" styleClass="ui-label" style="white-space:nowrap;"/>
+				    			</p:column>
+				    			<p:column>	 
+			                      	<p:calendar onchange="formatDate(this);" title="In service Date" id="InServiceDateCal"  style="width:100px" 
+			                      		disabled="#{upfitterInServiceQueueBean.disableInserviceDate}"
+			                      		pattern="MM/dd/yy" value="#{upfitterInServiceQueueBean.selectedUnitProgress.inServiceDateInput}"  showOn="button" 
+										styleClass="dateTimeField" tabindex="10" > 
+										<f:convertDateTime pattern="MM/dd/yy" />		    									
+									</p:calendar>
+			                    </p:column>
+			                    <p:column>	
+				    				<p:outputLabel for="inServiceOdoReading" value="Odometer Reading:*" styleClass="ui-label" style="white-space:nowrap;"/>
+				    			</p:column>
+				    			<p:column>	 
+			                        <p:inputNumber id="inServiceOdoReading" title="Odometer Reading" 
+			                                style="text-align:right; width:100px"									    							    
+						                    value="#{upfitterInServiceQueueBean.selectedUnitProgress.odoMeterReading}"	
+						                    thousandSeparator=""					
+						                    decimalPlaces="0"				
+						                    minValue="0"
+						                    maxValue="999999999"
+						                    autocomplete="off" tabindex="20" />				                      	
+			                    </p:column>
+		                		
+		                		<p:outputLabel for="vehiclePickedup" value="Vehicle Picked up:*" styleClass="ui-label" style="white-space:nowrap;" />
+		                      	<p:selectOneMenu id="vehiclePickedup" style= "width:110px" tabindex="30" value="#{upfitterInServiceQueueBean.selectedUnitProgress.vehiclePickedUp}" >
+										<f:selectItem itemLabel=""  itemValue=""/>
+										<f:selectItem itemLabel="Yes"  itemValue="Y"/>
+										<f:selectItem itemLabel="No"  itemValue="N"/>
+										<p:ajax event="change" update="createTransport, orderingContactPhone, orderingContact" />
+								</p:selectOneMenu>
+		                		
+			    				<p:outputLabel for="createTransport" value="Create Transport:*" styleClass="ui-label" style="white-space:nowrap;" rendered="#{upfitterInServiceQueueBean.showTransport}"/>
+		                      	<p:selectOneMenu id="createTransport" style= "width:110px" tabindex="30" value="#{upfitterInServiceQueueBean.selectedUnitProgress.createTransport}" rendered="#{upfitterInServiceQueueBean.showTransport}" 
+		                      						disabled="#{upfitterInServiceQueueBean.disableTransport or upfitterInServiceQueueBean.selectedUnitProgress.vehiclePickedUp == 'N'}">
+										<f:selectItem itemLabel=""  itemValue=""/>
+										<f:selectItem itemLabel="Yes"  itemValue="Y"/>
+										<f:selectItem itemLabel="No"  itemValue="N"/>
+								</p:selectOneMenu>
+			                    <p:outputLabel for="orderingContact" value="Contact Name:" styleClass="ui-label" style="white-space:nowrap;" rendered="#{upfitterInServiceQueueBean.showTransport}"/>
+								<p:inputText id="orderingContact" value="#{upfitterInServiceQueueBean.selectedUnitProgress.orderingContactName}" maxlength="250" size="40" 
+											rendered="#{upfitterInServiceQueueBean.showTransport}" 
+											disabled="#{upfitterInServiceQueueBean.disableTransport or upfitterInServiceQueueBean.selectedUnitProgress.vehiclePickedUp == 'N'}" tabindex="40" />
+								<p:outputLabel for="orderingContactPhone" value="Contact Phone:" styleClass="ui-label" style="white-space:nowrap;" rendered="#{upfitterInServiceQueueBean.showTransport}"/>
+								<p:inputText id="orderingContactPhone" value="#{upfitterInServiceQueueBean.selectedUnitProgress.orderingContactPhone}" maxlength="100" size="40" 
+											rendered="#{upfitterInServiceQueueBean.showTransport}" 
+											disabled="#{upfitterInServiceQueueBean.disableTransport or upfitterInServiceQueueBean.selectedUnitProgress.vehiclePickedUp == 'N'}" tabindex="50" />
+	                	</h:panelGrid>
+	                </p:panel>
+		    	  	<br/><br/>
+					<p:commandButton id="updateInServiceDateBtn" widgetVar="updateInServiceDateBtnWidgetVar" value="Save" actionListener="#{upfitterInServiceQueueBean.updateServiceDate}" update="@form" process="@form"  onstart="disableInServiceDateButtons();" oncomplete="enableInServiceDateButtons(); handleServiceDateSaveBtnClickRequest(xhr, status, args);" tabindex="60" />  
+					<p:commandButton id="cancel" widgetVar="cancelInServiceDateBtnWidgetVar"  value="Cancel" onclick="PF('updateInServiceDateWidget').hide();" tabindex="70" />	   
+	            </h:form>
+	        </p:dialog> 
+	        
+			<p:dialog id="driverAccountInfoDialog" widgetVar="driverAccountInfoDialogWidget" modal="true"
+                header="Driver/Account Information - Unit #{upfitterInServiceQueueBean.selectedUnitProgress.unitNo}" resizable="false" appendTo="@(body)" style="min-width: 500px; max-width: 800px;"
+                closeOnEscape="true" onShow="setFocus('driverAccountInfoDialogDoneBtn');">
+	            <h:form id="driverAccountInfoForm" prependId="false">
+					<p:panel id="driverAccountInfoHeaderPanel">  
+					    <h:panelGrid  columns="2" cellpadding="5" style="white-space:nowrap;">
+					    		<p:column>	
+				    				<p:outputLabel value="Trim: " styleClass="ui-label" style="white-space:nowrap;"/>
+				    			</p:column>
+				    			<p:column>	 
+			                      	<p:outputLabel value="#{upfitterInServiceQueueBean.selectedUnitProgress.modelDesc}" />
+			                    </p:column>			    
+								<p:column>	
+				    				<p:outputLabel value="Driver Name: " styleClass="ui-label" style="white-space:nowrap;"/>
+				    			</p:column>
+				    			<p:column>	 
+			                      	<p:outputLabel value="#{upfitterInServiceQueueBean.selectedUnitProgress.driver}" />
+			                    </p:column>
+			                    <p:column>	
+			                      	<p:outputLabel value="Client Name: " styleClass="ui-label" style="white-space:nowrap;"/>
+			                    </p:column>
+			                    <p:column>	
+			                      	<p:outputLabel value="#{upfitterInServiceQueueBean.selectedUnitProgress.accountName}" />		                 
+              					</p:column>              					
+		                </h:panelGrid>
+	                </p:panel>
+		    	  	<br/><br/>
+					<p:commandButton id="driverAccountInfoDialogDoneBtn" value="Done" onclick="PF('driverAccountInfoDialogWidget').hide();" />               
+					              
+	            </h:form>
+	        </p:dialog> 
+	        
+	       <p:dialog id="contactInfoDialog" widgetVar="contactInfoWidget"  modal="true"
+                header="#{upfitterInServiceQueueBean.showAccessories ? 'Contact and Accessory Information' :'Contact Information'} - #{upfitterInServiceQueueBean.dealerVendorNameOfRequest}" resizable="false" appendTo="@(body)" style="min-width: 400px; max-width: 800px;"
+                closeOnEscape="true" onShow="setFocus('contactInfoDialogDoneBtn');">
+	            <h:form id="contactInfoForm" prependId="false">
+					<p:panel id="contactInfoPanel" >  
+					    <h:panelGrid  columns="2" cellpadding="#{upfitterInServiceQueueBean.showAccessories ? 2 : 5}" style="white-space:nowrap;" rendered="#{upfitterInServiceQueueBean.requestedContactInfo != null ? 'true': 'false'}">			    
+								<p:column>	
+				    				<p:outputLabel value="Contact Name: " styleClass="ui-label" style="white-space:nowrap;"/>
+				    			</p:column>
+				    			<p:column>	 
+			                      	<p:outputLabel value="#{upfitterInServiceQueueBean.requestedContactInfo.name}" />
+			                    </p:column>
+			                    <p:column>	
+			                      	<p:outputLabel value="Contact Phone: " styleClass="ui-label" style="white-space:nowrap;"/>
+			                    </p:column>
+			                    <p:column>	
+			                      	<p:outputLabel value="#{upfitterInServiceQueueBean.requestedContactInfo.phone}" />		                 
+              					</p:column>  
+			                    <p:column rendered="#{!upfitterInServiceQueueBean.showAccessories}" >	
+			                      	<p:outputLabel value="Dealer Phone: " styleClass="ui-label" style="white-space:nowrap;" />
+			                    </p:column>
+			                    <p:column rendered="#{!upfitterInServiceQueueBean.showAccessories}" >	
+			                      	<p:outputLabel value="#{upfitterInServiceQueueBean.requestedContactInfo.dealerPhone}"  />		                 
+              					</p:column>   
+              					 <p:column>	
+			                      	<p:outputLabel value="Contact Email: " styleClass="ui-label" style="white-space:nowrap;"/>
+			                    </p:column>
+			                    <p:column>	
+			                      	<h:outputLink onclick="loadClientEmail('#{upfitterInServiceQueueBean.requestedContactInfo.email}'); return false;" rendered="#{upfitterInServiceQueueBean.requestedContactInfo.email ne 'NO EMAIL AVAILABLE'}">#{upfitterInServiceQueueBean.requestedContactInfo.email}</h:outputLink>
+			                      	<p:outputLabel value="#{upfitterInServiceQueueBean.requestedContactInfo.email}" rendered="#{upfitterInServiceQueueBean.requestedContactInfo.email eq 'NO EMAIL AVAILABLE'}" />
+              					</p:column>
+              					<p:column>	
+			                      	<p:outputLabel value="Address: " styleClass="ui-label" style="font-size: 90%;"/>
+			                    </p:column>
+	             				<p:column>	
+			                      	<p:outputLabel value="#{upfitterInServiceQueueBean.selectedVendorDealerAddressDetails}" style="white-space:pre;font-size: 90%;"/>
+			                    </p:column>
+		                </h:panelGrid>
+		                
+		                <h:panelGrid columns="2" cellpadding="5" style="white-space:nowrap;" rendered="#{upfitterInServiceQueueBean.requestedContactInfo != null ? 'false': 'true'}">			    
+							<p:column colspan="2">	
+			    				<p:outputLabel value="NO CONTACT AVAILABLE" styleClass="ui-label" style="white-space:nowrap;"/>
+			    			</p:column>
+			    			<br/>
+			    			<h:panelGrid columns="2" styleClass="panelGrid-top">
+			    				<p:column>	
+			                      	<p:outputLabel value="Address: " styleClass="ui-label" style="font-size: 90%;"/>
+			                    </p:column>
+	             					<p:column>	
+			                      	<p:outputLabel value="#{upfitterInServiceQueueBean.selectedVendorDealerAddressDetails}" style="white-space:pre;font-size:90%;"/>
+			                    </p:column>
+							</h:panelGrid>
+		                </h:panelGrid>
+		                
+	                </p:panel>
+	                <br/>
+	                <p:panel header="Driver/Account Information - Unit #{upfitterInServiceQueueBean.selectedUnitProgress.unitNo}" 
+	                		rendered="#{upfitterInServiceQueueBean.searchType == 2 ? 'true' : 'false'}">
+	                	<h:panelGrid  columns="2" cellpadding="5" style="white-space:nowrap;" >			    
+					    		<p:column>	
+				    				<p:outputLabel value="Trim: " styleClass="ui-label" style="white-space:nowrap;"/>
+				    			</p:column>
+				    			<p:column>	 
+			                      	<p:outputLabel value="#{upfitterInServiceQueueBean.selectedUnitProgress.modelDesc}" />
+			                    </p:column>	
+			                    <p:column>	
+				    				<p:outputLabel value="Exterior: " styleClass="ui-label" style="white-space:nowrap;"/>
+				    			</p:column>
+				    			<p:column>	 
+			                      	<p:outputLabel value="#{upfitterInServiceQueueBean.selectedUnitProgress.exteriorColour}" />
+			                    </p:column>	
+								<p:column>	
+				    				<p:outputLabel value="Driver Name: " styleClass="ui-label" style="white-space:nowrap;"/>
+				    			</p:column>
+				    			<p:column>	 
+			                      	<p:outputLabel value="#{upfitterInServiceQueueBean.selectedUnitProgress.driver}" />
+			                    </p:column>
+			                    <p:column>	
+			                      	<p:outputLabel value="Client Name: " styleClass="ui-label" style="white-space:nowrap;"/>
+			                    </p:column>
+			                    <p:column>	
+			                      	<p:outputLabel value="#{upfitterInServiceQueueBean.selectedUnitProgress.accountName}" />		                 
+              					</p:column>              					
+		                </h:panelGrid>
+		            </p:panel>
+	                <br/>
+				 	
+					<p:panel id="accessoriesPanel" style="max-height:250px;overflow:auto;" rendered="#{upfitterInServiceQueueBean.showAccessories}">  
+						<ui:repeat value="#{upfitterInServiceQueueBean.requestedVendorQuoteNoList}" var="vendorQuoteNo">	
+						     <h:outputText styleClass="ui-label" value="Vendor Quote Number : "/><h:outputText value="#{empty vendorQuoteNo ? 'Not Provided' : vendorQuoteNo}"/><br/>
+						     <ui:repeat value="#{upfitterInServiceQueueBean.getSelectedVendorQuoteNumberAccessories(vendorQuoteNo)}" var="access">	
+							     <p:spacer width="5"/> <h:outputText value="&#8226;"/> <h:outputText value="&#160;"/> <h:outputText id="accessory" value="#{access}" /><br/>						     
+						    </ui:repeat>						     
+					    </ui:repeat> 
+	                </p:panel>
+	                <br/>
+		    	  	
+				 	<p:commandButton id="contactInfoDialogDoneBtn" value="Done" onclick="PF('contactInfoWidget').hide();" />               
+	            </h:form>
+	        </p:dialog> 
+	        
+	        <p:dialog id="retUnitInfoDialog" widgetVar="retUnitInfoDialogWidget" modal="true"
+                header="Unit Information - Unit #{upfitterInServiceQueueBean.selectedUnitProgress.replacementUnitNo}" resizable="false" appendTo="@(body)" style="min-width: 500px; max-width: 800px;"
+                closeOnEscape="true" onShow="setFocus('retUnitInfoDialogDoneBtn');">
+	            <h:form id="retUnitInfoForm" prependId="false">
+					<p:panel id="retUnitInfoInfoHeaderPanel">  
+					    <h:panelGrid  columns="2" cellpadding="5" style="white-space:nowrap;">			    
+								<p:column>	
+				    				<p:outputLabel value="Trim: " styleClass="ui-label" style="white-space:nowrap;"/>
+				    			</p:column>
+				    			<p:column>	 
+			                      	<p:outputLabel value="#{upfitterInServiceQueueBean.requestedUnitInfo.trim}" />
+			                    </p:column>
+			                    <p:column>	
+			                      	<p:outputLabel value="Exterior Color: " styleClass="ui-label" style="white-space:nowrap;"/>
+			                    </p:column>
+			                    <p:column>	
+			                      	<p:outputLabel value="#{upfitterInServiceQueueBean.requestedUnitInfo.color}" />		                 
+              					</p:column>
+              					<p:column>	
+			                      	<p:outputLabel value="VIN Last 8: " styleClass="ui-label" style="white-space:nowrap;"/>
+			                    </p:column>
+			                    <p:column>	
+			                      	<p:outputLabel value="#{upfitterInServiceQueueBean.requestedUnitInfo.vin}" />		                 
+              					</p:column>              					
+		                </h:panelGrid>
+	                </p:panel>
+		    	  	<br/><br/>		    	   
+					<p:commandButton id="retUnitInfoDialogDoneBtn" value="Done" onclick="PF('retUnitInfoDialogWidget').hide();" />               
+					              
+	            </h:form>
+	        </p:dialog> 
+	        
+	         <p:dialog id="delayReasonDialog" widgetVar="delayReasonDialogWidget" modal="true"
+                header="Choose Delay Reason " resizable="false" appendTo="@(body)" style="min-width: 325px; max-width: 325px;"
+                closeOnEscape="true" onShow="setFocus('retUnitInfoDialogDoneBtn');">
+	            <h:form id="delayReasonForm" prependId="false">
+					<p:panel id="delayReasonPanel">  
+					    <h:panelGrid  columns="2" cellpadding="5" style="white-space:nowrap;">			    
+								<p:column>	
+				    				<p:outputLabel value="Delay Reason: " styleClass="ui-label" style="white-space:nowrap;"/>
+				    			</p:column>
+				    			<p:column>	 
+			                      	<p:selectOneMenu id="delayReasonId" style= "width:130px" value="#{upfitterInServiceQueueBean.selectedDelayReason}" converter="DelayReasonConverter" >
+						            	<f:selectItem itemLabel="" itemValue=""></f:selectItem>
+						                <f:selectItems value="#{upfitterInServiceQueueBean.delayReasonList}" var="delayReasons"
+						                       			itemLabel="#{delayReasons.delayReasonDescription}" itemValue="#{delayReasons}"/>
+						            </p:selectOneMenu>
+			                    </p:column>
+			                                					
+		                </h:panelGrid>
+	                </p:panel>
+		    	  	<br/><br/>		    	   
+		    	  	<p:commandButton id="delayReasonDialogCancelSaveBtn" value="Save"  actionListener="#{upfitterInServiceQueueBean.updateDelayReason}" oncomplete="PF('delayReasonDialogWidget').hide();"/>  
+					<p:commandButton id="delayReasonDialogCancelBtn" value="Cancel" immediate="true" type="button" onclick="PF('delayReasonDialogWidget').hide();" />               
+					              
+	            </h:form>
+	        </p:dialog> 
+	        
+	          <p:dialog id="vehicleOrderStatusDialog" 
+				        modal="true" 
+				        header="Vehicle Order Status" 
+				        widgetVar="vehicleOrderStatusWidget" 
+				        resizable="false" 
+				        height="680" 
+				        width="1105" 
+				        closeOnEscape="true"
+				        onHide="refreshUi();"
+				        appendTo="@(body)">
+				   <comp:maintainVehicleOrderStatus id="maintainVehicleOrderStatusCCId" 
+			    		showSearch ="false" showNotes ="false" showCancel = "true"
+			            mainPODocId="#{upfitterInServiceQueueBean.selectedUnitProgress.getDocId()}" 	
+			            isStockUnit="#{upfitterInServiceQueueBean.searchType == 1  ?  'false' : upfitterInServiceQueueBean.selectedUnitProgress.isStockUnit()}" 
+			            update ="vehicleOrderStatusDialog" 		
+			            unitNo = "#{upfitterInServiceQueueBean.selectedUnitProgress.getUnitNo()}"
+			            onLoadCallback ="PF('vehicleOrderStatusWidget').show();"  />
+		   		 			        
+			</p:dialog>
+
+	        <p:dialog id="vendorTaskCompleteDialog" widgetVar="vendorTaskCompleteDialogWidget" modal="true" dynamic="true"
+	              header="Complete Vendor Tasks - Unit #{upfitterInServiceQueueBean.selectedUnitProgress.unitNo}" resizable="true" appendTo="@(body)" height="180" width="700"
+	              closeOnEscape="true" onShow="setFocus('vendorTaskCompleteDialogSaveBtn');">
+				<h:form id="vendorTaskCompleteForm" prependId="false">
+	           		<p:scrollPanel id="vendorTasksPanel" style="height:120px; min-width:660px">
+						<p:dataTable id="vendorDataTableId" var="vendor" widgetVar="vendorsDataTableWidgetVar"            	  
+				        		value="#{upfitterInServiceQueueBean.vendorTaskList}" 
+								scrollable="true"
+								resizableColumns="true">
+							<p:column headerText="Vendors" width="70%">
+								<h:outputText value="#{vendor.vendorName}"/>
+							</p:column>
+							<p:column headerText="Work Status" width="20%" style="text-align:center;padding:0px;">
+								<h:selectBooleanCheckbox value="#{vendor.vendorTaskCompleted}" title="Work Status"/>
+							</p:column>	
+						</p:dataTable>
+					</p:scrollPanel>
+	    	  		<br/><br/>		    	   
+		    	  	<p:commandButton id="vendorTaskCompleteDialogSaveBtn" value="Save" actionListener="#{upfitterInServiceQueueBean.saveOrUpdateVendorTasks}" oncomplete="PF('vendorTaskCompleteDialogWidget').hide();setScrollPosition();"/>  
+					<p:spacer width="5"> </p:spacer>
+					<p:commandButton id="vendorTaskCompleteDialogCancelBtn" value="Cancel" immediate="true" onclick="PF('vendorTaskCompleteDialogWidget').hide();" />               
+	           </h:form>
+	       </p:dialog> 
+	        
+		<style type="text/css">
+			.dateTimeField input {
+				width: 75px;
+			}
+			
+			.ui-datatable thead th {
+				white-space: normal;
+				text-align: center;
+			}
+			
+			.textWrap {
+				white-space: normal;
+			}
+		</style>  
+			                                                                                               
+        <script type="text/javascript"> 
+	        
+            $.cookie("primefaces.download", null);            
+            function monitorDownload(recordCount) { 
+            	if(recordCount > 0){
+            		if(cookiesEnabled()){
+            			ajaxStatusShow();
+            			setTimeout("checkDownLoadStatus();",250); 
+            		}
+            	}
+            }
+            
+            function checkDownLoadStatus(){  
+            	if($.cookie("primefaces.download")){
+            		 $.cookie("primefaces.download", null);
+            		 ajaxStatusHide();
+            	}else{
+            		setTimeout("checkDownLoadStatus();",250); 
+            	}
+            }   
+            
+            function cookiesEnabled  () {
+    			var c = (navigator.cookieEnabled) ? true : false;
+    			if (typeof navigator.cookieEnabled === "undefined") {
+    				if(!c){
+    					document.cookie = "testcookie";
+    					c = (document.cookie.indexOf("testcookie") !== -1) ? true : false
+    			 	}
+    			}
+    			return (c)
+    		}
+            
+            function refreshUi(){
+        		var refreshNeeded = document.getElementById('maintainVehicleOrderStatusCCId:hiddenRefresh').value;
+        		if(refreshNeeded == 'true'){
+        			refreshData();	
+        		}
+        	}
+            
+            function handleServiceDateSaveBtnClickRequest(xhr, status, args) { 
+                if(!args.failure) {    
+                	PF('updateInServiceDateWidget').hide();
+                }
+			}         
+            
+            function callRefreshFollowUpDate(){    
+            	refreshFollowUpDate();      
+            	ajaxStatusHide();
+        	}
+        	
+           	function doKeypressFilter(event){
+    			if (event.keyCode == 13) {
+    				source = event.srcElement.id;
+    			   $('#filter').click();
+    			   resetUIState();
+    			   return false;
+    			}
+    			return true;	
+    		}
+           	
+            function moveScrollbarToTop() {
+           		$('#unitProgress .ui-datatable-scrollable-body').scrollTop(0);
+           	}
+         
+            
+            var  hasPermissionMaintainUpfit = #{upfitterInServiceQueueBean.hasPermission('maintainUpfit')};
+            var  hasPermissionMaintainInService = #{upfitterInServiceQueueBean.hasPermission('maintainInService')};
+            var  isEnquiryMode = #{upfitterInServiceQueueBean.enquiryMode};
+            function adjustBtnState() {          	
+            	if(#{upfitterInServiceQueueBean.searchType} == 1){
+            		
+        			if(PF('unitUpfitsTable').selection.length == 1){
+        				PF('notesBtnWidgetVar').enable();
+        				PF('upfitProgressBtnVar').enable(); 
+        				if(hasPermissionMaintainUpfit == true){        				
+            				PF('requestClientContactBtnVar').enable();            			    
+        				}
+        			}else if(PF('unitUpfitsTable').selection.length > 1){
+        				PF('upfitProgressBtnVar').disable();
+        				
+        				if(hasPermissionMaintainUpfit == true){
+        					PF('notesBtnWidgetVar').enable();
+            				PF('requestClientContactBtnVar').enable();          				
+        				}else{
+        					PF('notesBtnWidgetVar').disable();
+            				PF('requestClientContactBtnVar').disable();
+        				}
+        			}else if(PF('unitUpfitsTable').selection.length == 0){             				
+        				PF('notesBtnWidgetVar').disable();
+        				PF('requestClientContactBtnVar').disable();  
+						PF('upfitProgressBtnVar').disable();
+        			}
+        			
+           	 	}else if(#{upfitterInServiceQueueBean.searchType} == 2){
+           			 
+            			if(PF('unitUpfitsTable').selection.length == 1){
+            				PF('vehicleOrderStatusBtnWidgetVar').enable();
+            				PF('notesBtnWidgetVar').enable();
+            				PF('upfitProgressBtnVar').enable();
+            				if(hasPermissionMaintainInService == true){
+            					PF('delarReasonBtnBtnWidgetVar').enable();
+                				PF('requestClientContactBtnVar').enable();
+            				  }
+            			}else if(PF('unitUpfitsTable').selection.length > 1){
+            				PF('vehicleOrderStatusBtnWidgetVar').disable();
+            				PF('upfitProgressBtnVar').disable(); 
+            				if(hasPermissionMaintainInService == true){
+            					PF('delarReasonBtnBtnWidgetVar').enable(); 
+            					PF('notesBtnWidgetVar').enable();
+                				PF('requestClientContactBtnVar').enable();
+            				}else{
+            					PF('delarReasonBtnBtnWidgetVar').disable();
+            					PF('notesBtnWidgetVar').disable();
+            				}
+            			}else if(PF('unitUpfitsTable').selection.length == 0){
+            				PF('delarReasonBtnBtnWidgetVar').disable();    
+            				PF('vehicleOrderStatusBtnWidgetVar').disable();	
+            				PF('notesBtnWidgetVar').disable();
+            				PF('requestClientContactBtnVar').disable();
+            				PF('upfitProgressBtnVar').disable();
+            			}
+                	}else{
+                		PF('notesBtnWidgetVar').disable();
+        				PF('requestClientContactBtnVar').disable();
+        				PF('upfitProgressBtnVar').disable();
+                	}
+            	PF('unitUpfitsTable').updateHeaderCheckbox();
+            	            	
+            	if(!isEnquiryMode) {
+            	    PF('mainDoneBtnVar').enable();
+            	}
+            }
+            
+            function doShowVehicleOrderStatus(){   
+            	setSelectedVORC([{name: 'UNIT_NO', value: PF('unitUpfitsTable').selection}]);
+            	showVehicleOrderStatus();
+            }
+            function doShowDelayReason(){               
+            	setSelectedVORC([{name: 'UNIT_NO', value: PF('unitUpfitsTable').selection}]);
+            	 PF('delayReasonDialogWidget').show();
+            }
+            
+            function doShowRequestClientContacts(){ 
+            	setSelectedVORC([{name: 'UNIT_NO', value: PF('unitUpfitsTable').selection}]);            	
+            	setSelectedProcessStageObjectVORC([{name: 'UNIT_NO', value: PF('unitUpfitsTable').selection}]);            	
+            	showRequestClientContact();
+            }
+            
+            function doShowUpfitProgress() {       	
+            	setSelectedVORC([{name: 'UNIT_NO', value: PF('unitUpfitsTable').selection}]);            	
+            	setSelectedQuotationModelRC([{name: 'UNIT_NO', value: PF('unitUpfitsTable').selection}]); 
+            	disableAllButtons();
+            	showUpfitProgress();            	
+            }
+
+            function doShowNotes(){               
+           	 setSelectedFleetMastersRC([{name: 'UNIT_NO', value: PF('unitUpfitsTable').selection}]);
+           	 showLogBook();
+           }
+            
+            function setVendorTasks(){               
+            	setSelectedFleetMastersRC([{name: 'UNIT_NO', value: PF('unitUpfitsTable').selection}]);
+            }
+           	
+            function selectCurrentRow(table,index){
+            	if(index > (Number(50) -1)){//here 50 is rows being display in per page in dt
+            		index = index % 50;	
+            	}
+           	    PF(table).unselectAllRows();
+              	PF(table).selectRow(index, true);     
+                adjustBtnState();
+            } 
+          
+            function resetUIState() {
+            	  PF('unitUpfitsTable').unselectAllRows();
+            	  adjustBtnState()
+            }
+            
+            function saveScrollPosition() {
+            	document.getElementById('hiddenScrollPosition').value = $('#unitProgress .ui-datatable-scrollable-body').scrollTop();
+            }
+            function setScrollPosition() {
+            	if(PF('unitUpfitsTable').selection.length == 0) {
+            		moveScrollbarToTop();
+            	} else {
+            		$('#unitProgress .ui-datatable-scrollable-body').scrollTop(document.getElementById('hiddenScrollPosition').value);
+            	}
+            }
+            function upfitProgressOnClose(xhr, status, args){
+            	if(refreshAfterUpfitProgress == 'true'){
+            		upfitProgressOnCloseRC([{name:'success', value:args.success}]);
+            		refreshAfterUpfitProgress = false;
+            	}else{
+            		setScrollPosition(); 
+            		adjustBtnState();
+            	}
+            	ajaxStatusHide();
+            }
+            
+            function setRefreshNeeded(refreshNeeded){
+				if(refreshNeeded == 'true'){
+					refreshAfterUpfitProgress = refreshNeeded;
+				}
+			}
+            
+            function callRefreshRequestClientContact(){
+            	refreshRequestClientContact();
+            }   
+            
+            function disableAllButtons(){
+				PF('notesBtnWidgetVar').disable();
+				PF('requestClientContactBtnVar').disable(); 
+        		PF('upfitProgressBtnVar').disable();				
+            	
+        		if(#{upfitterInServiceQueueBean.searchType} == 2) {
+    				PF('vehicleOrderStatusBtnWidgetVar').disable(); 
+					PF('delarReasonBtnBtnWidgetVar').disable();    				            		
+            	} 
+        		
+        		if(!isEnquiryMode) {
+            	    PF('mainDoneBtnVar').disable();        			
+        		}       		
+            }
+            
+			function enableInServiceDateButtons(){
+				PF('updateInServiceDateBtnWidgetVar').enable();
+				PF('cancelInServiceDateBtnWidgetVar').enable(); 													
+			}
+			
+			function disableInServiceDateButtons(){
+				PF('updateInServiceDateBtnWidgetVar').disable();
+				PF('cancelInServiceDateBtnWidgetVar').disable(); 													
+			}	
+			
+         	$(window).load(function(){
+         		adjustBtnState();
+			});            
+			var refreshAfterUpfitProgress = false; 
+		    </script>
+	</ui:define>
+	
+</ui:composition>

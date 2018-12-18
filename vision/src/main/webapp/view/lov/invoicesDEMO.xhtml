@@ -1,0 +1,109 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	
+	<p:dialog header="Select Invoice"  
+	        widgetVar="invoicesLOVDEMO"
+		    id="INVOICE_GRID" 
+		    dynamic="true" 
+		    resizable="false" 
+			appendTo="@(body)"			    
+		    width="1300"
+		    height="350" 
+		    modal="true">	
+			    
+		<h:form id="invoicesLovForm" name="invoicesLovForm" prependId="false">
+			
+			<p:hotkey immediate="true" bind="esc" handler="PF('invoicesLOV').hide();"/>		
+			
+			<p:dataTable id="invoicesDataTable" 
+				value="#{invoicesLovBeanDemo.invoicesList}"
+				var="list"
+				paginator="true" paginatorPosition="bottom" >
+				    
+				<p:column width="7%">
+					<f:facet name="header">
+						<h:outputText value="Invoice Date" style="font-weight:bold" />
+					</f:facet>
+					<h:outputText value="#{list.invoiceDate}"></h:outputText>
+				</p:column>
+				<p:column width="7%">
+					<f:facet name="header">
+						<h:outputText value="Invoice No" style="font-weight:bold" />
+					</f:facet>
+					<h:outputText value="#{list.invoiceNo}"></h:outputText>
+				</p:column>
+				<p:column width="7%">
+					<f:facet name="header">
+						<h:outputText value="Contract No" style="font-weight:bold" />
+					</f:facet>
+					<h:outputText value="#{list.contractNo}"></h:outputText>
+				</p:column>
+				<p:column width="7%">
+					<f:facet name="header">
+						<h:outputText value="Amount" style="font-weight:bold" />
+					</f:facet>
+					<h:outputText value="#{list.amount}"></h:outputText>
+				</p:column>
+				<p:column width="7%">
+					<f:facet name="header">
+						<h:outputText value="Tax Amount" style="font-weight:bold" />
+					</f:facet>
+					<h:outputText value="#{list.taxAmount}"></h:outputText>
+				</p:column>
+				<p:column width="7%">
+					<f:facet name="header">
+						<h:outputText value="Total Amount" style="font-weight:bold" />
+					</f:facet>
+					<h:outputText value="#{list.totalAmount}"></h:outputText>
+				</p:column>
+				<p:column width="7%">
+					<f:facet name="header">
+						<h:outputText value="Billing Type/Source" style="font-weight:bold" />
+					</f:facet>
+					<h:outputText value="#{list.billingType}"></h:outputText>
+				</p:column>
+				<p:column width="7%">
+					<f:facet name="header">
+						<h:outputText value="Transaction Date" style="font-weight:bold" />
+					</f:facet>
+					<h:outputText value="#{list.detailTransactionDate}"></h:outputText>
+				</p:column>
+				<p:column width="12%">
+					<f:facet name="header">
+						<h:outputText value="Line Description" style="font-weight:bold" />
+					</f:facet>
+					<h:outputText value="#{list.detailLineDescription}"></h:outputText>
+				</p:column>
+				<p:column width="7%">
+					<f:facet name="header">
+						<h:outputText value="Amount" style="font-weight:bold" />
+					</f:facet>
+					<h:outputText value="#{list.detailAmount}"></h:outputText>
+				</p:column>
+				<p:column width="7%">
+					<f:facet name="header">
+						<h:outputText value="Tax Amount" style="font-weight:bold" />
+					</f:facet>
+					<h:outputText value="#{list.detailTaxAmount}"></h:outputText>
+				</p:column>
+				<p:column width="7%">
+					<f:facet name="header">
+						<h:outputText value="Total Amount" style="font-weight:bold" />
+					</f:facet>
+					<h:outputText value="#{list.detailTotalAmount}"></h:outputText>
+				</p:column>
+			</p:dataTable>	
+			
+			<div style="text-align: center;">
+				<h:outputText style="font-weight:bold;" value="Record Count: 3"/>
+				
+				<p:commandButton style="float:right;" value="Select">
+				</p:commandButton>
+				
+			</div>			
+        </h:form>	 
+	</p:dialog>				
+</ui:composition>						    

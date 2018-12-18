@@ -1,0 +1,212 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">                          
+	
+				 <p:dialog header="Select Service Provider" widgetVar="serviceProviderLOV" id="SERVICEPROVIDER_GRID" dynamic="true" resizable="true" appendTo="@(body)"
+						 width="1280" height="480" closeOnEscape="true" modal="true"  onShow="setFirstPageServiceProviderDataTableWidget(); tabIndexDev();">
+
+				 <h:form id="serviceProviderLovToolbarForm" name ="serviceProviderLovToolbarForm" prependId = "false" onkeydown="filter_onkeydown(event,'refresh')">
+                  
+					<p:toolbar id="searchToolbar">  
+					    <p:toolbarGroup align="left">  
+					    		<p:separator></p:separator>
+								<p:outputLabel for="provider" value="Provider : " />								
+								<p:inputText id="provider" title="Provider"  value="#{serviceProviderLovBean.provider}" tabindex="1" />
+								<p:outputLabel for="zipCode" value=" Zip Code : "   />								
+								<p:inputText id="zipCode" title="Zip Code"  value="#{serviceProviderLovBean.zipCode}" tabindex="2" />
+								<p:outputLabel for="phone" value=" Phone Number : "   />
+								<p:inputMask id="phone" title="Phone Number" value="#{serviceProviderLovBean.phoneNumber}" mask="(999)?999-9999" tabindex="3" />
+								<p:outputLabel for="payee" value=" Payee : "  />								
+								<p:inputText id="payee" title="Payee"  value="#{serviceProviderLovBean.payee}" tabindex="4" />
+								
+								<p:outputLabel for="serviceTypeCode" value=" Service Type : "  />								
+								<p:selectOneMenu id="serviceTypeCode"  widgetVar="serviceTypeCodeWidget"
+									value="#{serviceProviderLovBean.serviceTypeCode}"  tabindex="5" >
+									<f:selectItem itemValue="" itemLabel="ALL"></f:selectItem>
+									<f:selectItems
+										value="#{serviceProviderLovBean.serviceTypeCodelist}"
+										var="serviceTypeCode" itemLabel="#{serviceTypeCode.suppServiceTypeCode}"
+										itemValue="#{serviceTypeCode.suppServiceTypeCode}" />
+								</p:selectOneMenu>
+								
+					    </p:toolbarGroup>  
+					    <p:toolbarGroup align="right">  
+							<p:separator></p:separator>
+							
+					        <p:commandButton  value="Search" id="refresh" title="Refresh" process="@this, searchToolbar" tabindex="6" 
+					        	actionListener="#{serviceProviderLovBean.refresh}"  update=":serviceProviderLovForm:serviceProviderDataTableId :serviceProviderLovForm:serviceProviderSelectPanel" oncomplete="setFirstPageServiceProviderDataTableWidget();"/> 
+					        
+					    </p:toolbarGroup>  
+					  </p:toolbar>  
+				 </h:form>
+				 <h:form id="serviceProviderLovForm" name ="serviceProviderLovForm" prependId = "false" onkeydown="body_onkeydown(event,'serviceProviderSelectButton','serviceProviderLOV');">
+				       
+
+                    <p:dataTable  id="serviceProviderDataTableId"   widgetVar="serviceProviderDataTableWidget" var="serviceProvider" scrollable="true" scrollHeight="270" resizableColumns="true"
+                           lazy="true" value="#{serviceProviderLovBean.serviceProviders}" rows="#{serviceProviderLovBean.rowsPerPage}" paginator="true" paginatorPosition="bottom"  
+                           selection = "#{serviceProviderLovBean.selectedServiceProvider}" selectionMode="single"
+                           emptyMessage = "#{serviceProviderLovBean.dataTableMessage}" tabindex="-1" 
+                           >
+                           
+                           <p:ajax event="rowDblselect" listener="#{serviceProviderLovBean.onRowSelect}" 
+                                    update=":serviceProviderLovForm:lovServiceProviderName :serviceProviderLovForm:lovServiceProviderNumber :serviceProviderLovForm:lovServiceProviderId :serviceProviderLovForm:lovPayeeName :serviceProviderLovForm:lovPayeeNumber" 
+                                    oncomplete="hideServiceProviderLov();setServiceProviderValues();"  />
+                         
+                           <p:ajax event="rowSelect" listener="#{serviceProviderLovBean.onRowSelect}" 
+                            	update=":serviceProviderLovForm:lovServiceProviderName :serviceProviderLovForm:lovServiceProviderNumber :serviceProviderLovForm:lovServiceProviderId :serviceProviderLovForm:lovPayeeName :serviceProviderLovForm:lovPayeeNumber :serviceProviderLovForm:lovServiceTypeCode" />
+                            
+                           <p:ajax event="page" onstart="clearDataTableSelection('serviceProviderDataTableWidget');" oncomplete="setScrollDivAtTop();"/>
+                           
+                          
+                           <p:column width="190" resizable="true" tabindex="-1" >
+                                <f:facet name="header">
+                                    <h:outputText value="Service Provider"/>
+                                </f:facet>
+                                <h:outputText value="#{serviceProvider.serviceProviderName}"></h:outputText><br/>
+                                <h:outputText value="Serv. Prov. No: " rendered="#{serviceProvider.serviceProviderNumber != null ? true : false}" escape="false"></h:outputText>
+                                <h:outputText value="#{serviceProvider.serviceProviderNumber}"></h:outputText>
+                                <br/>
+                                <h:outputText value="#{serviceProvider.serviceProviderAddress1}"></h:outputText>
+                                <h:outputText value="#{not empty serviceProvider.serviceProviderAddress2 ? '&lt;br /&gt;' : ''}" escape="false" />
+                                <h:outputText value="#{serviceProvider.serviceProviderAddress2}"></h:outputText>
+                                <h:outputText value="#{not empty serviceProvider.serviceProviderAddress3 ? '&lt;br /&gt;' : ''}" escape="false" />
+                                <h:outputText value="#{serviceProvider.serviceProviderAddress3}"></h:outputText>
+                                <h:outputText value="#{not empty serviceProvider.serviceProviderAddress4 ? '&lt;br /&gt;' : ''}" escape="false" />
+                                <h:outputText value="#{serviceProvider.serviceProviderAddress4}"></h:outputText><br/>
+                                <h:outputText value="#{serviceProvider.serviceProviderTownCity}"></h:outputText>
+                                <h:outputText value="#{not empty serviceProvider.serviceProviderRegion ? ', ' : ''}" escape="false" />
+                                <h:outputText value="#{serviceProvider.serviceProviderRegion}
+                                                    #{serviceProvider.serviceProviderPostcode}"></h:outputText>
+                            </p:column>
+
+                            <p:column width="110" tabindex="-1">
+                                <f:facet name="header">
+                                    <h:outputText value="Serv. Prov. Phone"/>
+                                </f:facet>
+                                <h:outputText value="#{serviceProvider.serviceProviderTelephoneNumber}"></h:outputText>
+                            </p:column>
+                            
+                            <p:column width="170" tabindex="-1">
+                                <f:facet name="header">
+                                    <h:outputText value="Serv. Prov. Discounts"/>
+                                </f:facet>
+                                <h:outputText escape="false" value="#{serviceProvider.discountMsg}"></h:outputText>
+                            </p:column>
+                            
+                            <p:column width="195" tabindex="-1">
+                                <f:facet name="header">
+                                    <h:outputText value="Payee"/>
+                                </f:facet>
+                                <h:outputText value="#{serviceProvider.payeeName}"></h:outputText><br/>
+                                <h:outputText value="Payee No: " rendered="#{serviceProvider.payeeNumber != null ? true : false}" escape="false"></h:outputText>
+                                <h:outputText value="#{serviceProvider.payeeNumber}"></h:outputText>
+                                <br/>
+                                <h:outputText value="#{serviceProvider.payeeAddress1}"></h:outputText>
+                                <h:outputText value="#{not empty serviceProvider.payeeAddress2 ? '&lt;br /&gt;' : ''}" escape="false" />
+                                <h:outputText value="#{serviceProvider.payeeAddress2}"></h:outputText>
+                                <h:outputText value="#{not empty serviceProvider.payeeAddress3 ? '&lt;br /&gt;' : ''}" escape="false" />
+                                <h:outputText value="#{serviceProvider.payeeAddress3}"></h:outputText>
+                                <h:outputText value="#{not empty serviceProvider.payeeAddress4 ? '&lt;br /&gt;' : ''}" escape="false" />
+                                <h:outputText value="#{serviceProvider.payeeAddress4}"></h:outputText><br/>
+                                <h:outputText value="#{serviceProvider.payeeTownCity}"></h:outputText>
+                                <h:outputText value="#{not empty serviceProvider.payeeRegion ? ', ' : ''}" escape="false" /> 
+                                <h:outputText value="#{serviceProvider.payeeRegion}
+                                                    #{serviceProvider.payeePostcode}"></h:outputText>
+                            </p:column>
+                            
+                            <p:column width="100" tabindex="-1">
+                                <f:facet name="header">
+                                    <h:outputText value="Payee Phone"/>
+                                </f:facet>
+                                <h:outputText value="#{serviceProvider.payeeTelephoneNumber}"></h:outputText>
+                            </p:column>
+                            <p:column width="100" tabindex="-1">
+                                <f:facet name="header">
+                                    <h:outputText value="Service Type"/>
+                                </f:facet>
+                                <h:outputText value="#{serviceProvider.serviceType}"></h:outputText>
+                            </p:column>
+                            
+                    </p:dataTable>
+                    
+    				<p:panel id="serviceProviderSelectPanel" style="text-align:center; border:none">
+                            <h:outputText style="font-weight:bold;" 
+                                value="Record Count: #{serviceProviderLovBean.serviceProviders.rowCount}">
+                            </h:outputText>
+                            
+                            <p:commandButton  value="Select" id = "serviceProviderSelectButton" name ="serviceProviderSelectButton" style="float:right;" 
+                            oncomplete="hideServiceProviderLov();setServiceProviderValues();" tabindex="8" >
+                            </p:commandButton>
+                    </p:panel>
+                        		
+    					<h:inputHidden id="inputServiceProviderName" value="serviceProviderLOV" />
+                        <h:inputHidden id="lovServiceProviderName" value="#{serviceProviderLovBean.serviceProviderName}" />
+                        <h:inputHidden id="lovServiceProviderNumber" value="#{serviceProviderLovBean.serviceProviderNumber}" />
+                        <h:inputHidden id="lovServiceProviderId" value="#{serviceProviderLovBean.serviceProviderId}" />
+                        <h:inputHidden id="lovPayeeName" value="#{serviceProviderLovBean.payeeName}" />
+                		<h:inputHidden id="lovPayeeNumber" value="#{serviceProviderLovBean.payeeNumber}" />
+                        <h:inputHidden id="lovServiceTypeCode" value="#{serviceProviderLovBean.serviceTypeCode}" />
+    			</h:form>
+			
+				</p:dialog>
+			<script type="text/javascript">
+		
+			function tabIndexDev(){
+				
+				var tabvalue = -1;
+				var tabrow = 7;
+				$('.ui-paginator a').attr('tabindex',tabvalue);
+				$('.ui-dialog-titlebar .ui-dialog-titlebar-close').attr('tabindex',tabvalue);
+				$('#SERVICEPROVIDER_GRID #serviceProviderDataTableId_data tr:first-child').attr('tabindex',tabrow);
+			}
+
+			function setServiceProviderValues(){
+			var lovNameArray = new Array();
+			var lovValueArray = new Array();
+			lovNameArray[0]='SERVICE_PROVIDER_NAME';
+			lovValueArray[0]=document.getElementById('lovServiceProviderName').value;
+			lovNameArray[1]='SERVICE_PROVIDER_NUMBER';
+			lovValueArray[1]=document.getElementById('lovServiceProviderNumber').value;
+			lovNameArray[2]='SERVICE_PROVIDER_ID';
+			lovValueArray[2]=document.getElementById('lovServiceProviderId').value;
+			lovNameArray[3]='PAYEE_NAME';
+			lovValueArray[3]=document.getElementById('lovPayeeName').value;
+			lovNameArray[4]='PAYEE_NUMBER';
+			lovValueArray[4]=document.getElementById('lovPayeeNumber').value;
+			lovNameArray[5]='SERVICE_TYPE_CODE';
+			lovValueArray[5]=document.getElementById('lovServiceTypeCode').value;
+			
+			<!-- This method need to implement in parent page to populate LOV seletion-->
+			setSelection(document.getElementById('inputServiceProviderName').value,lovNameArray,lovValueArray);
+		}
+		
+		function showServiceProviderLov(){
+			showDialog('serviceProviderLOV');
+		}	
+		
+		function hideServiceProviderLov(){
+			hideDialog('serviceProviderLOV');
+		}
+		
+		function setFirstPageServiceProviderDataTableWidget(){
+			clearDataTableSelection('serviceProviderDataTableWidget');
+			setDataTableToFirstPage('serviceProviderDataTableWidget');
+			// also select the first row, but only if we have data
+			setDataTableToFirstRow('serviceProviderDataTableWidget');
+		}
+				
+		
+		function filter_onkeydown(event,buttonName) 
+	    {	
+		 	if(event.keyCode==13 &amp;&amp; document.getElementById(buttonName)) 
+	        {
+				document.getElementById(buttonName).click();	
+	        }
+		 	if( event.keyCode==27){
+		 		PF('serviceProviderLOV').hide();
+			}
+	    }
+		</script>
+</ui:composition>

@@ -1,0 +1,257 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">                          
+	
+	<p:dialog header="Select Stock Unit" widgetVar="stockUnitsLOV" id="stockUnitDialogId" dynamic="true" resizable="true" appendTo="@(body)"
+						 width="1280" height="550" closeOnEscape="true" modal="true"  onShow="setFirstPageServiceProviderDataTableWidget();"
+						 onHide="clearInputText(['unitNoTxtId', 'vehicleDescTxtId']);">
+
+	 	<h:form id="stockUnitsLovFormId" name ="stockUnitsLovForm" prependId = "false" onkeydown="filter_onkeydown(event,'stockUnitsSelectButtonId');">
+	 		<p:toolbar id="searchToolbar">  
+				<p:toolbarGroup align="left">  
+			    	<p:focus context="searchToolbar"/>	
+		    		<p:separator></p:separator>	
+												    		
+		    		<p:outputLabel for="unitNoTxtId" value="Unit No : " />								
+					<p:inputText id="unitNoTxtId" style="width:100px" value="#{stockUnitsLovBean.unitNoSearch}" title="Unit No"/>
+					<p:separator ></p:separator>
+							
+		    		<p:outputLabel for="vehicleDescTxtId" value="Vehicle Description : " />								
+					<p:inputText id="vehicleDescTxtId" style="width:180px" value="#{stockUnitsLovBean.vehicleDescSearch}" title="Vehicle Description"/>
+					<p:separator></p:separator>
+					<p:commandButton  value="Search" id="searchBtnId" title="Filter" oncomplete="setFirstPageServiceProviderDataTableWidget();" 
+									actionListener="#{stockUnitsLovBean.performSearch}" update="stockUnitDataTableId stockUnitsSelectPanel"
+									onstart="lockScreen();" ajax="true"/>
+			    </p:toolbarGroup>  
+			</p:toolbar> 
+	
+		    <p:dataTable  id="stockUnitDataTableId"   widgetVar="stockUnitsDataTableWidget" var="stockUnit" scrollable="true" scrollHeight="400" resizableColumns="true"
+		           lazy="true" value="#{stockUnitsLovBean.stockUnits}" rows="#{stockUnitsLovBean.rowsPerPage}" paginator="true" paginatorPosition="bottom"  
+		           selection = "#{stockUnitsLovBean.selectedStockUnit}" selectionMode="single" rowIndexVar="rowIndex" rowKey="#{stockUnit.fmsId}">
+		           
+		           <p:ajax event="rowDblselect" listener="#{stockUnitsLovBean.onRowSelect}" 
+		                    update=":stockUnitsLovFormId:lovStockUnitFmsId" 
+		                    oncomplete="hideStockUnitsLov();setStockUnitValues();"  />
+		         
+		           <p:ajax event="rowSelect" listener="#{stockUnitsLovBean.onRowSelect}" 
+		            	update=":stockUnitsLovFormId:lovStockUnitFmsId"/>
+		            
+		           <p:ajax event="page" onstart="clearDataTableSelection('stockUnitsDataTableWidget');" oncomplete="setScrollDivAtTop();"/>
+		           <p:ajax event="sort" listener="#{stockUnitsLovBean.onSortOperation}" oncomplete="setScrollDivAtTop();"/>
+		          
+		           <p:column width="7%" resizable="true" sortBy="#{stockUnit.unitNo}" >
+		                <f:facet name="header">
+		                    <h:outputText value="Unit No"/>
+		                </f:facet>
+		                <h:outputText value="#{stockUnit.unitNo}" />
+		            </p:column>
+		           	<p:column width="43%" resizable="true" sortBy="#{stockUnit.vehicleDescription}">
+		                <f:facet name="header">
+		                    <h:outputText value="Description"/>
+		                </f:facet>
+		                <h:outputText value="#{stockUnit.vehicleDescription}" />
+	            	</p:column>
+		           	<p:column width="8%" resizable="true" style="text-align: center;">
+		                <f:facet name="header">
+		                    <h:outputText value="Accessories"/>
+		                </f:facet>
+		   				<p:commandLink id="lovEquipmentInfoLink" 
+		   						onstart="selectRow(#{rowIndex})"
+                   				actionListener="#{stockUnitsLovBean.populateStockUnitEquipment}"		
+                   				oncomplete="PF('lovEquipmentInfoWidget').show();"					                              
+                             	update=":lovEquipmentInfoDialog" 
+                             	title="View Equipment" >
+							<p:graphicImage value="/images/custins.png" style="border-style:none" />
+							<f:setPropertyActionListener value="#{stockUnit}" target="#{stockUnitsLovBean.selectedStockUnit}" />	
+						</p:commandLink>
+		            </p:column>
+		           	<p:column width="20%" resizable="true" style="white-space: nowrap; text-overflow: ellipsis;">
+		                <f:facet name="header">
+		                    <h:outputText value="Exterior / Interior Colors"/>
+		                </f:facet>
+		                <h:outputText value="#{stockUnit.exteriorColor} / #{stockUnit.trimColor}" title="#{stockUnit.exteriorColor} / #{stockUnit.trimColor}"  />
+		            </p:column>
+		           	<p:column width="7%" resizable="true" >
+		                <f:facet name="header">
+		                    <h:outputText value="Current Odo"/>
+		                </f:facet>
+		                <h:outputText value="#{stockUnit.lastOdoReading}" styleClass="alignmentRight">
+		                	<f:convertNumber type="number" pattern="#,##0" />
+		                </h:outputText>
+		            </p:column>
+		           	<p:column width="8%" resizable="true" style="text-align: center;">
+		                <f:facet name="header">
+		                    <h:outputText value="Delivered?"/>
+		                </f:facet>
+		                <h:outputText value="Yes" rendered="#{stockUnit.receivedDate != null}"/>
+		                <p:commandLink id="lovETADateId" rendered="#{stockUnit.receivedDate == null}"
+							onstart="selectRow(#{rowIndex})"
+							actionListener="#{stockUnitsLovBean.populateETADate}"
+							title="View ETA Date"
+							update="lovETADateDialogId" 
+							oncomplete="showDialog('lovETADateWidget');"  
+							value="No" >  
+							<f:setPropertyActionListener value="#{stockUnit}" target="#{stockUnitsLovBean.selectedStockUnit}" />
+						</p:commandLink>
+		            </p:column>
+		           	<p:column width="7%" resizable="true" style="text-align: center;">
+		                <f:facet name="header">
+		                    <h:outputText value="Active Quotes"/>
+		                </f:facet>
+		                <p:commandLink id="lovActiveQuoteLinkId" 
+							onstart="selectRow(#{rowIndex})"
+							actionListener="#{stockUnitsLovBean.populateActiveQuotes}"
+							title="View Active Quotes"
+							update="lovActiveQuotesDialogId" 
+							oncomplete="showDialog('lovActiveQuotesWidget');"  
+							value="#{stockUnit.quoteCount}" >  
+							<f:setPropertyActionListener value="#{stockUnit}" target="#{stockUnitsLovBean.selectedStockUnit}" />
+						</p:commandLink>
+		            </p:column>
+		
+		            
+		    </p:dataTable>
+	                
+			<p:panel id="stockUnitsSelectPanel" style="text-align:center; border:none">
+		        <h:outputText style="font-weight:bold;" 
+		            value="Record Count: #{stockUnitsLovBean.stockUnits.rowCount}">
+		        </h:outputText>
+		        
+		        <p:commandButton  value="Select" id = "stockUnitsSelectButtonId" name ="stockUnitsSelectButton" style="float:right;" 
+		        oncomplete="hideStockUnitsLov();setStockUnitValues();" tabindex="8" >
+		        </p:commandButton>
+	        </p:panel>
+	                    		
+	        <h:inputHidden id="lovStockUnitFmsId" value="#{stockUnitsLovBean.stockUnitFmsId}" />
+		</h:form>
+			
+	</p:dialog>
+	
+				<p:dialog id="lovEquipmentInfoDialog" widgetVar="lovEquipmentInfoWidget" modal="true"
+                header="Accessories" resizable="false" appendTo="@(body)" style="min-width:450px; max-width:800px;"
+                closeOnEscape="true" onShow="setFocus('lovEquipmentInfoDialogDoneBtn');">
+	            <h:form id="lovEquipmentForm" prependId="false">
+					<p:panel id="lovEquipmentPanel" style="max-height:500px;overflow:auto;" >
+						<h:panelGroup >						     
+						    <h:outputText styleClass="ui-label" value="Standard" />
+						    <br/>
+						    <ui:repeat value="#{stockUnitsLovBean.standardEquipment}" var="standardEquipment">	
+							     <h:outputText value="#{standardEquipment}" /><br/>						     
+						    </ui:repeat>
+						    <h:outputText value="None" rendered="#{stockUnitsLovBean.standardEquipment.size() eq 0}"  /><br/>
+						    <h:outputText styleClass="ui-label" value="Model" />
+						    <br/>
+						    <ui:repeat value="#{stockUnitsLovBean.modelEquipment}" var="modelEquipment">	
+							     <h:outputText value="#{modelEquipment}" /><br/>						     
+						    </ui:repeat>
+							<h:outputText value="None" rendered="#{stockUnitsLovBean.modelEquipment.size() eq 0}"  /><br/>
+						    <h:outputText styleClass="ui-label" value="Dealer" />
+						    <br/>
+						    <ui:repeat value="#{stockUnitsLovBean.dealerEquipment}" var="dealerEquipment">	
+							     <h:outputText value="#{dealerEquipment}" /><br/>						     
+						    </ui:repeat>
+							<h:outputText value="None" rendered="#{stockUnitsLovBean.dealerEquipment.size() eq 0}"  />
+					    </h:panelGroup>
+	                </p:panel>
+		    	  	<br/>
+				 	<p:commandButton id="lovEquipmentInfoDialogDoneBtn" value="Done" onclick="PF('lovEquipmentInfoWidget').hide();" />               
+	            </h:form>
+	        </p:dialog>
+	
+		    <p:dialog id="lovActiveQuotesDialogId" widgetVar="lovActiveQuotesWidget" closeOnEscape="true" modal="true" onShow="setFocus('lovActiveQuotesDialogDoneBtn');"
+	    			header="Active Quotes" resizable="false" appendTo="@(body)"
+	    			width="45%" height="50%">
+	    	<h:form id="lovActiveQuotesFormId" prependId="false">
+	    		<p:panel id="lovActiveQuotesPanel">
+	    			<p:dataTable id="lovActiveQuotesTblId" widgetVar="lovActiveQuotesTblWidget" var="activeQuote"
+	    			value="#{stockUnitsLovBean.activeQuoteList}"
+	    			scrollable="true" scrollHeight="150">
+	    				<p:column headerText="Quote No." width="18%">
+	    					<h:outputText value="#{activeQuote.quoteDesc}"/>
+	    				</p:column>
+	    				<p:column headerText="Creator" width="30%">
+	    					<h:outputText value="#{activeQuote.originator}"/>
+	    				</p:column>
+	    				<p:column headerText="Quote Date" width="25%">
+	    					<h:outputText value="#{activeQuote.quoteDate}">
+	    						<f:convertDateTime pattern="MM/dd/yyyy" />
+	    					</h:outputText>
+	    				</p:column>
+	    				<p:column headerText="Status" width="27%">
+	    					<h:outputText value="#{activeQuote.status}"/>
+	    				</p:column>
+	    			</p:dataTable>
+	    		</p:panel>
+	    		<br/>
+			 	<p:commandButton id="lovActiveQuotesDialogDoneBtn" value="Done" onclick="hideDialog('lovActiveQuotesWidget')" />
+	    	</h:form>
+	    </p:dialog>
+	
+		    <p:dialog id="lovETADateDialogId" widgetVar="lovETADateWidget" closeOnEscape="true" modal="true" onShow="setFocus('lovETADateDialogDoneBtn');"
+	    			 resizable="false" appendTo="@(body)"
+	    			width="15%" >
+	    	<h:form id="lovETADateFormId" prependId="false">
+	    		<p:panel id="lovETADatePanel">
+	    			<p:outputLabel value="ETA Date: " style="font-weight:bold"/>
+   					<h:outputText value="#{stockUnitsLovBean.etaDate}">
+   						<f:convertDateTime pattern="MM/dd/yyyy" />
+   					</h:outputText>
+	    		</p:panel>
+	    		<br/>
+			 	<p:commandButton id="lovETADateDialogDoneBtn" value="Done" onclick="hideDialog('lovETADateWidget')" />
+	    	</h:form>
+	    </p:dialog>
+	
+	
+		<script type="text/javascript">
+	
+
+		function setStockUnitValues(){
+			var lovNameArray = new Array();
+			var lovValueArray = new Array();
+			lovNameArray[0]='STOCK_UNIT_FMS_ID';
+			lovValueArray[0]=document.getElementById('lovStockUnitFmsId').value;
+			setSelection('stockUnitsLOV', lovNameArray,lovValueArray);
+		}
+		
+		function showStockUnitsLov(){
+			showDialog('stockUnitsLOV');
+		}	
+		
+		function hideStockUnitsLov(){
+			hideDialog('stockUnitsLOV');
+		}
+		
+		function setFirstPageServiceProviderDataTableWidget(){
+			clearDataTableSelection('stockUnitsDataTableWidget');
+			setDataTableToFirstPage('stockUnitsDataTableWidget');
+			// also select the first row, but only if we have data
+			setDataTableToFirstRow('stockUnitsDataTableWidget');
+		}
+		
+		function selectRow(index) {
+			clearDataTableSelection('stockUnitsDataTableWidget');
+			PF('stockUnitsDataTableWidget').selectRow(index,false);
+		}
+		
+		function filter_onkeydown(event,buttonName) 
+	    {	
+			var sourceId = event.target.id;
+			if(sourceId == 'unitNoTxtId' || sourceId == 'vehicleDescTxtId' || sourceId == 'searchBtnId'){
+				if(event.keyCode==13){
+					document.getElementById('searchBtnId').click();
+				}
+			}else{
+			 	if(event.keyCode==13 &amp;&amp; document.getElementById(buttonName)) 
+		        {
+					document.getElementById(buttonName).click();	
+		        }
+			 	if( event.keyCode==27){
+			 		PF('stockUnitsLOV').hide();
+				}
+			}
+	    }
+		</script>
+</ui:composition>

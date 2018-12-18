@@ -1,0 +1,126 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	<style type="text/css">
+   	 	
+      
+   </style>
+	<p:dialog header="Vehicle Maintenance Schedule"
+		widgetVar="vehicleMaintenanceScheduleVar"
+		id="vehicleMaintenanceSchedule" dynamic="true" resizable="true"
+		appendTo="@(body)" width="80%" height="720" modal="true">
+		<h:form id="vehicleMaintenanceScheduleForm"
+			name="vehicleMaintenanceScheduleForm" prependId="false">
+			 <p:hotkey immediate="true" bind="esc" handler="PF('vehicleMaintenanceScheduleVar').hide();"/>
+			 <!-- Message display -->
+		
+			<p:messages id="messagesVehSch"   showDetail="false" autoUpdate="true" showSummary="true" globalOnly="false"/>
+		
+			<p:panel style="width:100%">
+				<h:panelGrid columns="2">
+					<p:outputLabel value = "Current POC:" styleClass="ui-label"/>
+					<h:outputText style="white-space:nowrap;" escape="false" value="#{viewVehicleMaintenanceScheduleBean.sendToContactName}"/>
+					<h:outputText />
+					<h:outputText style="white-space:nowrap;" escape="false" value="#{viewVehicleMaintenanceScheduleBean.sendToContactAddress}"/>
+							
+							
+						
+					<p:outputLabel value = "Date Generated:" styleClass="ui-label"/>
+					<h:outputText style="white-space:nowrap;" value="#{viewVehicleMaintenanceScheduleBean.dateGenerated}">
+						<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+					</h:outputText>
+					
+					<p:outputLabel value = "Driver Authorization Limit:" styleClass="ui-label"/>
+					<h:outputText value="#{viewVehicleMaintenanceScheduleBean.driverAuthorizationLimit}" >
+						<f:convertNumber type="currency" currencySymbol="$" />
+					</h:outputText>
+					
+					<p:outputLabel value = "Driver Authorization Number:" styleClass="ui-label"/>
+					<h:outputText value="#{viewVehicleMaintenanceScheduleBean.driverAuthorizationNumber}" />
+				</h:panelGrid>
+			</p:panel>
+			<p:panel header="Scheduled Maintenance Grid"  style="width:100%">
+				<div style="text-align:center">
+					
+					<p:outputLabel value="Vin:" styleClass="ui-label"/>
+					<p:spacer width="5"/>
+					<h:outputText value="#{viewVehicleMaintenanceScheduleBean.vin}" />
+					<br/>
+					
+					<p:outputLabel value="Unit #:" styleClass="ui-label"/>
+					<p:spacer width="5"/>
+					<h:outputText
+						value="#{viewVehicleMaintenanceScheduleBean.unitNumber}" />
+					<p:spacer width="10"/>
+					<p:outputLabel value="Fleet Ref #:" styleClass="ui-label"/>
+					<p:spacer width="5"/>
+					<h:outputText
+						value="#{viewVehicleMaintenanceScheduleBean.fleetRefNumber}" />
+					<br/>
+					
+					<h:outputText
+						value="#{viewVehicleMaintenanceScheduleBean.modelDesc}" />
+					<br/>
+					<br/>
+					
+				</div>
+				
+				<p:dataTable styleClass="verticalHeader"  scrollable="true" scrollWidth="98%"
+					value="#{viewVehicleMaintenanceScheduleBean.columnValues}" scrollHeight="#{viewVehicleMaintenanceScheduleBean.scrollHeight}"
+					var="columnValues"
+					rowIndexVar="columnValuesRowIndex">
+					<p:columns value="#{viewVehicleMaintenanceScheduleBean.headerList}" width="85"
+						var="headerText" columnIndexVar="index">
+						
+							<f:facet name="header"  >
+							
+							<h:outputText value="#{headerText}" escape="false" style="white-space:pre-line;"/>
+							
+							</f:facet>
+						
+						<div style="text-align:center">
+						<h:outputText value="#{columnValues[index]}" />
+						<h:panelGroup columns="1"  rendered="#{headerText == 'PO No' and columnValues[index] == null}">
+							<h:outputLink onclick="setSelectedAuthNumber('#{columnValues[index + 1]}'); return false;" rendered="#{!viewVehicleMaintenanceScheduleBean.readOnly}">Assign</h:outputLink><br/>
+						</h:panelGroup>
+						
+						</div>
+					</p:columns>
+				</p:dataTable>
+				<h:panelGrid columns="1">
+					<p:spacer height="5"/>
+					<h:outputText value="* Change engine oil and filter at interval indicated on schedule, when the maintenance light indicates due, or a minimum of every 12 months - whichever occurs first." />
+					<p:spacer />
+					<h:outputText value="** If the designated service only allows for a check or inspect, a separate authorization is required for replacement or repair." />
+				</h:panelGrid>
+			</p:panel>
+			 <h:inputHidden id="targetInputNameVehSch" value="vehicleScheduleLOV" />
+		</h:form>
+	</p:dialog>
+	<script type="text/javascript">
+	function showVehMaintSchedule(){
+	
+	}
+	function setSelectedAuthNumber( authorizationNumber){
+			var lovNameArray = new Array();
+			var lovValueArray = new Array();
+			lovNameArray[0]='AUTHORIZATION_NUMBER';
+			lovValueArray[0]=authorizationNumber;
+			<!-- This method need to implement in parent page to populate LOV seletion-->
+			setSelection(document.getElementById('targetInputNameVehSch').value,lovNameArray,lovValueArray);
+			hideVehMaintSchedule();
+	}	
+	
+	function hideVehMaintSchedule(){
+		hideDialog('vehicleMaintenanceScheduleVar');
+	}
+	
+	function showVehMaintSchedule(xhr, status, args) {
+		if (!args.failure) {
+			showDialog('vehicleMaintenanceScheduleVar');
+		} 
+	}
+	</script>
+</ui:composition>

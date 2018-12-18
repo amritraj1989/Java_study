@@ -1,0 +1,72 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+    <p:confirmDialog id="minimumCharacterDialog"
+		message="#{msgs.minimum_character_search}" header="Alert"
+		widgetVar="minimumCharacterWidgetVar"
+		appendTo="@(body)">
+		<p:focus context="minimumCharacterDialog" />
+
+		<h:form prependId="false">
+			<p:hotkey immediate="true" bind="esc"
+				handler="PF('minimumCharacterWidgetVar').hide(); focusSourceElement()" />
+			<p:commandButton id="cancelAlert" value="Ok"
+				onclick="PF('minimumCharacterWidgetVar').hide(); focusSourceElement()" />
+		</h:form>
+	</p:confirmDialog> 
+	 
+
+    <script type="text/javascript"> 	
+	    var sourceElement;
+		
+		/**
+		* Checks for at least one alphanumeric character
+		* in the passed in objects val(). If one does not exist,
+		* an alert dialog is displayed and returns false
+		* to cancel the caller's event. Otherwise, true is 
+		* returned indicating to the caller that at
+		* least one alphanumeric character was found.
+		* @param o (Required) UiElement that contains that may or may 
+		*          not contain the value to check. This object will 
+		*          also receive focus when the alert dialog closes.
+		* @param str The string to check
+		*/
+		function hasMinAlphaNumericCharacters(o, str){
+			var displayAlert = false;
+	
+			if(typeof str == 'undefined'){
+				if((o.val().length &lt; 1) || (!o.val().match(/[A-z0-9]/g))){
+					displayAlert = true;
+	    	    }
+			} else {
+		    	if((str.length &lt; 1) || (!str.match(/[A-z0-9]/g))){
+		    		displayAlert = true;
+		    	}
+			}
+			
+			if(displayAlert){
+				sourceElement = o;
+    	        showDialog('minimumCharacterWidgetVar');	
+    	        setFocus('cancelAlert');
+    	        return false;				
+			}
+			
+	    	return true;
+		}		
+
+		/**
+		* Sets focus to the element the curosor was on prior
+		* to the enter keypress event.
+		*/
+		function focusSourceElement(){
+			if(typeof sourceElement != 'undefined'){		
+				sourceElement.focus();
+			}
+		}			
+				
+	</script>	
+	
+</ui:composition>

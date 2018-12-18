@@ -1,0 +1,39 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>AdminMiscellaneous</title>
+    <body>
+    	<h1>Admin Miscellaneous</h1>
+    	<h2>Overview</h2>
+    		<p>Admin Miscellaneous page is used for simple miscellaneous administration operations 
+    		<span>This page includes an on demand refresh of application cache (only one for now).</span>
+    		</p>
+    		<p>It's broken up into <b>Acceptance Tests</b> that are Automated, <b>Manual Tests</b> and items that are known but deemed <b>Out of Scope</b>.</p>
+    		<p>The <b>Notes and Resources</b> section contains notes and links to various documents/resources related to this page/feature.</p>
+
+    	<h2>Acceptance Tests (Automated)</h2>
+    		<ul concordion:execute="#result = testRefreshCache()"><li>When clicking on the Refresh Cache button the cache will be refreshed and a <span concordion:assertTrue="#result">"Refresh cache process completed successfully" message will occur.</span></li></ul>
+    	<h2>Manual Tests</h2>
+    		<ul><li>Clicking on "Refresh Cache" stays on the current page and displays a success message when the refresh operation is complete</li></ul>
+    		<ul><li>Check User Interface is consistent with the Usability Guidelines.</li></ul>
+    		
+    	<h2>Untested (Out of Scope)</h2>
+    		<ul><li>Performance/Load testing of "Refresh Cache" is out of scope. If it does not impact the users during QA the assumption is this will not change in production.</li></ul>
+    		
+    	<h2>Notes and Resources</h2>
+    	    <h5>Related Stories</h5>
+    		<ul><li><a href="http://bpm5dwebvm/sites/projmgmt/WillowDev/Lists/Willow%20Product%20Backlog/DispForm.aspx?ID=105">#105 Trigger Cached Data Refresh on demain from Admin UI</a></li></ul>
+
+    		<h5>End User Documentation / Help Files (Job Aides)</h5>
+    		<ul><li>TODO: Link to JobAides?</li></ul>
+    		
+    		<h5>System Documentation (JavaDocs)</h5>
+    		<p>The primary business service related to refreshing the cache is the LookupCacheService and Impl (TODO: add details). 
+    		</p>
+    		<ul><li>TODO: link to the refreshCache method within LookupCacheService and Impl</li></ul>
+    		
+    		    	<h5>Design Notes</h5>
+    		<p>TODO: fill in or omit if "None".</p>
+    		
+
+    </body>
+</html>

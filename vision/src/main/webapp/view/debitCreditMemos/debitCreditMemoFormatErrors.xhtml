@@ -1,0 +1,253 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" 
+	template="../../templates/ui.xhtml" >
+
+	<ui:define name="content">
+	   	<h:form id="breadCrumbForm" prependId="false">
+   			<p:breadCrumb model="#{debitCreditMemoFormatErrorsBean.breadCrumbTrail}" ajax="false" immediate="true" styleClass="ui-layout"/>
+   		</h:form>
+
+   		<h:form id="mainForm" prependId="false">   	
+	    	<!-- Message display -->
+			<p:scrollPanel style="height:50px;" mode="native" styleClass="ui-layout">
+				<p:messages id="messages" showSummary="false" severity="info,error,fatal" showDetail="true" autoUpdate="false" />
+			</p:scrollPanel>
+	
+			<p:panel id="mainPanel" header="Format Errors  &#160;&#160;&#160;&#160;&#160; #{debitCreditMemoFormatErrorsBean.headerMessage}" style="min-width:980px;max-width:100%;width:auto;">
+			
+				<p:dataTable id="formatErrorsDataTableId" var="row" value="#{debitCreditMemoFormatErrorsBean.rows}" 
+					editable="true" 
+					resizableColumns="false" 
+					rowKey="#{row.jmsMessageId}"
+					selectionMode="single"
+					selection="#{debitCreditMemoFormatErrorsBean.selectedRow}"
+					style="margin-bottom:20px"				
+					rowExpandMode="single"
+					widgetVar="formatErrorsDataTableVar"
+					emptyMessage = "#{debitCreditMemoFormatErrorsBean.dataTableMessage}"
+					rowIndexVar="index"
+					scrollHeight="#{debitCreditMemoFormatErrorsBean.dataTable.height}"
+					scrollable="true"
+					sortMode="multiple"
+					sortBy="#{debitCreditMemoFormatErrorsBean.preSort}" >
+					
+					<p:ajax event="rowSelect"  listener="#{debitCreditMemoFormatErrorsBean.showSelectedRowErrors}" update="messages"  />
+			 			 
+			 		<p:column width="10">
+						<p:rowToggler />
+					</p:column> 
+			 
+					<p:column id="SUBMITTED_DATE" headerText="Submitted Date" sortBy="#{row.submittedDate}" style="width:75px">
+		        		<h:outputText value="#{row.submittedDate}" />
+					</p:column>
+					<p:column id="SUBMITTER" headerText="Submitted By" sortBy="#{row.submitter}" style="width:110px">
+						<p:inputText value="#{row.submitter}" size="15" onclick="selectRow(#{index})"
+							disabled="#{!debitCreditMemoFormatErrorsBean.hasGeneralEditPermission}" />
+					</p:column>
+					<p:column headerText="Client" sortBy="#{row.accountCode}" style="width:75px">
+						<p:inputText value="#{row.accountCode}" size="8" onclick="selectRow(#{index})"
+							disabled="#{!debitCreditMemoFormatErrorsBean.hasGeneralEditPermission}" />
+					</p:column>
+					<p:column headerText="Unit No." sortBy="#{row.unitNo}" style="width:75px">
+						<p:inputText value="#{row.unitNo}" size="8" onclick="selectRow(#{index})"
+							disabled="#{!debitCreditMemoFormatErrorsBean.hasGeneralEditPermission}" />
+					</p:column>
+					<p:column headerText="Type" sortBy="#{row.debitCreditType}" style="width:80px">
+						<p:inputText value="#{row.debitCreditType}" size="10" onclick="selectRow(#{index})"
+							disabled="#{!debitCreditMemoFormatErrorsBean.hasGeneralEditPermission}" />
+					</p:column>
+					<p:column sortBy="#{row.category}" style="width:80px">
+						<f:facet name="header">
+							Analysis<br />Category
+						</f:facet>
+					    <p:inputText value="#{row.category}" size="10" onclick="selectRow(#{index})"
+					    	disabled="#{!debitCreditMemoFormatErrorsBean.hasGeneralEditPermission}" />
+					</p:column>
+					<p:column sortBy="#{row.analysisCode}" style="width:150px">
+						<f:facet name="header">
+							Analysis<br />Code
+						</f:facet>
+					    <p:inputText value="#{row.analysisCode}" size="20" onclick="selectRow(#{index})"
+					    	disabled="#{!debitCreditMemoFormatErrorsBean.hasGeneralEditPermission}" />
+					</p:column>
+					<p:column style="width:75px" sortBy="#{row.netAmount}">
+					    <f:facet name="header">
+							Net<br />Amount
+						</f:facet>					    
+					    <p:inputText value="#{row.netAmount}" size="8" onclick="selectRow(#{index})"
+					    	disabled="#{!debitCreditMemoFormatErrorsBean.hasGeneralEditPermission}" />
+					</p:column>
+					<p:column sortBy="#{row.transactionDate}" style="width:75px">
+					    <f:facet name="header">
+							Transaction<br />Date
+						</f:facet>					    
+					    <p:inputText value="#{row.transactionDate}" size="8" onclick="selectRow(#{index})"
+					    	disabled="#{!debitCreditMemoFormatErrorsBean.hasGeneralEditPermission}" />
+					</p:column>
+					<p:column sortBy="#{row.rentApplicableDate}" style="width:75px">
+					    <f:facet name="header">
+							Rent<br />Applicable<br />Date
+						</f:facet>					    
+					    <p:inputText value="#{row.rentApplicableDate}" size="8" onclick="selectRow(#{index})"
+					    	disabled="#{!debitCreditMemoFormatErrorsBean.hasGeneralEditPermission}" />
+					</p:column>
+					<p:column headerText="Requested Approver" sortBy="#{row.selectedApprover}" style="width:110px">
+						<p:inputText value="#{row.selectedApprover}" size="15" onclick="selectRow(#{index})"
+							disabled="#{!debitCreditMemoFormatErrorsBean.hasGeneralEditPermission}" />
+					</p:column>
+					<p:column headerText="File Name" style="width:150px" sortBy="#{row.fileName}">			 
+						<h:outputText value="#{row.fileName}" />
+			 		</p:column>
+					
+					 <p:column headerText="Delete" style="width:50px" rendered="#{debitCreditMemoFormatErrorsBean.hasGeneralEditPermission}">
+            			<p:commandLink id="deleteLink" styleClass="ui-icon ui-icon-trash" onclick="selectRow(#{index}); showDialog('deleteConfirmVar')" 
+            				update="formatErrorsDataTableId" title="Delete" />
+        			</p:column>
+					
+					<p:rowExpansion id="rowExpansionId" >
+
+						<p:panel id="expansionPanelId" style="width:600px;">
+						<p:panelGrid>
+							<p:row>
+								<p:column style="width:125px">
+								    <p:outputLabel value="Invoice No.: " styleClass="ui-label"/>
+								</p:column>
+								<p:column>
+								    <p:inputText id="invoiceId"  value="#{row.invoiceNo}" size="30" disabled="#{!debitCreditMemoFormatErrorsBean.hasGeneralEditPermission}" >
+								    	<p:ajax event="change" process="invoiceId" />
+								    </p:inputText>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column >
+								    <p:outputLabel value="Ticket No.: " styleClass="ui-label"/>
+								</p:column>
+								<p:column>
+								    <p:inputText id="ticketId" value="#{row.ticketNo}" size="30" disabled="#{!debitCreditMemoFormatErrorsBean.hasGeneralEditPermission}" >
+								    	<p:ajax event="change" process="ticketId" />
+								    </p:inputText>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column >
+						    		<p:outputLabel value="Unit Belongs to Client: " styleClass="ui-label"/>
+								</p:column>
+								<p:column>
+									<p:inputText id="isClientUnitId" value="#{row.isClientUnit}" size="1" disabled="#{!debitCreditMemoFormatErrorsBean.hasGeneralEditPermission}" >
+								    	<p:ajax event="change" process="isClientUnitId" />
+								    </p:inputText>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+								    <p:outputLabel value="Reason: " styleClass="ui-label"/>
+								</p:column>
+								<p:column>
+								    <p:inputText id="reasonId" value="#{row.reason}" size="50" disabled="#{!debitCreditMemoFormatErrorsBean.hasGeneralEditPermission}" >
+								    	<p:ajax event="change" process="reasonId" />
+								    </p:inputText>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+								    <p:outputLabel value="Line Description: " styleClass="ui-label"/>
+								</p:column>
+								<p:column>
+								    <p:inputText id="lineDescriptionId" value="#{row.lineDescription}" size="50" disabled="#{!debitCreditMemoFormatErrorsBean.hasGeneralEditPermission}" >
+								    	<p:ajax event="change" process="lineDescriptionId" />
+								    </p:inputText>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+						    		<p:outputLabel value="Invoice Note: " styleClass="ui-label"/>
+								</p:column>
+								<p:column>
+						    		<p:inputText id="invoiceNoteId" value="#{row.invoiceNote}" size="50" disabled="#{!debitCreditMemoFormatErrorsBean.hasGeneralEditPermission}" >
+								    	<p:ajax event="change" process="invoiceNoteId" />
+								    </p:inputText>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+						    		<p:outputLabel value="Tax Amount: " styleClass="ui-label"/>
+								</p:column>
+								<p:column>
+									<p:inputText id="taxAmountId" value="#{row.taxAmount}" size="8" disabled="#{!debitCreditMemoFormatErrorsBean.hasGeneralEditPermission}" >
+								    	<p:ajax event="change" process="taxAmountId" />
+								    </p:inputText>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+						    		<p:outputLabel value="GL Code: " styleClass="ui-label"/>
+								</p:column>
+								<p:column>
+						    		<p:inputText id="glCodeId" value="#{row.glCode}" size="30" disabled="#{!debitCreditMemoFormatErrorsBean.hasGeneralEditPermission}" >
+								    	<p:ajax event="change" process="glCodeId" />
+								    </p:inputText>
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+						</p:panel>
+
+
+					</p:rowExpansion>
+
+					<f:facet name="footer" >
+						<h:outputText value="Total Records: #{debitCreditMemoFormatErrorsBean.rowCount}" />
+					</f:facet>
+					
+			   </p:dataTable>
+				
+					
+			</p:panel>
+				
+			<p:panel id="btnPanel">
+				<p:commandButton id="reprocessBtn" value="Resubmit" action="#{debitCreditMemoFormatErrorsBean.reprocess}" ajax="false" onclick="lockScreen();"
+					disabled="#{! debitCreditMemoFormatErrorsBean.isEnableReprocessBtn()}"/>
+				<p:spacer width="5" />
+				<p:commandButton id="cancelBtn" value="Cancel" action="#{debitCreditMemoFormatErrorsBean.cancel}" ajax="false" immediate="true" onclick="lockScreen();"/>
+			</p:panel>				
+	   		
+		</h:form>
+		
+	  	<p:confirmDialog id="deleteConfirmDialogId" message="Are you sure?" header="Confirm Delete" appendTo="@(body)"
+				widgetVar="deleteConfirmVar" resizable="false" width="200" height="60" >    
+           <h:form prependId="false">
+      				<p:commandButton  value="Yes" ajax="false" process="@this"	onclick="hideDialog('deleteConfirmVar');lockScreen();" 
+      					action="#{debitCreditMemoFormatErrorsBean.delete}"/>			  
+       			<p:spacer width="10" />
+       			<p:commandButton  value="No"  onclick="PF('deleteConfirmVar').hide();" type="button"/>
+        		</h:form>
+       	</p:confirmDialog>				
+	
+	
+	<script>	
+		PrimeFaces.widget.DataTable.prototype.toggleExpansion = (function() {
+ 			var cached_function = PrimeFaces.widget.DataTable.prototype.toggleExpansion;
+ 			return function() {
+     			var row = arguments[0].closest('tr');
+     			if(this.cfg.selectionMode === 'single') {
+     	    		this.unselectAllRows();
+     			}
+     			if(this.cfg.selectionMode){
+         			this.selectRow(row, false);
+     			}    
+     			var result = cached_function.apply(this, arguments);
+     			return result;
+ 			};
+		})();
+		
+		function selectRow(index) {
+			PF('formatErrorsDataTableVar').unselectAllRows(); 
+			PF('formatErrorsDataTableVar').selectRow(index);
+		}
+		
+		</script>
+	</ui:define>
+
+</ui:composition>

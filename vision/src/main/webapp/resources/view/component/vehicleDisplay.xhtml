@@ -1,0 +1,233 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	 xmlns:composite="http://java.sun.com/jsf/composite"
+	>
+	
+	  <!-- INTERFACE -->
+	  <composite:interface>
+	    <composite:attribute name="mrqId" required="false" type="java.lang.Long" />
+	    <composite:attribute name="fmsId" required="false" type="java.lang.Long" />  
+	    <composite:attribute name="vehInfo" required="false" type="com.mikealbert.data.vo.VehicleInformationVO" />  
+	    <composite:attribute name="actualStartDate" required="false" type="java.util.Date" />
+		<composite:attribute name="parentBean" required="false" type="com.mikealbert.vision.view.bean.StatefulBaseBean" />	            
+	  </composite:interface>
+	
+	  <!-- IMPLEMENTATION -->          
+	  <composite:implementation>
+	  <span  id="#{cc.clientId}">
+	   <p:panelGrid cellpadding="5" style="width:80%">
+			<p:row>
+				<p:column>
+					<p:commandLink id="unitDetailLink" styleClass="ui-icon ui-icon-triangle-1-e" style="float:left; color: green; "
+						onclick="return onUnitDetailClick()" />				
+					<h:outputLabel for="unit" styleClass="ui-label" onclick="onUnitDetailClick();" style="cursor:pointer;" value="Unit: " />
+				</p:column>
+				<p:column colspan="5">			
+					 <h:outputLabel id="unit" onclick="return onUnitDetailClick()"
+						value="#{vehicleDisplayBean.vehicleInfo.unitNo} - #{vehicleDisplayBean.vehicleInfo.unitDescription}" /><br />
+						<h:outputLabel value="Powertrain Warranty:"
+                            rendered="#{not empty vehicleDisplayBean.warrantyInformation}"/>
+						<h:outputLabel value="#{vehicleDisplayBean.warrantyInformation}"/><br />  
+						  <h:outputLabel value="#{vehicleDisplayBean.displayMessage}" style="color:red;font-weight:bold;"
+											rendered="#{vehicleDisplayBean.vehicleVO.vehicleUnderMaintenanceFlag}" /><br/>
+					<h:outputLabel id="extWarranty"
+					   value=" #{vehicleDisplayBean.extWarrantyInd}" style="color:red;font-weight:bold;"/>
+				</p:column>
+				<p:column>	
+					<h:outputLabel for="productType" styleClass="ui-label"
+						value="Product Type: " />
+				</p:column>
+				<p:column>
+					<h:outputLabel id="productType"
+						value="${vehicleDisplayBean.vehicleInfo.productType}" />
+				</p:column>
+				<p:column>
+					<h:outputLabel for="client" styleClass="ui-label" value="Client: " />
+				</p:column>
+				<p:column>
+					<h:outputLabel id="client"
+						value="#{vehicleDisplayBean.vehicleInfo.clientAccountNumber} - #{vehicleDisplayBean.vehicleInfo.clientAccountName}" />
+					<p:spacer width="10"/>					
+				    <p:commandLink id="maintenanceProfileCommandLink" immediate="true" title="Click to see maintenance profile"
+				    		onclick="viewMaintenanceProfile(#{vehicleDisplayBean.vehicleInfo.fmsId});">
+						<p:graphicImage
+							style="border-style:none;vertical-align:top"
+							value="/images/maint_profile.png" id="maintProfileImage" />
+					</p:commandLink>
+					<p:spacer width="10"/>					
+					<p:commandLink rendered="#{vehicleDisplayBean.vehicleInfo.clientTaxIndicator == 'E'? 'true' : 'false'}" 
+								title="Click to see list of Tax Exempted regions" style="color:red;font-weight:bold;vertical-align:top" immediate="true" oncomplete="showRegionDialog();">Tax</p:commandLink>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column colspan="10">
+					<p:panel id="unitDetail" toggleable="true" collapsed="false"
+						visible="false" widgetVar="unitDetailPanel"
+						style="border-color:green">
+						<p:panelGrid cellpadding="5">
+							<p:row>
+								<p:column>
+									<h:outputLabel for="vin" styleClass="ui-label" value="VIN: " />
+								</p:column>
+								<p:column>
+									<h:outputLabel id="vin"
+										value="#{vehicleDisplayBean.vehicleInfo.vin}" />
+								</p:column>
+								<p:column>
+									<h:outputLabel for="licensePlateNo" styleClass="ui-label"
+										value="License Plate No: " />
+								</p:column>
+								<p:column>
+									<h:outputLabel id="licensePlateNo"
+										value="#{vehicleDisplayBean.vehicleInfo.licensePlateNo}" />
+								</p:column>
+								<p:column>
+									<h:outputLabel for="fleetRefNo" styleClass="ui-label"
+										value="Fleet Ref No: " />
+								</p:column>
+								<p:column>
+									<h:outputLabel id="fleetRefNo"
+										value="#{vehicleDisplayBean.vehicleInfo.clientFleetReferenceNumber}" />
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<h:outputLabel for="driver" styleClass="ui-label"
+										value="Current Driver: " />
+								</p:column>
+								<p:column>
+								    <p:commandLink id="driver" value="#{vehicleDisplayBean.vehicleInfo.driverFullNameDisplay}" ajax="false" immediate="true"
+								    action="#{vehicleDisplayBean.editViewDriver}" onclick="lockScreen();"/>
+                                </p:column>
+								<p:column>
+									<h:outputLabel for="driverCostCenter" styleClass="ui-label"
+										value="Driver Cost Center: " />
+								</p:column>
+								<p:column>
+									<h:outputLabel id="driverCostCenter"
+										value="#{vehicleDisplayBean.vehicleInfo.driverCostCenter}" />
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+					</p:panel>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column> 
+					<h:outputLabel for="contractStartDate" styleClass="ui-label"
+						value="Contract Start Date: " />
+
+				</p:column>
+				<p:column>
+					<h:outputLabel id="contractStartDate"
+						value="#{vehicleDisplayBean.vehicleInfo.contractStartDate}">
+						<f:convertDateTime pattern="MM/dd/yyyy" />
+					</h:outputLabel>
+				</p:column>
+				<p:column>
+					<h:outputLabel for="contractEndDate" styleClass="ui-label"
+						value="Contract End Date: " />
+				</p:column>
+				<p:column>
+					<h:outputLabel id="contractEndDate"
+						value="#{vehicleDisplayBean.vehicleInfo.contractEndDate}">
+						<f:convertDateTime pattern="MM/dd/yyyy" />
+					</h:outputLabel>
+				</p:column>
+				<p:column>
+					<h:outputLabel for="replacementUnit" styleClass="ui-label"
+						value="Replacement Unit:" />								
+				</p:column>
+				<p:column>
+					<h:outputLabel id="replacementUnit" style="color:red;font-weight:bold;"
+						value="#{vehicleDisplayBean.vehicleInfo.replacementUnitNo}" />								
+				</p:column>
+				<p:column>
+					<h:outputLabel id="replacementDateLabel" for="replacementDate" styleClass="ui-label"
+						value="Replacement #{vehicleDisplayBean.vehicleInfo.replacementUnitDateType} Date:" />					
+				</p:column>
+				<p:column>
+					<h:outputLabel id="replacementDate" style="color:red;font-weight:bold;"
+						value="#{vehicleDisplayBean.vehicleInfo.replacementUnitDate}">
+						<f:convertDateTime pattern="MM/dd/yyyy" />				    
+				    </h:outputLabel>			
+				</p:column>	
+				<p:column>
+				</p:column>
+				<p:column>
+				</p:column>												
+			</p:row>
+		</p:panelGrid>
+		</span>
+		
+		<p:dialog id="taxExemptedRegionsDialog" header="Tax Exempted Regions" widgetVar="taxExemptedRegionsDialogWidget"
+		 dynamic="true" modal="true" appendTo="@(body)" resizable="true" height="250" width="400" onShow="setFocus('cancelRegions')">
+			<p:hotkey immediate="true" bind="esc" handler="PF('taxExemptedRegionsDialogWidget').hide();"/>
+				<p:dataTable id="taxExemptedRegionsDataTable" widgetVar="taxExemptedRegionsDataTableWidget"  
+				 	value="#{vehicleDisplayBean.taxExemptedRegionList}" var="region" 
+					rowKey="#{region.regionCodesPK}"
+					scrollable="true"
+					scrollHeight="150" 
+					resizableColumns="true">
+
+					<p:column width="30%"  >
+						<f:facet name="header"  >  
+             						<h:outputText id = "regionCode" value="Region Code"/>  
+         						</f:facet>
+						<h:outputLabel id = "regionCodeText"  value="#{region.regionCodesPK.regionCode}" style="white-space: normal; cursor:text" />  
+					</p:column>
+
+					<p:column width="60%"  >
+						<f:facet name="header"  >  
+             						<h:outputText id = "regionDescLabel" value="Region Description"/>  
+         						</f:facet>
+						<h:outputLabel id = "regionDescText"  value="#{region.regionDesc}" style="white-space: normal; cursor:text" />  
+					</p:column>
+					
+				</p:dataTable>
+				<p:panel id="regionsButtonPanel" style="height:360;">
+					<p:commandButton id="cancelRegions" value="Cancel" onclick="PF('taxExemptedRegionsDialogWidget').hide();" immediate="true"/>						
+				</p:panel>
+		</p:dialog>
+	
+		<script type="text/javascript">
+			var isUnitDetailCollapsed = true;
+	
+			function onUnitDetailClick() {
+				if (!isUnitDetailCollapsed) {
+					$('[id$=unitDetail]').hide();
+					$('[id$=unitDetailLink]').attr("class", "ui-commandlink ui-icon ui-icon-triangle-1-e");
+					isUnitDetailCollapsed = true;
+				} else {
+					$('[id$=unitDetail]').show();
+					$('[id$=unitDetailLink]').attr("class", "ui-commandlink ui-icon ui-icon-triangle-1-s");
+					isUnitDetailCollapsed = false;
+				}
+				return false;
+			}
+			
+			function showRegionDialog(){
+				if(PF('taxExemptedRegionsDialogWidget')){
+					PF('taxExemptedRegionsDialogWidget').show();	
+				}
+			}
+			
+			function viewMaintenanceProfile(fmsId){
+				$('[id$=maintenanceProfileLink]').click();
+			}
+			
+			function editViewDriver(driverId) {
+				if (document.getElementById('driverLinkDrvId') != null) {
+					document.getElementById('driverLinkDrvId').value = driverId;
+					if (document.getElementById('driverLink') != null) {
+						$('[id$=driverLink]').click();
+					}
+				}
+			}
+					
+		</script> 
+	  </composite:implementation>
+</html>

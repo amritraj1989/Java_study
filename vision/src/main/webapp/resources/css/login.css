@@ -1,0 +1,94 @@
+html, body {margin:0; padding:0; width:100%; height:100%; overflow:hidden; text-align:left;}
+
+body {font-family:Arial; font-size:90%; color:#444444;}
+
+#background{position:absolute; z-index:1; width:100%; height:100%;}
+
+#fixed {position:relative; z-index:2; width:100%; height:100%;}
+
+#HeaderPart {position:relative; width:100%; height:43%; padding-left:3%; padding-top:3%;}
+
+#HeadingMain {position:relative;  width:100%; height:7%; color:#f37121; font-size:25px; font-family:  Arial, Verdana, Helvetica, sans-serif; font-weight:bold;
+	padding-left:3%;}
+
+#HeadingSmall {position:relative; width:100%; height:5%;  color:#464544; font-size:20px; font-family:  Arial, Verdana, Helvetica, sans-serif; font-weight:bold;
+	padding-left:3%;}
+
+#LoginPart {position:relative; width:100%; height:40%; padding-left:2%;}
+
+#gbox-grd {
+  min-height: 150px;
+  padding: 10px 30px;
+  background: url('/vision/images/BgLogin.png') no-repeat !important; 
+  height: 250px; 
+  width:400px; 
+}
+
+#logo-grd {
+  min-height: 150px;
+  background: url('/vision/images/transparent_logo.png') no-repeat !important; 
+  height: 250px; 
+  width:800px;
+}
+
+.userInput{
+	width: 150px; 
+}
+
+
+.loginText{
+	color:  #464544; 
+	border:none;
+	font-size:15px;
+	font-family:  Arial, Verdana, Helvetica, sans-serif;
+	font-weight:bold;
+	padding:15px;
+}
+
+.ButtonMedium
+{
+	height:25px;
+	width:65px;
+	background: #fc4f15; 
+	color: #ffffff;
+	text-decoration: none; 
+	border:1px solid #d24615;
+	font-size:12px;
+	font-family:  Arial, Verdana, Helvetica, sans-serif;
+	font-weight:bold;
+} 
+
+#FooterPart {position:relative; z-index:4; width:100%; height:5%; text-align:center; padding-top:7px;  font-size: 12px;
+  color: #000000;}
+
+.ui-messages-info, .ui-messages-warn, .ui-messages-error,
+	.ui-messages-fatal {
+	border: 0px;
+	margin: 0px 0px;
+	
+}
+
+.ui-messages-info, .ui-message-info {
+	color: #00529B;
+}
+
+.ui-messages-info-icon, .ui-messages-warn-icon, .ui-messages-error-icon,
+	.ui-messages-fatal-icon, .ui-message-info-icon, .ui-message-warn-icon,
+	.ui-message-error-icon, .ui-message-fatal-icon {
+	padding: 0px 0px 0px 0px;
+}
+
+.ui-messages-info-summary, .ui-messages-warn-summary,
+	.ui-messages-error-summary, .ui-messages-fatal-summary,
+	.ui-message-info-summary, .ui-message-warn-summary,
+	.ui-message-error-summary, .ui-message-fatal-summary {
+	padding: 0px 0px 0px 0px;
+	margin-left: 0px;
+	font-weight: normal;
+}
+
+.ui-messages-warn, .ui-message-warn, .ui-messages-error,
+	.ui-message-error, .ui-messages-fatal, .ui-message-fatal,
+	.ui-messages-info, .ui-message-info {
+	padding: 0px 0px 0px 0px;
+}

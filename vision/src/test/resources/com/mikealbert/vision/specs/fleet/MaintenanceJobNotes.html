@@ -1,0 +1,37 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Fleet Maintenance / FM 205 View Maintenance Job Notes</title>
+    <body>
+    	<h1>Fleet Maintenance / FM 205 View Maintenance Job Notes</h1>
+    	<h2>Acceptance Tests (Automated)</h2>
+
+		    <ul concordion:execute="#result = testJobNotesExist(#jobNo)">
+	            <li>View maintenance PO <b><span concordion:set="#jobNo">J00164496</span></b><span concordion:assertTrue="#result"> 'Job Notes' button is displayed at the bottom of the Maintenance PO screen right next to the 'Cancel' button.</span></li>
+				<li>Click on the 'Job Notes' button open a dialog which displays the following content of the PO's job notes: <span concordion:assertEquals="jobNote">2009-12-15 2:58 pm driver brought in for lof and very bad paulsation when brakes are applied. front brakes 50% worn rotor discard 1.457 lf and rf rotor 1.495 and very heavley pitted. rear brakes 80 % worn discard 1.10 LR 1.138 RR 1.48 and also pitted, tpms light on this still poss warranty i told shop to direct driver to dealer.(BS)</span></li>	            
+			</ul>
+		    <ul concordion:execute="#result = testJobNotesExist(#jobNo)">
+	            <li>View maintenance PO <b><span concordion:set="#jobNo">J00293754</span></b><span concordion:assertFalse="#result"> 'Job Notes' button  should not display on the Maintenance PO screen.</span></li>
+			</ul>
+			
+<!--              
+            <ul concordion:execute="#result = testUpdatePOTaskItem(#jobNo, #modified)">
+            <li>Open an existing PO <b><span concordion:set="#jobNo">J00213872</span></b> and <b><style hidden="true"><span concordion:set="#modified">true</span></style>
+            and edit or change an existing service element or line item on the PO </b>
+            <span concordion:assertTrue="#result">the name and the date/time automatically recorded as the last coordinator who updated that line item.</span></li>
+			</ul>
+
+            <ul concordion:execute="#result = testUpdatePOTaskItem(#jobNo, #modified)">
+            <li>Open an existing PO <b><span concordion:set="#jobNo">J00213872</span></b> and <b><style hidden="true"><span concordion:set="#modified">false</span></style>
+            and do not edit or change an existing service element or line item on the PO </b>
+            <span concordion:assertFalse="#result">the name and the date/time should not be automatically recorded as the last coordinator who updated that line item.</span></li>
+			</ul>
+ -->
+    	<h2>Manual Tests</h2>
+    	    <ul type = "circle"><b>
+    	       <li>TODO: Add the Job Notes to a PO and verify the Job Notes when the PO is in other statuses.</li>
+    	    </b></ul>
+
+    	<h2>Untested (Out of Scope)</h2>
+    		<ul><li>TODO:</li></ul>
+    </body>
+</html>

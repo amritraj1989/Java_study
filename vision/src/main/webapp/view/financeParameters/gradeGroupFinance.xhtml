@@ -1,0 +1,109 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"    
+    template="../../templates/ui.xhtml" >
+
+    <ui:define name="content"> 
+	    <h:form id="clientGradeGroupsFinanceBreadCrumbForm" prependId="false">
+	    <p:breadCrumb model="#{gradeGroupFinanceBean.breadCrumbTrail}"
+	        ajax="false" immediate="true" />
+	    </h:form>   
+	      <!-- Message display -->
+	    <p:scrollPanel style="height:50px;" mode="native">
+	      <p:messages id="messages" severity="info,error,fatal" showSummary="false" showDetail="true" 
+	        autoUpdate="true" />
+	    </p:scrollPanel>
+   		
+   		<h:form id="gradeGroupFeesForm" prependId="false"> 
+			<p:panel id="gradeGroupPanel" header="Client Finance Fee: #{gradeGroupFinanceBean.clientAccount.externalAccountPK.accountCode} - #{gradeGroupFinanceBean.clientAccount.accountName}">  
+          		<p:dataTable id="gradeGroupFinancesTable" value="#{gradeGroupFinanceBean.inputClientFinanceVO}" var="clientFinanceParam" style="width:1000px">
+			      <p:column style="width:30%">
+			        <f:facet name="header">
+			          <h:outputLabel value="Description"/>
+			        </f:facet>
+			        <h:outputLabel value="#{clientFinanceParam.description}"/>
+			      </p:column>
+			      <p:column style="width:25%">
+			        <f:facet name="header">
+			          <h:outputLabel value="Fee Category"/>
+			        </f:facet>
+	            	<h:outputLabel value="#{clientFinanceParam.financeParamCategory}"/>
+	          	  </p:column>
+	              <p:column style="width:18%">
+	                <f:facet name="header">
+	                  <h:outputLabel value="Default Value"/>
+	                </f:facet>
+	                <h:outputLabel value="#{clientFinanceParam.defaultnvalue}" style="float:right"/>
+	              </p:column>
+	              <p:column style="width:17%">
+	                <f:facet name="header">
+	                  <h:outputLabel value="Client Value"/>
+	                </f:facet>
+	                <h:outputLabel value="#{clientFinanceParam.financeParameterValue}" style="float:right"/>
+	              </p:column>
+	              <p:column style="width:10%">
+	                <f:facet name="header">
+	                  <h:outputLabel value="Last Updated"/>
+	                </f:facet>
+	                <h:outputLabel value="#{clientFinanceParam.lastUpdated}">
+	                  <f:convertDateTime pattern="MM/dd/yyyy"/>
+	                </h:outputLabel>
+	              </p:column>
+			     </p:dataTable>
+			</p:panel>
+
+			<p:panel id="gradeGroupFeesPanel" header="Grade Group Finance Fees">
+				<p:focus context="gradeGroupFeesPanel"/>
+				<p:dataTable id="gradeGroupFinanceTable" var="element"
+						value="#{gradeGroupFinanceBean.rowList}" emptyMessage="No grade groups exist for this client"
+						scrollable="true" rowIndexVar="elementRowIndex"
+						scrollWidth="725px"
+						scrollHeight="#{gradeGroupFinanceBean.dataTable.height}"
+						rowKey="#{element.description}" style="width:700px">
+	
+						<p:column width="20%">
+							<f:facet name="header">
+								<h:outputText value="Grade Group" style="font-weight:bold" />
+							</f:facet>
+							<h:outputLabel
+								value="#{element.clientGradeGroupCode}" />
+						</p:column>
+						<p:column width="30%">
+							<f:facet name="header">
+								<h:outputText value="Description" style="font-weight:bold" />
+							</f:facet>
+							<h:outputLabel
+								value="#{element.clientGradeGroupDesc}" />
+						</p:column>
+						<p:column width="25%">
+							<f:facet name="header">
+								<h:outputText value="Value" style="font-weight:bold" />
+							</f:facet>
+							<p:inputText id="value" style="text-align:right; width:90%" disabled="#{!gradeGroupFinanceBean.hasPermission() or element.finParamAllow == 'N'}" 
+								value="#{element.financeParameterValue}" maxlength="40" tabindex="20"
+								styleClass="rowArray trackDirtyChildValues">
+							</p:inputText>					
+						</p:column>	
+						<p:column width="20%">
+							<f:facet name="header">
+								<h:outputText value="Last Updated" style="font-weight:bold" />
+							</f:facet>
+							<h:outputLabel
+								value="#{element.lastUpdated}">
+									<f:convertDateTime pattern="MM/dd/yyyy"/>
+							</h:outputLabel>
+					   </p:column>
+				</p:dataTable>	
+			      
+	  		</p:panel>
+	  		<p:panel id="commandPanel" style="min-width:980px;max-width:100%;width:auto;">
+				<p:commandButton id="savePage" value="Save" tabindex="40" action="#{gradeGroupFinanceBean.saveClientFinanceParams}" update="@form" process="@form" disabled="#{!gradeGroupFinanceBean.hasPermission()}"/>
+				<p:spacer width="10" />				    
+				<p:commandButton id="cancelPage" value="Cancel" tabindex="50" action="#{gradeGroupFinanceBean.cancel}" ajax="false" immediate="true" onclick="lockScreen();" />
+			</p:panel>
+   		</h:form>
+	</ui:define>
+</ui:composition>    

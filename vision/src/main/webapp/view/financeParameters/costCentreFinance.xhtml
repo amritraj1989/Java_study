@@ -1,0 +1,132 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:comp="http://java.sun.com/jsf/composite/view/component"   
+  xmlns:pe="http://primefaces.org/ui/extensions" 
+    template="../../templates/ui.xhtml" >
+
+    <ui:define name="content"> 
+    <h:form id="clientCostCentreFinanceBreadCrumbForm" prependId="false">
+    <p:breadCrumb model="#{costCentreFinanceBean.breadCrumbTrail}"
+        ajax="false" immediate="true" />
+    </h:form>   
+      <!-- Message display -->
+    <p:scrollPanel style="height:50px;" mode="native">
+      <p:messages id="messages" severity="info,error,fatal" showSummary="false" showDetail="true" 
+        autoUpdate="true" />
+    </p:scrollPanel>
+      
+    <h:form id="costCentreFinanceParamForm" prependId="false">
+      <p:panel id="costCentreClientPanel" header="Fee Category: #{costCentreFinanceBean.inputClientFinanceVO.eaAccountCode} - #{costCentreFinanceBean.customer.accountName}">
+	      <p:dataTable id="costCentreFinancesTable" value="#{costCentreFinanceBean}" var="costCentre" style="width:1000px">
+		      <p:column style="width:30%">
+		        <f:facet name="header">
+		          <h:outputLabel value="Description"/>
+		        </f:facet>
+		        <h:outputLabel value="#{costCentre.inputClientFinanceVO.description}"/>
+		      </p:column>
+		      <p:column style="width:25%">
+		        <f:facet name="header">
+		          <h:outputLabel value="Fee Category"/>
+		        </f:facet>
+            <h:outputLabel value="#{costCentre.inputClientFinanceVO.financeParamCategory}"/>
+          </p:column>
+          <p:column style="width:18%">
+            <f:facet name="header">
+              <h:outputLabel value="Default Value"/>
+            </f:facet>
+            <h:outputLabel value="#{costCentre.inputClientFinanceVO.defaultnvalue}" style="float:right"/>
+          </p:column>
+          <p:column style="width:17%">
+            <f:facet name="header">
+              <h:outputLabel value="Client Value"/>
+            </f:facet>
+            <h:outputLabel value="#{costCentre.inputClientFinanceVO.financeParameterValue}" style="float:right"/>
+          </p:column>
+          <p:column style="width:10%">
+            <f:facet name="header">
+              <h:outputLabel value="Last Updated"/>
+            </f:facet>
+            <h:outputLabel value="#{costCentre.inputClientFinanceVO.lastUpdated}">
+              <f:convertDateTime pattern="MM/dd/yyyy"/>
+            </h:outputLabel>
+          </p:column>
+	      </p:dataTable>
+      </p:panel>
+      <p:panel id="costCentreFinancesPanel" header="Cost Center Finance Fees">
+      	<p:focus context="costCentreFinancesPanel"/>
+        <p:treeTable id="costCentreTreeTable" value="#{costCentreFinanceBean.rootNode}" var="costCentre"
+        	scrollable="true" scrollHeight="350" scrollWidth="1025" style="width:1000px">
+          <p:column style="width:35%">
+            <f:facet name="header">
+              <h:outputLabel value="Cost Center" style="font-weight:bold"/>
+            </f:facet>
+            <h:outputLabel value="#{costCentre.clientCostCentreCode}"/>
+          </p:column>
+          <p:column style="width:35%">
+            <f:facet name="header">
+              <h:outputLabel value="Description" style="font-weight:bold"/>
+            </f:facet>
+            <h:outputLabel value="#{costCentre.clientCostCentreDesc}"/>
+          </p:column>
+          <p:column style="width:17%">
+            <f:facet name="header">
+              <h:outputLabel value="Value" style="font-weight:bold"/>
+            </f:facet>
+            <p:inputText id="value" style="text-align:right; width:90%" disabled="#{!clientFinanceBean.hasPermission() or costCentre.finParamAllow == 'N'}" 
+				value="#{costCentre.financeParameterValue}" maxlength="40" tabindex="20"
+				styleClass="rowArray trackDirtyChildValues">
+			</p:inputText>	
+          </p:column>
+          <p:column style="width:13%">
+            <f:facet name="header">
+              <h:outputLabel value="Last Updated" style="font-weight:bold"/>
+            </f:facet>
+            <h:outputLabel value="#{costCentre.lastUpdated}">
+              <f:convertDateTime pattern="MM/dd/yyyy"/>
+            </h:outputLabel>
+          </p:column>
+        </p:treeTable>
+      </p:panel>
+      <p:panel id="costCentreCommandPanel" style="min-width:980px;max-width:100%;width:auto;">
+        <p:commandButton id="saveCostCentre" value="Save" tabindex="40" action="#{costCentreFinanceBean.saveCostCentreFinanceParams}" update=":costCentreFinanceParamForm" process="@form" disabled="#{!clientFinanceBean.hasPermission()}"/>
+        <p:spacer width="10" />
+        <p:commandButton id="cancelCostCentre" value="Cancel" tabindex="50" action="#{costCentreFinanceBean.cancel}"
+          ajax="false" immediate="true"
+          onclick="lockScreen();"/>
+      </p:panel>
+    </h:form>
+      
+    <div id="quoteProfileFinanceParamInclude">
+      <ui:include src="../../resources/view/component/quoteProfileFinanceParam.xhtml" />
+    </div>
+    
+    <script type="text/javascript"> 
+      
+      /**
+      * Detects the Enter key and programatically clicks
+      * the filter button. The search button event handler
+      * will perform the min. alphanumeric check.
+      */
+      function doKeypressFilter(event){
+        if (event.keyCode == 13) {
+          source = event.srcElement.id;
+           $('#filter').click();
+           return false;
+        }
+        return true;  
+      }
+      
+      function initializeDirtyDetection() {
+        registerIgnoreButton("savePage");
+        saveDataForDirtyDetection();
+      }   
+      
+   	$(window).load(function(){
+   		initializeDirtyDetection();
+	});	
+    </script>
+  </ui:define>
+</ui:composition>    

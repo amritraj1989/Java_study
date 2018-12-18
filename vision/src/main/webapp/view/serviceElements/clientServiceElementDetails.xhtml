@@ -1,0 +1,505 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	template="../../templates/ui.xhtml">
+
+	<ui:define name="content">
+		<h:form id="clientServiceElementDetailBreadCrumbForm"
+			prependId="false">
+			<p:breadCrumb
+				model="#{clientServiceElementDetailsBean.breadCrumbTrail}"
+				ajax="false" immediate="true" />
+		</h:form>
+		<!-- Message display -->
+		<p:scrollPanel style="height:50px;" mode="native">
+			<p:messages id="messages" severity="info,error,fatal"
+				showSummary="false" showDetail="true" autoUpdate="true" />
+		</p:scrollPanel>
+
+		<!-- Per SS-557, may be implemented at a later date -->
+		<comp:billingOptionDialog id="billingOption"
+			radioOptionsValue="#{clientServiceElementDetailsBean.selectedBillingOption}"
+			saveBillingOptionAction="#{clientServiceElementDetailsBean.changeClientServiceElement}" />
+
+		<h:form id="hiddenInputForm" prependId="false">
+			<h:inputHidden id="selectedLeaseElement" name="leaseElement"
+				value="#{clientServiceElementDetailsBean.selectedLeaseElement}" />
+		</h:form>
+
+		<h:form id="clientServiceElementDetailsForm" prependId="false">
+			<p:panel id="clientInfoPanel" header="Client Information">
+				<div id="clientDisplayPanel">
+					<comp:clientDisplay id="clientDisplayId"
+						cId="#{clientServiceElementDetailsBean.accountCId}"
+						accountType="#{clientServiceElementDetailsBean.accountType}"
+						accountCode="#{clientServiceElementDetailsBean.accountCode}"
+						parentBean="#{clientServiceElementDetailsBean}"
+						update=":clientServiceElementDetailsForm:clientInfoPanel :clientServiceElementDetailsForm"
+						ajax="true" />
+				</div>
+			</p:panel>
+
+			<p:panel id="clientServiceElementDetailsDataTablePanel"
+				header="Active Service Element Details">
+				<p:dataTable id="clientServiceElementTbl"
+					value="#{clientServiceElementDetailsBean.clientServiceElementList}"
+					var="clientServiceElements">
+					<p:column style="width:50%">
+						<f:facet name="header">Service Element</f:facet>
+						<h:outputText
+							value="#{clientServiceElements.clientContractServiceElement.leaseElement.elementName} - #{clientServiceElements.clientContractServiceElement.leaseElement.description}" />
+					</p:column>
+					<p:column style="width:8%">
+						<f:facet name="header">Default Value</f:facet>
+						<h:outputText
+							value="#{clientServiceElementDetailsBean.getDefaultValues(clientServiceElements.clientContractServiceElement.leaseElement.lelId, clientServiceElements.clientServiceElementId)}"
+							style="float:right;" />
+					</p:column>
+					<p:column style="width:8%">
+						<f:facet name="header">Client Value</f:facet>
+						<h:panelGroup style="float:right">
+							<h:outputText
+								value="#{clientServiceElementDetailsBean.getClientValues(clientServiceElements.clientServiceElementId)}" />
+							<p:spacer width="10" />
+							<p:commandLink id="editLnk1"
+								oncomplete="PF('clientServEleFeesDialogWidget').show();"
+								title="Edit Fees" update=":clientServEleFeesDialog"
+								actionListener="#{clientServiceElementDetailsBean.populateElementValues(clientServiceElements.clientContractServiceElement.leaseElement.lelId, clientServiceElements.clientServiceElementId, clientServiceElements.product.productCode)}"
+								rendered="#{clientServiceElementDetailsBean.hasPermission()}">
+								<p:graphicImage value="/images/action_edit.png"
+									style="border-style: none" />
+							</p:commandLink>
+							<p:commandLink id="detailLnk"
+								oncomplete="PF('clientServEleFeesDialogWidget').show();"
+								title="View Fees" update=":clientServEleFeesDialog"
+								actionListener="#{clientServiceElementDetailsBean.populateElementValues(clientServiceElements.clientContractServiceElement.leaseElement.lelId, clientServiceElements.clientServiceElementId, clientServiceElements.product.productCode)}"
+								rendered="#{!clientServiceElementDetailsBean.hasPermission()}">
+								<p:graphicImage value="/images/action_detail.png"
+									style="border-style: none" />
+							</p:commandLink>
+						</h:panelGroup>
+					</p:column>
+					<!-- hide column as per SS-557, may be implemented at a later date -->
+					<p:column style="display: none">
+						<f:facet name="header">Billing Option</f:facet>
+						<p:commandLink id="billingOptionCommandLink"
+							update=":billingOption:billingOptionDialogForm"
+							action="#{clientServiceElementDetailsBean.initDialog(clientServiceElements.billingOption,clientServiceElements.clientServiceElementId)}"
+							process="@this" oncomplete="showBillingOptions();"
+							disabled="#{!clientServiceElementDetailsBean.hasPermission()}"
+							title="Click to change Billing Option">
+							<h:outputText
+								value="#{clientServiceElements.billingOption == 'MONTHLY' ? 'Monthly' : 'Per Occurrence'}" />
+						</p:commandLink>
+					</p:column>
+					<p:column style="width:10%">
+						<f:facet name="header">Agreement Number</f:facet>
+						<h:outputText
+							value="#{clientServiceElements.clientContractServiceElement.clientAgreement.agreementNumber}" />
+					</p:column>
+					<p:column style="width:10%">
+						<f:facet name="header">Agreement Date</f:facet>
+						<h:outputText
+							value="#{clientServiceElements.clientContractServiceElement.clientAgreement.agreementDate}">
+							<f:convertDateTime pattern="MM/dd/yyyy" />
+						</h:outputText>
+					</p:column>
+					<p:column style="width:14%">
+						<f:facet name="header" />
+						<p:commandLink id="deleteLnk" title="Product Exclusion"
+							rendered="#{clientServiceElementDetailsBean.hasPermission() and clientServiceElements.removedFlag == 'N'}"
+							action="#{clientServiceElementDetailsBean.initProductOverrideDialog(clientServiceElements.clientServiceElementId)}"
+							oncomplete="PF('productLevelDialogWidget').show();"
+							update=":productLevelDialogForm">
+							<h:outputText value="Product Exclusion" />
+						</p:commandLink>
+						<p:spacer width="10" />
+						<p:commandLink id="quoteProfileCommandLink" immediate="true"
+							value="QP" title="Click to see quotation profiles"
+							oncomplete="PF('quoteProfileDialogWidget').show();"
+							update=":quoteProfilePanelForm"
+							actionListener="#{clientServiceElementDetailsBean.populateQuoteProfile(clientServiceElements.clientContractServiceElement.leaseElement.lelId)}"
+							style="#{!clientServiceElementDetailsBean.quoteProfileExists(clientServiceElements.clientContractServiceElement.leaseElement.lelId) ? 'color:black;' : 'color:red;'}"
+							disabled="#{!clientServiceElementDetailsBean.quoteProfileExists(clientServiceElements.clientContractServiceElement.leaseElement.lelId)}">
+						</p:commandLink>
+					</p:column>
+				</p:dataTable>
+			</p:panel>
+			<p:panel style="height:35px;"></p:panel>
+			<p:panel header="Product Overrides">
+				<p:dataTable id="productExclusions"
+					value="#{clientServiceElementDetailsBean.productExclusionsList}"
+					var="productExclusionList">
+					<p:column style="width:15%">
+						<f:facet name="header">Product Type</f:facet>
+						<h:outputText value="#{productExclusionList.product.productName}"
+							style="#{productExclusionList.removedFlag == 'Y' ? 'text-decoration:line-through;':'text-decoration:none;'}" />
+					</p:column>
+					<p:column style="width:35%">
+						<f:facet name="header">Service Element</f:facet>
+						<h:outputText
+							value="#{productExclusionList.clientContractServiceElement.leaseElement.elementName} - #{productExclusionList.clientContractServiceElement.leaseElement.description}" />
+					</p:column>
+					<p:column style="width:8%">
+						<f:facet name="header">Default Value</f:facet>
+						<h:outputText
+							value="#{clientServiceElementDetailsBean.getDefaultValues(productExclusionList.clientContractServiceElement.leaseElement.lelId, productExclusionList.clientServiceElementId)}"
+							style="float:right;" />
+					</p:column>
+					<p:column style="width:8%">
+						<f:facet name="header">Client Value</f:facet>
+						<h:outputText
+							value="#{clientServiceElementDetailsBean.getClientValues(productExclusionList.clientContractServiceElement.leaseElement.lelId, productExclusionList.clientServiceElementId)}"
+							style="float:right;" />
+					</p:column>
+					<p:column style="width:8%">
+						<f:facet name="header">Product Value</f:facet>
+						<h:panelGroup style="float:right">
+							<h:outputText
+								value="#{clientServiceElementDetailsBean.getProductValues(productExclusionList.clientServiceElementId)}" />
+							<p:spacer width="10" />
+							<p:commandLink id="editLnk2"
+								oncomplete="PF('clientServEleFeesDialogWidget').show();"
+								title="Edit Fees" update=":clientServEleFeesDialog"
+								actionListener="#{clientServiceElementDetailsBean.populateElementValues(productExclusionList.clientContractServiceElement.leaseElement.lelId, productExclusionList.clientServiceElementId, productExclusionList.product.productCode)}"
+								rendered="#{clientServiceElementDetailsBean.hasPermission() and productExclusionList.removedFlag == 'N'}">
+								<p:graphicImage value="/images/action_edit.png"
+									style="border-style: none" />
+							</p:commandLink>
+							<p:commandLink id="detailLnk2"
+								oncomplete="PF('clientServEleFeesDialogWidget').show();"
+								title="View Fees" update=":clientServEleFeesDialog"
+								actionListener="#{clientServiceElementDetailsBean.populateElementValues(productExclusionList.clientContractServiceElement.leaseElement.lelId, productExclusionList.clientServiceElementId, productExclusionList.product.productCode)}"
+								rendered="#{!clientServiceElementDetailsBean.hasPermission() and productExclusionList.removedFlag == 'N'}">
+								<p:graphicImage value="/images/action_detail.png"
+									style="border-style: none" />
+							</p:commandLink>
+						</h:panelGroup>
+					</p:column>
+					<!-- hide column as per SS-557, may be implemented at a later date -->
+					<p:column style="display: none">
+						<f:facet name="header">Billing Option</f:facet>
+						<p:commandLink id="billingOptionCommandLink2"
+							update=":billingOption:billingOptionDialogForm"
+							action="#{clientServiceElementDetailsBean.initDialog(productExclusionList.billingOption,productExclusionList.clientServiceElementId)}"
+							process="@this" oncomplete="showBillingOptions();"
+							disabled="#{!clientServiceElementDetailsBean.hasPermission() or productExclusionList.removedFlag == 'Y'}"
+							title="Click to change Billing Option">
+							<h:outputText
+								value="#{productExclusionList.billingOption == 'MONTHLY' ? 'Monthly' : 'Per Occurrence'}" />
+						</p:commandLink>
+					</p:column>
+					<p:column style="width:10%">
+						<f:facet name="header">Agreement Number</f:facet>
+						<h:outputText
+							value="#{productExclusionList.clientContractServiceElement.clientAgreement.agreementNumber}" />
+					</p:column>
+					<p:column style="width:10%">
+						<f:facet name="header">Agreement Date</f:facet>
+						<h:outputText
+							value="#{productExclusionList.clientContractServiceElement.clientAgreement.agreementDate}">
+							<f:convertDateTime pattern="MM/dd/yyyy" />
+						</h:outputText>
+					</p:column>
+					<p:column style="width:6%">
+						<p:commandLink id="deleteLink"
+							actionListener="#{clientServiceElementDetailsBean.deleteProductRemoval(productExclusionList.clientServiceElementId)}"
+							immediate="true" process="@this"
+							update=":clientServiceElementDetailsForm"
+							rendered="#{clientServiceElementDetailsBean.hasPermission() and productExclusionList.removedFlag == 'Y'}"
+							title="Remove Product Exclusion">
+							<p:graphicImage value="/images/action_delete.png"
+								style="border-style: none" />
+						</p:commandLink>
+					</p:column>
+				</p:dataTable>
+
+			</p:panel>
+			<p:panel id="clientServiceElementDetailCommandPanel"
+				style="min-width:980px;max-width:100%;width:auto;">
+				<p:spacer width="10" />
+				<p:commandButton id="viewEditClientAgreements" value="Agreements"
+					tabindex="10"
+					actionListener="#{clientServiceElementDetailsBean.viewEditClientAgreements}"
+					ajax="false" />
+				<p:spacer width="10" />
+				<p:commandButton id="viewEditClientServiceElements"
+					value="Service Elements" tabindex="20"
+					actionListener="#{clientServiceElementDetailsBean.viewEditClientServiceElements}"
+					ajax="false" />
+				<p:spacer width="10" />
+				<p:commandButton id="clientServEleHistoryDialogButton"
+					value="Service Elements History" tabindex="30"
+					update=":clientServEleHistoryDialogForm" process="@this"
+					oncomplete="PF('clientServEleHistoryDialogWidget').show();" />
+				<p:spacer width="10" />
+				<p:commandButton id="viewEditGradeGroupServiceElementDetails"
+					value="Grade Group Service Element Details" tabindex="40"
+					actionListener="#{clientServiceElementDetailsBean.viewEditGradeGroupServiceElementDetails}"
+					ajax="false" />
+			</p:panel>
+		</h:form>
+
+
+		<p:dialog id="quoteProfileDialog"
+			header="Quotation Profiles with Element"
+			widgetVar="quoteProfileDialogWidget" modal="true" appendTo="@(body)"
+			dynamic="true" closeOnEscape="true" resizable="true" height="400"
+			width="700" onShow="setFocus('closeQuoteProfileDialog');">
+			<h:form id="quoteProfilePanelForm" prependId="false">
+				<p:panel>
+					<p:outputLabel value="Service Element: " styleClass="ui-label" />
+					<p:outputLabel
+						value="#{clientServiceElementDetailsBean.selectedLeaseElement.elementName} - #{clientServiceElementDetailsBean.selectedLeaseElement.description}" />
+				</p:panel>
+				<p:dataTable id="quoteProfilesTable"
+					value="#{clientServiceElementDetailsBean.quotationProfileList}"
+					var="quoteProfiles" scrollable="true" scrollHeight="275">
+					<p:column>
+						<f:facet name="header">
+							<h:outputLabel value="Profile Code" />
+						</f:facet>
+						<h:outputLabel value="#{quoteProfiles.profileCode}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">
+							<h:outputLabel value="Profile Description" />
+						</f:facet>
+						<h:outputLabel value="#{quoteProfiles.description}" />
+					</p:column>
+				</p:dataTable>
+				<p:spacer height="10" />
+				<p:panel id="quoteProfileDialogButtonPanel">
+					<p:commandButton id="closeQuoteProfileDialog" value="Close"
+						onclick="PF('quoteProfileDialogWidget').hide();" />
+				</p:panel>
+			</h:form>
+		</p:dialog>
+
+
+		<p:dialog id="clientServEleFeesDialog"
+			header="Client Service Element Finance Parameters"
+			widgetVar="clientServEleFeesDialogWidget" modal="true"
+			appendTo="@(body)" closeOnEscape="true" dynamic="true"
+			onShow="readOnlyFocus();" width="1000px">
+			<h:form id="clientServEleFeesForm" prependId="false">
+				<h:inputHidden id="hiddenClientTotal"
+					value="#{clientServiceElementDetailsBean.serviceElementParameterList.size() > 0 ? clientServiceElementDetailsBean.clientValueTotal : ''}" />
+				<h:inputHidden id="hiddenProductTotal"
+					value="#{clientServiceElementDetailsBean.serviceElementParameterList.size() > 0 ? clientServiceElementDetailsBean.productValueTotal : ''}" />
+				<p:remoteCommand name="adjustTotal"
+					actionListener="#{clientServiceElementDetailsBean.adjustTotal()}"
+					oncomplete="updateTotal();"
+					update="hiddenClientTotal hiddenProductTotal" />
+				<p:messages id="popupMessages" severity="info,error,fatal"
+					showSummary="true" showDetail="false" autoUpdate="true" />
+				<p:dataTable id="clientServiceElementDetailTable"
+					value="#{clientServiceElementDetailsBean.serviceElementParameterList}"
+					var="elementValues">
+					<p:column style="width:450px">
+						<f:facet name="header">Description</f:facet>
+						<h:outputText
+							value="#{elementValues.parameterKey} - #{elementValues.parameterDescription}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">Default Value</f:facet>
+						<h:outputText value="#{elementValues.defaultValue}"
+							style="float:right;" />
+					</p:column>
+					<p:column
+						rendered="#{clientServiceElementDetailsBean.productOverride}"  style="width:90px">
+						<f:facet name="header" id="clientValue">Client Value</f:facet>
+						<h:outputText value="#{elementValues.clientValue}"
+							style="float:right;" />
+					</p:column>
+					<p:column
+						rendered="#{!clientServiceElementDetailsBean.productOverride}">
+						<f:facet name="header" id="clientValue">Client Value</f:facet>
+						<p:inputNumber value="#{elementValues.clientValue}"
+							disabled="#{!clientServiceElementDetailsBean.hasPermission()}"
+							onchange="adjustTotal();" style="text-align:right" tabindex="100"
+							decimalPlaces="5" maxlength="16" minValue="-10000"
+							onfocus="selectText(this.id);" styleClass=" ui-text-align-right-dev" >
+						</p:inputNumber>
+					</p:column>
+					<p:column
+						rendered="#{clientServiceElementDetailsBean.productOverride}">
+						<f:facet name="header" id="productValue">Product Value</f:facet>
+						<p:inputNumber value="#{elementValues.productValue}"
+							disabled="#{!clientServiceElementDetailsBean.hasPermission()}"
+							onchange="adjustTotal();" 
+							style="text-align:right; width:100px"
+							tabindex="100"
+							decimalPlaces="5" maxlength="16" minValue="-10000"
+							onfocus="selectText(this.id);" styleClass="ui-input-number-size-dev2 ui-text-align-right-dev" >
+						</p:inputNumber>
+					</p:column>
+					<p:column>
+						<f:facet name="header">Last Updated</f:facet>
+						<h:outputText value="#{elementValues.lastUpdated}">
+							<f:convertDateTime pattern="MM/dd/yyyy HH:mm a" />
+						</h:outputText>
+					</p:column>
+					<p:columnGroup type="footer">
+						<p:row>
+							<p:column footerText="Total:" style="text-align:right" />
+							<p:column style="text-align:right">
+								<f:facet name="footer">
+									<h:outputText id="defaultTotal"
+										value="#{clientServiceElementDetailsBean.serviceElementParameterList.size() > 0 ? clientServiceElementDetailsBean.defaultValueTotal : ''}" />
+								</f:facet>
+							</p:column>
+							<p:column style="text-align:right">
+								<f:facet name="footer">
+									<h:outputText id="clientTotal"
+										value="#{clientServiceElementDetailsBean.serviceElementParameterList.size() > 0 ? clientServiceElementDetailsBean.clientValueTotal : ''}" />
+								</f:facet>
+							</p:column>
+							<p:column style="text-align:right"
+								rendered="#{clientServiceElementDetailsBean.productOverride}">
+								<f:facet name="footer">
+									<h:outputText id="productTotal"
+										value="#{clientServiceElementDetailsBean.serviceElementParameterList.size() > 0 ? clientServiceElementDetailsBean.productValueTotal : ''}" />
+								</f:facet>
+							</p:column>
+							<p:column footerText="" />
+						</p:row>
+					</p:columnGroup>
+
+				</p:dataTable>
+
+				<p:panel id="clientServEleFeesDialogCommandPanel"
+					style="min-width:980px;max-width:100%;width:auto;">
+					<p:commandButton id="savePage" value="Save" tabindex="110"
+						oncomplete="handleEditServEleDialogSave(xhr, status, args);"
+						action="#{clientServiceElementDetailsBean.save}"
+						update=":clientServiceElementDetailsForm"
+						disabled="#{!clientServiceElementDetailsBean.hasPermission()}" />
+					<p:spacer width="10" />
+					<p:commandButton id="cancelPage" value="Cancel" process="@none"
+						tabindex="120" immediate="true"
+						onclick="PF('clientServEleFeesDialogWidget').hide();" />
+					<p:spacer width="10" />
+				</p:panel>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog id="clientServEleHistoryDialog"
+			header="Client Service Element History"
+			widgetVar="clientServEleHistoryDialogWidget" modal="true"
+			appendTo="@(body)" dynamic="true" closeOnEscape="true"
+			onShow="setFocus('closeClientServEleHistoryDialog')">
+			<h:form id="clientServEleHistoryDialogForm" prependId="false">
+				<p:panel>
+					<p:outputLabel value="Account: " styleClass="ui-label" />
+					<p:outputLabel
+						value="#{clientServiceElementDetailsBean.clientAccount.externalAccountPK.accountCode} - #{clientServiceElementDetailsBean.clientAccount.accountName}" />
+				</p:panel>
+				<p:dataTable id="clientServHistory"
+					value="#{clientServiceElementDetailsBean.clientServiceElementHistoryList}"
+					var="serviceElementHistorylist">
+					<p:column>
+						<f:facet name="header">Element</f:facet>
+						<h:outputText
+							value="#{serviceElementHistorylist.clientContractServiceElement.leaseElement.elementName} - #{serviceElementHistorylist.clientContractServiceElement.leaseElement.description}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">
+							<h:outputLabel value="Start Date" />
+						</f:facet>
+						<h:outputLabel value="#{serviceElementHistorylist.startDate}">
+							<f:convertDateTime pattern="MM/dd/yyyy" />
+						</h:outputLabel>
+					</p:column>
+					<p:column>
+						<f:facet name="header">
+							<h:outputLabel value="End Date" />
+						</f:facet>
+						<h:outputLabel value="#{serviceElementHistorylist.endDate}">
+							<f:convertDateTime pattern="MM/dd/yyyy" />
+						</h:outputLabel>
+					</p:column>
+				</p:dataTable>
+				<p:panel id="clientServEleHistoryButtonPanel">
+					<p:commandButton id="closeClientServEleHistoryDialog" value="Close"
+						onclick="PF('clientServEleHistoryDialogWidget').hide();" />
+				</p:panel>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog id="productLevelDialog"
+			header="Select Product Level for Removal"
+			widgetVar="productLevelDialogWidget" modal="true" appendTo="@(body)"
+			dynamic="true" height="325" width="500" closeOnEscape="true">
+			<h:form id="productLevelDialogForm" prependId="false">
+				<p:focus />
+				<p:messages id="productLevelMessages" severity="info,error,fatal"
+					showSummary="true" showDetail="false" autoUpdate="true" />
+				<p:panelGrid id="productLevelDialogPanel">
+					<p:row>
+						<p:column style="vertical-align:top;">
+							<p:outputLabel for="radioOptions" styleClass="ui-label"
+								value="Product Level: " />
+							<h:outputText style="color:red;" value="*" styleClass="ui-label" />
+						</p:column>
+						<p:column style="vertical-align:top;">
+							<h:selectOneRadio id="radioOptions"
+								value="#{clientServiceElementDetailsBean.selectedProduct}"
+								layout="pageDirection" tabindex="200">
+								<f:selectItems
+									value="#{clientServiceElementDetailsBean.activeClientProductList}"
+									var="prodList" itemLabel="#{prodList.productCode} - #{prodList.productName}"
+									itemValue="#{prodList.productCode}" />
+							</h:selectOneRadio>
+						</p:column>
+					</p:row>
+				</p:panelGrid>
+				<p:panel id="productLevelDialogButtonPanel">
+					<p:commandButton id="saveProductLevelDialog" value="Save"
+						tabindex="210"
+						action="#{clientServiceElementDetailsBean.removeProductServiceElement()}"
+						update=":clientServiceElementDetailsForm" process="@form"
+						oncomplete="PF('productLevelDialogWidget').hide();" />
+					<p:spacer width="10" />
+					<p:commandButton id="cancelProductLevelDialog" value="Cancel"
+						tabindex="220" onclick="PF('productLevelDialogWidget').hide()" />
+				</p:panel>
+			</h:form>
+		</p:dialog>
+
+		<style type="text/css">              
+			.ui-input-number-size-dev2 .ui-inputfield {
+				width : 100px;
+				}
+        </style>
+
+
+		<script type="text/javascript">
+			function handleEditServEleDialogSave(xhr, status, args) {
+				if (!args.failure) {
+					PF('clientServEleFeesDialogWidget').hide();
+				}
+			}
+
+			function updateTotal() {
+				$('[id$=clientTotal]').html($('[id$=hiddenClientTotal]').val());
+				$('[id$=productTotal]').html(
+						$('[id$=hiddenProductTotal]').val());
+			}
+
+			function readOnlyFocus() {
+				if ($('[id$=savePage]').disabled = true) {
+					setFocus('cancelPage');
+				}
+			}
+
+			$(window).load(function() {
+				setFocus('viewEditClientAgreements');
+			});
+		</script>
+	</ui:define>
+</ui:composition>

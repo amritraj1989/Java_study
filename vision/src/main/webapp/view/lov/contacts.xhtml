@@ -1,0 +1,99 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">                          
+	
+	<p:dialog header="Select Contact" widgetVar="contactsLOV" id="contactsLOVId" dynamic="true" resizable="true" appendTo="@(body)"
+						 width="600" height="350" closeOnEscape="true" modal="true"  onShow="setFirstPageContactsDataTableWidget();setFocus('contactsSelectButtonId');" >
+
+	 	<h:form id="contactsLovFormId" name ="contactsLovForm" prependId = "false" onkeydown="filter_onkeydown(event,'contactsSelectButtonId');">
+	
+			
+			
+			    <p:dataTable  id="contactsDataTableId"   widgetVar="contactsDataTableWidget" var="contact" scrollable="true" scrollHeight="238" resizableColumns="true"
+			           lazy="false" value="#{contactsLovBean.contacts}" rows="500"  paginator="true" paginatorPosition="bottom"
+			           selection = "#{contactsLovBean.selectedContact}" selectionMode="single" rowIndexVar="rowIndex" rowKey="#{contact.contactId}">
+			           
+			    	<p:ajax event="rowDblselect" listener="#{contactsLovBean.onRowSelect}" 
+			                    update=":contactsLovFormId:lovContactId" 
+			                    oncomplete="hideContactsLov();setContactValues();"  />
+			         
+			        <p:ajax event="rowSelect" listener="#{contactsLovBean.onRowSelect}" 
+			            	update=":contactsLovFormId:lovContactId"/>
+			        
+		          
+					<p:column headerText="Name" width="30%">
+						<h:outputText id="contactLastName" value="#{contact.lastName}"/>
+						<h:outputText value=", " rendered="#{(not empty contact.lastName) and (not empty contact.firstName)}"/>
+						<h:outputText id="contactFirstName" value="#{contact.firstName}"/>
+					</p:column>
+					<p:column headerText="Job Title" width="22%">
+						<h:outputText value="#{contact.jobTitle}"/>
+					</p:column>
+					<p:column headerText="Contact Type" width="20%">
+						<h:outputText value="#{contact.contactType}"/>
+					</p:column>
+					<p:column headerText="E-Mail" width="28%">
+						<h:outputText value="#{contact.email}" />
+					</p:column>
+			    </p:dataTable>
+			
+
+			<p:panel id="contactsSelectPanel" style="text-align:center; border:none">
+		        <h:outputText style="font-weight:bold;" 
+		            value="Record Count: #{contactsLovBean.contacts.size()}">
+		        </h:outputText>
+		        
+		        <p:commandButton  value="Select" id="contactsSelectButtonId" name="contactsSelectButton" style="float:right;" 
+		        	oncomplete="hideContactsLov();setContactValues();" tabindex="8" update="lovContactId" immediate="true" 
+		        	disabled="#{contactsLovBean.contacts.size() == 0}"/>
+	        </p:panel>
+	                    		
+	        <h:inputHidden id="lovContactId" value="#{contactsLovBean.selectedContact.contactId}" />
+	        <h:inputHidden id="lovContactFirstNameId" value="#{contactsLovBean.selectedContact.firstName}" />
+	       	<h:inputHidden id="lovContactLastNameId" value="#{contactsLovBean.selectedContact.lastName}" />
+		</h:form>
+			
+	</p:dialog>
+	
+	
+	
+		<script type="text/javascript">
+	
+
+		function setContactValues(){
+			var lovNameArray = new Array();
+			var lovValueArray = new Array();
+			lovNameArray[0]='CONTACT_ID';
+			lovValueArray[0]=document.getElementById('lovContactId').value;
+			lovNameArray[1]='CONTACT_FIRST_NAME';
+			lovValueArray[1]=document.getElementById('lovContactFirstNameId').value;
+			lovNameArray[2]='CONTACT_LAST_NAME';
+			lovValueArray[2]=document.getElementById('lovContactLastNameId').value;
+			setSelection('contactsLOV', lovNameArray,lovValueArray);
+		}
+		
+		function showContactsLov(){
+			showDialog('contactsLOV');
+		}	
+		
+		function hideContactsLov(){
+			hideDialog('contactsLOV');
+		}
+		
+		function setFirstPageContactsDataTableWidget(){
+			clearDataTableSelection('contactsDataTableWidget');
+			setDataTableToFirstPage('contactsDataTableWidget');
+			// also select the first row, but only if we have data
+			setDataTableToFirstRow('contactsDataTableWidget');
+		}
+
+		
+		function selectRow(index) {
+			clearDataTableSelection('contactsDataTableWidget');
+			PF('contactsDataTableWidget').selectRow(index,false);
+		}
+		
+		</script>
+</ui:composition>

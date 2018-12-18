@@ -1,0 +1,379 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:pe="http://primefaces.org/ui/extensions" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:comp="http://java.sun.com/jsf/composite/view/component" 
+    template="../../templates/ui.xhtml" >
+	
+    <ui:define name="content">
+    	<h:form id="maintenanceCodeMgmtBreadCrumbForm" prependId="false">
+   				<p:breadCrumb model="#{providerMaintCodeMgmtBean.breadCrumbTrail}" ajax="false" immediate="true" style="min-width:980px;max-width:100%;width:auto;"/>
+   		</h:form>
+    	<!-- Message display -->
+		<p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:980px;max-width:100%;width:auto;">
+			<p:messages id="messages" showSummary="false" showDetail="true" autoUpdate="true" />
+		</p:scrollPanel>
+					
+   		<h:form id="maintenanceCodeMgmtForm" prependId="false">
+ 			
+   			<p:panel id="maintenanceCodeMgmtDatatablePanel" header="Provider Maint Codes : " > 			
+
+   				<h:inputHidden id="clickIndex" name ="clickIndex" value = "#{providerMaintCodeMgmtBean.selectionIndex}"/>
+   				<h:inputHidden id="returnedFromNextPage" name ="returnedFromNextPage" value = "#{providerMaintCodeMgmtBean.returnedFromNextPage}"/>
+
+   				<p:toolbar id="filterToolbar" rendered="true">  
+				    <p:toolbarGroup align="left">  
+				    		<p:separator></p:separator>
+							<p:outputLabel for="providerFilter" value="Service Provider : "  />	
+							<h:panelGroup style="white-space:nowrap;">							
+								<p:inputText id="providerFilter" name="providerFilter" title="Service Provider" tabindex="10" value="#{providerMaintCodeMgmtBean.searchCriteria.serviceProvider}" onkeypress="return doKeypressFilter(event)" />
+								<p:commandButton id='serviceProviderLOV' icon="icon-lov" title="lov" tabindex="20"
+			                             oncomplete="showServiceProviderLov();" immediate="true"
+			                             actionListener="#{serviceProviderLovBean.fetchLOVDataByServiceProviderName}"
+			                             process="@all" dynamic="true" async="true"
+			                             update=":serviceProviderLovToolbarForm:searchToolbar :serviceProviderLovForm:serviceProviderDataTableId  :serviceProviderLovForm:serviceProviderSelectPanel">
+			                             <f:param name="SERVICEPROVIDER_LOV_INPUT" value="providerFilter" />
+			                             <f:param name="INCLUDEPARENTSONLY_LOV_INPUT" value="Y" />
+			                     </p:commandButton>
+			          		</h:panelGroup>
+							
+							
+							<p:outputLabel for="categoryFilter" value=" Category : "  />
+			               	<h:panelGroup style="white-space:nowrap;">			
+								<p:selectOneMenu id="categoryFilter" title="Category" tabindex="30" styleClass="selectMenu" value="#{providerMaintCodeMgmtBean.searchCriteria.maintenanceCategory}" onkeydown="return doKeypressFilter(event);" style="width:160px;" >
+									<f:selectItem itemLabel="----" itemValue="" />
+									<f:selectItems
+										value="#{providerMaintCodeMgmtBean.maintCategories}"
+							    		var="category" 
+										itemLabel="#{category.code}"
+										itemValue="#{category.code}"/>
+								</p:selectOneMenu>														
+							</h:panelGroup>
+							
+							
+							<p:outputLabel for="approvedFilter" value=" Approval Status : "  />						
+							<h:panelGroup style="white-space:nowrap;">
+								<p:selectOneMenu id="approvedFilter" title="Approved"  tabindex="40" styleClass="selectMenu" value="#{providerMaintCodeMgmtBean.searchCriteria.approvedStatus}" onkeydown="return doKeypressFilter(event);" style="width:120px;">
+									<f:selectItems
+										value="#{providerMaintCodeMgmtBean.approvalStatuses}"
+							    		var="approveStatus" 
+										itemLabel="#{approveStatus}"
+										itemValue="#{approveStatus}"/>
+								</p:selectOneMenu>														
+							</h:panelGroup>
+							<p:separator></p:separator>
+							<p:commandButton  value="Search" id="filter" title="Search" tabindex="50" process="@this, providerFilter, categoryFilter, approvedFilter" update="maintenanceCodeMgmtDataTable" actionListener="#{providerMaintCodeMgmtBean.performFilter}" oncomplete="setDefaultVendorMaintCodeRowSelection();saveDataForDirtyDetection();" /> 
+				    </p:toolbarGroup>  
+				</p:toolbar>     				
+
+   				<p:remoteCommand name="updateFooter" update="maintenanceCodeMgmtDataTable:totalResultSet"></p:remoteCommand>
+   				<p:dataTable id="maintenanceCodeMgmtDataTable" var="providerMaintCode" widgetVar="maintenanceCodeMgmtDataTableWidget"
+	                	value="#{providerMaintCodeMgmtBean.serviceProviderMaintCodeLazyList}"   
+	                	scrollable="true"  
+	                	scrollHeight="#{providerMaintCodeMgmtBean.dataTable.height}"
+	                	lazy="true"
+	                	rows="#{providerMaintCodeMgmtBean.resultPerPage}" 
+	                	rowIndexVar="maintCodeRowIndex"
+	                	resizableColumns="true"
+	                	paginator="true"
+	                	paginatorPosition="bottom"
+	                	emptyMessage = "#{providerMaintCodeMgmtBean.dataTableMessage}">
+	                	<p:ajax event="page" onstart="return getGoToNextPage();" onsuccess="openDirtyDialog()" oncomplete="initializeDirtyDetection();updateFooter()" />
+	                	<p:ajax event="sort" oncomplete="initializeDirtyDetection();"/>
+
+			            <p:column sortBy="#{providerMaintCode.serviceProvideName}" headerText="Service Provider" width="14%"> 
+			               	<h:outputText id="serviceProvider" value="#{providerMaintCode.serviceProvideName} &lt;br /&gt; No: #{providerMaintCode.serviceProvideCode}" escape="false" style="white-space: normal"/>
+			            </p:column>
+			            <p:column sortBy="#{providerMaintCode.provideMaintCode}" headerText="Provider Maint Code" width="16%"> 
+			                <h:inputText styleClass="trackDirtyValue" id="providerMaintCode" value="#{providerMaintCode.provideMaintCode}" disabled="#{!providerMaintCodeMgmtBean.hasPermission()  or not empty providerMaintCode.provideMaintCode}" style="white-space: normal; width:100%; " maxlength="25" />
+			            </p:column>
+			            <p:column sortBy="#{providerMaintCode.provideMaintCodeDesc}" headerText="Provider Maint Description" width="30%"> 
+			                <h:inputText styleClass="trackDirtyValue" id="providerMaintDesc" value="#{providerMaintCode.provideMaintCodeDesc}" disabled="#{!providerMaintCodeMgmtBean.hasPermission()}" style="white-space: normal; width:100%; " maxlength="80" />
+			            </p:column>
+
+			            <p:column sortBy="#{providerMaintCode.mafsMaintCode}" headerText="MAFS Maintenance Code" width="22%">
+			            	<h:inputHidden id="maintCodeId" value="#{providerMaintCode.mafsMaintCodeId}"/>
+			            	<h:panelGroup style="white-space:nowrap; float:right">
+			            	<p:inputText styleClass="trackDirtyValue" id="maintCode" value="#{providerMaintCode.mafsMaintCode}" onchange="onMaintCodeDecodeStart('#{maintCodeRowIndex}');" disabled="#{!providerMaintCodeMgmtBean.hasPermission()}" style="white-space: normal;">	
+							</p:inputText>
+			            	
+			            	<p:commandButton id="maintCodeLOV" icon="icon-lov" disabled="#{!providerMaintCodeMgmtBean.hasPermission()}" style="white-space: normal"
+									onclick="setSelectedDSIndex('#{maintCodeRowIndex}')"
+									oncomplete="showMaintenanceCodeLov();" immediate="true" process="@all" dynamic="true" async="true"
+									actionListener="#{maintenanceCodeLovBean.fetchLOVDataByMaintenanceCodeDescription}"
+									update=":MaintLovForm:MAINTENANCE_CODE_GRID">
+									<f:param name="MAINTENANCE_CODE_LOV_INPUT" value="maintenanceCodeMgmtDataTable:#{maintCodeRowIndex}:maintCode" />
+							</p:commandButton>			            	 
+			            	</h:panelGroup>
+			            </p:column>			            
+			            <p:column sortBy="#{providerMaintCode.mafsMaintCodeDesc}" headerText="MAFS Maintenance Description" width="27%"> 
+			                <h:outputText id="maintDesc" value="#{providerMaintCode.mafsMaintCodeDesc}" escape="false" style="white-space: normal"/>
+			            </p:column>
+			            <p:column headerText="Approved" width="9%"> 
+			            	<h:selectBooleanCheckbox styleClass="trackDirtyCheckbox" id="approved" disabled="#{!providerMaintCodeMgmtBean.hasPermission()}" value="#{providerMaintCode.approved}" />
+			            </p:column>
+
+ 						<f:facet name="footer">
+ 						
+							Record Count: <h:outputText value="#{providerMaintCodeMgmtBean.totalResultSet }" id="totalResultSet"/> of <h:outputText value="#{providerMaintCodeMgmtBean.serviceProviderMaintCodeLazyList.rowCount}" id="rowCount"/>
+						</f:facet>	            
+				</p:dataTable>
+				
+				
+
+   			</p:panel>
+
+   			<p:panel id="commandPanel" style="min-width:980px;max-width:100%;width:auto;">
+   				<p:commandButton id="saveMaintCode"
+	   				 tabindex="60" value="Save" 
+	   				 process="@all" update="@this"
+	   				 disabled="#{!providerMaintCodeMgmtBean.hasPermission()}"
+	   				 actionListener="#{providerMaintCodeMgmtBean.save}" oncomplete="initializeDirtyDetection();"
+	   				  />
+	   			<p:spacer width="10" />
+	   			<p:commandButton ajax="false" id="addServiceProviderMaintCode"
+	   				 tabindex="70" value="Add New Provider Code" 
+	   				 onclick="lockScreen();" 
+	   				 disabled="#{!providerMaintCodeMgmtBean.hasPermission()}"
+	   				 action="#{providerMaintCodeMgmtBean.addServiceProviderMaintCode}" 
+	   				  />
+	   			<p:spacer width="10" />
+	   			<p:commandButton ajax="false" id="refreshMaintCodeCache"
+	   				 tabindex="77" value="Refresh Maintenance Code(s) Cache" 
+	   				 onclick="lockScreen();" 
+	   				 disabled="#{!providerMaintCodeMgmtBean.hasPermission()}"
+	   				 action="#{providerMaintCodeMgmtBean.refreshMaintCodeCache}" 
+	   				  />
+	   			<p:spacer width="10" />
+	   			<p:commandButton ajax="false" id="maintainDiscounts"
+	   				 tabindex="75" value="Maintain Supplier Discounts" 
+	   				 onclick="lockScreen();" 
+	   				 action="#{providerMaintCodeMgmtBean.maintainDiscounts}" 
+	   				  />
+				<p:spacer width="10" />
+				<p:commandButton id="cancel" value="Cancel" action="#{providerMaintCodeMgmtBean.cancel}" ajax="false" onclick="lockScreen();" immediate="true" />
+			</p:panel>
+   		</h:form>
+   		<p:dialog id= "dirtyDataDialog"  
+		          onShow="setFocus('dirtyDataDialogOk');" widgetVar="dirtyDataDialogWidget" 
+		          modal="true" appendTo="@(body)" resizable="false" width="400" height="100">
+			<h:form prependId="false">
+				<h:outputText value="You have unsaved data on this page, Please save before moving to next page." />
+				<h:panelGrid columns = "1" cellpadding="10" cellspacing="1">
+					 
+					<p:commandButton  value="Ok"  id="dirtyDataDialogOk" name = "dirtyDataDialogOk" process="@this"   onclick="hideDialog('dirtyDataDialogWidget')"/>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+   		<div id="SERVICEPROVIDER_LOV_DIV">
+            <ui:include src="../lov/serviceProviders.xhtml" />
+        </div>
+        
+        <div id="MAINTENANCE_LOV_DIV">
+            <ui:include src="../lov/maintenanceCode.xhtml" />
+        </div>
+		
+		<style type="text/css">
+			.ui-tooltip{
+				max-width: 350px;
+			}
+			.selectMenu { display: inline-block; vertical-align: top; }
+		</style> 		
+			
+		<script type="text/javascript">
+		
+		function setDefaultRowSelectionOnPageEvent(){			
+			var grpRadio = document.getElementsByName("maintenanceCodeRadioGrp");	
+			grpRadio[0].checked == true;
+			setSelectedMaintenanceCodeRow();
+			setScrollDivAtTop();	
+		}
+		
+		function getSelectedRadioIndex(){ 
+            var grpRadio = document.getElementsByName("maintenanceCodeRadioGrp");
+            var index = 0;
+            for (var i= 0 ; i &lt; grpRadio.length; i++){
+                if (grpRadio[i].checked == true){                   
+                    index = i ; break;          
+                }
+            }
+            
+            return index + 1;
+        }
+		
+		function setSelectedMaintenanceCodeRow(){
+			var iRow = getSelectedRadioIndex();
+            var dataRows = $('.radioSelector');
+            if(dataRows[iRow])
+                dataRows[iRow].click();
+		}
+		
+		function setSelectedMaintenanceCodeRadio(){
+			var iRow  = document.getElementById('clickIndex').value;
+            var radioId = "maintenanceCodeRadio"+iRow;
+            if(document.getElementById(radioId))
+             document.getElementById(radioId).checked=true;
+            setFocus(radioId);
+		}
+		
+		function setDefaultMaintenanceCodeRowSelection(){
+			var retFromNextPage = document.getElementById('returnedFromNextPage').value;
+			if(retFromNextPage == 'true'){
+				setSelectedMaintenanceCodeRadio();
+				setSelectedMaintenanceCodeRow();
+            	setScrollDivAtTop();
+			}
+		}
+		
+		//var goToNextPage = "false";
+		//function setGoToNextPage(){
+			//goToNextPage = "true";
+	//	}
+		var isDirtyData = false;
+		function getGoToNextPage(){
+			 isDirtyData =  dirtyCheckOnPage();
+			//initializeDirtyDetection();
+			if(isDirtyData == true ){
+				openDirtyDialog();
+				registerIgnoreButton("dirtyDataDialogOk");
+				return false;
+			}else{
+				return true;
+			}
+		}
+		function dirtyCheckOnPage(){
+			
+				var dirty = false;
+				var compareVal = true;
+				$(".trackDirtyValue").each(function() { 
+					if($(this).val() === undefined ){
+						compareVal = false;
+					}
+					if($(this).data('initial_value') === undefined ){
+						compareVal = false;
+					}
+					//alert("Compare:"+compareVal);
+					if(dirty == false &amp;&amp;  compareVal == true){
+						if ($(this).val() != $(this).data('initial_value')) {
+							//alert($(this).val()+" , "+$(this).data('initial_value'))
+							dirty = true;
+				          }
+						
+					}
+					
+				});	
+				$(".trackDirtyCheckbox").each(function() {
+					if($(this).val() === undefined ){
+						compareVal = false;
+					}
+					if($(this).data('initial_value') === undefined ){
+						compareVal = false;
+					}
+					if ($(this).prop("checked") != $(this).data('initial_value')) {
+						dirty = true;
+			          }
+				});
+			
+				return dirty;
+			
+		}
+		function	openDirtyDialog(){
+			//alert(isDirtyData);
+				if(isDirtyData == true){
+					PF('dirtyDataDialogWidget').show();
+			}
+		}
+		
+		function setDefaultVendorMaintCodeRowSelection(){
+			var firstRow=document.getElementById("maintenanceCodeMgmtDataTable:0:providerMaintDesc");
+			if (typeof(firstRow) != 'undefined' &amp;&amp; firstRow != null){
+				document.getElementById("maintenanceCodeMgmtDataTable:0:providerMaintDesc").focus();
+			}
+			setScrollDivAtTop();
+			
+		}
+		
+		
+		/**
+		* Detects the Enter key and programatically clicks
+		* the filter button. The search button event handler
+		* will perform the min. alphanumeric check.
+		*/
+		function doKeypressFilter(event){
+			if (event.keyCode == 13) {
+				source = event.srcElement.id;
+			   $('#filter').click();
+			   return false;
+			}
+			return true;	
+		}
+
+	
+    var lovCaller;	    
+
+	function initializeDirtyDetection() {
+		registerIgnoreButton("saveMaintCode");
+		registerIgnoreButton("filter");
+		registerIgnoreButton("refreshMaintCodeCache");
+		registerIgnoreButton("dirtyDataDialogOk");
+		saveDataForDirtyDetection();
+	}
+	
+	
+	
+    /**
+    * Capturing the id of the text field that invoked the LOV.
+    * The id will be used later to evaluate where the return
+    * value from the LOV should be stored.
+    */
+    function onClickMiantenanceCodeLOV(caller) {	    	
+    	lovCaller = caller;	
+    }
+    
+	var selectedRowIndex;
+	function setSelectedDSIndex(value1){
+		selectedRowIndex = value1;
+	}
+	function onMaintCodeDecodeStart(value1){
+		setSelectedDSIndex(value1);
+		document.getElementById('maintenanceCodeMgmtDataTable:' + value1 + ':maintCodeId').value="";
+		document.getElementById('maintenanceCodeMgmtDataTable:' + value1 + ':maintDesc').innerHTML="";
+	}
+	function onMaintCodeDecodeComplete(){
+		document.getElementById('maintenanceCodeMgmtDataTable:' + selectedRowIndex + ':maintCodeLOV').focus();
+	}
+		
+    function setSelection( lovName, nameArray, valueArray){	
+    		var index1 = selectedRowIndex;
+			if(lovName == 'maintenanceCodeLOV') {
+			    for(var i=0; i  &lt; nameArray.length ; i++) {	
+				    if(nameArray[i] == "MAINTENANCE_CODE") {	
+				   		document.getElementById('maintenanceCodeMgmtDataTable:' + index1 + ':maintCode').value =  valueArray[i];	
+					} else if(nameArray[i] == "MAINTENANCE_DESCRIPTION") {
+						document.getElementById('maintenanceCodeMgmtDataTable:' + index1 + ':maintDesc').innerHTML=valueArray[i];	
+					} else if(nameArray[i] == "MAINTENANCE_CODE_ID") {
+						document.getElementById('maintenanceCodeMgmtDataTable:' + index1 + ':maintCodeId').value=valueArray[i];	
+					}
+				}			    
+			}else if(lovName == 'serviceProviderLOV'){
+                for(var i=0; i  &lt; nameArray.length ; i++){
+                    if(nameArray[i] == 'SERVICE_PROVIDER_NAME'){
+                        document.getElementById('providerFilter').value = valueArray[i];
+                    }
+                }
+                setFocus('providerFilter');
+            } 	 					 				
+		}
+       	
+	 	$(window).load(function(){
+	 		initializeDirtyDetection();
+	 		setDefaultVendorMaintCodeRowSelection();		
+		});    
+    	
+		</script>
+	</ui:define>
+	
+	
+</ui:composition>

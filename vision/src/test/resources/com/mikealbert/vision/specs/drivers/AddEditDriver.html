@@ -1,0 +1,41 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Add and View/Edit Driver</title>
+    <body>
+    	<h1>Add and View/Edit Driver</h1>
+    	<h2>Acceptance Tests (Automated)</h2>
+    		<ul concordion:execute="#result = testSaveWithoutGaraged(#input)"><li>A new Driver added to the system with <b><span concordion:set="#input">0</span></b> garaged addresses will <span concordion:assertTrue="#result">result in an error.</span></li></ul>
+			<ul concordion:execute="#result = testSaveWithoutGaraged(#input)"><li>A new Driver added to the system with <b><span concordion:set="#input">1</span></b> garaged addresses will <span concordion:assertFalse="#result">not results in an error; it will succeed.</span></li></ul>
+    		
+    		<ul concordion:execute="#result = testSaveWithoutCustomersAccount(#input)"><li>A new Driver added to the system with <b>"" <span concordion:set="#input"></span></b>as the customer account will <span concordion:assertTrue="#result">result in an error.</span></li></ul>
+    		<ul concordion:execute="#result = testSaveWithoutCustomersAccount(#input)"><li>A new Driver added to the system with <b><span concordion:set="#input">00000001</span></b> (an invalid number) as the customer account will <span concordion:assertTrue="#result">result in an error.</span></li></ul>
+    		<ul concordion:execute="#result = testSaveWithoutCustomersAccount(#input)"><li>A new Driver added to the system with <b><span concordion:set="#input">00005679</span></b> as the customer account will <span concordion:assertFalse="#result">not results in an error; it will succeed.</span></li></ul>
+    		
+    		<ul concordion:execute="#result = testSaveWithoutGradeGroup(#customerAccount,#driverGradeName)"><li>A new Driver added to the system with <b><span concordion:set="#customerAccount">00005679</span></b> as the customer account and a grade of "" <b><span concordion:set="#driverGradeName"></span></b> will <span concordion:assertTrue="#result">result in an error.</span></li></ul>
+    		<ul concordion:execute="#result = testSaveWithoutGradeGroup(#customerAccount,#driverGradeName)"><li>A new Driver added to the system with <b><span concordion:set="#customerAccount">00005679</span></b> as the customer account and a grade of <b><span concordion:set="#driverGradeName">ABC</span></b> will <span concordion:assertTrue="#result">result in an error.</span></li></ul>
+    		<ul concordion:execute="#result = testSaveWithoutGradeGroup(#customerAccount,#driverGradeName)"><li>A new Driver added to the system with <b><span concordion:set="#customerAccount">00005679</span></b> as the customer account and a grade of <b><span concordion:set="#driverGradeName">CAD</span></b> will <span concordion:assertFalse="#result">not results in an error; it will succeed.</span></li></ul>
+
+
+			<ul concordion:execute="#result = testSaveWithoutFirstNameLastNameTitle(#firstName,#lastName,#title)"><li>A new Driver added to the system with <b>"" <span concordion:set="#firstName"></span></b> as the first name, <b><span concordion:set="#lastName">Jones</span></b> as the last name and <b><span concordion:set="#title">MR</span></b> as the title will <span concordion:assertTrue="#result">result in an error.</span></li></ul>
+    		<ul concordion:execute="#result = testSaveWithoutFirstNameLastNameTitle(#firstName,#lastName,#title)"><li>A new Driver added to the system with <b><span concordion:set="#firstName">Bob</span></b> as the first name, <b>"" <span concordion:set="#lastName"></span></b> as the last name and <b><span concordion:set="#title">MR</span></b> as the title will <span concordion:assertTrue="#result">result in an error.</span></li></ul>
+    		<ul concordion:execute="#result = testSaveWithoutFirstNameLastNameTitle(#firstName,#lastName,#title)"><li>A new Driver added to the system with <b><span concordion:set="#firstName">Bob</span></b> as the first name, <b><span concordion:set="#lastName">Jones</span></b> as the last name and <b>"" <span concordion:set="#title"></span></b> as the title will <span concordion:assertTrue="#result">result in an error.</span></li></ul>
+    		<ul concordion:execute="#result = testSaveWithoutFirstNameLastNameTitle(#firstName,#lastName,#title)"><li>A new Driver added to the system with <b><span concordion:set="#firstName">Bob</span></b> as the first name, <b><span concordion:set="#lastName">Jones</span></b> as the last name and <b><span concordion:set="#title">MR</span></b> as the title will <span concordion:assertFalse="#result">not results in an error; it will succeed.</span></li></ul>
+			
+    		<ul><li>An Address Search for a given zip code <b><span concordion:set="#zipCode">45040</span></b> will results in the following cities returned.</li></ul>
+    		<p align="center">
+    		<table concordion:verifyRows="#zipCity : testGetAllCityZipCodesByZipCode(#zipCode)">
+		        <tr><th concordion:assertEquals="#zipCity.cityZipCodePK.cityCode">Returned Cities</th></tr>
+		        <tr><td>DEERFIELD TOWNSHIP</td></tr>
+		        <tr><td>MASON</td></tr>
+            </table>
+    		</p>
+    		
+    	<h2>Manual Tests</h2>
+    		<ul><li>Clicking on Save And Stay saves the driver, displays a success message and keeps me on the current page.</li></ul>
+    		<ul><li>Clicking on Save saves the driver, navigates me to the page I came from and displays a success message on the page I navigate to.</li></ul>
+    		<ul><li>Check User Interface is consistent with the Usability Guidelines.</li></ul>
+    		
+    	<h2>Untested (Out of Scope)</h2>
+    		<ul><li>There are feeds that send Driver information to the vehicle manufacturer for the so that they can send out recall and warranty notices; these should work as coded by it was purposely decided that we should not test these are they are not very important to the core Mike Albert Leasing business.</li></ul>
+    </body>
+</html>

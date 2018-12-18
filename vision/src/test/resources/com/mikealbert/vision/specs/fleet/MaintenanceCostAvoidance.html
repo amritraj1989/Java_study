@@ -1,0 +1,28 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Fleet Maintenance / FM 150  and 539 Goodwill PO's</title>
+    <body>
+    	<h1>Fleet Maintenance / FM 151  Cost Avoidance PO</h1>
+    	<h2>Acceptance Tests (Automated)</h2>					            
+			<ul>
+			    <li>When creating a PO with a Cost avoidance task for unit <b><span concordion:set="#unitNo">00961960</span></b></li>
+		        <ul>
+	                <li>Given that a new purchase order has been created for an out of network service provider and it contains a cost avoidance task (DECLINED - Repair not needed and declined by coordinator) with an quantity of 1, unit price of $200.00 and a cost avoidance amount of $30.00 </li>
+	                    <ul concordion:execute="#result = testCostAvoidancePO(#unitNo)">	
+	                        <li>PO Total = <b>$<span concordion:assertEquals="#result.poTotal">200.00</span></b></li>
+	                        <li>PO Mark Up Total = <b>$<span concordion:assertEquals="#result.poMarkupTotal">20.00</span></b></li>
+	                        <li>PO Recharge Total = <b>$<span concordion:assertEquals="#result.poRechargeTotal">220.00</span></b></li>	                        	                                                
+	                        <li>PO Cost Avoidance Total = <b>$<span concordion:assertEquals="#result.poCostAvoidanceTotal">30.00</span></b></li>
+	                        <li>PO Goodwill Total = <b>$<span concordion:assertEquals="#result.poGoodwillTotal">0.00</span></b></li>	                        
+	                    </ul>	  	                            	            	            	            	            
+			    </ul>
+            </ul>			
+    	<h2>Manual Tests</h2>
+    	    <ul type = "circle"><b>
+    	       <li>TODO: </li>
+    	    </b></ul>
+
+    	<h2>Untested (Out of Scope)</h2>
+    		<ul><li>TODO:</li></ul>
+    </body>
+</html>

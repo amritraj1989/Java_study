@@ -1,0 +1,456 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	>
+		  <!-- INTERFACE -->
+	  <composite:interface>
+	    <composite:attribute name="showSearch" required="true" type="java.lang.Boolean" />
+	    <composite:attribute name="showNotes" required="false" type="java.lang.Boolean" />
+	    <composite:attribute name="showUpfitProgress" required="false" default="false" type="java.lang.Boolean" />	    
+	    <composite:attribute name="enquiryMode" required="false" type="java.lang.Boolean" />
+	    <composite:attribute name="showCancel" required="false" type="java.lang.Boolean" />
+	    <composite:attribute name="mainPODocId" required="false" type="java.lang.Long" />
+	    <composite:attribute name="isStockUnit" required="false" type="java.lang.Boolean" />
+	    <composite:attribute name="onLoadCallback" required="false" type="java.lang.String" />	    
+	    <composite:attribute name="update" required="false" default="none" type="java.lang.String" />
+	    <composite:attribute name="addNotes" required="false" default="false" type="java.lang.Boolean" />
+	    <composite:attribute name="fmsId" required="false" type="java.lang.Long" />
+	    <composite:attribute name="unitNo" required="false" type="java.lang.String" />
+	  </composite:interface>
+	
+	  <!-- IMPLEMENTATION -->          
+	  <composite:implementation>
+	  	<h:form id="ccVehicleOrderStatusHiddenForm" prependId="false">           
+	            <p:commandButton id="ccInitVehicleOrderStatusHiddenBtn" 
+	                    style="display:none"
+	                    actionListener="#{maintainVehicleOrderStatusBean.service()}" 
+	                    oncomplete="#{cc.attrs.onLoadCallback};setConditionalFocus(#{maintainVehicleOrderStatusBean.isHasManagePermission()})"
+	                    update="@(#{cc.attrs.update})"/>
+	  	</h:form>
+
+	    <p:panel rendered="#{maintainVehicleOrderStatusBean.showNotes}">
+		    <comp:logBook id="logBookFromMntVehStatus"
+		                entity="#{maintainVehicleOrderStatusBean.getSelectedFleetMaster()}" 
+		                logBookTypes="#{maintainVehicleOrderStatusBean.logBookType}" 
+		                enableFollowUpDate="true" 
+		                enableAddAndClose="false" 
+		                addNotes = "#{maintainVehicleOrderStatusBean.addNotes}"/>
+        </p:panel>		            
+	
+  		<p:scrollPanel style="height:50px;" mode="native" styleClass="ui-layout">
+					<p:messages id="dialogErrorMsgID" showDetail="false" autoUpdate="true" showSummary="true" globalOnly="false"/>     
+		</p:scrollPanel>
+	  	<h:form id="ccVehicleOrderStatusSearchForm" prependId="false">
+	  		<p:panel id="ccVehicleOrderStatusSearchPanel" header="Search" styleClass="ui-layout" rendered="#{maintainVehicleOrderStatusBean.showSearch}">
+				<p:focus context="ccVehicleOrderStatusSearchPanel" />
+				<h:panelGrid columns="8" cellspacing="5">
+					<h:outputLabel for="searchUnitNo" value="Unit No: " styleClass="ui-label" />
+					<p:inputText id="searchUnitNo" title="Unit No" value="#{maintainVehicleOrderStatusBean.searchCriteria.unitNo}" onkeypress="return doKeypressSearch(event)" >
+						<p:keyFilter regEx="/[a-z0-9]/i" preventPaste="false"/>
+					</p:inputText>
+					<h:outputLabel for="searchPoNumber" value="PO No: " styleClass="ui-label" />
+					<p:inputText id="searchPoNumber" title="PO Number" style="text-transform:uppercase;" value="#{maintainVehicleOrderStatusBean.searchCriteria.purchaseOrderNumber}" onkeypress="return doKeypressSearch(event)" >
+						<p:keyFilter regEx="/[a-z0-9]/i" preventPaste="false"/>
+					</p:inputText>
+					<h:outputLabel for="searchFactoryNo" value="Factory No: " styleClass="ui-label" />
+					<p:inputText id="searchFactoryNo" title="Factory No" style="text-transform:uppercase;" value="#{maintainVehicleOrderStatusBean.searchCriteria.factoryNo}" onkeypress="return doKeypressSearch(event)" >
+						<p:keyFilter regEx="/[a-z0-9]/i" preventPaste="false"/>
+					</p:inputText>
+	
+					<p:spacer width="10"></p:spacer>
+					<p:commandButton id="searchVehicleOrderStatusBtn" widgetVar="searchButtonWidgetVar" title="Search" value="Search" style="float:right" 
+							onstart="return validateSearch(event);" onmouseover="handleSearch = true;" onmouseout="handleSearch = false;" ajax="true"
+							actionListener="#{maintainVehicleOrderStatusBean.performSearch}" update="#{':'.concat(cc.clientId).concat(':ccVehicleOrderStatusSearchForm:ccVehicleOrderStatusDataPanel')}" />
+				</h:panelGrid>
+			</p:panel>
+
+			<p:panel id="ccVehicleOrderStatusDataPanel">
+				<p:spacer height="10"></p:spacer>	
+	      		<h:panelGrid  columns="8"  cellspacing="5"  >	
+					<h:outputLabel  value="Unit No: "  styleClass="ui-label"  style="white-space: nowrap"/>						
+					<p:outputLabel  value="#{maintainVehicleOrderStatusBean.unitNo}" />	
+					<p:spacer width="20"></p:spacer>
+					<p:outputLabel id="vinLabelId" value="VIN: " style="white-space:nowrap;" styleClass="ui-label" />
+					<h:panelGrid columns="2" style="white-space:nowrap;">
+						<p:inplace id="vinInplaceId" editor="true" rendered="true" widgetVar="vinInplaceVar" toggleable="false" label="#{maintainVehicleOrderStatusBean.vinLabel}"
+							>
+							<p:ajax event="save" listener="#{maintainVehicleOrderStatusBean.saveVin}"
+								oncomplete="handleSaveVinRequest(xhr, status, args);"
+								process="vinTxtId" 
+								update="vinInplaceId" />
+							<p:ajax event="cancel" listener="#{maintainVehicleOrderStatusBean.cancelSaveVin}" immediate="true"
+								oncomplete="showIcon('maintainVehicleOrderStatusCCId:vinAddImageId');"
+								update="vinInplaceId" />
+							<p:inputText id="vinTxtId" style="text-align:right;text-transform:uppercase;" onchange="makeUpperCase(this);checkForSpecialChar(this);" maxlength="17" value="#{maintainVehicleOrderStatusBean.vinLabel}"
+								>
+								<p:keyFilter regEx="/[a-z0-9]/i" preventPaste="false"/>
+							</p:inputText>
+						</p:inplace>
+	
+						<p:commandLink style="cursor:pointer;border:none" styleClass="enabledTextButton" >
+							<p:graphicImage id="vinAddImageId" style="cursor:pointer;border:none"
+								onclick="PF('vinInplaceVar').show();hideIcon('maintainVehicleOrderStatusCCId:vinAddImageId');"
+								value="/images/action_edit.png" title="Add VIN" 
+								/>
+						</p:commandLink>
+					</h:panelGrid>
+					<p:spacer width="20"></p:spacer>
+					<h:outputLabel value="Vehicle Desc: " styleClass="ui-label" style="white-space:nowrap" />						
+					<p:outputLabel value="#{maintainVehicleOrderStatusBean.unitDesc}"  />							
+						
+					<p:outputLabel id="factoryNoLabelId" value="Factory No: " style="white-space:nowrap;" styleClass="ui-label"/>
+					<h:panelGrid columns="2" style="white-space:nowrap;">
+						<p:inplace id="factoryNoInplaceId" editor="true" rendered="true" widgetVar="factoryNoInplaceVar" toggleable="false" label="#{maintainVehicleOrderStatusBean.factoryNoLabel}">
+							<p:ajax event="save" listener="#{maintainVehicleOrderStatusBean.saveFactoryNo}"
+								oncomplete="handleSaveFactoryNoRequest(xhr, status, args);"
+								process="factoryNoTxtId"
+								update="factoryNoInplaceId" />
+							<p:ajax event="cancel" listener="#{maintainVehicleOrderStatusBean.cancelSaveFactoryNo}" immediate="true"
+								oncomplete="showIcon('maintainVehicleOrderStatusCCId:factoryNoEditImageId');"
+								update="factoryNoInplaceId" />
+							<p:inputText id="factoryNoTxtId" style="text-align:right;text-transform:uppercase;" onchange="makeUpperCase(this);checkForSpecialChar(this);" maxlength="80" size="10" value="#{maintainVehicleOrderStatusBean.factoryNoLabel}">
+								<p:keyFilter regEx="/[a-z0-9]/i" preventPaste="false"/>
+							</p:inputText>
+						</p:inplace>
+						<p:commandLink style="cursor:pointer;border:none" disabled="#{maintainVehicleOrderStatusBean.hasPermission('manage_veh_order_status') ? (empty maintainVehicleOrderStatusBean.mainPODocId ? 'true' : 'false') : 'true'}">
+							<p:graphicImage id="factoryNoEditImageId" style="cursor:pointer;border:none"
+								onclick="PF('factoryNoInplaceVar').show();hideIcon('maintainVehicleOrderStatusCCId:factoryNoEditImageId');"
+								value="/images/action_edit.png" title="Add/Edit Factory No"
+								rendered="#{maintainVehicleOrderStatusBean.hasPermission('manage_veh_order_status') ? (empty maintainVehicleOrderStatusBean.mainPODocId ? 'false' : 'true') : 'false'}"/>
+						</p:commandLink>
+					</h:panelGrid>
+					<p:spacer width="20"></p:spacer>
+					<h:outputLabel value="Driver: " styleClass="ui-label" />
+					<h:outputLabel value="#{maintainVehicleOrderStatusBean.driverName}" />
+					<p:spacer width="20"></p:spacer>
+					<h:outputLabel value="Client: " styleClass="ui-label" />
+					<h:outputLabel value="#{maintainVehicleOrderStatusBean.clientName}" />
+					<h:outputLabel value="PO No: " styleClass="ui-label" style="white-space: nowrap" />
+					<p:outputLabel value="#{maintainVehicleOrderStatusBean.docPONo}" />
+					<p:spacer width="20"></p:spacer>
+					<h:outputLabel value="Requested Date: " styleClass="ui-label" style="white-space: nowrap" />
+					<h:outputText value="#{maintainVehicleOrderStatusBean.requestedDate}">
+						<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+					</h:outputText>
+					<p:spacer width="20"></p:spacer>
+					<h:outputLabel value="Vendor: " styleClass="ui-label" />
+					<h:outputLabel value="#{maintainVehicleOrderStatusBean.vendorName}" />
+					
+					<h:outputLabel value="Acquisition Type:" styleClass="ui-label"/>
+					<h:outputLabel value="#{maintainVehicleOrderStatusBean.acquisitionType}"/>
+					<p:spacer width="20"></p:spacer>
+					<h:outputLabel value="Ordering Lead Time:" styleClass="ui-label"/>
+					<h:outputLabel value="#{maintainVehicleOrderStatusBean.orderingLeadTime}"/>
+					<p:spacer width="20"></p:spacer>
+					<h:outputLabel value="Upfit:" styleClass="ui-label" />
+					<h:outputLabel value="#{maintainVehicleOrderStatusBean.upfitYN}" />
+			</h:panelGrid>
+						       	 	       
+			      	<p:panel id="ccVehicleOrderStatusDataPanel1">
+	    	    		<p:focus id="focusDataPanel"  context="ccVehicleOrderStatusDataPanel1"/>									         
+					   	<p:commandLink id="expandCollapse" style="vertical-align:5px;cursor:pointer;font-weight: bold;"
+			        	    	    process="@this" update="@this, #{':'.concat(cc.clientId).concat(':ccVehicleOrderStatusSearchForm:ccVehicleOrderStatusDataTableId')}"			        	    	    
+			        	    	    actionListener="#{maintainVehicleOrderStatusBean.toggleFetchAllEntry}" oncomplete="setConditionalFocus(#{maintainVehicleOrderStatusBean.isHasManagePermission()})"
+					        		title="Show All/Latest">
+					            <h:outputLabel value="#{maintainVehicleOrderStatusBean.toggleLabel}" />
+					    </p:commandLink>
+					   
+				 		 <p:dataTable id="ccVehicleOrderStatusDataTableId" resizableColumns="true"
+				 		 				var="prgElement"  
+										value="#{maintainVehicleOrderStatusBean.supplierProgressHistoryList}" 
+										emptyMessage="No records found"
+										scrollable="true" 
+										rowIndexVar="elementRowIndex"
+										scrollHeight="#{maintainVehicleOrderStatusBean.dataTable.height}"
+										styleClass="ui-datatable-header-align-dev ui-datatable-resizing-dev">
+			
+							<f:facet name="header">
+						    	<p:commandLink id="addSPHLink"  rendered="#{maintainVehicleOrderStatusBean.hasPermission('manage_veh_order_status')}"
+							            style="float:right; border:thin solid gray; text-decoration:none; cursor:pointer;"
+							            action="#{maintainVehicleOrderStatusBean.add}" process="@this" update="@form"
+							            oncomplete="scrollToTop();"
+							            title="Add Vehicle Order Status">						   
+							        <p:graphicImage style="border-style: none;" value="/images/action_add.png" />
+							        <h:outputLabel  style="vertical-align:5px" value="Add &#160;"  /> 						            							            
+								</p:commandLink>
+							    <p:spacer height="15px;"/>			                    
+			                </f:facet> 
+
+							<p:column headerText="Status Code"  style="width:#{maintainVehicleOrderStatusBean.dataTable.col1}">
+								<p:outputLabel id="actionType" value="#{prgElement.progressType}" rendered="#{(prgElement.updateMode =='true'  and prgElement.sphId gt 0) or (prgElement.updateMode =='false') }"/>
+								<p:selectOneMenu id="configCode"  value="#{maintainVehicleOrderStatusBean.selectedSupplierProgressHistory.progressType}" 
+									 style="width:80%" rendered="#{prgElement.updateMode =='true'  and prgElement.sphId lt 0}">
+									<f:selectItem itemLabel="Please Select" itemValue="" />
+									<f:selectItems value="#{maintainVehicleOrderStatusBean.progressTypeCodeList}" var="entry" itemLabel="#{entry.progressType}" itemValue="#{entry.progressType}" />
+									<p:ajax process="@form" listener="#{maintainVehicleOrderStatusBean.progressTypeChangeListener}" update="@form" />
+								</p:selectOneMenu>
+							</p:column>
+							
+							<p:column headerText="Description"  style="width:22%">
+								<p:outputLabel	value="#{prgElement.progressTypeCode.description}" />
+							</p:column>
+							
+							<p:column headerText="Status Date" style="width:#{maintainVehicleOrderStatusBean.dataTable.col3}">
+								<h:outputLabel	value="#{prgElement.actionDate}"  rendered="#{prgElement.updateMode =='false'}"  > 
+		                    		<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+		                    	</h:outputLabel>
+	                  	
+								<p:calendar onchange="formatDate(this);" title="Status Date" id="startDateCal" size="11" pattern="MM/dd/yyyy" value="#{prgElement.actionDate}"  
+											showOn="button" rendered="#{prgElement.updateMode =='true'}" styleClass="ui-input-number-size-dev"> 
+									<f:convertDateTime pattern="MM/dd/yyyy" />		    									
+								</p:calendar>
+							</p:column>
+							<p:column headerText="Source" style="width:21%">
+								<p:outputLabel	value="#{prgElement.supplier}"  rendered="#{prgElement.updateMode =='false'}"/>
+								<p:inputText value="#{prgElement.supplier}"  rendered="#{prgElement.updateMode =='true'}"  style="width:95%"></p:inputText>
+							</p:column>
+							<p:column headerText="Entered Date" style="width:#{maintainVehicleOrderStatusBean.dataTable.col5}">
+								<h:outputLabel	value="#{prgElement.enteredDate}" > 
+		                    		<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+		                    	</h:outputLabel>
+							</p:column>
+							<p:column headerText="Entered By" style="width:#{maintainVehicleOrderStatusBean.dataTable.col6}">
+								<p:outputLabel	value="#{prgElement.opCode}"/>
+							</p:column>
+							<p:column style="width:7%"  rendered="#{maintainVehicleOrderStatusBean.hasPermission('manage_veh_order_status')}">
+								<p:commandLink id="vehicleOrderStatusEditLink" rendered="#{not prgElement.updateMode and (prgElement.progressTypeCode.sysGenerated == 'N' or maintainVehicleOrderStatusBean.hasEditPermission == 'true')}" 
+										actionListener="#{maintainVehicleOrderStatusBean.editSupplierProgress(prgElement)}" process="@this"
+										update="@form"
+										title="Edit Vehicle Order Status">
+	                                <p:graphicImage value="/images/action_edit.png" styleClass="ui-border-none" />                                
+	                            </p:commandLink>
+	                            <p:spacer width="10" rendered="#{not prgElement.updateMode}"/>
+	                            <p:commandLink id="vehicleOrderStatusDeleteLink" rendered="#{not prgElement.updateMode  and (prgElement.progressTypeCode.sysGenerated == 'N' or maintainVehicleOrderStatusBean.hasEditPermission == 'true')}" process="@this"
+	                            		actionListener="#{maintainVehicleOrderStatusBean.deleteSupplierProgressListener(prgElement)}" 
+	                            		update="#{':'.concat(cc.clientId).concat(':ccVehicleOrderStatusSearchForm:ccVehicleOrderStatusDataTableId')}"
+	                            		oncomplete="PF('confirmationDelSPH').show();setFocus('cancelBtnPop')" 
+	                            		title="Delete Vehicle Order Status">   
+	                                <p:graphicImage value="/images/action_delete.png" styleClass="ui-border-none" />                                
+	                            </p:commandLink> 
+	                            <p:commandLink id="vehicleOrderStatusAcceptLink" rendered="#{prgElement.updateMode}" 
+										actionListener="#{maintainVehicleOrderStatusBean.save}" 
+										oncomplete="setFocus('addSPHLink')" update="#{':'.concat(cc.clientId).concat(':ccVehicleOrderStatusSearchForm:ccVehicleOrderStatusDataTableId')} maintainVehicleOrderStatusCCId:hiddenRefresh" title="Accept Changes">
+	                                <p:graphicImage value="/images/action_check.png" styleClass="ui-border-none" />                                
+	                            </p:commandLink>
+	                            <p:spacer width="10" rendered="#{prgElement.updateMode}"/>
+	                            <p:commandLink id="vehicleOrderStatusRejectLink" rendered="#{prgElement.updateMode}"
+	                            		actionListener="#{maintainVehicleOrderStatusBean.restore}" process="@this"
+	                            		oncomplete="setFocus('addSPHLink')" update="#{':'.concat(cc.clientId).concat(':ccVehicleOrderStatusSearchForm:ccVehicleOrderStatusDataTableId')}" title="Reject Changes">   
+	                                <p:graphicImage value="/images/action_delete.png" styleClass="ui-border-none" />                                
+	                            </p:commandLink>  
+							</p:column>
+						</p:dataTable>										
+					</p:panel>
+					<p:panel>	
+						 <p:commandButton value="Cancel" onclick="PF('vehicleOrderStatusWidget').hide();" rendered="#{maintainVehicleOrderStatusBean.showCancel}"/>
+						 <p:spacer height="0" width="10px" rendered="#{maintainVehicleOrderStatusBean.showCancel}"/>
+						 <p:commandButton id="unitNotes" value="Notes" disabled="#{empty maintainVehicleOrderStatusBean.selectedFleetMaster}" rendered="#{maintainVehicleOrderStatusBean.showNotes}" 
+						 	immediate="true" process="@this" oncomplete="showLogBook();" title="Notes" />
+						 <p:spacer height="0" width="10px" rendered="#{maintainVehicleOrderStatusBean.showNotes}"/>	
+						 <p:commandButton id="cancel" tabindex="36" value="Cancel" action="#{maintainVehicleOrderStatusBean.cancel}" ajax="false" rendered="#{maintainVehicleOrderStatusBean.showNotes}" 
+								onclick="lockScreen();" immediate="true" />
+								
+						<h:inputHidden id="hiddenRefresh" value="#{maintainVehicleOrderStatusBean.needRefresh}" />
+					</p:panel>	
+			</p:panel>			        
+		</h:form>
+					
+		<!-- Delete Supplier Progress confirmation dialog -->
+		<p:confirmDialog id="confirmDialog" appendTo="@(body)"
+			message="Do you want to delete record?"
+			header="Delete Confirmation"
+			severity="alert" widgetVar="confirmationDelSPH">
+			<h:form id="ccConfirmDialogForm" prependId="false">
+				<p:hotkey immediate="true" bind="esc" handler="PF('confirmationDelSPH').hide();"/>
+				<p:commandButton id="okBtn" value="Ok" process="@this"
+					actionListener="#{maintainVehicleOrderStatusBean.delete}" 
+					immediate="true" oncomplete="PF('confirmationDelSPH').hide();setFocus('addSPHLink')"   
+					update="#{':'.concat(cc.clientId).concat(':ccVehicleOrderStatusSearchForm:ccVehicleOrderStatusDataPanel')} maintainVehicleOrderStatusCCId:hiddenRefresh" />	
+				<p:commandButton id="cancelBtnPop" value="Cancel" onclick="PF('confirmationDelSPH').hide();setFocus('addSPHLink');" type="button" />
+			</h:form>
+		</p:confirmDialog>
+		
+		<p:confirmDialog id="minimumCharacterDialog" message="#{msgs.minimum_character_search}" header="Alert" widgetVar="minimumCharacterWidgetVar" appendTo="@(body)">
+			<h:form prependId="false">
+				<p:hotkey immediate="true" bind="esc" handler="PF('minimumCharacterWidgetVar').hide(); focusSourceElement()" />
+				<p:commandButton id="cancelAlert" value="Ok" onclick="PF('minimumCharacterWidgetVar').hide(); focusSourceElement()"/>
+			</h:form>
+		</p:confirmDialog>
+		
+		<p:confirmDialog id="confirmVinDialogId" message="#{maintainVehicleOrderStatusBean.warningMessage}. Continue?" header="VIN Confirmation" appendTo="@(body)"  
+			widgetVar="confirmWidgetVar" resizable="false" width="500" height="60" onShow="setFocus('okBtnId');">    
+        	<p:focus context="confirmVinDialogId" />
+	           <h:form id="confirmDialogForm" prependId="false">
+               		<p:hotkey immediate="true" bind="esc" handler="PF('confirmWidgetVar').hide();setFocus('vin')"/>
+	       				<p:commandButton  value="Ok" id="okBtnId" process="@this" onclick="hideDialog('confirmWidgetVar');" 
+	       					actionListener="#{maintainVehicleOrderStatusBean.saveOnConfirm}" oncomplete="handleSaveVinRequest(xhr, status, args);"/>
+	       				<h:outputText value="&#160;"/>			  
+	        			<p:commandButton value="Cancel" id="cancelBtnId" process="@this" onclick="hideDialog('confirmWidgetVar');setFocus('vinInplaceId')" 
+	        				actionListener="#{maintainVehicleOrderStatusBean.cancelOnConfirm}" oncomplete="handleConfirmCancelResponse(xhr, status, args);"/>
+        		</h:form>
+        </p:confirmDialog>
+        
+        <p:confirmDialog id="specialCharacterDialog" message="Special characters are not allowed" header="Alert" widgetVar="specialCharacterWidgetVar" appendTo="@(body)">
+			<h:form prependId="false">
+				<p:hotkey immediate="true" bind="esc" handler="PF('specialCharacterWidgetVar').hide(); focusSourceElement()" />
+				<p:commandButton id="cancelSpAlert" value="Ok" onclick="PF('specialCharacterWidgetVar').hide(); focusSourceElement()" type="button" />
+			</h:form>
+		</p:confirmDialog>
+		
+		<style type="text/css">	
+			.ui-datatable-header-align-dev .ui-widget-header{
+				overflow:auto !important;
+			}	
+			.ui-datatable-resizing-dev .ui-datatable-scrollable-body {
+				max-height:320px;
+			}
+			.ui-input-number-size-dev .ui-inputfield {
+				width : 60%;
+				}		
+		</style>
+		<script type="text/javascript">
+			function showVehicleOrderStatus(){			
+				$('[id$=ccInitVehicleOrderStatusHiddenBtn]').click();				
+			}
+			
+			function setConditionalFocus(hasEditPermission){	
+				if(hasEditPermission){
+					setFocus('addSPHLink');
+				}else{
+					setFocus('expandCollapse');
+				}		
+			}
+			
+			function scrollToTop(){
+				var $scrollable = $('div[id*=ccVehicleOrderStatusDataTableId]').children('.ui-datatable-scrollable-body')[0];
+				$scrollable.scrollTop =  0;
+			}
+			
+			var sourceElement;
+			
+			/**
+			* Detects the Enter key and programatically clicks
+			* the search button. The search button event handler
+			* will perform the min. alphanumeric check.
+			*/
+			function doKeypressSearch(event){
+				if (event.keyCode == 13) {
+					source = event.srcElement.id;
+				   $('[id$=searchVehicleOrderStatusBtn]').click();
+				   return false;
+				}
+				return true;	
+			}
+			
+			/**
+			* Handles the search button's client side validation before the ajax search happens. A minimum alphanumric character 
+			* check is performed. The search process either continues or not based on
+			* on the check's boolean result.
+			*/
+			function validateSearch(event){	
+				var searchCriteria = "";
+				
+				searchCriteria += document.getElementById('maintainVehicleOrderStatusCCId:searchUnitNo').value;
+				searchCriteria += document.getElementById('maintainVehicleOrderStatusCCId:searchPoNumber').value;
+				searchCriteria += document.getElementById('maintainVehicleOrderStatusCCId:searchFactoryNo').value;
+				
+				if(!hasMinAlphaNumericCharacters(event.srcElement, searchCriteria)) {		
+					return false;
+				} else {
+					return true;
+				}		
+			}
+			
+			function hasMinAlphaNumericCharacters(o, str){
+				var displayAlert = false;
+		
+				if(typeof str == 'undefined'){
+					if((o.val().length &lt; 1) || (!o.val().match(/[A-z0-9]/g))){
+						displayAlert = true;
+		    	    }
+				} else {
+			    	if((str.length &lt; 1) || (!str.match(/[A-z0-9]/g))){
+			    		displayAlert = true;
+			    	}
+				}
+				
+				if(displayAlert){
+					sourceElement = o;
+	    	        showDialog('minimumCharacterWidgetVar');
+	    	        document.getElementById('maintainVehicleOrderStatusCCId:cancelAlert').focus();
+	    	        setFocus('cancelAlert');
+	    	        return false;				
+				}
+				
+		    	return true;
+			}		
+
+			/**
+			* Sets focus to the element the curosor was on prior
+			* to the enter keypress event.
+			*/
+			function focusSourceElement(){
+				if(typeof sourceElement != 'undefined'){		
+					sourceElement.focus();
+				}
+			}
+			
+			function showIcon(id){	
+				document.getElementById(id).style.display = "block";	
+			}
+			
+			function hideIcon(id){	
+				document.getElementById(id).style.display = "none";
+			}
+			
+			function handleSaveVinRequest(xhr, status, args) { 
+				if(args.failure) {
+                	PF('vinInplaceVar').show();  
+                	hideIcon('maintainVehicleOrderStatusCCId:vinAddImageId');
+                } else if(args.warning) {    
+                	showWarning();
+                } else if(args.empty) {    
+                	PF('vinInplaceVar').hide();  
+                	showIcon('maintainVehicleOrderStatusCCId:vinAddImageId');
+                } else {
+                	PF('vinInplaceVar').hide();  
+                }
+			}
+			
+			function showWarning(){
+				showDialog('confirmWidgetVar');
+			}
+			
+			function handleConfirmCancelResponse(xhr, status, args) {
+               	PF('vinInplaceVar').show();  
+               	hideIcon('maintainVehicleOrderStatusCCId:vinAddImageId');
+			}
+			
+			function handleSaveFactoryNoRequest(xhr, status, args) { 
+                if(args.failure) {
+                	PF('factoryNoInplaceVar').show();  
+                	hideIcon('maintainVehicleOrderStatusCCId:factoryNoEditImageId');
+                } else {
+                	PF('factoryNoInplaceVar').hide();  
+                	showIcon('maintainVehicleOrderStatusCCId:factoryNoEditImageId');
+                }
+			}
+			
+			function checkForSpecialChar(obj) {
+				sourceElement = obj;
+				var pattern = new RegExp(/[^a-z0-9]/i); 
+			    if (pattern.test(obj.value)) {
+			    	obj.value = '';
+			    	showDialog('specialCharacterWidgetVar');
+	    	        document.getElementById('maintainVehicleOrderStatusCCId:cancelSpAlert').focus();
+			    }
+			}  			
+			
+		</script> 
+	</composite:implementation>
+</html>

@@ -1,0 +1,97 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	 xmlns:composite="http://java.sun.com/jsf/composite"
+	>
+	
+	  <!-- INTERFACE -->
+	  <composite:interface>
+	    <composite:attribute name="cId" required="false" type="java.lang.Long" />
+	    <composite:attribute name="accountCode" required="false" type="java.lang.String" />  
+	    <composite:attribute name="accountType" required="false" type="java.lang.String" />  
+		<composite:attribute name="parentBean" required="false" type="com.mikealbert.vision.view.bean.StatefulBaseBean" />
+		<composite:attribute name="update" required="false" type="java.lang.String" />
+		<composite:attribute name="ajax" required="false" type="java.lang.Boolean" />					            
+	  </composite:interface>
+	
+	  <!-- IMPLEMENTATION -->          
+	  <composite:implementation>
+	  <span  id="#{cc.clientId}">
+	  	<p:panelGrid id="clientInfoPanelGrid">
+			<p:row>
+				<p:column style="width:500px">
+					<p:commandLink id="clientDetailsLink"
+						styleClass="ui-icon ui-icon-triangle-1-s"
+						style="float:left; color: green; "
+						onclick="return onClientDetailClick()" />
+					<p:outputLabel for="clientDetail"
+						onclick="return onClientDetailClick()"
+						styleClass="ui-label" style="cursor:pointer;white-space: nowrap"
+						value="Account: " />	
+					<p:outputLabel id="clientDetail" 
+					            value="#{clientDisplayBean.clientAccount.externalAccountPK.accountCode} - #{clientDisplayBean.clientAccount.accountName}"/>
+					<p:spacer width="10"/>						
+				</p:column>
+			</p:row>
+			<p:row>
+			<p:column colspan="5">
+				<p:scrollPanel id="clientDetailPanel" toggleable="true" style="border-color: green;min-width:980px;max-width:100%;width:auto;" mode="native">
+					<p:panelGrid style="margin-top:10px">					
+						<p:row>
+							<p:column style="width:500px;vertical-align:top">
+								<h:outputLabel value="Parent Account: " styleClass="ui-label"/>
+								<p:commandLink value="#{clientDisplayBean.parentAccount.externalAccountPK.accountCode} - #{clientDisplayBean.parentAccount.accountName}"
+								     	ajax="#{clientDisplayBean.ajax}" action="#{clientDisplayBean.editViewClientFinance(clientDisplayBean.parentAccount)}" update="#{clientDisplayBean.update}"
+								     	rendered="#{clientDisplayBean.parentAccount.externalAccountPK.accountCode != clientDisplayBean.clientAccount.externalAccountPK.accountCode}"/> 
+								<p:outputLabel value="#{clientDisplayBean.parentAccount.externalAccountPK.accountCode} - #{clientDisplayBean.parentAccount.accountName}"
+								    	rendered="#{clientDisplayBean.parentAccount.externalAccountPK.accountCode == clientDisplayBean.clientAccount.externalAccountPK.accountCode}"
+								    	styleClass="ui-label"/>
+								<h:outputLabel value="&lt;br /&gt; &lt;br /&gt; Child Accounts: " styleClass="ui-label" escape="false"/>
+								<h:outputLabel value="None"  rendered="#{empty clientDisplayBean.childAccountList}"/>
+								<p:dataList value="#{clientDisplayBean.childAccountList}" var="childAccount" itemType="disc" rendered="#{not empty clientDisplayBean.childAccountList}">  
+								    <p:commandLink value="#{childAccount.externalAccountPK.accountCode} - #{childAccount.accountName}" 
+								     	ajax="#{clientDisplayBean.ajax}" action="#{clientDisplayBean.editViewClientFinance(childAccount)}" update="#{clientDisplayBean.update}"  
+								     	rendered="#{childAccount.externalAccountPK.accountCode != clientDisplayBean.clientAccount.externalAccountPK.accountCode}"/> 
+								    <p:outputLabel value="#{childAccount.externalAccountPK.accountCode} - #{childAccount.accountName}" 
+								    	rendered="#{childAccount.externalAccountPK.accountCode == clientDisplayBean.clientAccount.externalAccountPK.accountCode}"
+								    	styleClass="ui-label"/>
+								</p:dataList>
+							</p:column>
+							<p:column style="width:500px;vertical-align:top" rendered="#{not empty clientDisplayBean.quotationProfiles}">
+								<h:outputLabel value="Quotation Profiles: " styleClass="ui-label"/>
+								<h:outputLabel value="#{clientDisplayBean.clientAccount.externalAccountPK.accountCode} - #{clientDisplayBean.clientAccount.accountName}"/>
+								<p:dataList value="#{clientDisplayBean.quotationProfiles}" var="quotationProfile" itemType="disc" >  
+								    #{quotationProfile.profileCode} - #{quotationProfile.description}  
+								</p:dataList> 
+							</p:column>
+						</p:row>	
+					</p:panelGrid>
+				</p:scrollPanel>
+			</p:column>
+			</p:row>
+		</p:panelGrid>
+	   
+	  </span>
+	
+		<script type="text/javascript">
+		
+			var isClientDetailPanelCollapsed = false;
+
+			function onClientDetailClick() { 
+				if (!isClientDetailPanelCollapsed) {
+					$('[id$=clientDetailPanel]').hide();
+					$('[id$=clientDetailsLink]').attr("class", "ui-commandlink ui-icon ui-icon-triangle-1-e");
+					isClientDetailPanelCollapsed = true;
+				} else {
+					$('[id$=clientDetailPanel]').show();
+					$('[id$=clientDetailsLink]').attr("class", "ui-commandlink ui-icon ui-icon-triangle-1-s");
+					isClientDetailPanelCollapsed = false;
+				} 
+				return false;
+			}
+					
+		</script> 
+	  </composite:implementation>
+</html>

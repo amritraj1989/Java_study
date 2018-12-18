@@ -1,0 +1,144 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"   
+	xmlns:pe="http://primefaces.org/ui/extensions"	  
+    template="../../templates/ui.xhtml" >
+	
+    <ui:define name="content">
+    	    <h:form id="webUserSearchBreadCrumbForm" prependId="false">
+   			    <p:breadCrumb model="#{webUserSearchBean.breadCrumbTrail}" ajax="false" immediate="true" 
+   			    style="min-width:980px;max-width:100%;width:auto;"/>
+   		    </h:form>
+   		        
+    	    <!-- Message display -->
+		    <p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:980px;max-width:100%;width:auto;">
+			    <p:messages id="messages" showSummary="false" showDetail="true" autoUpdate="true" />
+		    </p:scrollPanel>   
+		    	
+			<h:form id="webUserSearchForm" prependId="false">
+			
+				<p:panel id="webUserSearchPanel" header="Search Criteria">
+					<p:focus context="webUserSearchPanel" />
+					<h:panelGrid columns="3" cellspacing="5">																		
+				
+						<h:outputLabel for="clientId" value="Client Account Code:" styleClass="ui-label" title="Client" />
+						<h:panelGroup style="white-space:nowrap;">							
+							<p:inputText id="clientId" title="Client" value="#{webUserSearchBean.accountCode}" onkeypress="return doKeypressSearch(event);"/>
+							<p:commandButton id='clientLOVId' icon="icon-lov" title="lov"
+								oncomplete="showCustomerLov();" immediate="true"
+								actionListener="#{customerLovBean.fetchLOVDataByCustomerName}"
+								process="@this,clientId" dynamic="true" async="true"
+								onstart="return hasMinAlphaNumericCharacters($('#clientId'));"
+								update=":custLovForm:CUSTOMER_GRID">
+								<f:param name="CUSTOMER_LOV_INPUT" value="clientId" />
+								<f:param name="INCLUDE_CLOSED_ACCOUNTS" value="N" />
+							</p:commandButton>
+						</h:panelGroup>
+					
+					
+						<p:commandButton id="searchId" widgetVar="searchButtonWidgetVar" title="Search"
+									actionListener="#{webUserSearchBean.performSearch}" update="webUserSearchResultsPanel editButton"
+									process="@this clientId"
+									onstart="return validateSearch(event);lockScreen();" ajax="true" oncomplete="resetUIState();"
+									value="Search" style="float:right"/>
+
+					</h:panelGrid>					
+				</p:panel>
+				<p:panel id="webUserSearchResultsPanel" header="Web Users">
+					
+					<p:dataTable id="DT_UI_ID" widgetVar="dataTableResults"
+						var="websiteUser" 
+						value="#{webUserSearchBean.websiteUserList}"
+						scrollable="true" 
+						scrollHeight="#{webUserSearchBean.dataTable.height}"
+						rows="50"
+ 						paginator="true" 
+ 						paginatorPosition="bottom" 
+						resizableColumns="true"
+						selection="#{webUserSearchBean.selectedWebsiteUser}"
+						rowKey="#{websiteUser.id}" 
+						selectionMode="single"
+						>
+												
+						
+						<p:column sortBy="#{websiteUser.username}" width="30%"> 
+			                <f:facet name="header">
+			                	<h:outputText value="Username"/>
+			                </f:facet>
+			                <h:outputText value="#{websiteUser.username}" />
+			            </p:column>
+						<p:column sortBy="#{websiteUser.driver.driverSurname}" width="30%"> 
+			                <f:facet name="header">
+			                	<h:outputText value="Name"/>
+			                </f:facet>
+			                <h:outputText value="#{websiteUser.driver.driverSurname}, #{websiteUser.driver.driverForename}" />
+			            </p:column>
+						<p:column width="30%"> 
+			                <f:facet name="header">
+			                	<h:outputText value="User Type"/>
+			                </f:facet>
+			                <h:outputText value="#{websiteUser.websiteUserType}" />
+			            </p:column>
+						
+					</p:dataTable>
+					
+				</p:panel>
+				<p:panel id="btnPanel">
+					<p:commandButton id="editButton" value="Edit"
+								action="#{webUserSearchBean.navigateToWebUserEdit}" ajax="false" disabled="#{webUserSearchBean.websiteUserList.size() == 0 or webUserSearchBean.websiteUserList == null}"
+								onclick="lockScreen()" />
+					<p:spacer width="10" />
+					<p:commandButton id="cancelId" value="Cancel" action="#{webUserSearchBean.cancel}" ajax="false" immediate="true" onclick="lockScreen();" />
+				</p:panel>
+				
+			</h:form>
+			
+			<div id="CUSTOMER_LOV_DIV">
+				<ui:include src="../lov/customers.xhtml" />
+			</div>
+			<div id="inputFieldChecks">
+				<ui:include src="../alert/inputFieldChecks.xhtml" />
+			</div>
+			
+			
+			
+			<SCRIPT type="text/javascript">
+			
+				function resetUIState() {
+	        		setScrollDivAtTop();
+	        	}
+			
+				function validateSearch(event){
+
+					return true;
+				}
+
+				function doKeypressSearch(event){
+					if (event.keyCode == 13) {
+						setFocus('searchId');
+					   $('#searchId').click();
+					   return false;
+					}
+					return true;	
+				}
+
+				function setSelection(lovName, nameArray, valueArray) {
+					if(lovName == 'customerLOV'){
+						for(var i=0; i  &lt; nameArray.length ; i++){
+							if(nameArray[i] == 'CUSTOMER_CODE'){
+								document.getElementById('clientId').value = valueArray[i];
+							}
+						}
+						setFocus('clientId');
+					}
+				}
+				
+			</SCRIPT>
+						
+						
+	</ui:define>
+	
+</ui:composition>

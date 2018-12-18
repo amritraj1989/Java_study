@@ -1,0 +1,144 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"   
+	xmlns:pe="http://primefaces.org/ui/extensions" 
+    template="../../templates/ui.xhtml" >
+
+    <ui:define name="content"> 
+		<h:form id="clientServiceElementsBreadCrumbForm" prependId="false">
+ 			<p:breadCrumb model="#{clientServiceElementsBean.breadCrumbTrail}"
+				ajax="false" immediate="true" />
+		</h:form>   
+    	<!-- Message display -->
+		<p:scrollPanel style="height:50px;" mode="native">
+			<p:messages id="messages" severity="info,error,fatal" showSummary="false" showDetail="true" autoUpdate="true" />
+		</p:scrollPanel>
+		
+		<!-- Per SS-557, may be implemented at a later date -->
+		<comp:billingOptionDialog id="billingOption" radioOptionsValue="#{clientServiceElementsBean.selectedBillingOption}" saveBillingOptionAction="#{clientServiceElementsBean.addClientServiceElements}" />
+   		
+   		<h:form id="clientServiceElementsForm" prependId="false"> 
+		<p:focus for="conServEle" />   		
+			<p:panel id="clientServiceElementsPanel">
+        	    <f:facet name="header">
+        	    	<h:outputLabel style="float:left;" value="Active Service Elements" />
+        	    	<h:outputLabel style="float:left;" value="&#160;&#160;&#160;" />
+        	    	<p:commandLink id="expandCollapse" style="float:left; border:thin solid gray; text-decoration:none; cursor:pointer;"
+	        	    	    process="@this" update=":clientServiceElementsForm"
+	        	    	    actionListener="#{clientServiceElementsBean.collapsingOrExpanding}"
+			        		tabindex="400" title="Expand and collapse account list">
+			            <h:outputLabel  style="vertical-align:5px" value="&#160; +/- &#160;" />
+			    	</p:commandLink>
+	        	</f:facet>
+				<p:outputLabel style ="font-weight:bold" value="#{clientServiceElementsBean.parentAccountExist == true ? 'Parent Account:' : 'Account:'}" />
+	 			<p:tree value="#{clientServiceElementsBean.parentRootNode}" var="parentNode" id="parentTree" scrollable="true" scrollHeight="350" scrollWidth="1025" style="width:1000px;border-width:0;">         
+					<p:treeNode id="parentTreeNode">             
+						<h:outputText value="#{parentNode}" id="lblParentNode"/>         
+					</p:treeNode>     
+				</p:tree>
+				
+				<p:outputLabel style ="font-weight:bold" rendered="#{clientServiceElementsBean.parentAccountExist == true}" >Child Accounts:</p:outputLabel>
+				<p:tree value="#{clientServiceElementsBean.childRootNode}" var="childNode" id="childTree" scrollable="true" scrollHeight="350" scrollWidth="1025" style="width:1000px;border-width:0;">         
+					<p:treeNode id="childTreeNode">             
+						<h:outputText value="#{childNode}" id="lblChildNode"/>         
+					</p:treeNode>     
+				</p:tree>				
+
+			</p:panel>
+
+			<p:panel id="maintainClientServiceElementsPanel" header="Maintain Client Service Elements">
+				<p:panelGrid id="maintainClientServiceElementsPanelGrid" style="min-width:900px;max-width:100%;width:auto;">
+					<p:row>
+						<p:column> 
+							<p:outputLabel for="conServEle" styleClass="ui-label"
+								value="Contracted Service Elements:" />
+								<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>							       		
+        				</p:column>
+        				<p:column>
+        					<p:outputLabel for="accounts" styleClass="ui-label"
+        						value="Accounts:" />
+        						<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>
+        				</p:column>
+        				<p:column>
+        					<p:outputLabel styleClass="ui-label" 
+        						value="Product Level Override:"/>
+        				</p:column>
+       				</p:row>
+       				<p:row>
+						<p:column style="vertical-align:top;">
+							<p:selectOneMenu id="conServEle" tabindex="10" 
+									value="#{clientServiceElementsBean.selectedClientContractServiceElement}"
+									converter="ServiceElementConverter">
+								<f:selectItem itemLabel="Select One" itemValue="" />
+								<f:selectItems
+									value="#{clientServiceElementsBean.clientContractServiceElementList}"
+									var="contractServEle" itemLabel="#{contractServEle.leaseElement.elementName} - #{contractServEle.leaseElement.description}"
+									itemValue="#{contractServEle}" />
+							</p:selectOneMenu>
+						</p:column>
+						<p:column style="vertical-align:top;">
+							<p:selectManyMenu id="accounts" tabindex="20" style="width: 350px;" value="#{clientServiceElementsBean.selectedAccountListString}">
+								<f:selectItem itemLabel="All" itemValue="ALL" />
+								<f:selectItems
+									value="#{clientServiceElementsBean.accountList}"
+									var="account" itemLabel="#{account.externalAccountPK.accountCode} - #{account.accountName}"
+									itemValue="#{account.externalAccountPK.accountCode}" />
+							</p:selectManyMenu>
+						</p:column>
+
+						<p:column style="vertical-align:top;">
+							<p:selectOneMenu id="prodLevelOverride"  tabindex="25" value="#{clientServiceElementsBean.selectedProduct}">
+								<f:selectItem itemLabel=" -------------------------------------------- " itemValue="" />
+								<f:selectItems
+									value="#{clientServiceElementsBean.activeClientProductList}"
+									var="prodList" itemLabel="#{prodList.productCode} - #{prodList.productName}"
+									itemValue="#{prodList.productCode}" />
+							</p:selectOneMenu>
+						</p:column>
+					</p:row> 
+				</p:panelGrid> 
+			</p:panel>   		
+
+	  		<p:panel id="commandPanel" style="min-width:980px;max-width:100%;width:auto;">
+	  		 <p:remoteCommand name="removeClientServiceElement" actionListener="#{clientServiceElementsBean.removeClientServiceElements}" update=":clientServiceElementsForm"/>
+	  			<p:commandButton id="doneBtn" value="Done" action="#{clientServiceElementsBean.done}" ajax="false" immediate="true" tabindex="30"/>	
+	  			<p:spacer width="10" />  
+				<p:commandButton id="addElements" value="Add" tabindex="40" action="#{clientServiceElementsBean.addClientServiceElementsButtonClick()}" disabled="#{!clientServiceElementsBean.hasPermission()}"/>
+				<p:spacer width="10" />				    
+				<p:commandButton id="removeElements" value="Remove" tabindex="50" oncomplete="handleRemoveServiceElementConfirmDialog(xhr, status, args);"
+				  actionListener="#{clientServiceElementsBean.showHideRemoveServiceElementConfirmDialog}"
+				  update=":clientServiceElementsForm :removeServiceElementConfirmDialogId" process="@form" 
+				  disabled="#{!clientServiceElementsBean.hasPermission()}"/>
+			</p:panel>
+   		</h:form>
+   		
+		<p:dialog id="removeServiceElementConfirmDialogId" header="Remove '#{clientServiceElementsBean.selectedClientContractServiceElement.leaseElement.description}' Element Confirmation" 
+			onShow="setTimeout('setFocus(\'yesComplete\')',300)" widgetVar="removeServiceElementWidgetVar" modal="true" appendTo="@(body)" dynamic="true" width="650" height="120" closeOnEscape="true" resizable="false">
+	        <h:outputText value="&#160;"/><br/> 
+          		<h:outputFormat  value="#{msgs.remove_service_element_confirmation}" style="font-weight:bold;"/>
+	         <h:form id ="removeServiceElementConfirmDialogForm" prependId = "false">	
+           		<h:outputText value="&#160;"/><br/><br/>	           		
+           		<h:panelGroup> 
+   					<p:commandButton style="width:6em;" id = "yesComplete" value="Yes" action="#{clientServiceElementsBean.removeClientServiceElements}" ajax="false" process="@(form)" onclick="PF('removeServiceElementWidgetVar').hide();" />  
+	       			<p:spacer width="6"/>
+	       			<p:commandButton style="width:6em;" value="No" onclick="PF('removeServiceElementWidgetVar').hide();"/>  
+	       		</h:panelGroup>
+        	</h:form>
+	    </p:dialog>	   		
+		
+		<script type="text/javascript">
+		
+		function handleRemoveServiceElementConfirmDialog(xhr, status, args) {
+			if(args.failure) {
+				showDialog('removeServiceElementWidgetVar');
+			} else {
+				removeClientServiceElement();
+			}
+		}
+
+		</script>
+	</ui:define>
+</ui:composition>    

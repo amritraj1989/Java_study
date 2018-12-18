@@ -1,0 +1,1076 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:pe="http://primefaces.org/ui/extensions"	
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	template="../../templates/ui.xhtml">
+	
+	<ui:define name="content">
+			<h:form id="capitalCostsForm" prependId="false">
+				<p:breadCrumb model="#{capitalCostsBean.breadCrumbTrail}"  
+				 style="max-width:100%;width:auto;" 
+				ajax="false" immediate="true" styleClass="ui-layout"/>
+			</h:form>
+			<!-- Error message display --> 
+			<p:scrollPanel style="height:50px;max-width:100%;width:auto;" 
+				mode="native" styleClass="ui-layout">
+				<p:messages id="messages" showSummary="false" showDetail="true"	autoUpdate="true" />
+			</p:scrollPanel>			
+			
+			<h:form id="capitalCostForm" prependId="false">
+				
+	    		<p:panel id="capitalCostHeaderPanel" style="max-width:100%;width:auto;" >
+
+		    		<h:panelGrid columns="5">
+		    			<p:spacer width="400" height="1"/>
+						<p:spacer width="50" height="1"/>		    		
+						<p:spacer width="400" height="1"/>
+						<p:spacer width="100" height="1"/>
+						<p:spacer width="100" height="1"/>		    		
+		    		
+			    		<h:panelGrid columns="5">
+			    			<p:outputLabel value="Client:" styleClass="ui-label"/>
+							<p:spacer width="10" height="1"/>
+		    				<h:outputText value="#{capitalCostsBean.accountCode}" /> 
+	            			<p:spacer width="10" height="1"/>
+	            			<h:outputText value="#{capitalCostsBean.accountName}" />
+			    			<p:outputLabel value="Unit:" styleClass="ui-label"/>
+							<p:spacer width="10" height="1"/>
+		    				<h:outputText value="#{capitalCostsBean.unitNo != null ? capitalCostsBean.unitNo : capitalCostsBean.quoteType != null ? 'N/A     ' : null}" /> 
+	            			<p:spacer width="10" height="1"/>
+	            			<h:outputText value="#{capitalCostsBean.modelDescription}" />
+	            			<p:outputLabel value="Quote Type:" styleClass="ui-label"/>
+	            			<p:spacer width="10" height="1"/>
+	            			<h:outputText value="#{capitalCostsBean.productCode}" />
+	            			<p:spacer width="10" height="1"/>
+	            			<h:outputText value="#{capitalCostsBean.productName}" />
+	            		</h:panelGrid>
+						<p:spacer width="50" height="1"/>
+			    		<h:panelGrid columns="5">
+			    			<p:outputLabel value="Ordering Dealer:" styleClass="ui-label"/>
+							<p:spacer width="10" height="1"/>
+		    				<h:outputText value="#{capitalCostsBean.orderingDealerCode != null ? capitalCostsBean.orderingDealerCode : 'N/A'}" /> 
+	            			<p:spacer width="12" height="1"/>
+	            			<h:outputText value="#{capitalCostsBean.orderingDealerName}" />
+			    			<p:outputLabel value="Delivering Dealer:" styleClass="ui-label"/>
+							<p:spacer width="10" height="1"/>
+		    				<h:outputText value="#{capitalCostsBean.deliveringDealerCode != null ? capitalCostsBean.deliveringDealerCode : 'N/A'}" /> 
+	            			<p:spacer width="12" height="1"/>
+	            			<h:outputText value="#{capitalCostsBean.deliveringDealerName}" />
+							<p:outputLabel value="Invoice Currency:" styleClass="ui-label" rendered="#{capitalCostsBean.canadaUnit}"/>
+							<p:spacer width="1" height="10"/>
+							<h:panelGroup rendered="#{capitalCostsBean.canadaUnit}">
+								<a id="CAD" href="javascript:convertToCanadian();" title="Enter Invoice amounts as Canadian dollars">CAD</a>
+								<p:outputLabel value=" |" />
+								<a id="USD" href="javascript:convertToUS();" title="Enter Invoice amounts as US dollars">USD</a>
+							</h:panelGroup>
+							<p:spacer width="12" height="1"/>
+							<h:panelGroup rendered="#{capitalCostsBean.canadaUnit}">
+								<p:inputNumber style="text-align:right"  id="exchangeRate"
+									value="1" size="4" 
+									maxlength="5" decimalPlaces="4" maxValue="9.9999"
+									minValue="0" emptyValue="1" 
+									rendered="true" 
+									styleClass="ui-text-align-right-dev " />
+								<h:outputText value=" CAD = 1 USD" />
+							</h:panelGroup>
+							
+	            		</h:panelGrid>
+	            		<p:spacer width="10" height="1"/>
+	            		
+	            		<p:commandButton value="Show Dates" onclick="PF('dateDialogVar').show();" ajax="false" type="button"  />
+	            		
+            		</h:panelGrid>
+            	</p:panel>
+            	<h:inputHidden id="capitalCostCalcType" name="quoteType" value="#{capitalCostsBean.capitalCostCalcType}"/>
+            	<h:inputHidden id="quoteType" name="quoteType" value="#{capitalCostsBean.quoteType}"/>
+            	<h:inputHidden id="partRechargeCapEle" name="partRechargeCapEle" value="#{capitalCostsBean.partRechargeCapEle}"/>
+				<p:scrollPanel style="width:auto;height:#{capitalCostsBean.dataTable.height}px"  mode="native" > 
+            		
+					<p:panel id="capitalCostDatatableTablePanel" style="max-width:100%;width:auto;" >
+					
+					<p:focus context="capitalCostDatatableTablePanel"/>	
+					
+		                <p:dataTable  style ="width:auto;align:center;" id="capitalCostDatatableTable" var="element" 
+		                	value="#{capitalCostsBean.rowList}" 
+		                	emptyMessage=""  
+		                	rowIndexVar="rowIndex"
+		                	scrollable="false"  
+		                	scrollHeight="#{capitalCostsBean.dataTable.height}">
+		                	
+		                	<p:columnGroup type="header">
+		                    	<p:row>
+		                        	<p:column rowspan="2" width="#{capitalCostsBean.dataTable.col1}"  headerText=" Cost Elements"  />                           	
+		                            <p:column colspan="2" width="#{capitalCostsBean.dataTable.col2}"> 
+							    		<f:facet name="header" >
+								    		<h:panelGrid columns="2" styleClass="panelGrid-compact alignmentRight">
+								    			<p:spacer width="1" height="1" />
+								    			<p:spacer width="80" height="1" />
+								    			<p:outputLabel value="Standard Order:" />
+			   					 				<h:outputText value="#{capitalCostsBean.standardQuoteInfo != null ? capitalCostsBean.standardQuoteInfo : ''}" /> 
+								    			<p:outputLabel value="Lease Rate:" style="font-size:smaller;font-weight:normal"/>
+			   					 				<h:outputText value="#{capitalCostsBean.standardOrderLeaseRate}" style="font-size:smaller;font-weight:normal" 
+			   					 					rendered="#{capitalCostsBean.standardQuoteInfo != null}">
+			   					 					<f:converter converterId="malDollarValueConverter" />
+			   					 				</h:outputText>
+			   					 				<p:spacer width="1" height="1" rendered= "#{capitalCostsBean.standardQuoteInfo == null}"/> 
+			   					 				<p:outputLabel value="IRR:" style="font-size:smaller;font-weight:normal"/>
+			   					 				<h:panelGroup rendered="#{capitalCostsBean.standardQuoteInfo != null}">
+				   					 				<h:outputText value="#{capitalCostsBean.standardOrderIrr}" style="font-size:smaller;font-weight:normal" > 
+				   					 					<f:convertNumber maxFractionDigits="3" minFractionDigits="3" />
+				   					 				</h:outputText>	 
+				   					 				<p:outputLabel value="%" style="font-size:smaller;font-weight:normal" />
+			   					 				</h:panelGroup>
+			   					 				<h:outputText value="" rendered="#{capitalCostsBean.standardQuoteInfo == null}" /> 
+			   					 				<p:outputLabel value="Global Rate:" style="font-size:smaller;font-weight:normal"/>
+			   					 				<h:outputText value="#{capitalCostsBean.standardOrderGlobalMin}%" style="font-size:smaller;font-weight:normal" 
+			   					 					rendered="#{capitalCostsBean.standardQuoteInfo != null}" /> 
+			   					 				<h:outputText value="" rendered="#{capitalCostsBean.standardQuoteInfo == null}" /> 
+								    			<p:outputLabel value="Residual:" style="font-size:smaller;font-weight:normal"/>
+			   					 				<h:outputText value="#{capitalCostsBean.standardQuoteResidual}" style="font-size:smaller;font-weight:normal" 
+			   					 					rendered="#{capitalCostsBean.standardQuoteInfo != null}">
+			   					 					<f:converter converterId="malDollarValueConverter" />
+			   					 				</h:outputText> 
+		            						</h:panelGrid>
+				    					</f:facet>
+									</p:column>	                            	   
+		                            <p:column colspan="2"  width="#{capitalCostsBean.dataTable.col6}">
+							    		<f:facet name="header" >
+								    		<h:panelGrid columns="2" styleClass="panelGrid-compact alignmentRight">
+								    			<p:spacer width="1" height="1" />
+								    			<p:spacer width="80" height="1" />
+								    			<p:outputLabel value="New/Accepted:" />
+			   					 				<h:outputText value="#{capitalCostsBean.firstQuoteInfo != null ? capitalCostsBean.firstQuoteInfo : ''}" />
+								    			<p:outputLabel value="Lease Rate:" style="font-size:smaller;font-weight:normal"/>
+			   					 				<h:outputText value="#{capitalCostsBean.firstLeaseRate}" style="font-size:smaller;font-weight:normal" 
+			   					 					rendered="#{capitalCostsBean.firstQuoteInfo != null}">
+			   					 					<f:converter converterId="malDollarValueConverter" />
+			   					 				</h:outputText> 
+			   					 				<h:outputText value="" rendered="#{capitalCostsBean.firstQuoteInfo == null}"/>
+								    			<p:outputLabel value="IRR:" style="font-size:smaller;font-weight:normal"/>
+			   					 				<h:panelGroup rendered="#{capitalCostsBean.firstQuoteInfo != null}">
+				   					 				<h:outputText value="#{capitalCostsBean.firstQuoteIrr}" style="font-size:smaller;font-weight:normal" >
+				   					 					<f:convertNumber maxFractionDigits="3" minFractionDigits="3"/>
+				   					 				</h:outputText>	
+				   					 				<p:outputLabel value="%" style="font-size:smaller;font-weight:normal" />
+			   					 				</h:panelGroup>
+			   					 				<h:outputText value="" rendered="#{capitalCostsBean.firstQuoteInfo == null}"/>
+								    			<p:outputLabel value="Global Rate:" style="font-size:smaller;font-weight:normal"/>
+			   					 				<h:outputText value="#{capitalCostsBean.firstGlobalMin}%" style="font-size:smaller;font-weight:normal" 
+			   					 					rendered="#{capitalCostsBean.firstQuoteInfo != null}"/>
+			   					 				<h:outputText value="" rendered="#{capitalCostsBean.firstQuoteInfo == null}"/>
+								    			<p:outputLabel value="Residual:" style="font-size:smaller;font-weight:normal"/>
+			   					 				<h:outputText value="#{capitalCostsBean.acceptedQuoteResidual}" style="font-size:smaller;font-weight:normal" 
+			   					 					rendered="#{capitalCostsBean.firstQuoteInfo != null}">
+			   					 					<f:converter converterId="malDollarValueConverter" />
+			   					 				</h:outputText> 
+		            						</h:panelGrid>
+				    					</f:facet>
+		                            </p:column>
+		                            <p:column colspan="1" width="#{capitalCostsBean.dataTable.col3}"  headerText="PO" />
+		                           	<p:column colspan="1" width="#{capitalCostsBean.dataTable.col5}"  headerText="Invoice" />	                             
+		                            <p:column colspan="1" width="#{capitalCostsBean.dataTable.col4}"  headerText="Recharge" />
+		                            <p:column colspan="2"  width="#{capitalCostsBean.dataTable.col2}">
+							    		<f:facet name="header" >
+								    		<h:panelGrid id="finalizedNumbers" columns="2" styleClass="panelGrid-compact alignmentRight">
+								    			<p:spacer width="1" height="1" />
+								    			<p:spacer width="80" height="1" />
+								    			<p:outputLabel value="Finalized:" />
+								    			<h:outputText value="#{capitalCostsBean.finalizedQuoteInfo != null ? capitalCostsBean.finalizedQuoteInfo : ''}" />
+								    			<p:outputLabel value="Lease Rate:" style="font-size:smaller;font-weight:normal"/>
+			   					 				<h:outputText value="#{capitalCostsBean.finalizedLeaseRate}" style="font-size:smaller;font-weight:normal" 
+			   					 					rendered="#{capitalCostsBean.finalizedQuoteInfo != null}">
+			   					 					<f:converter converterId="malDollarValueConverter" />
+			   					 				</h:outputText> 
+			   					 				<h:outputText value="" rendered="#{capitalCostsBean.finalizedQuoteInfo == null}"/>
+								    			<p:outputLabel value="IRR:" style="font-size:smaller;font-weight:normal"/>
+			   					 				<h:panelGroup rendered="#{capitalCostsBean.finalizedQuoteInfo != null}">
+				   					 				<h:outputText value="#{capitalCostsBean.finalizedQuoteIrr}" style="font-size:smaller;font-weight:normal" >
+				   					 					<f:convertNumber maxFractionDigits="3" minFractionDigits="3"/>
+				   					 				</h:outputText> 
+				   					 				<p:outputLabel value="%" style="font-size:smaller;font-weight:normal" />
+			   					 				</h:panelGroup>
+			   					 				<h:outputText value="" rendered="#{capitalCostsBean.finalizedQuoteInfo == null}"/> 
+								    			<p:outputLabel value="Global Rate:" style="font-size:smaller;font-weight:normal"/>
+			   					 				<h:outputText value="#{capitalCostsBean.finalizedGlobalMin}%" style="font-size:smaller;font-weight:normal" 
+			   					 					rendered="#{capitalCostsBean.finalizedQuoteInfo != null}"/> 
+			   					 				<h:outputText value="" rendered="#{capitalCostsBean.finalizedQuoteInfo == null}"/> 
+								    			<p:outputLabel value="Residual:" style="font-size:smaller;font-weight:normal"/>
+			   					 				<h:outputText value="#{capitalCostsBean.finalizeQuoteResidual}" style="font-size:smaller;font-weight:normal" 
+			   					 					rendered="#{capitalCostsBean.finalizedQuoteInfo != null}">
+			   					 					<f:converter converterId="malDollarValueConverter" />
+			   					 				</h:outputText> 
+		            						</h:panelGrid>
+				    					</f:facet>
+		                            </p:column> 
+		                        </p:row>
+		                        <p:row>
+		                          	<p:column headerText="Mike Albert" width="#{capitalCostsBean.dataTable.col4}"  />
+		                            <p:column headerText="Client" width="#{capitalCostsBean.dataTable.col4}" /> 
+		                            <p:column headerText="Mike Albert" width="#{capitalCostsBean.dataTable.col4}"  />
+		                            <p:column headerText="Client" width="#{capitalCostsBean.dataTable.col4}"  />
+		                            <p:column headerText="" width="#{capitalCostsBean.dataTable.col3}"  />
+		                            <p:column headerText="" width="#{capitalCostsBean.dataTable.col5}"  />	                            
+		                            <p:column headerText="" width="#{capitalCostsBean.dataTable.col4}"  />	                               
+		                            <p:column headerText="Mike Albert" width="#{capitalCostsBean.dataTable.col4}"  />
+		                            <p:column headerText="Client" width="#{capitalCostsBean.dataTable.col4}"  />
+		                        </p:row>
+		                    </p:columnGroup>
+		                	
+		                    <p:column  width="#{capitalCostsBean.dataTable.col1}"  style="#{(element.isFooter ? 'text-align:right;font-weight:bold': 'text-align:left;background: #F0F0F0;')}" styleClass="#{(element.isFooter ? 'ui-state-default': '')}"  >  
+		                    	<h:outputLabel value="&#183;" rendered="#{element.isAccessoryData}" /> 
+		                    	<h:outputLabel value="#{element.name}" styleClass="rowArray" id="elementNameLabel"/>
+		                    	 
+							</p:column>
+		                    <p:column width="#{capitalCostsBean.dataTable.col4}"  
+		                    style="text-align:right;align:right;#{(element.isFooter ? 'font-weight:bold': '')}" styleClass="#{(element.isFooter ? 'ui-state-default': '')}"  >     
+		                    	<h:outputLabel style="text-align:right;align:right" value="#{element.standardOrderDealCost}" rendered="#{element.standardOrderDealCost != 0.0}" >
+		                        	<f:convertNumber pattern="#,##0.00" />
+		                        </h:outputLabel> 
+		                   	</p:column> 
+		                    <p:column  width="#{capitalCostsBean.dataTable.col4}"  
+		                    style="text-align:right;align:right;#{(element.isFooter ? 'font-weight:bold': '')}"  styleClass="#{(element.isFooter ? 'ui-state-default': '')}"> 
+		                   		<h:outputLabel  value="#{element.standardOrderCustomerCost}" rendered="#{element.standardOrderCustomerCost != 0.0}" >
+		                        	<f:convertNumber pattern="#,##0.00" />
+		                        </h:outputLabel>                       		                       
+		                    </p:column>  
+		                    <p:column  width="#{capitalCostsBean.dataTable.col4}" 
+		                     style="text-align:right;align:right;#{(element.isFooter ? 'font-weight:bold': '')}" styleClass="#{(element.isFooter ? 'ui-state-default': '')}" >   
+		                    	<h:outputLabel value="#{element.firstQuoteDealCost}" rendered="#{element.firstQuoteDealCost != 0.0}" id="acceptedDealCost" >
+		                       		<f:convertNumber pattern="#,##0.00" />
+		                       	</h:outputLabel>                        	                 
+		                   	</p:column>   
+		                    <p:column width="#{capitalCostsBean.dataTable.col4}"   
+		                     style="text-align:right;align:right;#{(element.isFooter ? 'font-weight:bold': '')}" styleClass="#{(element.isFooter ? 'ui-state-default': '')}">  
+		                   		<h:outputLabel value="#{element.firstQuoteCustomerCost}" rendered="#{element.firstQuoteCustomerCost != 0.0}" id="acceptedClientCost"  >
+		                       		<f:convertNumber pattern="#,##0.00" />
+		                        </h:outputLabel>
+		                    </p:column>
+		                    <p:column width="#{capitalCostsBean.dataTable.col3}"
+		                    	style="text-align:center;align:center;#{(element.isFooter ? 'font-weight:bold': '')}"  styleClass="#{(element.isFooter ? 'ui-state-default': '')}">
+		                    	<p:graphicImage width="12" height="12" id= "poImgMain" rendered="#{element.poNumber != null}"   style="border-style: none;" value="/images/checkmark_icon.png" />
+           								  <p:tooltip  id="hoverPanelMainPO" for="poImgMain" showEffect="blind"  >  
+							        		<h:panelGrid columns="2" >	
+												<h:outputLabel style="white-space:nowrap;" styleClass="ui-label" value="PO Number:" />
+												<h:panelGroup>
+														<h:outputText  value="#{element.poNumber}"    />
+								 						<h:outputText value="/" />
+														<h:outputText value="#{element.poRevNo}" />
+												</h:panelGroup>
+								 			
+								 				<h:outputLabel style="white-space:nowrap;" styleClass="ui-label" value="PO Released:"  />
+								 				<h:outputText  value="#{element.poOrderDate}" >
+								 					<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+								 				</h:outputText>
+								 				<h:outputLabel style="white-space:nowrap;" styleClass="ui-label" value="Vendor:"  />
+								 				<h:outputText  value="#{element.accountInfo}"  />				
+							 				</h:panelGrid>
+							    		</p:tooltip >
+		                    </p:column>       
+		                   	<p:column width="#{capitalCostsBean.dataTable.col5}"  
+		                   	 style="text-align:right;align:right;#{(element.isFooter ? 'font-weight:bold': '')}" styleClass="#{(element.isFooter ? 'ui-state-default': '')}">
+		                         
+		                    	<h:outputLabel value="#{element.invoiceCost}" styleClass="invoiceCostArray" id="invoiceLabel"
+		                    		rendered="#{(element.isFooter and element.invoiceCost != 0.0) or (element.invoiceCost != 0.0 and element.poNumber != capitalCostsBean.targetPONumber) or (element.invoiceCost != 0.0 and !capitalCostsBean.editInvoice)}" >
+		                        	<f:convertNumber pattern="#,##0.00" />
+		                        </h:outputLabel>
+								<p:inputNumber style="text-align:right"  id="invoiceCost"
+									value="#{element.invoiceCost}" size="10" thousandSeparator="," onblur="setDefaultValue();"
+									maxlength="10" decimalPlaces="2" maxValue="#{element.hasReclaim or element.possibleReclaim ? '0' : '99999999.99'}"
+									minValue="-999999.99" emptyValue="empty" onchange="changeInvoiceValues('#{rowIndex}')" 
+									styleClass="invoiceCostArray trackDirtyChildValues ui-text-align-right-dev"
+									rendered="#{capitalCostsBean.editInvoice and !element.isFooter and element.poNumber == capitalCostsBean.targetPONumber}"/>
+
+		                   	 	 <p:graphicImage style="text-align:right;align:right;"
+										value="/images/reclaim_icon.png"  title="#{element.hasReclaim ? 'Submitted Reclaim' : 'Possible Reclaim'}"  
+											rendered="#{(element.hasReclaim or element.possibleReclaim) and (element.invoiceCost != 0.0 or element.poNumber == capitalCostsBean.targetPONumber)}"/>
+		                   	 	 
+		                   	 	 <p:spacer width="16" height="8" rendered="#{!((element.hasReclaim or element.possibleReclaim) and (element.invoiceCost != 0.0 or element.poNumber == capitalCostsBean.targetPONumber)) }"/>
+
+		                   	 	 		                        
+		                   	</p:column> 
+		                   
+		                   	<p:column width="#{capitalCostsBean.dataTable.col4}"  
+		                   	 style="text-align:right;align:right;#{(element.isFooter ? 'font-weight:bold': '')}" styleClass="#{(element.isFooter ? 'ui-state-default': '')}"> 
+		                    	<h:outputLabel id="rechargeId" value="#{element.rechargeAmt}" rendered="#{element.rechargeAmt != 0.0 or (capitalCostsBean.editInvoice and element.name eq 'Courtesy Delivery Fee') or element.isFooter}"  > 
+		                        	<f:convertNumber pattern="#,##0.00" />
+		                        </h:outputLabel>
+		                   	</p:column>   
+
+		                   	<p:column width="#{capitalCostsBean.dataTable.col4}"  
+		                   	 style="text-align:right;align:right;#{(element.isFooter ? 'font-weight:bold': '')}"  styleClass="#{(element.isFooter ? 'ui-state-default': '')}">  
+		                    	<h:outputText id="dealCostId" value="#{element.finalizedQuoteDealCost}" styleClass="dealCostArray"
+		                    			rendered="#{element.finalizedQuoteDealCost != 0.0 or capitalCostsBean.editMode}" >
+		                       		<f:convertNumber pattern="#,##0.00" />
+		                        </h:outputText>
+		                   	</p:column>  
+
+		                    <p:column width="#{capitalCostsBean.dataTable.col4}"  
+		                     style="text-align:right;align:right;#{(element.isFooter ? 'font-weight:bold': '')}" styleClass="#{(element.isFooter ? 'ui-state-default': '')}">  
+
+		                    	<h:outputLabel value="#{element.finalizedQuoteCustomerCost}" styleClass="clientCostArray" id="clientCostLabel"
+		                    			rendered="#{(element.isFooter and element.finalizedQuoteCustomerCost != 0.0) 
+		                    			or (!element.clientCostAdjustmentFlag and capitalCostsBean.editMode) 
+		                    			or (element.finalizedQuoteCustomerCost != 0.0 and !capitalCostsBean.editMode)
+		                    			or element.code eq 'OE_REV_ASSMNT'
+		                    			or element.code eq 'OE_REV_INT_ADJ'}" >
+		                        	<f:convertNumber pattern="#,##0.00" />
+		                        </h:outputLabel>
+		         
+								<p:inputNumber style="text-align:right" widgetVar="clientCost#{rowIndex}"  id="clientCost"
+									value="#{element.finalizedQuoteCustomerCost}" size="10" thousandSeparator=","
+									maxlength="10" decimalPlaces="2" maxValue="999999.99" onblur="setDefaultValue();"
+									minValue="-999999.99" emptyValue="empty" onchange="changeClientValues('#{rowIndex}')" 
+									styleClass="clientCostArray trackDirtyChildValues ui-text-align-right-dev ui-input-number-size-dev"
+									rendered="#{(capitalCostsBean.editMode and !element.isFooter and element.clientCostAdjustmentFlag 
+									and !(element.code eq 'OE_REV_ASSMNT')
+									and !(element.code eq 'OE_REV_INT_ADJ'))}" />
+
+
+								<h:inputHidden id="adjustmentFlag" value="#{element.clientCostAdjustmentFlag}" />
+								<h:inputHidden id="dealAdjustmentFlag" value="#{element.dealCostAdjustmentFlag}" />
+								<h:inputHidden id="group" value="#{element.elementGroup}" />
+								<h:inputHidden id="invoiceHiddenCost" value="#{element.invoiceCost}" />
+								<h:inputHidden id="dealHiddenCost" value="#{element.finalizedQuoteDealCost}" />
+								<h:inputHidden id="clientHiddenCost" value="#{element.finalizedQuoteCustomerCost}" />
+								<h:inputHidden id="originalRechargeAmount" value="#{element.rechargeAmt}" />
+								<h:inputHidden id="originalCost" value="#{element.firstQuoteCustomerCost}" />
+								<h:inputHidden id="fullRechargeFlag" value="#{element.fullRechargeFlag}" />
+								<h:inputHidden id="rechargeHiddenAmount" value="#{element.rechargeAmt}" />
+		                   	</p:column>
+		                   		
+		                </p:dataTable>
+		              
+		              
+		              	<h:inputHidden id="fixedDealFlag" value="#{capitalCostsBean.fixedDealFlag}" />
+		              
+		              </p:panel>
+		              
+<!-- Amendment section -->
+	               
+	               <p:panel id= "amedmentHistoryPanel" >
+	             	            	
+	              	<p:dataList   value= "#{capitalCostsBean.amendmentHistoryList}"    type="definition"
+	              		  rendered="#{fn:length(capitalCostsBean.amendmentHistoryList) gt 0}"  	var = "mainQuote"  >
+	              		
+	              			<p></p>
+	              			<p:dataTable id= "amendTable2" value= "#{mainQuote.OERevision == true ?  mainQuote.revisionElements : mainQuote.afterMarketEquipments}" var = "afterMarket"   >
+	              			 	<f:facet name="header">
+	              			 	<h:panelGrid styleClass="panelGrid-compact">	              			 	
+  
+  
+		              			 	<h:panelGrid columns="11" styleClass="panelGrid-compact alignmentLeft">
+              			 				<h:outputText value= "#{mainQuote.getAmendmentTypeDescription() }"  rendered="#{mainQuote.amendmentSource eq 'O' ? false:true}"/>
+              							<p:spacer width="40" height="1"/>
+										<h:panelGroup>
+	           								<p:outputLabel value="Quote: " />
+	           								<h:outputText value= "#{mainQuote.quote}" />
+										</h:panelGroup>										
+              							<p:spacer width="40" height="1"/>
+			              				<h:panelGroup>
+				              				<p:outputLabel value="Effective Date: " />
+				              				<h:outputText value= "#{mainQuote.effectiveDate}" >
+				              					<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+				              				</h:outputText>
+			              				</h:panelGroup>
+			              				<p:spacer width="40" height="1"/>
+			              				<h:panelGroup>
+				              				<h:outputLabel styleClass="ui-label"  value="Effective Period: " rendered="#{mainQuote.amendmentSource eq 'O' ? false:true}" /> 
+			           						<h:outputText value="#{mainQuote.effectivePeriod}" rendered="#{mainQuote.amendmentSource eq 'O' ? false:true}" />	 
+			              				</h:panelGroup>		
+		           						<p:spacer width="40" height="1"/>
+										<h:panelGroup>
+			           						<p:outputLabel styleClass="ui-label" value="Lease Rate: " />
+				              				<h:outputText   value="#{mainQuote.leaseRate}">
+				              					<f:converter converterId="malDollarValueConverter" />
+				              				</h:outputText> 
+										</h:panelGroup>
+			              				<p:spacer width="40" height="1"/>
+										<h:panelGroup>
+				              				<p:outputLabel styleClass="ui-label" value="Created By: " />
+				              				<h:outputLabel  value="#{mainQuote.createdBy}"  /> 
+										</h:panelGroup>
+										
+									</h:panelGrid>		           						             			         
+	              			 	</h:panelGrid>
+        						</f:facet>
+	              					 <p:column width="57%"> 
+           								<f:facet name="header">                  
+           									<p:outputLabel styleClass="ui-label">Element</p:outputLabel>
+	              						</f:facet>
+           								
+										<h:outputText value="&#8211;" styleClass="amendment-ind" rendered="#{afterMarket.amendmentTypeInd eq '-'}"/>
+										<h:outputText value="+" styleClass="amendment-ind" rendered="#{afterMarket.amendmentTypeInd eq '+'}"/>
+
+
+           								<p:spacer width="10" height="1"/>
+           								<h:outputText value="#{afterMarket.elementDesc}"/>
+           								
+           								<f:facet name="footer" >  
+           									<h:outputText value="Total Cost to Place In Service:" styleClass="ui-label" />
+            							</f:facet>
+            							<h:panelGroup rendered="#{mainQuote.noChangeInfo != null}" >
+            								<h:outputText value="#{mainQuote.noChangeInfo}"  />
+            								
+           									
+           								</h:panelGroup>
+            							  
+           							</p:column>
+           							<p:column width="#{capitalCostsBean.dataTable.col4}">  
+           								<f:facet name="header">                  
+           									Monthly         
+           								</f:facet>
+           								<h:outputText  rendered="#{afterMarket.rental!= null and afterMarket.rental != 0.0 }" value="#{afterMarket.rental!= null ? afterMarket.rental:0}" styleClass="alignmentRight">
+           									<f:converter converterId="malDollarValueConverter" />
+           								</h:outputText>
+           							</p:column>
+           							<p:column width="#{capitalCostsBean.dataTable.col3}" style="text-align:center">  
+           								<f:facet name="header">                  
+           									PO          
+           								</f:facet>
+           								 <p:graphicImage width="12" height="12" id= "poImg" rendered="#{afterMarket.poNumber != null}"  style="border-style: none;" value="/images/checkmark_icon.png" />
+           								  <p:tooltip  id="hoverPanel" for="poImg" showEffect="blind"  >  
+							        		<h:panelGrid columns="2"    >	
+												<h:outputLabel style="white-space:nowrap;" styleClass="ui-label" value="PO Number:" />
+								 				<h:outputText  value="#{afterMarket.poNumber}"  styleClass="alignmentRight"  />
+								 				<h:outputLabel style="white-space:nowrap;" styleClass="ui-label" value="PO Released:"  />
+								 				<h:outputText  value="#{afterMarket.poOrderDate}" styleClass="alignmentRight" >
+								 					<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+								 				</h:outputText>
+								 				<h:outputLabel style="white-space:nowrap;" styleClass="ui-label" value="Vendor:"  />
+								 				<h:outputText  value="#{afterMarket.accountInfo}" styleClass="alignmentRight" />				
+							 				</h:panelGrid>
+							    		</p:tooltip > 		
+           							</p:column>
+           							<p:column width="#{capitalCostsBean.dataTable.col5}" >  
+           								<f:facet name="header">                  
+           									Invoice         
+           								</f:facet>
+           								<h:outputLabel  rendered="#{afterMarket.invoiceAmt != null and afterMarket.invoiceAmt != 0.0}"    value="#{afterMarket.invoiceAmt}" styleClass="alignmentRight">
+           									<f:converter converterId="malDollarValueConverter" />
+           									<p:spacer width="16" height="8" />
+           								</h:outputLabel>
+           							</p:column>
+           							<p:column width="#{capitalCostsBean.dataTable.col4}">  
+           								<f:facet name="header">                  
+           									Recharge                
+           								</f:facet>
+           								<h:outputText rendered="#{afterMarket.rechargeAmt != null and afterMarket.rechargeAmt != 0.0}"   value="#{afterMarket.rechargeAmt}" styleClass="alignmentRight">
+		           							<f:converter converterId="malDollarValueConverter" />
+		           						</h:outputText>
+           							</p:column>
+           							<p:column width="#{capitalCostsBean.dataTable.col4}">  
+           								<f:facet name="header">                  
+           									Mike Albert            
+           								</f:facet>
+           								<h:outputText rendered="#{afterMarket.dealCost != null and  afterMarket.dealCost  != 0.0}"  value="#{afterMarket.dealCost}" styleClass="alignmentRight">
+		           							<f:converter converterId="malDollarValueConverter" />
+		           						</h:outputText>
+		           						<f:facet name="footer">  
+               								<h:outputText  value="#{mainQuote.dealCost != null ? mainQuote.dealCost:0}" styleClass="ui-label alignmentRight">
+		           								<f:converter converterId="malDollarValueConverter" />
+		           							</h:outputText>
+            							</f:facet>  
+           							</p:column>
+           							<p:column width="#{capitalCostsBean.dataTable.col4}">  
+           								<f:facet name="header">                  
+           									Client            
+           								</f:facet>
+           								<h:outputText rendered="#{afterMarket.clientCost != null and  afterMarket.clientCost  != 0.0}"   value="#{afterMarket.clientCost != null ? afterMarket.clientCost:0}" styleClass="alignmentRight" >
+		           							<f:converter converterId="malDollarValueConverter" />
+		           						</h:outputText>
+		           						<f:facet name="footer">  
+               								<h:outputText  value="#{mainQuote.customerCost != null ? mainQuote.customerCost:0}" styleClass="ui-label alignmentRight" >
+		           								<f:converter converterId="malDollarValueConverter" />
+		           							</h:outputText>
+            							</f:facet>  
+           							</p:column>
+           							
+	              				</p:dataTable>
+	              		
+	              		
+	              	</p:dataList> 
+	              	
+	              </p:panel>
+				</p:scrollPanel>	              
+
+	            <h:panelGrid id="buttons">
+					<f:facet name="footer">
+						<p:commandButton id="calc" tabindex="40" value="Calculate"
+							actionListener="#{capitalCostsBean.calculate}" ajax="false" disabled="#{capitalCostsBean.disableCalculate}"
+							update=":capitalCostForm:capitalCostDatatableTable:finalizedNumbers, buttons"
+							onclick="lockScreen();" />
+						<p:spacer width="10" />
+						<p:commandButton id="save" tabindex="36" value="Save" 
+							action="#{capitalCostsBean.save}" ajax="false" disabled="#{capitalCostsBean.disableSave}"
+							update=":capitalCostForm:capitalCostDatatableTable:finalizedNumbers, buttons"
+							onclick="lockScreen();" />
+						<p:spacer width="10" />
+						<p:commandButton id="post" tabindex="50" value="Post Invoice"
+							action="#{capitalCostsBean.postInvoice}" ajax="false" disabled="#{capitalCostsBean.disablePost or !capitalCostsBean.editInvoice}"
+							onclick="lockScreen();" />
+						<p:spacer width="10" />						
+						
+						<p:commandButton id="cancel" tabindex="70" value="Cancel"
+							action="#{capitalCostsBean.cancel}" ajax="false"
+							onclick="lockScreen();" immediate="true" />
+					</f:facet>
+				</h:panelGrid>
+
+	              
+	              
+	              <h:inputHidden id="showWarning" name= "showWarning" value="#{capitalCostsBean.showWarning}"/>
+	              
+			</h:form>
+			
+			<p:dialog id="dateDialog" header="Show Dates" widgetVar="dateDialogVar" modal="true"
+				appendTo="@(body)" resizable="false" style="min-width: 180px; max-width: 300px;"> 
+		
+				<h:form>
+					<p:hotkey immediate="true" bind="esc" handler="PF('dateDialogVar').hide();"/>
+					
+					<h:panelGrid columns="1" style="margin: 0 auto;">
+						<p:dataTable id="dateDialogDataTableId" value="#{capitalCostsBean.vehicleTimeline}" var="row" >  
+							<p:column  headerText="Event"> 
+								 <h:outputText  value="#{row.description}" />
+			   				</p:column>
+							<p:column  headerText="Date"> 
+								 <h:outputText  value="#{row.date}" >
+								 	<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+								 </h:outputText>
+			   				</p:column>
+						</p:dataTable>
+						
+						<h:panelGrid columns="1" style="margin: 0 auto;">
+            				<p:commandButton value="Ok" type="button" ajax="false" onclick="hideDialog('dateDialogVar');" />
+						</h:panelGrid>
+						
+					
+					</h:panelGrid>
+					
+
+
+
+
+				</h:form>
+		
+				
+		
+			</p:dialog>	
+			
+			<p:dialog  id="confirmDialogId" onShow="setFocusOnInvoicePopup()"
+		header="Post Invoice" modal="true" focus="#{capitalCostsBean.invoiveAmountMismatch ? 'okBtnId2':'okBtn'}"
+		widgetVar="confirmWidgetVar" resizable="false" width="500" height="120" appendTo="@(body)" >
+			
+				<h:form id="confirmDialogForm" prependId="false">
+	               		<p:hotkey immediate="true" bind="esc" handler="PF('confirmWidgetVar').hide();setFocus('post')"/>
+	               		<span class="ui-icon ui-icon-alert ui-confirm-dialog-severity"></span>
+	               		<h:outputText value="#{capitalCostsBean.warningMessage}" />
+	               	
+	               		<h:panelGrid columns="2" style="margin: auto;">
+	               			<h:outputLabel value="Invoice Amount:" style="font-weight:bold" />
+	               			<h:outputText value="#{capitalCostsBean.invoiceHeaderTotal}" style="float:right;">
+	               				<f:converter converterId="malDollarValueConverter" />
+	               			</h:outputText>
+	               			<h:outputLabel value="Invoice Details:" style="font-weight:bold" />
+	               			<h:outputText value="#{capitalCostsBean.invoiceDetailTotal}" style="float:right;">
+	               				<f:converter converterId="malDollarValueConverter" />
+	               			</h:outputText>
+	               		</h:panelGrid>
+	               		
+	               		<p:spacer height="30"/>
+		       			<p:commandButton  value="Post" id="okBtn" 
+		       			ajax="false" rendered="#{capitalCostsBean.invoiveAmountMismatch ? 'false':'true'}"
+		       			process="@this"	 onclick="hideDialog('confirmWidgetVar');lockScreen();" 
+		       			action="#{capitalCostsBean.saveOnConfirm}"/>
+		       							
+		       			<p:commandButton  value="Ok" id="okBtnId2" ajax="true" rendered="#{capitalCostsBean.invoiveAmountMismatch }" 
+		       							process="@this"	update=":capitalCostForm:showWarning" onclick="hideDialog('confirmWidgetVar');" actionListener="#{capitalCostsBean.holdPosting}"/>
+		       			<h:outputText value="&#160;"/>			  
+		        		<p:commandButton  value="Cancel" update=":capitalCostForm:showWarning" rendered="#{capitalCostsBean.invoiveAmountMismatch ? 'false':'true'}" id="cancelBtnId" process="@this"  actionListener="#{capitalCostsBean.holdPosting}"
+		        		 onclick="hideDialog('confirmWidgetVar');setFocus('vin')"/>
+        			
+        		</h:form>
+			   
+	           
+        </p:dialog>
+        
+        <p:dialog  id="negCdFeeErrorDialog" 
+		header="CD FEE" modal="true" onShow="setFocus('okNegCd')"
+		widgetVar="negCdFeeErrorDialogVar" resizable="false" width="350" height="100" appendTo="@(body)" >
+			<h:form  prependId="false">
+						<p:focus/>
+						<p:hotkey immediate="true" bind="esc" handler="PF('negCdFeeErrorDialogVar').hide();"/>
+	               		<span class="ui-icon ui-icon-alert ui-confirm-dialog-severity"></span>
+	               		<h:outputText value="Can't recharge a negative CD Fee amount" />
+	               		<p:spacer width="1" height="30"/>
+	               		<p></p>
+	               		<div style="text-align:center">
+	               		<p:commandButton id="okNegCd" value="Ok" immediate="true" actionListener="#"
+		        		 onclick="hideDialog('negCdFeeErrorDialogVar'); "/>
+		        		 </div>	
+		        		 <h:inputHidden id="inEleToFocus"></h:inputHidden>
+			</h:form>
+	               		
+	               	
+        </p:dialog>
+        
+        
+        <style type="text/css">              
+			.ui-input-number-size-dev .ui-inputfield {
+				width : 70px;
+				}
+        </style>
+        
+			
+		<script type="text/javascript">
+		
+		var firstConversionFlag = true;
+		var currency = 'USD';
+		
+		
+		function setFocusOnInvoicePopup(){
+			if(document.getElementById('okBtn')){
+				setFocus('okBtn');
+			}else{
+				setFocus('okBtnId2');
+			}
+		}
+		
+		
+		function showWarning(){
+			var showWarning = document.getElementById('showWarning').value;
+			
+			if(showWarning == 'true'){
+				showDialog('confirmWidgetVar');
+				
+			}
+		}
+		
+		function changeInvoiceValues(index) {
+			disableButtons();
+			document.getElementById("calc").disabled = false;
+			fixedDeal = document.getElementById('fixedDealFlag').value;
+ 			var dataRows = $('.rowArray'); 
+ 			var partRechargeCapEle	= document.getElementById('partRechargeCapEle').value;
+ 			if(dataRows[index]) {
+ 				var capElementNameId = "capitalCostDatatableTable:" + index + ":elementNameLabel";
+ 				var capElementName = document.getElementById(capElementNameId).innerHTML;
+ 				invoiceId = "capitalCostDatatableTable:" + index + ":invoiceCost_input";
+ 				invoiceHiddenCostId = "capitalCostDatatableTable:" + index + ":invoiceHiddenCost";
+ 				dealHiddenCostId = "capitalCostDatatableTable:" + index + ":dealHiddenCost";
+ 				clientHiddenCostId = "capitalCostDatatableTable:" + index + ":clientHiddenCost";
+ 				fullRechargeFlagId = "capitalCostDatatableTable:" + index + ":fullRechargeFlag";
+ 				rechargeId = "capitalCostDatatableTable:" + index + ":rechargeId";
+	 			adjustmentFlagId = "capitalCostDatatableTable:" + index + ":adjustmentFlag";
+	 			dealAdjustmentFlagId = "capitalCostDatatableTable:" + index + ":dealAdjustmentFlag";
+	 				
+ 				originalRechargeAmountId = "capitalCostDatatableTable:" + index + ":originalRechargeAmount";
+ 				originalRechargeValue = document.getElementById(originalRechargeAmountId).value;
+ 				nOriginalRechargeValue = getValue(originalRechargeValue.replace(/,/g, ""));
+ 				rechargeHiddenAmountId = "capitalCostDatatableTable:" + index + ":rechargeHiddenAmount";
+ 				
+ 				dealCostId = "capitalCostDatatableTable:" + index + ":dealCostId";
+ 				
+				clientCostId = "capitalCostDatatableTable:" + index + ":clientCost_input";
+ 				if(!document.getElementById(clientCostId)) {   // if there isn't an input then it must be a label
+ 					clientCostId = "capitalCostDatatableTable:" + index + ":clientCostLabel";
+ 				}
+ 				
+ 				originalValue = document.getElementById(invoiceId).value;
+ 				originalNValue = getValue(originalValue.replace(/,/g, ""));
+ 				//alert(originalValue);
+ 				if(currency == 'USD') {
+ 	 				nValue = originalNValue;
+ 	 				value = originalValue;
+ 				} else {
+ 	 				nValue = convertValue(originalNValue, 'USD');
+ 	 				value = formatValue(nValue);
+ 				}
+ 				var newRechargeAmt	 = 0;
+ 				var quoteType	= document.getElementById('quoteType').value;
+ 				var capitalCostCalcType = document.getElementById('capitalCostCalcType').value;
+ 				if('CapitalClientInvoiceCosts' == capitalCostCalcType){
+ 					if(partRechargeCapEle == 'Y' ){
+ 						if(capElementName == 'Courtesy Delivery Fee'){
+ 							var acceptedDealCostId = "capitalCostDatatableTable:" + index + ":acceptedDealCost";
+ 							var acceptedCost = "0";
+ 							if(document.getElementById(acceptedDealCostId)) {
+ 	 							acceptedCost = document.getElementById(acceptedDealCostId).innerHTML;
+ 							}
+ 							var acceptedCostNValue = getValue(acceptedCost.replace(/,/g, ""));
+ 							newRechargeAmt = nValue - acceptedCostNValue;
+ 						}
+ 					}
+ 				}
+ 				
+ 				if(nOriginalRechargeValue &gt; 0) {
+ 					
+ 					if(document.getElementById(fullRechargeFlagId).value == 'true') {
+ 						
+ 						document.getElementById(rechargeId).innerHTML = value;
+ 						document.getElementById(rechargeHiddenAmountId).value = nValue;
+ 	 	 				document.getElementById(dealCostId).innerHTML = formatValue(0);
+ 	 	 				document.getElementById(dealHiddenCostId).value = 0;
+ 						document.getElementById(clientCostId).value = formatValue(0);
+ 		 				document.getElementById(clientHiddenCostId).value = 0;
+ 		 				
+ 					} else {
+ 						nCost = originalNValue - nOriginalRechargeValue;
+ 						document.getElementById(rechargeId).innerHTML = formatValue(nOriginalRechargeValue);
+ 						document.getElementById(rechargeHiddenAmountId).value = nOriginalRechargeValue;
+ 						
+ 						document.getElementById(dealCostId).innerHTML = formatValue(nCost);
+ 	 	 				document.getElementById(dealHiddenCostId).value = nCost;
+ 						if(fixedDeal == 'false') {
+ 		 	 				if(document.getElementById(adjustmentFlagId).value == 'true') {
+ 		 	 					document.getElementById(clientCostId).value = formatValue(nCost);
+ 		 		 				document.getElementById(clientHiddenCostId).value = nCost;
+ 		 	 				}//for RC-2048
+ 		 	 				else{
+ 		 	 					clientCostLabelId = "capitalCostDatatableTable:" + index + ":clientCostLabel";
+ 		 	 					if(document.getElementById(clientCostLabelId)){
+ 		 	 						document.getElementById(clientCostLabelId).innerHTML = formatValue(nCost);
+ 			 	 					document.getElementById(clientHiddenCostId).value = nCost;	
+ 		 	 					}
+ 		 	 				}
+ 		 	 					
+ 						}
+ 					}
+ 				} else {
+ 					
+ 					if(partRechargeCapEle == 'Y'  ){
+ 						if('CapitalClientInvoiceCosts' == capitalCostCalcType){
+ 							if(capElementName == 'Courtesy Delivery Fee'){
+ 								if(nValue &lt; 0){
+ 	 								document.getElementById("calc").disabled = true;
+ 	 								disableButtons() ;
+ 	 								showDialog('negCdFeeErrorDialogVar');
+ 	 								document.getElementById('inEleToFocus').value = invoiceId;
+ 	 								
+ 	 							}else{
+ 	 								document.getElementById(rechargeId).innerHTML = formatValue(newRechargeAmt);
+ 	 	 	 						document.getElementById(rechargeHiddenAmountId).value = newRechargeAmt;	
+ 	 							}
+ 							
+ 							}else{
+ 								document.getElementById(dealCostId).innerHTML = value;
+ 		 	 					document.getElementById(dealHiddenCostId).value = nValue;
+
+ 		 	 					if(document.getElementById(adjustmentFlagId).value == 'true') {
+ 		 	 						document.getElementById(clientCostId).value = value;
+ 		 		 					document.getElementById(clientHiddenCostId).value = nValue;
+ 		 	 					}
+ 		 	 					
+ 							}
+ 						}else{
+ 							document.getElementById(dealCostId).innerHTML = value;
+		 	 				document.getElementById(dealHiddenCostId).value = nValue;
+
+		 	 				if(document.getElementById(adjustmentFlagId).value == 'true') {
+		 	 					document.getElementById(clientCostId).value = value;
+		 		 				document.getElementById(clientHiddenCostId).value = nValue;
+		 	 				}
+		 	 				
+ 						}	
+					}else{
+						
+						if('CapitalCosts' == capitalCostCalcType || 'CapitalCostsWithMargin' == capitalCostCalcType){
+							if(document.getElementById(dealAdjustmentFlagId).value == 'false') {
+								document.getElementById(dealCostId).innerHTML = '0.00';
+ 	 							document.getElementById(dealHiddenCostId).value = 0;
+							}else{
+								document.getElementById(dealCostId).innerHTML = value;
+ 	 							document.getElementById(dealHiddenCostId).value = nValue;
+							}
+						}else{
+							document.getElementById(dealCostId).innerHTML = value;
+ 	 						document.getElementById(dealHiddenCostId).value = nValue;
+						}
+ 							
+	 	 				if(document.getElementById(adjustmentFlagId).value == 'true') {
+	 	 					document.getElementById(clientCostId).value = value;
+	 		 				document.getElementById(clientHiddenCostId).value = nValue;
+	 	 				}
+					}	
+ 				}
+ 				
+ 				
+ 				document.getElementById(invoiceHiddenCostId).value = originalNValue;
+ 			}
+ 			sumColumns();
+		}
+			
+
+		function setDefaultCDFeeRecharge() {
+			var cdFeeIndex = 0;
+			var rechargeAmount = 0;
+			var partRechargeCapEle	= document.getElementById('partRechargeCapEle').value;
+			var dataRows = $('.rowArray');
+			for (var i=0;i &lt; dataRows.length;i++) {
+ 				var capElementNameId = "capitalCostDatatableTable:" + i + ":elementNameLabel";
+ 				var capElementName = document.getElementById(capElementNameId).innerHTML;
+				if(capElementName == 'Courtesy Delivery Fee') {
+					cdFeeIndex = i;
+					break;
+				}				
+			}
+			
+			if(partRechargeCapEle == 'Y') {
+ 				invoiceId = "capitalCostDatatableTable:" + cdFeeIndex + ":invoiceCost_input";
+ 				if(document.getElementById(invoiceId)) {
+ 	 				invoiceCost = document.getElementById(invoiceId).value;
+
+ 					acceptedDealCostId = "capitalCostDatatableTable:" + cdFeeIndex + ":acceptedDealCost";
+ 	 				if(document.getElementById(acceptedDealCostId)) {
+ 	 	 				acceptedCost = document.getElementById(acceptedDealCostId).innerHTML;
+ 	 				} else {
+ 	 					acceptedCost = '0';
+ 	 				}
+ 	 				acceptedCostNValue = getValue(acceptedCost.replace(/,/g, ""));
+ 	 				nInvoiceCost = getValue(invoiceCost.replace(/,/g, ""));
+ 	 				rechargeAmount = nInvoiceCost - acceptedCostNValue;
+
+ 	 				rechargeId = "capitalCostDatatableTable:" + cdFeeIndex + ":rechargeId";
+ 	 				document.getElementById(rechargeId).innerHTML = formatValue(rechargeAmount);
+ 				}		
+			}
+
+			rechargeHiddenId = "capitalCostDatatableTable:" + cdFeeIndex + ":rechargeHiddenAmount";
+			document.getElementById(rechargeHiddenId).value = rechargeAmount;
+			
+		}
+		
+		function changeClientValues(index) {
+
+			disableButtons();
+ 			var dataRows = $('.rowArray'); 
+  			if(dataRows[index]) {
+ 				clientHiddenCostId = "capitalCostDatatableTable:" + index + ":clientHiddenCost";
+ 				clientCostId = "capitalCostDatatableTable:" + index + ":clientCost_input";
+ 				value = document.getElementById(clientCostId).value;
+ 				document.getElementById(clientHiddenCostId).value = value.replace(/,/g, "");
+ 				sumColumns();
+ 			}
+		}
+
+		
+		function sumColumns() {
+
+			invoiceTotal = 0;
+			dealTotal = 0;
+			clientTotal = 0;
+			rechargeTotal = 0;
+			
+			var dataRows = $('.rowArray');
+			for (var i=0;i &lt; dataRows.length;i++) {
+				groupId = "capitalCostDatatableTable:" + i + ":group";
+				invoiceId = "capitalCostDatatableTable:" + i + ":invoiceHiddenCost";
+				dealId = "capitalCostDatatableTable:" + i + ":dealHiddenCost";
+				clientId = "capitalCostDatatableTable:" + i + ":clientHiddenCost";
+				rechargeId = "capitalCostDatatableTable:" + i + ":rechargeHiddenAmount";
+				
+				group = document.getElementById(groupId).value;
+				invoiceValue = getValueForId(invoiceId);
+				dealValue = getValueForId(dealId);
+				clientValue = getValueForId(clientId);
+				rechargeValue = getValueForId(rechargeId);
+								
+				if(group &gt; 0) {
+					invoiceTotal = invoiceTotal + invoiceValue;
+					dealTotal = dealTotal + dealValue;
+					clientTotal = clientTotal + clientValue;
+					rechargeTotal = rechargeTotal + rechargeValue;
+				} else {
+					updateGroupTotals(i, invoiceTotal, dealTotal, clientTotal, rechargeTotal);
+				}
+			}
+		}
+		
+
+	
+		
+		function updateGroupTotals(row, invoiceTotal, dealTotal, clientTotal, rechargeTotal) {
+						
+			invoiceTotalId = "capitalCostDatatableTable:" + row + ":invoiceLabel";
+			if(document.getElementById(invoiceTotalId)) {
+				document.getElementById(invoiceTotalId).innerHTML = formatValue(invoiceTotal);	
+				invoiceHiddenCostId = "capitalCostDatatableTable:" + row + ":invoiceHiddenCost";
+				document.getElementById(invoiceHiddenCostId).value = invoiceTotal;
+			}
+
+			dealTotalId = "capitalCostDatatableTable:" + row + ":dealCostId";
+			if(document.getElementById(dealTotalId)) {
+				document.getElementById(dealTotalId).innerHTML = formatValue(dealTotal);
+				dealHiddenCostId = "capitalCostDatatableTable:" + row + ":dealHiddenCost";
+				document.getElementById(dealHiddenCostId).value = dealTotal;
+			}
+
+			clientTotalId = "capitalCostDatatableTable:" + row + ":clientCostLabel";
+			if(document.getElementById(clientTotalId)) {
+				document.getElementById(clientTotalId).innerHTML = formatValue(clientTotal);
+				clientHiddenCostId = "capitalCostDatatableTable:" + row + ":clientHiddenCost";
+				document.getElementById(clientHiddenCostId).value = clientTotal;
+			}
+
+			rechargeTotalId = "capitalCostDatatableTable:" + row + ":rechargeId";
+			if(document.getElementById(rechargeTotalId)) {
+				document.getElementById(rechargeTotalId).innerHTML = formatValue(rechargeTotal);
+			}
+
+
+		}
+		
+
+		function getValueForId(id) {
+			value = 0;
+			if(document.getElementById(id)) {
+				value = getValue(document.getElementById(id).value);
+			} else {
+				value = 0;
+			}
+			return value;
+		}
+		
+		function getValue(value) {
+			var nValueTemp = parseFloat(value);
+			if(isNaN(nValueTemp)) {
+				nValueTemp = 0;
+			}
+			return nValueTemp;
+		}
+		
+		
+		function formatValue(value) {
+			temp1 = value.toFixed(2);
+			return temp1.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+			
+		}
+		
+		function initializeDirtyDetection() {
+			registerIgnoreButton("calc");
+			registerIgnoreButton("save");
+			registerIgnoreButton("post");
+			registerIgnoreButton("USD");
+			registerIgnoreButton("CAD");
+			saveDataForDirtyDetection();
+		}
+		
+		function convertToCanadian() {
+			if(currency != 'CAD') {
+				document.getElementById("calc").disabled = true;
+				document.getElementById("save").disabled = true;
+				document.getElementById("post").disabled = true;
+				document.getElementById("CAD").style.fontWeight="bold";
+				document.getElementById("USD").style.fontWeight="normal";
+				document.getElementById("exchangeRate_input").disabled = false;
+				currency='CAD';
+				if(firstConversionFlag) {
+					resetInvoiceValues("ZERO");
+					firstConversionFlag = false;
+				} else {
+					resetInvoiceValues("CAD");
+				}
+			}
+		}
+
+		function convertToUS() {
+			if(currency != 'USD') {
+				document.getElementById("calc").disabled = false;
+				document.getElementById("CAD").style.fontWeight="normal";
+				document.getElementById("USD").style.fontWeight="bold";
+				document.getElementById("exchangeRate_input").disabled = true;
+				currency='USD';
+				resetInvoiceValues("USD");
+			}
+		}
+
+		function loadCanadianUnitProcessing() {
+			if(document.getElementById("USD")) {
+				document.getElementById("USD").style.fontWeight="bold";
+				document.getElementById("exchangeRate_input").disabled = true;
+			}
+		}
+		
+		function resetInvoiceValues(type) {
+			var dataRows = $('.rowArray');
+			for (var i=0;i &lt; dataRows.length;i++) {
+ 				invoiceId = "capitalCostDatatableTable:" + i + ":invoiceCost_input";
+ 				invoiceHiddenCostId = "capitalCostDatatableTable:" + i + ":invoiceHiddenCost";
+ 				dealHiddenCostId = "capitalCostDatatableTable:" + i + ":dealHiddenCost"; 				
+ 				dealCostId = "capitalCostDatatableTable:" + i + ":dealCostId";
+
+ 				
+ 				if(document.getElementById(invoiceId)) {
+ 					if(type == 'CAD') {
+ 						value = convertValue(document.getElementById(invoiceHiddenCostId).value, 'CAD');
+ 	 	 				document.getElementById(invoiceId).value = formatValue(value);
+ 	 	 				document.getElementById(invoiceHiddenCostId).value = value;
+
+ 					} else if(type=='USD') {
+ 						value = convertValue(document.getElementById(invoiceHiddenCostId).value, 'USD');
+ 	 	 				document.getElementById(invoiceId).value = formatValue(value);
+ 	 	 				document.getElementById(invoiceHiddenCostId).value = value;
+
+ 						changeInvoiceValues(i);
+ 					} else {
+ 						value = 0.00;
+ 	 	 				document.getElementById(invoiceId).value = formatValue(value);
+ 	 	 				document.getElementById(invoiceHiddenCostId).value = value;
+
+ 					}
+ 	 				
+ 				}
+ 				sumColumns();
+			}
+		}
+
+		
+		function convertValue(value, convertTo) {
+			conversionFactor = getConversionFactor();
+			
+			if(convertTo == 'USD') {
+				convertedValue = (1/conversionFactor) * getValue(value);
+			} else {
+				convertedValue = conversionFactor * getValue(value);
+			}
+			convertedValue = Math.round(convertedValue*100)/100;
+			return convertedValue;
+		}
+		
+		function getConversionFactor() {
+			if(document.getElementById("exchangeRate_input")) {
+ 				return document.getElementById("exchangeRate_input").value;
+			} else {
+				return 1;
+			}
+		}
+		
+		function disableButtons() {
+//			document.getElementById("save").disabled = true;
+//			document.getElementById("post").disabled = true;
+		}
+		function setDefaultValue(){
+			 
+			var allInputRows = $("input[type=text]");
+			for (var i= 0 ; i &lt; allInputRows.length; i++){
+			
+				if(String(allInputRows[i].value).length == 0){
+					allInputRows[i].value ='0.00';	
+				}					
+			}
+		}
+		
+     	$(window).load(function(){
+     		initializeDirtyDetection();
+     		showWarning();
+     		loadCanadianUnitProcessing();
+     		setDefaultCDFeeRecharge();
+     		sumColumns();		
+		});			
+		</script>
+
+	</ui:define>
+</ui:composition>

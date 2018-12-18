@@ -1,0 +1,418 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"   
+	xmlns:pe="http://primefaces.org/ui/extensions"	  
+    template="../../templates/ui.xhtml" >
+	
+    <ui:define name="content">
+    	    <h:form id="purchaseOrderReleaseQueueBreadCrumbForm" prependId="false">
+   			    <p:breadCrumb model="#{purchaseOrderReleaseQueueBean.breadCrumbTrail}" ajax="false" immediate="true" style="min-width:980px;max-width:100%;width:auto;"/>
+   		    </h:form>
+   		        
+    	    <!-- Message display -->
+		    <p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:980px;max-width:100%;width:auto;">
+			    <p:messages id="messages" showSummary="false" showDetail="true" autoUpdate="true" />
+		    </p:scrollPanel>   
+
+		    <h:form id="mainForm" prependId="false" rendered="true">
+			
+	    		<p:panel id="inputPanel">
+	    			<h:panelGrid columns="10">
+	    			
+	    				<h:panelGrid columns="3" styleClass="panelGrid-top">
+		    				<p:outputLabel value="Looking For - " styleClass="ui-label"/>
+							<p:spacer width="50" height="1"/>
+							
+						</h:panelGrid>
+ 						
+						<p:commandLink title="Purchase Order Release" action="#{purchaseOrderReleaseQueueBean.loadTableWithoutData}" immediate="true" ajax="false" onclick="lockScreen()">	
+							 <h:outputText value="Purchase Order Release" styleClass="ui-label" rendered="true" />
+						</p:commandLink>
+						<p:spacer width="20" height="1"/>
+ 						<p:commandLink title="Third Party Progress" action="#{purchaseOrderReleaseQueueBean.navigateToThirdPartyQueue}" immediate="true" ajax="false" onclick="lockScreen()">							
+							 <h:outputText value="Third Party Progress"  rendered="true" />
+						</p:commandLink>
+						<p:spacer width="20" height="1"/>
+ 						<p:commandLink title="Manufacturer Progress" action="#{purchaseOrderReleaseQueueBean.navigateToManufacturerQueue}" immediate="true" ajax="false" onclick="lockScreen()">							
+							 <h:outputText value="Manufacturer Progress" rendered="true" />
+						</p:commandLink>
+						<p:spacer width="20" height="1"/>
+	 					<p:commandLink title="Upfit Progress" action="#{purchaseOrderReleaseQueueBean.navigateToUpfitterQueue}" immediate="true" ajax="false" onclick="lockScreen()">							
+							 <h:outputText value="Upfit Progress"  rendered="true" />
+						</p:commandLink>
+						<p:spacer width="20" height="1"/>
+						<p:commandLink title="In Service Date Progress" action="#{purchaseOrderReleaseQueueBean.navigateToInServiceQueue}" immediate="true" ajax="false" onclick="lockScreen()">	
+							 <h:outputText value="In Service Date Progress" rendered="true" />
+						</p:commandLink>
+						
+						<p:spacer width="100" height="1"/>
+
+				
+					</h:panelGrid>
+						
+              	</p:panel>
+			</h:form>	
+			
+			<comp:logBook id="logBook" 
+		            entities="#{purchaseOrderReleaseQueueBean.getSelectedFleetMasterList()}" 
+		            logBookTypes="#{purchaseOrderReleaseQueueBean.logBookType}" 
+		            combineLogBooks="true" 
+		            enableFollowUpDate="true" 
+		            enableAddAndClose="false" 
+		            onClose="" />	    		            
+		     
+		     <comp:requestClientContact id="ccRequestClientContact" 
+		            processStageObjects="#{purchaseOrderReleaseQueueBean.selectedProcessStageObjects}" 
+		            targetStage="#{purchaseOrderReleaseQueueBean.targetProcessStage}"  
+		            windowTitle="Unit No.: #{purchaseOrderReleaseQueueBean.selectedPurchaseOrderReleaseQueueV.unitNo}"
+		             onClose="callRefreshRequestClientContact()" />	 
+		           
+		     <h:form id="RCForm" prependId="false">
+		     	 <p:remoteCommand name="setSelectedRC"  actionListener="#{purchaseOrderReleaseQueueBean.setSelectedRC()}" />
+           	  	 <p:remoteCommand name="rowSelectionListener" actionListener="#{purchaseOrderReleaseQueueBean.rowSelectionListener()}" />    
+           	  	 <p:remoteCommand name="refreshRequestClientContact" actionListener="#{purchaseOrderReleaseQueueBean.refreshRequestClientContactListener()}" />        	  	 
+		     </h:form>  
+		                                    
+           <h:form id="purchaseOrderReleaseQueueForm" prependId="false">
+            	<p:panel id="purchaseOrderReleaseTablePanel" header="Purchase Order Release Queue"> 
+                <h:inputHidden id="hiddenScrollPosition" value="#{purchaseOrderReleaseQueueBean.scrollPosition}" />	
+            	<p:toolbar id="searchToolbar">  
+				    <p:toolbarGroup align="left">  
+				    	 <p:focus context="searchToolbar"/>	
+				    		<p:separator></p:separator>	
+							<p:outputLabel for="makeId" value="Make : " />								
+							<p:inputText id="makeId" style="width:100px" title="Make" value="#{purchaseOrderReleaseQueueBean.makeFilter}" autocomplete="off" onkeypress="return doKeypressFilter(event)"/>
+							<p:separator ></p:separator>
+							
+							<p:outputLabel for="orderTypeId" value="Order Type : " />								
+							<p:inputText id="orderTypeId" style="width:100px" title="Order Type" value="#{purchaseOrderReleaseQueueBean.orderTypeFilter}" autocomplete="off" onkeypress="return doKeypressFilter(event)" />
+							<p:separator></p:separator>
+												    		
+				    		<p:outputLabel for="unitNoTxtId" value="Unit No : " />								
+							<p:inputText id="unitNoTxtId" style="width:100px" title="Unit No" value="#{purchaseOrderReleaseQueueBean.unitNoFilter}" autocomplete="off" onkeypress="return doKeypressFilter(event)"/>
+							<p:separator ></p:separator>
+							
+				    		<p:outputLabel for="clientNameTxtId" value="Client : " />								
+							<p:inputText id="clientNameTxtId" style="width:180px" title="Client" value="#{purchaseOrderReleaseQueueBean.clientNameFilter}" autocomplete="off" onkeypress="return doKeypressFilter(event)" />
+							
+							<p:separator></p:separator>
+							<p:outputLabel for="quoteCreatorTxtId" value="Quote Creator : " />			
+							<p:inputText id="quoteCreatorTxtId" style="width:100px" title="Quote creator" value="#{purchaseOrderReleaseQueueBean.quoteCreatorFilter}" autocomplete="off" onkeypress="return doKeypressFilter(event)" />
+							
+							<p:separator></p:separator>
+							<p:outputLabel for="poStatusTxtId" value="PO Status : " />			
+							<p:inputText id="poStatusTxtId" style="width:100px" title="PO Status" value="#{purchaseOrderReleaseQueueBean.poStatusFilter}" autocomplete="off" onkeypress="return doKeypressFilter(event)" />
+							<p:separator></p:separator>
+							
+							<p:commandButton  value="Search" id="filter" title="Filter" update="purchaseOrderReleaseTablePanel btnPanel" actionListener="#{purchaseOrderReleaseQueueBean.performSearch}" oncomplete="resetUIState();" />
+				    </p:toolbarGroup>  
+				</p:toolbar> 
+			   	<p:dataTable id="DT_UI_ID" var="element" widgetVar="purchaseOrderReleaseTableVar"             	  
+				        value="#{purchaseOrderReleaseQueueBean.filteredList}" 
+						scrollable="true" rowIndexVar="elementRowIndex" 
+						scrollHeight="#{purchaseOrderReleaseQueueBean.dataTable.height}"
+						resizableColumns="true" 
+						rowKey="#{element.rowKey}"
+						rows="#{purchaseOrderReleaseQueueBean.recordPerPage}"	
+						paginator="true" paginatorPosition="bottom" 
+						selectionMode="single"
+						emptyMessage="#{purchaseOrderReleaseQueueBean.emptyDataTableMessage}"
+						selection="#{purchaseOrderReleaseQueueBean.selectedPurchaseOrderReleaseQueueV}" >						
+						
+						<p:ajax event="rowSelect" onstart="adjustBtnState();return false;"  />	
+						<p:ajax event="rowUnselect" onstart="adjustBtnState();return false;"  />
+						<p:ajax event="page" oncomplete="moveScrollbarToTop();resetUIState();" />		            
+		                <p:ajax event="sort"  oncomplete="moveScrollbarToTop();resetUIState();" />
+		        		 
+	                
+       				    <p:column width="24" sortBy="#{element.toleranceYN}" style="text-align:center;padding:0px;" exportable="false">               
+		            	   <p:graphicImage value="/images/overdue.png" title="Overdue" style="border-style: none" onclick="selectCurrentRow('purchaseOrderReleaseTableVar',#{elementRowIndex});" rendered="#{element.toleranceYN eq 'N' ? 'true' : 'false'}" />
+		                </p:column>   
+		                       					 
+       					<p:column id="MAKE_UI_ID" sortBy="#{element.make}" headerText="Make" width="#{purchaseOrderReleaseQueueBean.dataTable.col2}" exportable="false">				
+							<h:outputText  value="#{element.make}" />
+						</p:column>
+						 
+						<p:column id="ORDER_TYPE_UI_ID" sortBy="#{element.orderType}" headerText="Order Type" width="#{purchaseOrderReleaseQueueBean.dataTable.col3}" exportable="false">
+							<h:outputText  value="#{element.orderType}" />
+							<h:outputText value="&#160;" />
+							<p:graphicImage value="/images/b_icon.png" title="Bailment unit" style="border-style: none; vertical-align:bottom" onclick="selectCurrentRow('purchaseOrderReleaseTableVar',#{elementRowIndex});" rendered="#{element.acquisitionType eq 'Bailment'}" />
+						</p:column>
+						 
+						<p:column id="UNIT_NO_UI_ID" headerText="Unit No" sortBy="#{element.unitNo}" width="#{purchaseOrderReleaseQueueBean.dataTable.col4}"  exportable="false">				
+						    <h:outputText value="#{element.unitNo}" style="height:10px;"/>
+						</p:column>
+						
+						<p:column headerText="Trim" width="#{purchaseOrderReleaseQueueBean.dataTable.col5}" exportable="false" 
+									style="white-space: nowrap; text-overflow: ellipsis;">	
+							<h:outputText id="trimValue" value="#{element.trim}"/><br/>			
+							<p:tooltip value="#{element.trim}" for="trimValue"/>
+						</p:column>
+						
+						<p:column headerText="Client" width="#{purchaseOrderReleaseQueueBean.dataTable.col6}" exportable="false">								
+							  <h:panelGroup style="white-space:nowrap;">							  			
+						  			<h:outputText value="#{element.clientAccountName}" styleClass="textWrap" />
+							 </h:panelGroup>
+						</p:column>	
+						
+						<p:column headerText="Quote No" width="#{purchaseOrderReleaseQueueBean.dataTable.col7}" exportable="false">								
+							  <h:panelGroup style="white-space:nowrap;">							  			
+						  			<h:outputText value="#{element.quoteNumber}" styleClass="textWrap" />
+							 </h:panelGroup>
+						</p:column>		
+						
+						<p:column id="QUOTE_CREATOR_UI_ID" headerText="Quote Creator" width="#{purchaseOrderReleaseQueueBean.dataTable.col8}" exportable="false" >	
+						    <h:outputText value="#{element.quoteCreator}">
+							</h:outputText>
+						</p:column>
+						
+						
+					 	<p:column id="CLIENT_REQ_DATE_UI_ID" headerText="Reqd By" width="#{purchaseOrderReleaseQueueBean.dataTable.col9}" exportable="false" >	
+						    <h:outputText value="#{element.quoteRequiredDate}">
+							</h:outputText>
+						</p:column>
+						
+						<p:column id="PO_STATUS_UI_ID" headerText="PO Status" width="#{purchaseOrderReleaseQueueBean.dataTable.col10}" exportable="false" sortBy="#{element}" sortFunction="#{purchaseOrderReleaseQueueBean.poStatusCustomSort}">
+							<p:commandLink id="ordDealerContactInfoLink" rendered="#{element.poStatus eq 'Released'}"
+									actionListener="#{purchaseOrderReleaseQueueBean.getSelectedOrderingDealerContact(element)}"
+									oncomplete="showDialog('contactInfoWidget');selectCurrentRow('purchaseOrderReleaseTableVar',#{elementRowIndex});"
+									update=":contactInfoDialog"
+									title="View Ordering Dealer Contact Info" immediate="true">
+								<p:graphicImage value="/images/custins.png" style="border-style: none" />	
+							</p:commandLink>	
+						    <h:outputText value="&#160;" />
+						    <h:outputText id="poStatusValue" value="#{element.poStatus}">
+							</h:outputText>
+							<p:tooltip id="hoverPanel" for="poStatusValue" showEffect="blind" rendered="#{element.poStatus != null}" >  
+							        		<h:panelGrid columns="2"    >	
+												<h:outputLabel style="white-space:nowrap;" styleClass="ui-label" value="PO Number:" />
+								 				<h:outputText  value="#{element.poNumber}"  styleClass="alignmentRight"  />
+								 				<h:outputLabel style="white-space:nowrap;" styleClass="ui-label" value="PO Released:"  />
+								 				<h:outputText  value="#{element.poReleaseDate}" styleClass="alignmentRight" >
+								 					<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+								 				</h:outputText>
+								 				<h:outputLabel style="white-space:nowrap;" styleClass="ui-label" value="Vendor:"  />
+								 				<h:outputText  value="#{element.vendorName}" styleClass="alignmentRight" />				
+							 				</h:panelGrid>
+							    		</p:tooltip >
+						</p:column>
+						
+						<f:facet  name="footer"  >
+							Record Count: <h:outputText value="#{purchaseOrderReleaseQueueBean.filteredList.size()}" />
+							<div style= "text-align:right;">
+							     <h:commandLink title="Export To Excel" onclick="monitorDownload('#{purchaseOrderReleaseQueueBean.filteredList.size()}');" >
+					               <p:graphicImage value="/images/excel.png" styleClass="ui-border-none" />	
+					                <p:dataExporter type="xls" target=":purchaseOrderReleaseQueueForm:purchaseOrderReleaseDld" fileName="purchase_order" 
+					                preProcessor="#{purchaseOrderReleaseQueueBean.preProcessDownloadXLS}" postProcessor="#{purchaseOrderReleaseQueueBean.postProcessDownloadXLS}" />
+					            </h:commandLink>
+					        </div>
+						</f:facet>	
+					</p:dataTable>  
+				</p:panel>
+
+				<p:dataTable value="#{purchaseOrderReleaseQueueBean.downloadableRowsData}" var="row"  id="purchaseOrderReleaseDld"  rendered="false">
+				    <p:columns value="#{purchaseOrderReleaseQueueBean.downloadableColumns}" var="column">		
+				   	 <f:facet name="header">
+                			<h:outputText value="#{column}" />
+            			</f:facet>		       
+				        <h:outputText value="#{row[column]}" />	
+				    </p:columns>
+				</p:dataTable>
+				
+				<p:panel id="btnPanel">
+					<p:commandButton id="maintainPOBtn" widgetVar="maintainPOBtnVar"  value="Maintain PO" onclick="saveScrollPosition();lockScreen();"
+						  			 ajax="false" action="#{purchaseOrderReleaseQueueBean.navigateToMaintainPOScreen}"/>
+						<p:spacer width="10" rendered="true"/>
+					<p:commandButton id="maintNotesBtn" widgetVar="maintNotesBtnVar"  value="Notes" actionListener="#{purchaseOrderReleaseQueueBean.setSelectedFleetMasterVOs}" 
+						oncomplete="showLogBook();" />
+					<p:spacer width="10" />	
+					<p:commandButton id="requestClientContactBtn" widgetVar="requestClientContactBtnVar" value="Request Client Contact" actionListener="#{purchaseOrderReleaseQueueBean.requestClientContactListner}"
+						oncomplete="showRequestClientContact()" />
+					<p:spacer width="10" />	
+					<p:commandButton id="done" value="Cancel" action="#{purchaseOrderReleaseQueueBean.cancel}" ajax="false" immediate="true" onclick="lockScreen();" />
+				</p:panel>
+						           
+            </h:form> 
+            
+	       <p:dialog id="contactInfoDialog" widgetVar="contactInfoWidget"  modal="true"
+                header="Contact Information - #{purchaseOrderReleaseQueueBean.selectedOrderingDealerName}" resizable="false" appendTo="@(body)" style="min-width: 400px; max-width: 800px;"
+                closeOnEscape="true" onShow="setFocus('contactInfoDialogDoneBtn');">
+	            <h:form id="contactInfoForm" prependId="false">
+					<p:panel id="contactInfoPanel" >  
+					    <h:panelGrid  columns="2" cellpadding="5" style="white-space:nowrap;" rendered="#{purchaseOrderReleaseQueueBean.requestedContactInfo != null ? 'true': 'false'}">			    
+								<p:column>	
+				    				<p:outputLabel value="Contact Name: " styleClass="ui-label" style="white-space:nowrap;"/>
+				    			</p:column>
+				    			<p:column>	 
+			                      	<p:outputLabel value="#{purchaseOrderReleaseQueueBean.requestedContactInfo.name}"/>
+			                    </p:column>
+			                    <p:column>	
+			                      	<p:outputLabel value="Contact Phone: " styleClass="ui-label" style="white-space:nowrap;"/>
+			                    </p:column>
+			                    <p:column>	
+			                      	<p:outputLabel value="#{purchaseOrderReleaseQueueBean.requestedContactInfo.phone}" />		                 
+              					</p:column>   
+              					 <p:column>	
+			                      	<p:outputLabel value="Contact Email: " styleClass="ui-label" style="white-space:nowrap;"/>
+			                    </p:column>
+			                    <p:column>	
+			                      	<h:outputLink onclick="loadClientEmail('#{purchaseOrderReleaseQueueBean.requestedContactInfo.email}'); return false;" rendered="#{purchaseOrderReleaseQueueBean.requestedContactInfo.email ne 'NO EMAIL AVAILABLE'}">#{purchaseOrderReleaseQueueBean.requestedContactInfo.email}</h:outputLink>
+			                      	<p:outputLabel value="#{purchaseOrderReleaseQueueBean.requestedContactInfo.email}" rendered="#{purchaseOrderReleaseQueueBean.requestedContactInfo.email eq 'NO EMAIL AVAILABLE'}" />
+              					</p:column>
+              					<p:column>	
+			                      	<p:outputLabel value="Address: " styleClass="ui-label" style="font-size: 90%;"/>
+			                    </p:column>
+	             				<p:column>	
+			                      	<p:outputLabel value="#{purchaseOrderReleaseQueueBean.selectedOrderingDealerAddressDetails}" style="white-space:pre;font-size: 90%;"/>
+			                    </p:column>
+		                </h:panelGrid>
+		                
+		                <h:panelGrid columns="2" cellpadding="5" style="white-space:nowrap;" rendered="#{purchaseOrderReleaseQueueBean.requestedContactInfo != null ? 'false': 'true'}">			    
+							<p:column colspan="2">	
+			    				<p:outputLabel value="NO CONTACT AVAILABLE" styleClass="ui-label" style="white-space:nowrap;"/>
+			    			</p:column>
+			    			<br/>
+			    			<h:panelGrid columns="2" styleClass="panelGrid-top">
+			    				<p:column>	
+			                      	<p:outputLabel value="Address: " styleClass="ui-label" style="font-size: 90%;"/>
+			                    </p:column>
+	             					<p:column>	
+			                      	<p:outputLabel value="#{purchaseOrderReleaseQueueBean.selectedOrderingDealerAddressDetails}" style="white-space:pre;font-size:90%;"/>
+			                    </p:column>
+							</h:panelGrid>
+		                </h:panelGrid>
+	                </p:panel>
+	                <br/>
+				 	<p:commandButton id="contactInfoDialogDoneBtn" value="Done" onclick="hideDialog('contactInfoWidget');" />               
+	            </h:form>
+	        </p:dialog>
+	        
+	       
+	        	        
+		<style type="text/css">
+			.ui-datatable thead th {
+				white-space: normal;
+				text-align: center;
+			}
+			
+			.textWrap {
+				white-space: normal;
+			}
+		</style>  
+			                                                                                               
+        <script type="text/javascript"> 
+        	$(document).ready(function() {
+        		$.cookie("client.excel.download", null, { path: '/'});
+        	});
+        	
+        	function monitorDownload(recordCount) { 
+            	if(recordCount > 0){
+            		if(cookiesEnabled()){
+            			ajaxStatusShow();
+            			setTimeout("checkDownloadStatus();",250); 
+            		}
+            	}
+            }
+            
+            function checkDownloadStatus(){ 
+            	if($.cookie("client.excel.download")){
+            		$.cookie("client.excel.download", null, { path: '/'});
+            		ajaxStatusHide();
+            	}else{
+            		setTimeout("checkDownloadStatus();",250); 
+            	}
+            }   
+            
+            function cookiesEnabled() {
+    			var c = (navigator.cookieEnabled) ? true : false;
+    			if (typeof navigator.cookieEnabled === "undefined") {
+    				if(!c){
+    					document.cookie = "tcookie";
+    					c = (document.cookie.indexOf("tcookie") !== -1) ? true : false;
+    			 	}
+    			}
+    			return (c);
+    		}
+            
+           	function doKeypressFilter(event){
+    			if (event.keyCode == 13) {
+    				source = event.srcElement.id;
+    			   $('#filter').click();
+    			   return false;
+    			}
+    			return true;	
+    		}
+           	
+            function moveScrollbarToTop() {
+           		$('#DT_UI_ID .ui-datatable-scrollable-body').scrollTop(0);
+           	}
+           	
+            function selectCurrentRow(table,index){
+            	if(index > (Number(50) -1)){//here 50 is rows being display in per page in dt
+            		index = index % 50;	
+            	}
+                PF(table).unselectAllRows();
+              	PF(table).selectRow(index ,false);
+            }
+            
+            function resetUIState() {
+              PF('purchaseOrderReleaseTableVar').unselectAllRows();
+              adjustBtnState()
+           	}
+            
+            var  hasPermissionManageVehOrderStatus =  #{purchaseOrderReleaseQueueBean.hasVehOrderStatusPermission};
+            var  hasPermissionManagePurchaseOrder =  #{purchaseOrderReleaseQueueBean.hasPermission()};
+            function adjustBtnState() {;
+            	if(hasPermissionManagePurchaseOrder == true){
+            		if(PF('purchaseOrderReleaseTableVar').selection.length == 1){
+            			PF('maintainPOBtnVar').enable();
+            		}else{
+            			PF('maintainPOBtnVar').disable();
+            		}
+            	}else{
+            		PF('maintainPOBtnVar').disable();
+            	}
+
+            	var poStatus = String(PF('purchaseOrderReleaseTableVar').selection);
+            	
+           		if(PF('purchaseOrderReleaseTableVar').selection.length == 1){
+           			if(poStatus.toLowerCase().indexOf("released") != -1){
+           				PF('maintNotesBtnVar').enable();
+           				PF('requestClientContactBtnVar').enable();
+           			}else{
+           				PF('maintNotesBtnVar').disable();
+           				PF('requestClientContactBtnVar').disable();
+           			}
+           		}else{
+           			PF('maintNotesBtnVar').disable();
+           			PF('requestClientContactBtnVar').disable();
+           		}
+            		
+           		if(hasPermissionManageVehOrderStatus == false){
+            		PF('maintNotesBtnVar').disable();
+            	}
+           	  }
+            
+            
+            function saveScrollPosition() {
+            	document.getElementById('hiddenScrollPosition').value = $('#DT_UI_ID .ui-datatable-scrollable-body').scrollTop();
+            }
+            function setScrollPosition() {
+            	$('#DT_UI_ID .ui-datatable-scrollable-body').scrollTop(document.getElementById('hiddenScrollPosition').value);
+            }
+            
+            function callRefreshRequestClientContact(){
+            	refreshRequestClientContact();
+            }
+            
+            $(window).load(function(){
+        		 adjustBtnState();
+        		 setScrollPosition();
+		  	});    
+		    </script>
+	</ui:define>
+	
+</ui:composition>

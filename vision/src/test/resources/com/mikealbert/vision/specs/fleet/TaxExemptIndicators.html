@@ -1,0 +1,45 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Fleet Maintenance / FM-131 Pop Up - Tax Exempt Status</title>
+    <body>
+    	<h1>Fleet Maintenance / FM-131 Pop Up - Tax Exempt Status</h1>
+    	<h2>Acceptance Tests (Automated)</h2>
+    	
+		<ul concordion:execute="testTaxExemptedRegions(#jobNo)">
+            
+            <li>Search on the PO <b><span concordion:set="#jobNo">J00309800</span></b> with Unit Status = Both and click on the Create Purchase Order button 
+            <span concordion:assertTrue="taxExemptedIndicator">the Create Maintenance Purchase Order screen show the Vehicle Information section with tax exempt indicator.</span></li>
+            <li>Click on the 'Tax' link in the Vehicle Information section <span concordion:assertTrue="taxExemptedRegionsExist">the Tax Exempted Regions pop up is displayed.</span></li>
+		
+            <li>Search on the PO <b><span concordion:set="#jobNo">J00309800</span></b> with Unit Status = Both and click on the View Purchase Order button  
+            <span concordion:assertTrue="taxExemptedIndicator">the Edit Maintenance Purchase Order screen show the Vehicle Information section with tax exempt indicator.</span></li>
+            <li>Click on the 'Tax' link in the Vehicle Information section <span concordion:assertTrue="taxExemptedRegionsExist">the Tax Exempted Regions pop up is displayed.</span></li>
+		
+            <li>Search on the PO <b><span concordion:set="#jobNo">J00309800</span></b> with Unit Status = Both and click on the Service History button 
+            <span concordion:assertTrue="taxExemptedIndicator"> the Service History screen show the Vehicle Information section with tax exempt indicator.</span></li>
+            <li>Click on the 'Tax' link in the Vehicle Information section <span concordion:assertTrue="taxExemptedRegionsExist">the Tax Exempted Regions pop up is displayed.</span></li>
+            
+		</ul>
+
+		<ul concordion:execute="testTaxExemptedRegions(#jobNo)">
+            
+            <li>Search on the PO <b><span concordion:set="#jobNo">J00304722</span></b> with Unit Status = Both and click on the Create Purchase Order button 
+            <span concordion:assertFalse="taxExemptedIndicator">the Create Maintenance Purchase Order screen show the Vehicle Information section without tax exempt indicator.</span></li>
+		
+            <li>Search on the PO <b><span concordion:set="#jobNo">J00304722</span></b> with Unit Status = Both and click on the View Purchase Order button  
+            <span concordion:assertFalse="taxExemptedIndicator">the Edit Maintenance Purchase Order screen show the Vehicle Information section without tax exempt indicator.</span></li>
+		
+            <li>Search on the PO <b><span concordion:set="#jobNo">J00304722</span></b> with Unit Status = Both and click on the Service History button 
+            <span concordion:assertFalse="taxExemptedIndicator"> the Service History screen show the Vehicle Information section without tax exempt indicator.</span></li>
+            
+		</ul>
+
+    	<h2>Manual Tests</h2>
+    	    <ul type = "circle"><b>
+    	       <li>TODO: Verify the data on the Tax Exempted Regions pop up with the data in the Ext_Acc_Tax_Exempt table.</li>
+    	    </b></ul>
+ 
+    	<h2>Untested (Out of Scope)</h2>
+    		<ul><li>TODO:</li></ul>
+    </body>
+</html>    	

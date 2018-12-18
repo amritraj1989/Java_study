@@ -1,0 +1,120 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+            xmlns:h="http://java.sun.com/jsf/html"
+            xmlns:f="http://java.sun.com/jsf/core"
+            xmlns:ui="http://java.sun.com/jsf/facelets"
+            xmlns:p="http://primefaces.org/ui">
+            <h:form id= "invalidPercentForm" prependId="false">
+            	<h:inputHidden id = "invalidPercentElement" name = "invalidPercentElement" value= ""/>
+            	<p:dialog  id="invalidPercentDialog" onShow="setElementFocus('alertInvalidPercOk')"  widgetVar="invalidPercentDialogVar" 
+            				closable="false"  severity="alert" dynamic="false" width="200"  height="100"  modal="true"  header="Invalid Input" resizable="false" appendTo="@(body)">
+            				<h:panelGroup style="display:block; text-align:center">			  
+		        			<h:outputText value="Invalid input "/>
+							<h:outputText id = "invalidPercentlabel" name = "invalidPercentlabel" value=""/>
+							
+        					</h:panelGroup>
+							<br/>
+							<p/>
+	               			<h:panelGroup style="display:block; text-align:center">			  
+		        			<p:commandButton id = "alertInvalidPercOk" value="Ok"  type="button" onclick="hideDiaglogForInvalidPercent()"/>
+        					</h:panelGroup>
+					
+	   			</p:dialog>	
+	   		</h:form>
+	   		<script type="text/javascript">
+	   		function validateDecimalPrecisioninPercent(value){
+	   			var indexOfDecimal = value.indexOf('.');
+	   			var indexOfPerc = value.indexOf('%');
+	   			var str;
+	   			if(indexOfDecimal &gt; -1){
+	   				if(indexOfPerc &gt; -1){
+	   					str = value.substring(indexOfDecimal+1,indexOfPerc);
+	   				}else{
+	   					str = value.substring(indexOfDecimal+1);
+	   				}
+	   				
+	   	
+	   				if(str.length &gt; 3){
+	   					return false;
+	   				}
+	   			}
+	   			return true;
+	   		}
+	   		function formatPercentValue(inputName,labelName){
+	   			
+	   			var obj = document.getElementById(inputName);
+	   			var value ;
+	   			if(obj){
+	   				value = obj.value;
+	   			}
+	   			
+	   			if(value.length &gt; 0)
+	   			{	
+	   				if(validateDecimalPrecisioninPercent(value) == false){
+	   					showDiaglogForInvalidPercent(inputName,labelName);
+   						return false;
+					}
+	   				var indexOfNegative = value.indexOf('-');
+	   				var indexOfPercentage =  value.indexOf('%');
+	   				var negativeNumber = false;
+	   				if(indexOfNegative &gt; -1)
+	   				{
+	   					negativeNumber = true;
+	   					var str = value.substring(indexOfNegative+1);
+	   					if(str.length == 0 ){
+	   						showDiaglogForInvalidPercent(inputName,labelName);
+	   						return false;
+	   					}else{
+	   						if(indexOfNegative &gt; 0){
+	   						showDiaglogForInvalidPercent(inputName,labelName);
+	   						return false;
+	   						}
+	   					}
+	   				}
+	   				else{
+	   					if(indexOfPercentage &gt; -1){
+	   						if(indexOfPercentage &lt; (value.length -1)){
+	   							//invalid amount,dollar sign is not on start
+	   							showDiaglogForInvalidPercent(inputName,labelName);
+	   							return false;
+	   						}else{
+	   							value = value.substring(0,indexOfPercentage);
+	   							if(value.length == 0){
+	   								showDiaglogForInvalidPercent(inputName,labelName);
+	   								return false;
+	   							}
+	   							
+	   						}
+	   					}
+	   				}
+	   				value = value.replace(/%/g,'');
+	   				value = value.replace(/,/g,'');
+	   				if(value == '-'){
+	   					showDiaglogForInvalidPercent(inputName,labelName);
+	   					return false;
+	   				}
+	   				var valueTemp = Number(value);
+	   				if(isNaN(valueTemp)){
+	   					showDiaglogForInvalidPercent(inputName,labelName)
+	   					return false;
+	   				}
+	   				var returnValue = valueTemp.numberFormat(3,'PERCENT');
+	   				returnValue = returnValue + '%';
+	   				document.getElementById(inputName).value = returnValue;
+	   				
+	   				}
+	   			}
+		   		function showDiaglogForInvalidPercent(elementToUpdate,labelName){
+		   			
+		   		 	$('#invalidPercentlabel').text(labelName);
+		   			document.getElementById('invalidPercentElement').value = elementToUpdate;
+					showDialog('invalidPercentDialogVar');
+					setElementFocus('alertInvalidPercOk');
+					
+				}
+				function hideDiaglogForInvalidPercent(){
+					hideDialog('invalidPercentDialogVar');
+					var elementToSetFocus =document.getElementById('invalidPercentElement').value;
+					setElementFocus(elementToSetFocus);
+				}
+	   		</script>
+ </ui:composition>

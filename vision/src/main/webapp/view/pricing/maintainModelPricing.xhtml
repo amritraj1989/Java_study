@@ -1,0 +1,1006 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"   
+	xmlns:pe="http://primefaces.org/ui/extensions"	  
+    template="../../templates/ui.xhtml" >
+	
+    <ui:define name="content">
+    	    <h:form id="modelPricingBreadCrumbForm" prependId="false">
+   			    <p:breadCrumb model="#{maintainModelPricingBean.breadCrumbTrail}" ajax="false" immediate="true" style="min-width:980px;max-width:100%;width:auto;"/>
+   		    </h:form>
+   		        
+    	    <!-- Message display -->
+		    <p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:980px;max-width:100%;width:auto;">
+			    <p:messages id="messages" severity="info,fatal" showSummary="false" showDetail="true" autoUpdate="true" />
+		    </p:scrollPanel>   	
+		    
+		    <p:panel>
+		        <comp:modelDisplay id="modelDisplay" entities="#{maintainModelPricingBean.models}"/>		    	        
+            </p:panel>
+                                
+            <h:form id="maintainModelPriceForm" prependId="false">
+   			    <h:inputHidden id="dirtyData" value="#{maintainModelPricingBean.dirtyData}"/>    
+   			    <h:inputHidden id ="assignedUpfitterCount" value="#{maintainModelPricingBean.assignedUpfitterCount}"/>
+   			            
+			    <p:accordionPanel id="modelPriceLevelsPanel" activeIndex="3">
+				    <p:tab id="modelPriceLevelTab" title="Trim Price">	
+		                <p:dataTable id="modelPriceDataTable" 
+		                        var="model" 
+		                        value="#{maintainModelPricingBean.model}"
+		                        scrollable="true">
+		                        
+			                <p:column width="5%">
+                                <p:commandLink id="standardAccessoryLink" 
+                                        oncomplete="PF('standardAccessoriesDialogWidget').show();"
+                                        update=":standardAccessoriesDialog" 
+                                        title="View Standard Accessories">
+	                                <p:graphicImage value="/images/custins.png" style="border-style: none" />
+                                </p:commandLink>                       
+			                </p:column>		                        
+		                        
+			                <p:column headerText="Effective Date" width="10%">
+                                <h:outputLabel value="#{maintainModelPricingBean.modelEffectivePricing(model).effectiveDate}">
+                                    <f:convertDateTime pattern="MM/dd/yyyy" />
+                                </h:outputLabel>                             
+			                </p:column>
+			                
+			                <p:column headerText="Price" width="10%">
+                                <h:outputLabel style="float:right" value="#{maintainModelPricingBean.modelEffectivePricing(model).totalPrice}">
+									<f:convertNumber type="currency" currencySymbol="$" />                               
+                                </h:outputLabel>
+			                </p:column>				
+			                
+			                <p:column headerText="MSRP" width="10%">
+                                <h:outputLabel style="float:right" value="#{maintainModelPricingBean.modelEffectivePricing(model).msrp}">
+									<f:convertNumber type="currency" currencySymbol="$" />                               
+                                </h:outputLabel>
+			                </p:column>	
+			                
+			                <p:column headerText="Holdback" width="10%">
+                                <h:outputLabel style="float:right" value="#{maintainModelPricingBean.modelEffectivePricing(model).holdback}">
+									<f:convertNumber type="currency" currencySymbol="$" />                               
+                                </h:outputLabel>
+			                </p:column>				                				                				                                				                		                
+			                		                        
+			                <p:column width="45%">
+                                <p:commandLink id="modelPriceListEditLink" 
+                                        actionListener="#{maintainModelPricingBean.modelEditPriceListener()}"                                
+                                        oncomplete="PF('modelPriceListDialogWidget').show();"
+                                        update=":modelPriceListDialog" 
+                                        title="View Model Pricing">
+	                                <p:graphicImage value="/images/action_detail.png" style="border-style: none"/>
+                                </p:commandLink>  
+                                			                
+	                            <p:spacer width="10" />
+	                            
+	                            <p:graphicImage value="/images/action_add.png" style="border-style: none" title="Add Model Pricing" onclick="alert('Comming soon...')" rendered="false"/>
+			                </p:column>		
+			                                        
+		                 </p:dataTable>
+				    </p:tab>	
+				    
+				    <p:tab id="modelOptionPackLevelTab" title="Option Packs">	
+		                <p:dataTable id="optionPackDataTable" 
+		                        var="optionPackHeader" 
+		                        value="#{maintainModelPricingBean.model.optionPackHeaders}"
+		                        scrollable="true"
+		                        scrollHeight="300">
+		                        
+			                <f:facet name="header">
+			                    <h:outputLabel  style="vertical-align:15px" value="Option Packs" />		                    
+			                </f:facet>		                        
+
+			                <p:column width="5%">
+                                <p:commandLink id="optionPackAccessoryLink" rendered="#{maintainModelPricingBean.hasOptionPackAccessories(optionPackHeader)}"
+                                        actionListener="#{maintainModelPricingBean.optionPackAccessoryListener(optionPackHeader)}"
+                                        oncomplete="PF('optionPackAccessoriesDialogWidget').show();"
+                                        update=":optionPackItemsDialog" 
+                                        title="View Option Pack Accessories">
+                                    <p:graphicImage value="/images/custins.png" style="border-style: none" />
+                                </p:commandLink>                       
+			                </p:column>
+			                			                			                
+			                <p:column headerText="Code" sortBy="#{optionPackHeader.optionPackTypeCode.code}" width="10%">
+                                <p:outputLabel value="#{optionPackHeader.optionPackTypeCode.code}" />                         
+			                </p:column>
+			                
+			                <p:column headerText="Description" width="48%">
+                                <p:outputLabel value="#{optionPackHeader.optionPackTypeCode.description}"/>
+			                </p:column>
+			                
+			                <p:column headerText="Price" width="8%">
+                                <h:outputLabel style="float:right" value="#{maintainModelPricingBean.optionPackEffectivePrice(optionPackHeader).cost}">
+									<f:convertNumber type="currency" currencySymbol="$" />
+                                </h:outputLabel>
+			                </p:column>	
+			                
+			                <p:column headerText="MSRP" width="8%">
+                                <h:outputLabel style="float:right" value="#{maintainModelPricingBean.optionPackEffectivePrice(optionPackHeader).msrp}" >
+									<f:convertNumber type="currency" currencySymbol="$" />                                
+                                </h:outputLabel>
+			                </p:column>	
+			                
+			                <p:column headerText="Holdback" width="8%">
+                                <h:outputLabel style="float:right" value="#{maintainModelPricingBean.optionPackEffectivePrice(optionPackHeader).holdback}" >
+									<f:convertNumber type="currency" currencySymbol="$" />                                
+                                </h:outputLabel>
+			                </p:column>	
+			                
+			                <p:column headerText="Effective Date" width="9%">
+                                <h:outputLabel value="#{maintainModelPricingBean.optionPackEffectivePrice(optionPackHeader).effectiveDate}">
+                                    <f:convertDateTime pattern="MM/dd/yyyy" />
+                                </h:outputLabel>                             
+			                </p:column>			                
+			                
+			                <p:column headerText="" width="4%">
+                                <p:commandLink id="optionPackPriceListEditLink" 
+                                        actionListener="#{maintainModelPricingBean.optionPackAccessoryListener(optionPackHeader)}"                                
+                                        oncomplete="PF('optionPackPriceListDialogWidget').show();"
+                                        update=":optionPackPriceListDialog" 
+                                        title="View Option Pack Pricing">
+	                                <p:graphicImage value="/images/action_detail.png" style="border-style: none"/>
+                                </p:commandLink>  
+                                			                
+	                            <p:spacer width="10" />
+	                            
+	                            <p:graphicImage value="/images/action_add.png" style="border-style: none" title="Add Option Pack Pricing" onclick="alert('Coming soon...');" rendered="false"/>
+			                </p:column>				                			                			                			                			                
+			                			                        
+		                </p:dataTable>
+				    </p:tab>	
+				    
+				    <p:tab id="factoryAccessoryTab" title="Factory Accessories">	
+		                <p:dataTable id="factoryAccessoryDataTable" 
+		                        var="factoryAccessory" 
+		                        value="#{maintainModelPricingBean.model.optionalAccessories}"
+		                        scrollable="true"
+		                        scrollHeight="300">
+		                        
+			                <f:facet name="header">
+			                    <h:outputLabel  style="vertical-align:15px" value="Factory Accessories" />		                    
+			                </f:facet>  		                        
+		                        			                		                        
+			                <p:column headerText="Code" sortBy="#{factoryAccessory.accessoryCode.newAccessoryCode}" width="12%">
+                                    <p:outputLabel id="optionPackDetailLink" value="#{factoryAccessory.accessoryCode.newAccessoryCode}"/>                           
+			                </p:column>	
+			                
+			                <p:column headerText="Description" width="48%">
+                                <p:outputLabel value="#{factoryAccessory.accessoryCode.description}"/>
+			                </p:column>
+			                			                
+			                <p:column headerText="Price" width="8%">
+                                <h:outputLabel style="float:right" value="#{maintainModelPricingBean.factoryAccessoryEffectivePricing(factoryAccessory).totalPrice}">
+									<f:convertNumber type="currency" currencySymbol="$" />                               
+                                </h:outputLabel>
+			                </p:column>				
+			                
+			                <p:column headerText="MSRP" width="8%">
+                                <h:outputLabel style="float:right" value="#{maintainModelPricingBean.factoryAccessoryEffectivePricing(factoryAccessory).msrp}">
+									<f:convertNumber type="currency" currencySymbol="$" />                               
+                                </h:outputLabel>
+			                </p:column>	
+			                
+			                <p:column headerText="Holdback" width="8%">
+                                <h:outputLabel style="float:right" value="#{maintainModelPricingBean.factoryAccessoryEffectivePricing(factoryAccessory).holdback}">
+									<f:convertNumber type="currency" currencySymbol="$" />                               
+                                </h:outputLabel>
+			                </p:column>	
+			                
+			                <p:column headerText="Effective Date" width="10%">
+                                <h:outputLabel value="#{maintainModelPricingBean.factoryAccessoryEffectivePricing(factoryAccessory).effectiveDate}">
+                                    <f:convertDateTime pattern="MM/dd/yyyy" />                              
+                                </h:outputLabel>
+			                </p:column>			                			                				                				                                				                		                
+			                		                        
+			                <p:column width="6%">
+                                <p:commandLink id="factoryAccessoryPriceListEditLink" 
+                                        actionListener="#{maintainModelPricingBean.factoryAccessoryListener(factoryAccessory)}"                                
+                                        oncomplete="PF('factoryAccessoryPriceListDialogWidget').show();"
+                                        update=":factoryAccessoryPriceListDialog" 
+                                        title="View Factory Accessory Pricing">
+	                                <p:graphicImage value="/images/action_detail.png" style="border-style: none"/>
+                                </p:commandLink>  
+                                			                
+	                            <p:spacer width="10" />
+	                            
+	                            <p:graphicImage value="/images/action_add.png" style="border-style: none" title="Add Factory Accessory Pricing" onclick="alert('Coming soon...');" rendered="false"/>
+			                </p:column>				                			                
+			                			                	                        
+		                 </p:dataTable>
+				    </p:tab>
+				    
+				    <p:tab id="dealerAccessoryTab" title="Dealer Accessories" >	
+		                <p:dataTable id="dealerAccessoryDataTable" 
+		                        var="effectiveDealerAccessoryPrice" 
+		                        value="#{maintainModelPricingBean.dealerAccessoriesEffectivePricing}"
+		                        scrollable="true"
+		                        scrollHeight="300">		                        			                		                       
+			                	            
+			                <f:facet name="header">
+			                    <h:outputLabel  style="vertical-align:15px" value="Dealer Accessories" />
+							    <p:commandLink id="addTaskLnk" 
+							            style="float:right; border:thin solid gray; text-decoration:none; cursor:pointer;"
+							            title="Add Dealer Accessory" 
+							            oncomplete="PF('addDealerAccessoryDialogWidget').show();" 
+							            actionListener="#{maintainModelPricingBean.addDealerAccessoryListener()}" 
+							            update=":addDealerAccessoryDialog"
+							            rendered="#{maintainModelPricingBean.hasPermission()}">						   
+							        <p:graphicImage style="border-style: none;" value="/images/action_add.png" />
+							        <h:outputLabel  style="vertical-align:5px" value="Add &#160;"  /> 						            							            
+							    </p:commandLink>
+							    <p:spacer height="15px;"/>			                    
+			                </f:facet>  
+			                          
+			                <p:column headerText="Code" sortBy="#{effectiveDealerAccessoryPrice.dealerAccessory.dealerAccessoryCode.newAccessoryCode}" width="8%">
+                                    <p:outputLabel value="#{effectiveDealerAccessoryPrice.dealerAccessory.dealerAccessoryCode.newAccessoryCode}"/>                           
+			                </p:column>	
+			                
+			                <p:column headerText="Description" width="35%">
+                                <p:outputLabel value="#{effectiveDealerAccessoryPrice.dealerAccessory.dealerAccessoryCode.description}"/>
+			                </p:column>	
+			                
+			                <p:column headerText="Category" width="15%">
+                                <p:outputLabel value="#{empty effectiveDealerAccessoryPrice.dealerAccessory.dealerAccessoryCode.optionAccessoryCategory.mafsDescription ? effectiveDealerAccessoryPrice.dealerAccessory.dealerAccessoryCode.optionAccessoryCategory.description : effectiveDealerAccessoryPrice.dealerAccessory.dealerAccessoryCode.optionAccessoryCategory.mafsDescription}"/>
+			                </p:column>	
+			                
+			                <p:column headerText="Vendor" sortBy="#{effectiveDealerAccessoryPrice.payeeAccount.accountName}" width="19%">
+                                    <p:outputLabel value="#{effectiveDealerAccessoryPrice.payeeAccount.accountName}"/>                           
+			                </p:column>				                		                
+			                
+			                <p:column headerText="Price" width="8%">
+                                <h:outputLabel style="float:right" value="#{effectiveDealerAccessoryPrice.totalPrice}">
+									<f:convertNumber type="number" pattern="$#,##0.00" />                               
+                                </h:outputLabel>
+			                </p:column>	
+			                
+			                <p:column headerText="MSRP" width="8%">
+                                <h:outputLabel style="float:right" value="#{effectiveDealerAccessoryPrice.msrp}">
+									<f:convertNumber type="number" pattern="$#,##0.00" />                               
+                                </h:outputLabel>
+			                </p:column>	
+			                
+			                <p:column headerText="Lead Time" width="7%">
+                                <h:outputLabel style="float:right" value="#{maintainModelPricingBean.determineLeadTime(effectiveDealerAccessoryPrice)}" />                                                               
+			                </p:column>	
+			                		
+			                <p:column headerText="Effective Date" width="9%">
+                                <h:outputLabel value="#{effectiveDealerAccessoryPrice.effectiveDate}" >  
+                                    <f:convertDateTime pattern="MM/dd/yyyy" />                                                                 
+                                </h:outputLabel>
+			                </p:column>
+			                			                			                
+			                <p:column width="7%">
+                                <p:commandLink id="dealerAccessoryPriceListHistoryLink" 
+                                        actionListener="#{maintainModelPricingBean.viewDealerAccessoryPricingListener(effectiveDealerAccessoryPrice.dealerAccessory, effectiveDealerAccessoryPrice.payeeAccount)}"                                
+                                        oncomplete="PF('dealerAccessoryPriceListDialogWidget').show();" 
+                                        update=":dealerAccessoryPriceListDialog" 
+                                        title="View Dealer Accessory Pricing">
+	                                <p:graphicImage value="/images/action_detail.png" style="border-style: none"/>
+                                </p:commandLink> 
+                                			                
+	                            <p:spacer width="10" />
+	                            
+                                <p:commandLink id="dealerAccessoryPriceListEditLink" 
+                                        actionListener="#{maintainModelPricingBean.editDealerAccessoryListener(effectiveDealerAccessoryPrice.dealerAccessory, effectiveDealerAccessoryPrice.payeeAccount)}"                                
+                                        oncomplete="PF('addDealerAccessoryDialogWidget').show();" 
+                                        update=":addDealerAccessoryDialog" 
+                                        title="Edit Dealer Accessory Pricing"
+                                        rendered="#{maintainModelPricingBean.hasPermission()}">
+	                                <p:graphicImage value="/images/action_edit.png" style="border-style: none"/>                                
+                                </p:commandLink>                                 	                            
+			                </p:column>				                			                				                			                		                        
+		                        
+		                </p:dataTable>
+				    </p:tab>					    						    					    		
+				</p:accordionPanel> 
+	            <p:panel>
+				    <p:commandButton id="upfiterQuote" value="Maintain Vndr Quote" action="#{maintainModelPricingBean.maintainUpfitterQuote}" ajax="false" immediate="true" onclick="lockScreen();" />
+				    <p:spacer width="5" />	            
+				    <p:commandButton id="cancel" value="Cancel" action="#{maintainModelPricingBean.cancel}" ajax="false" immediate="true" onclick="lockScreen();" />
+	            </p:panel>					           
+            </h:form>
+                        
+            <p:dialog id="optionPackItemsDialog" 
+                    widgetVar="optionPackAccessoriesDialogWidget" 
+                    header="Option Pack Accessories" 
+                    modal="true" 
+                    height="450" 
+                    width="600" 
+                    appendTo="@(body)"
+                    dynamic="true"
+                    closeOnEscape="true"
+                    onShow="setFocus('optionPackItemsDialogDoneBtn');">	
+                <h:form prependId="false">
+                    <p:panel id="optionPackHeaderInfoPanel">
+                        <p:panelGrid columns="2">
+                                <h:outputLabel value="Option Pack Code:" styleClass="ui-label" />
+                                <h:outputLabel value="#{maintainModelPricingBean.selectedOptionalAccessory.accessoryCode.newAccessoryCode}" />
+                                
+                                <h:outputLabel value="Option Pack Description:" styleClass="ui-label" />
+                                <h:outputLabel value="#{maintainModelPricingBean.selectedOptionalAccessory.accessoryCode.description}" />                                                         
+                        </p:panelGrid>
+                    </p:panel>
+                    <p:panel id="optionPackAccessoriesPanel" header="Accessories">
+		                <p:dataTable id="optionPackAccessoryDatatable" 
+		                        var="optionPackAccessory" 
+		                        value="#{maintainModelPricingBean.selectedOptionPackHeader.optionPackDetail}"
+		                        scrollable="true"
+		                        scrollHeight="250"> 
+		                        
+			                <p:column headerText="Code" width="20%">
+                                <h:outputLabel value="#{empty optionPackAccessory.optionalAccessory ? '*'.concat(optionPackAccessory.childOptionPackHeader.optionPackTypeCode.code) : optionPackAccessory.optionalAccessory.accessoryCode.newAccessoryCode }" />                               
+			                </p:column>		
+			                
+			                <p:column headerText="Description" width="80%">
+                                <h:outputLabel value="#{empty optionPackAccessory.optionalAccessory ? optionPackAccessory.childOptionPackHeader.optionPackTypeCode.description : optionPackAccessory.optionalAccessory.accessoryCode.description}" />                               
+			                </p:column>					                                         
+		                        
+		                </p:dataTable> 
+		                <h:outputLabel value="* Indicates Option Pack" />             
+                    </p:panel>
+                    <p:panel>
+                        <p:commandButton id="optionPackItemsDialogDoneBtn" value="Done" type="button" onclick="PF('optionPackAccessoriesDialogWidget').hide();" />
+                    </p:panel>
+                </h:form>
+            </p:dialog>
+            
+            <p:dialog id="standardAccessoriesDialog" 
+                    widgetVar="standardAccessoriesDialogWidget" 
+                    header="Standard Accessories" 
+                    modal="true" 
+                    height="500" 
+                    width="600" 
+                    appendTo="@(body)"
+                    dynamic="true"
+                    closeOnEscape="true"
+                    onShow="setFocus('standardAccessoryDialogDoneBtn');">
+                <h:form prependId="false">
+                    <p:panel id="standardAccessoriesPanel">
+		                <p:dataTable id="standardAccessoryDatatable" 
+		                        var="standardAccessory" 
+		                        value="#{maintainModelPricingBean.model.standardAccessories}"
+		                        scrollable="true"
+		                        scrollHeight="400"> 
+		                        
+			                <p:column headerText="Code" width="20%">
+                                <h:outputLabel value="#{standardAccessory.standardAccessoryCode.newAccessoryCode}" />                               
+			                </p:column>		
+			                
+			                <p:column headerText="Description" width="80%">
+                                <h:outputLabel value="#{standardAccessory.standardAccessoryCode.description}" />                               
+			                </p:column>					                                         
+		                        
+		                </p:dataTable>              
+                    </p:panel>
+                    
+                    <p:panel>
+                        <p:commandButton id="standardAccessoryDialogDoneBtn" value="Done" type="button" onclick="PF('standardAccessoriesDialogWidget').hide();" />
+                    </p:panel>
+                </h:form>
+            </p:dialog>
+            
+            <p:dialog id="modelPriceListDialog" 
+                    widgetVar="modelPriceListDialogWidget" 
+                    header="Model Price List" 
+                    modal="true" 
+                    height="auto" 
+                    width="650" 
+                    appendTo="@(body)"
+                    dynamic="true"
+                    closeOnEscape="true" onShow="setFocus('modelPriceListDialogDoneBtn');">
+                <h:form id="modelPriceListForm" prependId="false">
+                    <p:panel id="modelPriceListPanel">
+		                <p:dataTable id="modelPriceListDatatable" 
+		                        var="modelPrice" 
+		                        value="#{maintainModelPricingBean.selectedModelPrices}"
+		                        scrollable="true"
+		                        scrollHeight="250"> 
+		                        
+			                <p:column headerText="Effective Date" width="40%">                                
+                                <h:outputLabel value="#{modelPrice.effectiveDate}">
+                                    <f:convertDateTime pattern="MM/dd/yyyy" />
+                                </h:outputLabel>                                                          
+			                </p:column>
+			                
+			                <p:column headerText="Price" width="20%">
+								<h:outputLabel style="float:right" value="#{modelPrice.totalPrice}" >
+									<f:convertNumber type="currency" currencySymbol="$" /> 
+								</h:outputLabel> 										                                                                
+			                </p:column>				
+			                
+			                <p:column headerText="MSRP" width="20%">     
+                                <h:outputLabel style="float:right" value="#{modelPrice.msrp}" >
+									<f:convertNumber type="currency" currencySymbol="$" />                             
+                                </h:outputLabel>			                                                                            
+			                </p:column>	
+			                
+			                <p:column headerText="Holdback" width="20%">                                
+								<h:outputLabel style="float:right" value="#{modelPrice.holdback}" >
+									<f:convertNumber type="currency" currencySymbol="$" /> 
+								</h:outputLabel> 										                                  
+			                </p:column>					                                         		                        
+		                </p:dataTable>              
+                    </p:panel>
+                    
+                    <p:panel>                        
+                        <p:commandButton id="modelPriceListDialogDoneBtn" 
+                                type="button"
+                                value="Done" 
+                                onclick="PF('modelPriceListDialogWidget').hide();"/>                                                  
+                    </p:panel>
+                </h:form>
+            </p:dialog> 
+            
+            <p:dialog id="optionPackPriceListDialog" 
+                    widgetVar="optionPackPriceListDialogWidget" 
+                    header="Option Pack Price List" 
+                    modal="true" 
+                    height="auto" 
+                    width="700" 
+                    appendTo="@(body)"
+                    dynamic="true"
+                    closeOnEscape="true" onShow="setFocus('optionPackPriceListDialogDoneBtn');">
+                <h:form id="optionPackPriceListForm" prependId="false">
+                    <p:panel id="optionPackPriceListHeaderPanel">
+                        <p:panelGrid columns="2">
+                                <h:outputLabel value="Option Pack Code:" styleClass="ui-label" />
+                                <h:outputLabel value="#{maintainModelPricingBean.selectedOptionalAccessory.accessoryCode.newAccessoryCode}" />
+                                
+                                <h:outputLabel value="Option Pack Description:" styleClass="ui-label" />
+                                <h:outputLabel value="#{maintainModelPricingBean.selectedOptionalAccessory.accessoryCode.description}" />                                                         
+                        </p:panelGrid>
+                    </p:panel>
+                    
+                    <p:panel id="optionPackPriceListPanel">
+		                <p:dataTable id="optionPackPriceListDatatable" 
+		                        var="optionPackPrice" 
+		                        value="#{maintainModelPricingBean.selectedOptionPackHeader.optionPackCosts}"
+		                        scrollable="true"
+		                        scrollHeight="250"> 
+		                        
+			                <p:column headerText="Effective Date" width="40%">                                                                        
+                                <h:outputLabel value="#{optionPackPrice.effectiveDate}">
+                                    <f:convertDateTime pattern="MM/dd/yyyy" />
+                                </h:outputLabel>                                                                                                  
+			                </p:column>
+			                
+			                <p:column headerText="Price" width="20%">                                										
+                                <h:outputLabel style="float:right" value="#{optionPackPrice.cost}">
+									<f:convertNumber type="currency" currencySymbol="$" />                              
+                                </h:outputLabel>											                                
+			                </p:column>				                		
+			                
+			                <p:column headerText="MSRP" width="20%">  
+                                <h:outputLabel style="float:right" value="#{optionPackPrice.msrp}">
+									<f:convertNumber type="currency" currencySymbol="$" />                              
+                                </h:outputLabel>				                                                                               
+			                </p:column>	
+			                
+			                <p:column headerText="Holdback" width="20%">                                										
+                                <h:outputLabel style="float:right" value="#{optionPackPrice.holdback}">
+									<f:convertNumber type="currency" currencySymbol="$" />                           
+                                </h:outputLabel>											                                  
+			                </p:column>					                                         		                        
+		                </p:dataTable>              
+                    </p:panel>
+                    
+                    <p:panel>                        
+                        <p:commandButton id="optionPackPriceListDialogDoneBtn" 
+                                type="button"
+                                value="Done" 
+                                onclick="PF('optionPackPriceListDialogWidget').hide();"/>                          
+                    </p:panel>
+                </h:form>
+            </p:dialog>                          
+                   
+            <p:dialog id="factoryAccessoryPriceListDialog" 
+                    widgetVar="factoryAccessoryPriceListDialogWidget" 
+                    header="Factory Accessory Price List" 
+                    modal="true" 
+                    height="auto" 
+                    width="700" 
+                    appendTo="@(body)"
+                    dynamic="true"
+                    closeOnEscape="true" onShow="setFocus('factoryAccessoryPriceListDialogDoneBtn');">
+                <h:form id="factoryAccessoryPriceListForm" prependId="false">
+                    <p:panel id="factoryAccessoryHeaderInfoPanel">
+                        <p:panelGrid columns="2">
+                            <h:outputLabel value="Factory Accessory Code:" styleClass="ui-label" />
+                            <h:outputLabel value="#{maintainModelPricingBean.selectedOptionalAccessory.accessoryCode.newAccessoryCode}" />
+                             
+                            <h:outputLabel value="Factory Accessory Description:" styleClass="ui-label" />
+                            <h:outputLabel value="#{maintainModelPricingBean.selectedOptionalAccessory.accessoryCode.description}" />                                                         
+                        </p:panelGrid>
+                    </p:panel>
+                                    
+                    <p:panel id="factoryAccessoryPriceListPanel">
+		                <p:dataTable id="factoryAccessoryPriceListDatatable" 
+		                        var="factoryAccessoryPrice" 
+		                        value="#{maintainModelPricingBean.selectedOptionalAccessory.optionPrices}"
+		                        scrollable="true"
+		                        scrollHeight="250"> 
+		                        
+			                <p:column headerText="Effective Date" width="40%">                                                                        
+                                <h:outputLabel value="#{factoryAccessoryPrice.effectiveDate}">
+                                    <f:convertDateTime pattern="MM/dd/yyyy" />
+                                </h:outputLabel>                                                                                                 
+			                </p:column>
+			                
+			                <p:column headerText="Price" width="20%">										
+                                <h:outputLabel style="float:right" value="#{factoryAccessoryPrice.totalPrice}">
+									<f:convertNumber type="currency" currencySymbol="$" />                                
+                                </h:outputLabel>											 
+							</p:column>			                			                		
+			                
+			                <p:column headerText="MSRP" width="20%"> 
+                                <h:outputLabel style="float:right" value="#{factoryAccessoryPrice.msrp}" >
+									<f:convertNumber type="currency" currencySymbol="$" />                                
+                                </h:outputLabel>			                                                                               
+			                </p:column>	
+			                
+			                <p:column headerText="Holdback" width="20%">                                										
+                                <h:outputLabel style="float:right" value="#{factoryAccessoryPrice.holdback}">
+									<f:convertNumber type="currency" currencySymbol="$" />                               
+                                </h:outputLabel>											                                 
+			                </p:column>					                                         		                        
+		                </p:dataTable>              
+                    </p:panel>
+                    
+                    <p:panel>
+                        <p:commandButton id="factoryAccessoryPriceListDialogDoneBtn" 
+                                value="Done" 
+                                onclick="PF('factoryAccessoryPriceListDialogWidget').hide();"/>                        
+                    </p:panel>
+                </h:form>
+            </p:dialog>  
+            
+            <p:dialog id="dealerAccessoryPriceListDialog" 
+                    widgetVar="dealerAccessoryPriceListDialogWidget" 
+                    header="Dealer Accessory Price List" 
+                    modal="true" 
+                    height="auto" 
+                    width="775" 
+                    appendTo="@(body)"
+                    dynamic="true"
+                    closeOnEscape="true" onShow="setFocus('dealerAccessoryPriceListDialogDoneBtn');">
+                <h:form id="dealerAccessoryPriceListForm" prependId="false">
+                    <p:panel id="dealerAccessoryHeaderPanel">
+                        <p:panelGrid columns="4">
+                            <h:outputLabel value="Code:" styleClass="ui-label" />
+                            <h:outputLabel value="#{maintainModelPricingBean.selectedDealerAccessory.dealerAccessoryCode.newAccessoryCode}" />                                                        
+                            
+                            <h:outputLabel value="Description:" styleClass="ui-label" />
+                            <h:outputLabel value="#{maintainModelPricingBean.selectedDealerAccessory.dealerAccessoryCode.description}" /> 
+                            
+                            <h:outputLabel value="Vendor:" styleClass="ui-label" />
+                            <h:outputLabel value="#{maintainModelPricingBean.selectedDealerAccessoryUpfitter()}" />                                                                                           
+                            
+                            <h:outputLabel value="Category:" styleClass="ui-label" />
+                            <h:outputLabel value="#{empty maintainModelPricingBean.selectedDealerAccessory.dealerAccessoryCode.optionAccessoryCategory.mafsDescription ? maintainModelPricingBean.selectedDealerAccessory.dealerAccessoryCode.optionAccessoryCategory.description : maintainModelPricingBean.selectedDealerAccessory.dealerAccessoryCode.optionAccessoryCategory.mafsDescription}" />
+                            
+                            <h:outputLabel value="Default Lead Time:" styleClass="ui-label" />
+                            <h:outputLabel value="#{maintainModelPricingBean.selectedDealerAccessory.dealerAccessoryCode.leadTime}" /> 
+                                                                                                                                 
+                        </p:panelGrid>
+                    </p:panel>
+                                        
+                    <p:panel id="dealerAccessoryPriceListPanel">
+		                <p:dataTable id="dealerAccessoryPriceListDatatable" 
+		                        var="dealerAccessoryPrice" 
+		                        rowKey="dealerAccessoryPrice.dplId"
+		                        rowIndexVar="dealerAccessoryPriceRowIndexVar"
+		                        value="#{maintainModelPricingBean.selectedDealerAccessoryPrices}"
+		                        scrollable="true"
+		                        scrollHeight="250" editable="true"> 
+		                        
+			                <p:column headerText="Effective Date" width="20%">                                
+                                <h:outputLabel value="#{dealerAccessoryPrice.effectiveDate}">
+                                    <f:convertDateTime pattern="MM/dd/yyyy" />
+                                </h:outputLabel>                                                         
+			                </p:column>		
+			                
+			                <p:column headerText="Vendor Quote" width="20%">                                
+                                <h:outputLabel value="#{dealerAccessoryPrice.upfitterQuote.quoteNumber}">
+                                </h:outputLabel>                                                         
+			                </p:column>					                                
+			                
+			                <p:column headerText="Price" width="20%">										
+                                <h:outputLabel style="float:right" value="#{dealerAccessoryPrice.totalPrice}">
+									<f:convertNumber type="currency" currencySymbol="$" />                                
+                                </h:outputLabel>											
+							</p:column>			                			                		
+			                
+			                <p:column headerText="MSRP" width="20%">
+                                <h:outputLabel style="float:right" value="#{dealerAccessoryPrice.msrp}" >
+									<f:convertNumber type="currency" currencySymbol="$" />                              
+                                </h:outputLabel>				                                                                             
+			                </p:column>	
+			                
+			                <p:column headerText="Lead Time" width="20%">                                										
+                                <h:outputLabel style="float:right" value="#{dealerAccessoryPrice.leadTime}" />									                                  
+			                </p:column>					                                         		                        
+		                </p:dataTable>              
+                    </p:panel>
+                    
+                    <p:panel id="dealerAccessoryPricingDialogControlPanel">
+                        <p:commandButton id="dealerAccessoryPriceListDialogDoneBtn" 
+                                value="Done"                                    
+                                onclick="PF('dealerAccessoryPriceListDialogWidget').hide();" />
+                    </p:panel>
+                </h:form>
+            </p:dialog>  
+            
+            <p:dialog id="addDealerAccessoryDialog" 
+                    widgetVar="addDealerAccessoryDialogWidget" 
+                    header="#{maintainModelPricingBean.addMode ? 'Add Dealer Accessories' :'Edit Dealer Accessory'}" 
+                    modal="true" 
+                    height="auto" 
+                    width="1200" 
+                    appendTo="@(body)"
+                    dynamic="true"
+                    closeOnEscape="true"
+                    onHide="addDealerAccessoryDialogHideHandler();">
+                
+                <p:ajax event="close" update=":maintainModelPriceForm:modelPriceLevelsPanel:dealerAccessoryDataTable" />
+                
+			    <p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;width:auto;">
+				    <p:messages id="addDealerAccessoryDialogMessages" severity="info,error,fatal" showSummary="true" showDetail="false" autoUpdate="true" />
+			    </p:scrollPanel>                  
+                
+                <h:form id="addDealerAccessoryDialogForm" prependId="false">
+			                       
+                    <p:tabView id="addDealerAccessoryCodeTab" rendered="#{maintainModelPricingBean.addMode}" cache="false" dynamic="true" activeIndex="#{maintainModelPricingBean.tabIndex}">
+                                                
+                        <p:ajax event="tabChange" listener="#{maintainModelPricingBean.newExistingTabChangeListener}" update="@this"/>
+                        
+                        <p:tab id="newDealerAccessoryCodeTab" title="New">
+                            
+                            <p:focus context="newCodeTxt"/>                        
+		                    
+		                    <p:panelGrid id="newDealerAccessoryCodePG" columns="4">
+							    <p:outputLabel for="newCodeTxt" value="Code:*" styleClass="ui-label" /> 
+								<p:inputText id="newCodeTxt" value="#{maintainModelPricingBean.newDealerAccessoryCode}" size="10" maxlength="10" onkeyup="$(this).val($(this).val().toUpperCase())" onchange="setDirtyData(true);" />
+		
+								<p:outputLabel for="newDescriptionTxt" value="Description:*" styleClass="ui-label" />
+								<p:inputText id="newDescriptionTxt" value="#{maintainModelPricingBean.newDealerAccessoryDescription}" maxlength="80" size="85" onchange="setDirtyData(true);"/>  
+								
+								<p:outputLabel for="newCategoryMnu" value="Category:*" styleClass="ui-label" />
+								<p:selectOneMenu id="newCategoryMnu" value="#{maintainModelPricingBean.newOptionAccessoryCategory}" converter="#{optionAccessoryCategoryConverter}">
+									<f:selectItem itemValue="" itemLabel="" />								
+								    <f:selectItems value="#{maintainModelPricingBean.accessoryCategories}" var="category" itemLabel="#{empty category.mafsDescription ? category.description : category.mafsDescription}" itemValue="#{category}" itemDescription="#{empty category.mafsDescription ? category.description : category.mafsDescription}"/>
+								</p:selectOneMenu>
+								
+								<h:outputLabel for="newDacLeadTimeNbr" value="Lead Time:" styleClass="ui-label" />
+								<p:inputNumber id="newDacLeadTimeNbr" value="#{maintainModelPricingBean.newDealerAccessoryLeadTime}" decimalPlaces="0" maxlength="3" maxValue="999" onchange="setDirtyData(true);"/>								
+								
+		                    </p:panelGrid>                        
+                        </p:tab>
+                        
+                        <p:tab id="existingDealerAccessoryCodeTab" title="Existing">	
+                            
+                            <p:focus context="dealerAccessoryCodeAC"/>                                                
+		                    
+		                    <p:panelGrid id="existingDealerAccessoryCodePG" columns="4">			                    					
+								<h:outputLabel value="Dealer Accessory:" styleClass="ui-label" />	
+								<h:panelGroup>
+		                            <p:watermark for="dealerAccessoryCodeAC" value="Search with a keyword" />									                    
+								    <p:autoComplete id="dealerAccessoryCodeAC"
+									        value="#{maintainModelPricingBean.selectedDealerAccessoryCode}"
+									        var="dealerAccessoryCode"
+									        completeMethod="#{maintainModelPricingBean.autoCompleteDealerAccessories}"
+									        itemLabel="#{empty dealerAccessoryCode.newAccessoryCode ? null : dealerAccessoryCode.newAccessoryCode.concat(' - ').concat(dealerAccessoryCode.description).concat(' - ').concat(empty dealerAccessoryCode.optionAccessoryCategory.mafsDescription ? dealerAccessoryCode.optionAccessoryCategory.description : dealerAccessoryCode.optionAccessoryCategory.mafsDescription)}"
+									        itemValue="#{dealerAccessoryCode}"
+									        converter="#{dealerAccessoryCodeConverter}" 
+									        forceSelection="false" 
+									        size="95" 
+									        maxlength="100" 
+									        scrollHeight="100" >
+									    <p:ajax event="query" onstart="clearExistingDealerAccessoryCodePGFields();" />
+								        <p:ajax event="itemSelect" 
+								                listener="#{maintainModelPricingBean.autoCompleteDealerAccessorySelectListener}"
+								                update="existingCategoryLbl existingDealerAccessoryLeadTimeLbl" onsuccess="setDirtyData(true);" />							                                                              
+								    </p:autoComplete> 
+                                </h:panelGroup>
+                                
+								<h:outputLabel value="" />
+								<h:outputLabel value="" />
+															    
+								<h:outputLabel for="existingCategoryLbl" value="Category:" styleClass="ui-label" />
+								<h:outputLabel id="existingCategoryLbl" value="#{empty maintainModelPricingBean.selectedDealerAccessoryCode.optionAccessoryCategory.mafsDescription ? maintainModelPricingBean.selectedDealerAccessoryCode.optionAccessoryCategory.description : maintainModelPricingBean.selectedDealerAccessoryCode.optionAccessoryCategory.mafsDescription}" />
+								
+								<h:outputLabel for="existingDealerAccessoryLeadTimeLbl" value="Lead Time:" styleClass="ui-label" />
+								<h:outputLabel id="existingDealerAccessoryLeadTimeLbl" value="#{maintainModelPricingBean.selectedDealerAccessoryCode.leadTime}" />								 						                       
+		                    </p:panelGrid>                        
+                        </p:tab>                      
+                    </p:tabView> 
+                    
+                    <p:panelGrid id="selectedDealerAccessoryCodePG" columns="4" rendered="#{not maintainModelPricingBean.addMode}">
+					    <h:outputLabel value="Code:" styleClass="ui-label" />
+						<h:outputLabel id="selectedCodeLbl" value="#{maintainModelPricingBean.selectedDealerAccessory.dealerAccessoryCode.newAccessoryCode}" />
+
+						<p:outputLabel for="selectedDealerAccessoryDescriptionTxt" value="Description:*" styleClass="ui-label" />
+						<p:inputText id="selectedDealerAccessoryDescriptionTxt" value="#{maintainModelPricingBean.selectedDealerAccessory.dealerAccessoryCode.description}" maxlength="80" size="85" onchange="setDirtyData(true);" />   
+  								
+						<p:outputLabel for="selectedCategoryMnu" value="Category:*" styleClass="ui-label" />
+						<p:selectOneMenu id="selectedCategoryMnu" value="#{maintainModelPricingBean.selectedDealerAccessory.dealerAccessoryCode.optionAccessoryCategory}" converter="#{optionAccessoryCategoryConverter}">
+							<f:selectItem itemValue="" itemLabel="" />																												
+							<f:selectItems value="#{maintainModelPricingBean.accessoryCategories}" var="category" itemLabel="#{empty category.mafsDescription ? category.description : category.mafsDescription}" itemValue="#{category}" itemDescription="#{empty category.mafsDescription ? category.description : category.mafsDescription}" />
+						</p:selectOneMenu>
+								
+						<h:outputLabel for="selectedDacLeadTimeNbr" value="Lead Time:" styleClass="ui-label" />
+						<p:inputNumber id="selectedDacLeadTimeNbr" value="#{maintainModelPricingBean.selectedDealerAccessory.dealerAccessoryCode.leadTime}" decimalPlaces="0" maxlength="3" maxValue="999" onchange="setDirtyData(true);"/>						                 
+                    </p:panelGrid>  
+                                                        
+                    <p:separator />                    					
+
+					<p:panelGrid id="UpfittersAssignmentPnl" styleClass="ui-layout">
+					
+                        <p:row>
+                            <p:column>
+                                <h:outputLabel for="upfitterSearchTerm" value="Vendor:" styleClass="ui-label" />
+		                        <p:watermark for="upfitterSearchTerm" value="Search with a keyword" />                                
+                                <p:inputText id="upfitterSearchTerm" value="#{maintainModelPricingBean.upfitterSearchTerm}" size="41"> <p:spacer width="10px" />
+                                    <p:ajax event="keyup" listener="#{maintainModelPricingBean.searchAvailableUpffitersListener()}" update="availableUpfitters"/>
+                                </p:inputText>                            
+                            </p:column>
+                            <p:column>
+                            </p:column>
+                            <p:column></p:column>
+                            <p:column></p:column>
+                        </p:row>
+                        
+                        <p:row>                        
+                            <p:column colspan="2">
+					            <p:panel style="height:250px; width:350px;">
+					                <p:dataTable id="availableUpfitters" 
+					                        widgetVar="availableUpfittersWidget"					                        
+					                        var="availableUpfitter" 
+					                        value="#{maintainModelPricingBean.availableUpfitters}"
+					                        selectionMode="single"
+					                        selection="#{maintainModelPricingBean.selectedAvailableUpfitter}" 
+					                        rowKey="#{availableUpfitter.payeeAccountCode}"
+					                        scrollable="true" 
+					                        scrollHeight="175">
+					                        
+								        <f:facet name="header">Available Vendors</f:facet>
+
+										<p:ajax event="rowDblselect" process="@form"
+											onstart="return PF('availableUpfittersWidget').getSelectedRowsCount() &lt; 1 ? false : true;"
+											listener="#{maintainModelPricingBean.assignUpfitter}"
+											update="availableUpfitters :addDealerAccessoryDialogForm:assignedUpfitters :maintainModelPriceForm:dirtyData"
+											oncomplete="setFocusOnPrice();" />
+
+										<p:column headerText="Vendor">
+					                        <h:outputText value="#{availableUpfitter.payeeAccountName}" /><br />										
+					                        <h:outputText value="#{availableUpfitter.payeeAccountCode == '-1' ? 'NO VENDOR' : availableUpfitter.payeeAccountCode}" />
+					                    </p:column>
+					                    
+					                </p:dataTable>
+					            </p:panel>                            
+                            </p:column>
+                            
+                            <p:column>
+								<p:commandButton id="addUpfitter" 
+								    icon="ui-icon-arrowthick-1-e" 
+								    title="Add" 
+								    onstart="return PF('availableUpfittersWidget').getSelectedRowsCount() &lt; 1 ? false : true;"
+								    actionListener="#{maintainModelPricingBean.assignUpfitter}"
+								    update="availableUpfitters assignedUpfitters :maintainModelPriceForm:dirtyData" oncomplete="setFocusOnPrice(); setFocusOnPrice();" />
+								<br />
+								<br />
+								<p:commandButton id="addUpfitters"
+									icon="ui-icon-arrowthickstop-1-e"
+									title="Add All" 									
+								    actionListener="#{maintainModelPricingBean.assignUpfitters}"
+								    update="availableUpfitters assignedUpfitters :maintainModelPriceForm:dirtyData" oncomplete="setFocusOnPrice(); setFocusOnPrice();"/>
+								<br />
+								<br />
+								<p:commandButton id="removeUpfitter"
+									icon="ui-icon-arrowthick-1-w"
+									title="Remove" 
+								    onstart="return PF('assignedUpfittersWidget').getSelectedRowsCount() &lt; 1 ? false : true;"									
+								    actionListener="#{maintainModelPricingBean.unassignUpFitter}"
+								    update="assignedUpfitters availableUpfitters :maintainModelPriceForm:dirtyData" oncomplete="setFocusPF('upfitterSearchTerm'); setFocus('upfitterSearchTerm')"/>
+								<br />
+								<br />
+								<p:commandButton id="removeUpfitters"
+									icon="ui-icon-arrowthickstop-1-w"
+									title="Remove All" 									
+								    actionListener="#{maintainModelPricingBean.unassignUpFitters}"
+								    update="assignedUpfitters availableUpfitters :maintainModelPriceForm:dirtyData" oncomplete="setFocusPF('upfitterSearchTerm'); setFocus('upfitterSearchTerm')"/>
+								<br />
+								<br />
+							</p:column>
+                            
+                            <p:column>
+					            <p:panel style="height:250px; width:100%;">
+					                <p:dataTable id="assignedUpfitters"
+					                        widgetVar="assignedUpfittersWidget" 
+					                        var="assignedUpfitter" 
+					                        value="#{maintainModelPricingBean.assignedUpfitters}" 
+					                        selectionMode="single"
+					                        selection="#{maintainModelPricingBean.selectedAssignedUpfitter}"
+					                        rowKey="#{assignedUpfitter.payeeAccountCode}"
+					                        scrollable="true" 
+					                        scrollHeight="175">
+					                    
+								        <f:facet name="header">Assigned Vendor Pricing</f:facet>
+
+										<p:ajax event="rowDblselect" process="@form"
+											onstart="return PF('assignedUpfittersWidget').getSelectedRowsCount() &lt; 1 ? false : true;"
+											listener="#{maintainModelPricingBean.unassignUpFitter}"
+											update=":addDealerAccessoryDialogForm:availableUpfitters assignedUpfitters :maintainModelPriceForm:dirtyData"
+											oncomplete="setFocusPF('upfitterSearchTerm');" />
+
+										<p:column width="5%">
+	                                        <p:graphicImage value="/images/locked.png" 
+	                                                style="border-style: none" 
+	                                                title="Vendor Cannot Be Unassigned"  
+	                                                rendered="#{maintainModelPricingBean.isUpfitterPriceRowLocked(assignedUpfitter)}"/>                                        
+                                        </p:column>	
+                                        							        					                        
+					                    <p:column headerText="Vendor" width="30%">					                    
+					                        <h:outputText value="#{assignedUpfitter.payeeAccountCode == '-1' ? 'NO VENDOR' : assignedUpfitter.payeeAccountCode}" /><br />
+					                        <h:outputText value="#{empty assignedUpfitter.payeeAccountName ? '' : assignedUpfitter.payeeAccountName}" />					                        
+					                    </p:column>
+					                    
+					                    <p:column headerText="Quote" width="14%">					                    
+					                        <h:outputText value="#{assignedUpfitter.quoteNumber}" />					                        
+					                    </p:column>					                    
+					                    					                    
+					                    <p:column headerText="Price" width="14%">
+					                        <p:inputNumber id="upfitterBasePrice"
+					                        		symbol="$" symbolPosition="p" 
+								                    style="text-align:right; width:50px"									    							    
+								                    value="#{assignedUpfitter.basePrice}" 										
+								                    decimalPlaces="2"
+								                    decimalSeparator="." 	
+								                    minValue="-999999.99"									
+								                    maxValue="999999.99" 
+								                    onchange="setDirtyData(true);"/> 						                        					                    
+					                    </p:column>					                    
+					                    
+					                    <p:column headerText="Effective Date" width="22%">
+						                    <p:calendar id="upfitterPriceEffectiveDate" 
+						                            size="10"
+							                        value="#{assignedUpfitter.effectiveDate}"
+							                        pattern="MM/dd/yyyy" 
+							                        style="width:20px" 
+							                        showOn="button" 
+							                        onchange="formatDate(this);setDirtyData(true);">
+												<f:convertDateTime pattern="MM/dd/yyyy" />		    									
+											</p:calendar>        					                    
+					                    </p:column>
+					                    
+					                    		
+					                    <p:column headerText="Lead Time" width="13%">
+					                        <p:inputNumber id="upfitterLeadTime" 
+								                    style="text-align:right; width:50px"									    							    
+								                    value="#{assignedUpfitter.leadTime}" 	
+								                    thousandSeparator=""									
+								                    decimalPlaces="0"
+								                    minValue="0"
+								                    maxValue="9999" 
+								                    onchange="setDirtyData(true);" />         					                    
+					                    </p:column>
+					                    					                    					                    											                    									                    					                    
+					                </p:dataTable>
+					            </p:panel>                            
+                            </p:column>
+                        </p:row>       
+                                                                        					
+					</p:panelGrid>
+					
+					<p:panel>
+						<p:commandButton id="saveDealerAccessoryBtn" 
+						        value="Save"
+						        widgetVar="saveDealerAccessoryBtnWidgetVar"
+					            actionListener="#{maintainModelPricingBean.saveDealerAccessory(false)}" 
+					            update="@form, :maintainModelPriceForm:modelPriceLevelsPanel:dealerAccessoryDataTable"
+					            process="@form"
+					            onsuccess="setDirtyData(false);" 
+					            onstart="PF('saveDealerAccessoryBtnWidgetVar').disable()"
+					            oncomplete="PF('saveDealerAccessoryBtnWidgetVar').enable()"/>
+						<p:spacer width="10" />					            
+						<p:commandButton id="saveAndStayDealerAccessoryBtn"
+						        value="Save and Stay"
+					            actionListener="#{maintainModelPricingBean.saveDealerAccessory(true)}" 
+					            update="@form"
+					            process="@form" 
+					            onsuccess="setDirtyData(false);" 
+					            rendered="#{maintainModelPricingBean.addMode}" />
+						<p:spacer width="10" rendered="#{maintainModelPricingBean.addMode}" />					            					        
+						<p:commandButton id="cancelDealerAccessoryBtn" 
+						        value="Cancel"
+						        update="@form"
+						        onclick="cancelDealerAccessoryBtnHandler();" />
+					</p:panel>
+				</h:form>
+            </p:dialog> 
+            
+		    <p:dialog id="dirtyCheckDialog" modal="true" header="Save Changes" onShow="setFocus('dirtyCheckDialogOkBtn')" dynamic="true"
+			        widgetVar="dirtyCheckDialogVar" resizable="false" width="520" height="auto" closeOnEscape="true" appendTo="@(body)">
+			    <br />
+			    <h:outputFormat value="Are you sure want to navigate away from this dialog?" />
+			    <br /> <br />
+			    <h:outputFormat value="You have unsaved data and will lose it" />
+			    <br /> <br />			    
+			    <h:outputFormat value="Press OK to continue, or Cancel to stay on the current page." />			    
+			    <h:form id="dirtyCheckDialogForm" prependId="false">
+				    <br />
+				    <br />
+				    <p:commandButton id="dirtyCheckDialogOkBtn" value="Ok" onclick="dirtyCheckDialogOkBtnHandler();"/>
+				    <h:outputText value="&#160;"/>
+				    <p:commandButton id="dirtyCheckDialogCancelBtn" value="Cancel" onclick="PF('dirtyCheckDialogVar').hide();" />
+			    </h:form>
+		    </p:dialog>            
+                                                                                                                                             
+            <script type="text/javascript">
+			    /**
+			    * Dirty Detection 
+			    */
+                function initializeDirtyDetection() {
+			    	registerIgnoreButton("saveDealerAccessoryBtn");
+			    	registerIgnoreButton("saveAndStayDealerAccessoryBtn");
+			    	setDirtyDataById("dirtyData");
+					//saveDataForDirtyDetection();			    	
+				}
+			    
+			    /**
+			    * Handles the cancel onclick event. Return boolean to continue or halt based
+			    * on dirty detection.
+			    */
+			    function cancelDealerAccessoryBtnHandler(){
+					if(dirtyCheck()) {
+						PF('dirtyCheckDialogVar').show();
+						return false;
+					}
+					
+					PF('addDealerAccessoryDialogWidget').hide();
+					
+					return true;
+			    }
+			    
+			    /**
+			    * Clicking 'Ok' button on the dirty data dialog
+			    */
+			    function dirtyCheckDialogOkBtnHandler(){
+			    	setDirtyData(false); 
+			    	PF('dirtyCheckDialogVar').hide(); 
+			    	PF('addDealerAccessoryDialogWidget').hide();			    	
+			    }
+			    
+			    function addDealerAccessoryDialogHideHandler(){
+					if(dirtyCheck()) {
+						PF('addDealerAccessoryDialogWidget').show();
+						PF('dirtyCheckDialogVar').show();
+						//return false;
+					}			    	
+			    }
+			    
+                /**
+                * Clears the existing dealer accessory autocomplete respective fields
+                */
+                function clearExistingDealerAccessoryCodePGFields(){
+                	$('[id$=existingCategoryLbl]').text('');
+                	$('[id$=existingDealerAccessoryLeadTimeLbl]').text('');
+                }   
+                
+                function setFocusOnPrice(){
+                	var index = document.getElementById('assignedUpfitterCount').value - 1;
+                	
+                	setFocusPF('assignedUpfitters:'+index+':upfitterBasePrice_input');
+                	//setFocus('assignedUpfitters:'+index+':upfitterBasePrice_input');
+				}
+
+                $(window).load(function(){
+                	initializeDirtyDetection();
+        		});	                
+                
+		    </script>
+	</ui:define>
+	
+</ui:composition>

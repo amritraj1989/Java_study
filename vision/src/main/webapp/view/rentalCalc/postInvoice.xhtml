@@ -1,0 +1,244 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	template="../../templates/ui.xhtml">
+
+	<ui:define name="content">
+			<h:form id="breadCrumbForm" prependId="false">
+				<p:breadCrumb model="#{postInvoiceBean.breadCrumbTrail}"
+					style="min-width:1000px;max-width:100%;width:auto" ajax="false"
+					immediate="true" styleClass="ui-layout" />
+			</h:form>
+			<!-- Error message display -->
+			<p:scrollPanel style="height:50px;max-width:100%;width:auto;"
+				mode="native" styleClass="ui-layout">
+				<p:messages id="messages" showSummary="false" showDetail="true"
+					autoUpdate="true" />
+			</p:scrollPanel>
+
+			<h:form id="invoiceDetailEntryForm" prependId="false">
+				<p:panel id="pagePanel" style="border:none!important;width:950px;">
+					<p:panel>
+							
+							<h:panelGrid columns="3" >								
+								<h:panelGroup>
+									<p:outputLabel value="Unit:" styleClass="ui-label"/>
+									<p:spacer width="10" height="1"/>
+									<h:outputText value = "#{postInvoiceBean.unitNumber}"/>
+								</h:panelGroup>
+								<p:spacer width="50" height="1"/>
+								<h:panelGroup>
+									<p:outputLabel value="" />
+									<p:outputLabel value="Ordering Dealer:" styleClass="ui-label"/>
+									<p:spacer width="10" height="1"/>
+				    				<h:outputText value="#{postInvoiceBean.orderingDealerCode}" />
+				    				<p:spacer width="10" height="1"/>
+		            				<h:outputText value="#{postInvoiceBean.orderingDealerName}" /> 
+	            				</h:panelGroup>
+	            				
+			    				<h:outputText value = "#{postInvoiceBean.modelDesc}"/>
+								<p:spacer width="50" height="1"/>
+								<h:panelGroup>	        	    			
+				    				<p:outputLabel value="Delivering Dealer:" styleClass="ui-label"/>
+									<p:spacer width="10" height="1"/>
+			    					<h:outputText value="#{postInvoiceBean.deliveringDealerCode }" /> 
+		            				<p:spacer width="10" height="1"/>
+		            				<h:outputText value="#{postInvoiceBean.deliveringDealerName}" />
+	            				</h:panelGroup>
+	            				<h:panelGroup>	
+		            				<p:outputLabel value="Quote:" styleClass="ui-label"/>	
+		            				<p:spacer width="10" height="1"/>							
+									<h:outputText value = "#{postInvoiceBean.quoteInfo}" />
+	            				</h:panelGroup>
+				    			
+	            			</h:panelGrid>
+						
+					
+						<p:dataTable id="invoiceDetailEntryTableId" var="element"
+							value="#{postInvoiceBean.lineItems}" emptyMessage=""
+							scrollable="true" rowIndexVar="elementRowIndex"
+							scrollHeight="#{postInvoiceBean.dataTable.height}"
+							rowKey="#{element.lineId}">
+
+							<p:column style="width:90px">
+								<f:facet name="header">
+									<h:outputText value="Cost Elements" style="font-weight:bold" />
+								</f:facet>
+								<h:outputLabel	value="#{element.lineDescription}" />
+							</p:column>
+
+							<p:column style="text-align:center;width:60px">
+								<f:facet name="header">
+									<h:outputText value="Invoice" style="font-weight:bold" />
+								</f:facet>
+								<p:inputNumber  style="text-align:right" id="lineCost" disabled="#{element.enableEdit ? 'false':'true'}"
+									value="#{element.lineCost}" size="12" thousandSeparator="," onblur="setDefaultValue();"
+									maxlength="10" decimalPlaces="2" maxValue="#{element.reclaimable ? '0' : '999999.99'}"
+									minValue="-999999.99" emptyValue="empty" 
+									styleClass="rowArray trackDirtyChildValues ui-text-align-right-dev" onchange="updateTotalAmount();" />
+									
+								<p:graphicImage style="text-align:right;align:right;" id="reclaimIcon" title="Possible Reclaim" 
+										value="/images/reclaim_icon.png"   rendered="#{element.reclaimable ? true : false}"/>
+								 <p:spacer width="16" height="8" rendered="#{element.reclaimable ? false : true}"/>		 
+							</p:column>
+
+
+						</p:dataTable>
+				</p:panel>
+				<h:panelGrid id="totalCostPanelGrid" columns="4" cellspacing="3">
+						<p:spacer width="535" height="1" />
+						<h:outputLabel value="Total Invoice Cost:" style="font-weight:bold" />
+						<p:spacer width="12" height="1" />
+						<h:outputText id="totalInvoice"	value="#{postInvoiceBean.totalInvoice}">
+							<f:converter converterId="malDollarValueConverter" />
+						</h:outputText>
+					</h:panelGrid>
+
+				<h:panelGrid id="buttons">
+					<f:facet name="footer">
+						<p:commandButton id="post" tabindex="13" value="Post" disabled="#{postInvoiceBean.disablePost}"					
+							action="#{postInvoiceBean.post}" ajax="false" />
+						<p:spacer width="10" />						
+						<p:commandButton id="cancel" tabindex="15" value="Cancel"
+							action="#{postInvoiceBean.cancel}" ajax="false"
+							onclick="lockScreen();" immediate="true" />
+
+					</f:facet>
+				</h:panelGrid>	
+				</p:panel>	
+				<h:inputHidden id="showWarning" name= "showWarning" value="#{postInvoiceBean.showWarning}"/>
+			</h:form>
+			
+		<p:dialog  id="confirmDialogId" onShow="setFocusOnInvoicePopup()"
+		header="Post Invoice" modal="true" focus="#{postInvoiceBean.invoiveAmountMismatch ? 'okBtnId2':'okBtn'}"
+		widgetVar="confirmWidgetVar" resizable="false" width="500" height="120" appendTo="@(body)" >
+				<p:focus context="confirmDialogForm"></p:focus>
+				<h:form id="confirmDialogForm" prependId="false">
+	               		<p:hotkey immediate="true" bind="esc" handler="PF('confirmWidgetVar').hide();setFocusOnScreen()"/>
+	               		<span class="ui-icon ui-icon-alert ui-confirm-dialog-severity"></span>
+	               		<h:outputText value="#{postInvoiceBean.warningMessage}" />
+	               	
+	               		<h:panelGrid columns="2" style="margin: auto;">
+	               			<h:outputLabel value="Invoice Amount:" style="font-weight:bold" />
+	               			<h:outputText value="#{postInvoiceBean.invoiceHeaderTotal}" style="float:right;">
+	               				<f:converter converterId="malDollarValueConverter" />
+	               			</h:outputText>
+	               			<h:outputLabel value="Invoice Details:" style="font-weight:bold" />
+	               			<h:outputText value="#{postInvoiceBean.invoiceDetailTotal}" style="float:right;">
+	               				<f:converter converterId="malDollarValueConverter" />
+	               			</h:outputText>
+	               		</h:panelGrid>
+	               		
+	               		<p:spacer height="30"/>
+		       			<p:commandButton  value="Post" id="okBtn" 
+				       			ajax="false" rendered="#{postInvoiceBean.invoiveAmountMismatch ? 'false':'true'}"
+				       			process="@this"	onclick="hideDialog('confirmWidgetVar');" 
+				       			action="#{postInvoiceBean.postOnConfirm}"/>
+		       							
+		       			<p:commandButton  value="Ok" id="okBtnId2" ajax="true" rendered="#{postInvoiceBean.invoiveAmountMismatch }" oncomplete="setFocusOnScreen()"
+		       							process="@this"	update=":invoiceDetailEntryForm:showWarning" onclick="hideDialog('confirmWidgetVar');" actionListener="#{postInvoiceBean.holdPosting}"/>
+		       			<h:outputText value="&#160;"/>			  
+		        		<p:commandButton  value="Cancel" rendered="#{postInvoiceBean.invoiveAmountMismatch ? 'false':'true'}" id="cancelBtnId" process="@this" onclick="hideDialog('confirmWidgetVar');setFocusOnScreen()"/>
+        			
+        		</h:form>
+			   
+	           
+        </p:dialog>
+        
+        
+		<script type="text/javascript">
+		/* $( 'form' ).bind('keypress', function(e){
+			   if ( e.keyCode == 13 ) {
+			         document.getElementById('save').focus();
+			   }
+			 }); */
+			 function setFocusOnDelInvoicePopup(){
+					if(document.getElementById('yesDelInvoice')){
+						setFocus('yesDelInvoice');
+					}
+				}
+		
+		 function setDefaultValue(){
+				 
+			var allInputRows = $("input[type=text]");
+			for (var i= 0 ; i &lt; allInputRows.length; i++){
+			
+				if(String(allInputRows[i].value).length == 0){
+					allInputRows[i].value ='0.00';	
+				}					
+			}
+		}
+		function setFocusOnScreen(){
+			var index = findFirstEditableField();
+			if(index >= 0) {
+				vName = 'invoiceDetailEntryTableId:' + index + ':lineCost_input';
+				document.getElementById(vName).focus();
+			}
+		}
+		
+		function setFocusOnInvoicePopup(){
+			if(document.getElementById('okBtn')){
+				setFocus('okBtn');
+			}else{
+				setFocus('okBtnId2');
+			}
+		}
+		function showWarning(){
+			var showWarning = document.getElementById('showWarning').value;
+			
+			if(showWarning == 'true'){
+				showDialog('confirmWidgetVar');
+				
+			}
+		}
+		
+		function initializeDirtyDetection() {
+			registerIgnoreButton("post");
+			registerIgnoreButton("okBtn");
+			saveDataForDirtyDetection();
+		}
+		
+		function setFocusOnElement(id){	
+			setCurrentElementFocus(id);
+		}
+		
+		function updateTotalAmount(){	
+			
+			var allInputRows = $("input[type=text]");	
+			var total  = 0;
+			for (var i= 0 ; i &lt; allInputRows.length; i++){
+				//var reclaimId = "invoiceDetailEntryTableId:"+i+":reclaimIcon" ;
+					total = Number(total) + Number(allInputRows[i].value.replace(/[^0-9-.]/g, ''));
+			}			
+			
+		 	var formattedInput =  '$' +  total.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,")  ;			
+			 $('#totalInvoice').text(formattedInput);
+	
+		}
+		
+		function findFirstEditableField() {
+			var allInputRows = $("input[type=text]");
+			var index = -1;
+			for (var i= 0 ; i &lt; allInputRows.length; i++){
+				if(!allInputRows[i].disabled) {
+					index = i;
+					break;
+				}
+			}			
+			return index;
+		}
+		
+     	$(window).load(function(){
+     		setFocusOnScreen();
+     		showWarning();
+     		setDefaultValue();
+     		initializeDirtyDetection();
+		});			
+		
+		</script>
+
+	</ui:define>
+</ui:composition>

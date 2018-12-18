@@ -1,0 +1,114 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">                          
+	
+
+				 <h:form id="custLovForm" name ="custLovForm" prependId = "false">
+				 <p:dialog header="Select Client" widgetVar="customerLOV" id="CUSTOMER_GRID" dynamic="true" resizable="true" appendTo="@(body)"
+						 width="710" height="365"  modal="true" onShow="setFirstPageCustDataTableWidget();setFocus('customerSelectButton');">
+						 
+						 <p:hotkey immediate="true" bind="esc" handler="PF('customerLOV').hide();"/>
+				        
+				        <h:form id="custLovDataTblForm" onkeydown="body_onkeydown(event,'custLovDataTblForm:customerSelectButton','customerLOV');">
+						<p:dataTable  widgetVar="custDataTableWidget" lazy="true" var="customer" scrollable="true" scrollHeight="270" resizableColumns="true"
+							value="#{customerLovBean.customers}" rows="#{customerLovBean.rowsPerPage}" paginator="true" paginatorPosition="bottom"  
+						   selection = "#{customerLovBean.selectedCustomerContact}" selectionMode="single" 
+						   >
+						   
+						    <p:ajax event="rowDblselect" listener="#{customerLovBean.onRowSelect}" 
+									update=":custLovForm:lovCustomerCode,:custLovForm:lovCustomerName,:custLovForm:lovCustomerType,:custLovForm:lovCustomerCid" 
+									oncomplete="hideCustomerLov();setCustomerValues();"  />
+							<p:ajax event="rowSelect" listener="#{customerLovBean.onRowSelect}" />
+							<p:ajax event="page" onstart="clearDataTableSelection('custDataTableWidget');" oncomplete="setScrollDivAtTop();"/>
+							<h:messages />
+							<p:column width="195">
+								<f:facet name="header">
+									<h:outputText value="Client Name" style ="font-weight:bold"/>
+								</f:facet>
+								<h:outputText value="#{customer.customer.accountName}"></h:outputText>
+							</p:column>
+							
+							<p:column width="100">
+								<f:facet name="header">
+									<h:outputText value="Client Code" style ="font-weight:bold"/>
+								</f:facet>
+								<h:outputText value="#{customer.customer.externalAccountPK.accountCode}"></h:outputText>
+							</p:column>
+							<p:column width="100">
+								<f:facet name="header">
+									<h:outputText value="Primary Contact" style ="font-weight:bold"/>
+								</f:facet>
+								
+								<h:outputText value="#{customer.primaryContact.firstName} #{customer.primaryContact.lastName}"></h:outputText>
+							</p:column>	
+							<p:column width="125">
+								<f:facet name="header">
+									<h:outputText value="Fleet Administrator" style ="font-weight:bold"/>
+								</f:facet>
+								
+								<h:outputText value="#{customer.fleetAdminContact.firstName} #{customer.fleetAdminContact.lastName}"></h:outputText>
+							</p:column>	
+						
+						</p:dataTable>
+						
+						<div style="text-align:center;">
+								
+									<h:outputText style="font-weight:bold;" 
+										value="Record Count: #{customerLovBean.customers.rowCount}">
+									</h:outputText>	
+									<p:commandButton style="float:right;"  value="Select" id = "customerSelectButton" name ="customerSelectButton"
+										update=":custLovForm:lovCustomerCode,:custLovForm:lovCustomerName,:custLovForm:lovCustomerType,:custLovForm:lovCustomerCid" oncomplete="hideCustomerLov();setCustomerValues();"
+										>
+									</p:commandButton>
+									
+             			</div>
+             			</h:form>	 
+					</p:dialog>	
+					
+					 	<h:inputHidden id ="radioSelectedCustomerIndex"  />
+						<h:inputHidden id="targetInputName" value="customerLOV" />
+				        <h:inputHidden id="lovCustomerCode" value="#{customerLovBean.customerCode}" />
+				        <h:inputHidden id="lovCustomerName" value="#{customerLovBean.customerName}" />
+				        <h:inputHidden id="lovCustomerType" value="#{customerLovBean.customerType}" />
+				        <h:inputHidden id="lovCustomerCid" value="#{customerLovBean.customerCId}" />
+				        <h:inputHidden id="lovRecordsPerPageCust" value="#{customerLovBean.lovRecordsPerPage}" />
+			        
+					</h:form>
+					<script type="text/javascript">
+		
+		function setCustomerValues(){
+			var lovNameArray = new Array();
+			var lovValueArray = new Array();
+			lovNameArray[0]='CUSTOMER_CODE';
+			lovValueArray[0]=document.getElementById('lovCustomerCode').value;
+			
+			lovNameArray[1]='CUSTOMER_NAME';
+			lovValueArray[1]=document.getElementById('lovCustomerName').value;
+			
+			lovNameArray[2]='CUSTOMER_TYPE';
+			lovValueArray[2]=document.getElementById('lovCustomerType').value;
+			
+			lovNameArray[3]='CUSTOMER_CID';
+			lovValueArray[3]=document.getElementById('lovCustomerCid').value;
+			<!-- This method need to implement in parent page to populate LOV seletion-->
+			setSelection(document.getElementById('targetInputName').value,lovNameArray,lovValueArray);
+		}
+		
+		function showCustomerLov(){
+			showDialog('customerLOV');
+		}	
+		
+		function hideCustomerLov(){
+			hideDialog('customerLOV');
+		}
+		
+		function setFirstPageCustDataTableWidget(){
+			setDataTableToFirstPage('custDataTableWidget');
+			// also select the first row, but only if we have data
+			setDataTableToFirstRow('custDataTableWidget');
+		}
+		
+		</script>
+</ui:composition>

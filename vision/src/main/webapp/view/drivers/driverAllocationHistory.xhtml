@@ -1,0 +1,177 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" template="../../templates/ui.xhtml">
+
+	<ui:define name="content">
+		<h:form id="driverAllocationHistoryBreadCrumbForm" prependId="false">
+			<p:breadCrumb model="#{driverAllocationHistoryBean.breadCrumbTrail}"
+				ajax="false" immediate="true" />
+		</h:form>
+		<!-- Message display -->
+		<p:scrollPanel style="height:50px;" mode="native">
+			<p:messages id="messages" showSummary="false" showDetail="true"
+				autoUpdate="true" />
+		</p:scrollPanel>
+
+		<h:form id="driverAllocationHistoryForm" prependId="false">
+
+			<!-- Unit Detail Panel -->
+			<p:panel id="unitDetailPanel" header="Unit Detail"
+				styleClass="ui-layout">
+				<h:panelGrid columns="6" cellpadding="5">
+					<h:outputText value="Unit" styleClass="ui-label" />
+					<h:outputText value="#{driverAllocationHistoryBean.selectedUnit.unitNo}" /> - 
+					<h:outputText value="#{driverAllocationHistoryBean.selectedUnit.model.modelDescription}" />
+				</h:panelGrid>
+			</p:panel>
+
+			<p:panel id="allocationHistoryPanel" header="Allocation History" styleClass="ui-layout">
+				<p:dataTable id="allocationsTable" var="allocationVO"
+					value="#{driverAllocationHistoryBean.allocationList}"
+					scrollable="true"
+					scrollHeight="#{driverAllocationHistoryBean.dataTable.height}">
+
+					<p:column width="200">
+						<f:facet name="header">
+							<h:outputText value="Driver" style="font-weight:bold" />
+						</f:facet>
+						<p:commandLink action="#{driverAllocationHistoryBean.editDriver}" ajax="false" immediate="true" onclick="lockScreen();">
+							<f:setPropertyActionListener value="#{allocationVO.allocation.driver}" 
+							           target="#{driverAllocationHistoryBean.selectedDriver}"/>
+							<h:outputText value="#{allocationVO.allocation.driver.driverSurname}, #{allocationVO.allocation.driver.driverForename}"/><br/>
+						</p:commandLink>
+						<h:outputText value="#{allocationVO.allocation.driver.poolManager}" converter="PoolManagerConverter"/>
+					</p:column>
+
+					<p:column width="100">
+						<f:facet name="header">
+							<h:outputText value="Allocation From" style="font-weight:bold" />
+						</f:facet>
+						<h:outputText value="#{allocationVO.allocation.allocationDate}">
+							<f:convertDateTime pattern="MM/dd/yyyy" />
+						</h:outputText>
+					</p:column>
+
+					<p:column width="100">
+						<f:facet name="header">
+							<h:outputText value="Allocation To" style="font-weight:bold" />
+						</f:facet>
+						<h:outputText value="#{allocationVO.allocation.deallocationDate}">
+							<f:convertDateTime pattern="MM/dd/yyyy" />
+						</h:outputText>
+					</p:column>
+
+					<p:column width="300">
+						<f:facet name="header">
+							<h:outputText value="Driver Addresses During Allocation" style="font-weight:bold" />
+						</f:facet>
+						<p:dataList value="#{allocationVO.driverAddressesVO}" var="address" itemType="disc" styleClass="ui-noBorder">  
+							<h:outputText value="#{address.fromDate}" style="font-weight:bold">
+								<f:convertDateTime pattern="MM/dd/yyyy" />
+							</h:outputText>
+							<h:outputText value=" - " style="font-weight:bold"/>
+							<h:outputText value="#{address.toDate}" style="font-weight:bold">
+								<f:convertDateTime pattern="MM/dd/yyyy" />
+							</h:outputText> <br />
+							<h:outputText value="(#{address.type})" /> <br />
+							<h:outputText value="#{address.businessAddressLine}" /> 
+						 	<h:outputText value=" &lt;br /&gt; "  rendered="#{address.businessAddressLine != null ? 'true': 'false'}"  escape="false" />
+    						<h:outputText value="#{address.displayAddressLine1}" /> <br /> 
+    						<h:outputText value="#{address.displayAddressLine2}" /> <br />
+    						<h:outputText value="#{address.displayAddressLine2Details}" />
+						</p:dataList>  
+					</p:column>
+					<p:column width="225">
+						<f:facet name="header">
+							<h:outputText value="Unit Client" style="font-weight:bold" />
+						</f:facet>
+						<h:outputText value="#{allocationVO.customer.externalAccountPK.accountCode}" />  <br />
+						<h:outputText value="#{allocationVO.customer.accountName}" /> 
+					</p:column>
+					
+				</p:dataTable>
+			</p:panel>
+			<p:panel id="controlPanel" styleClass="ui-layout">
+				<p:commandButton id="edit" tabindex="220" value="Edit Current"
+					update=":allocationDialogId" immediate="true"
+					oncomplete="PF('allocationDialog').show();" 
+					rendered="#{driverAllocationHistoryBean.showEditButton and driverAllocationHistoryBean.hasPermission('driverAllocationHistory_edit')}" />
+				<p:spacer width="10" />
+
+				<p:commandButton id="cancel" tabindex="240" value="Cancel"
+					action="#{driverAllocationHistoryBean.cancel}" ajax="false"
+					onclick="lockScreen();" immediate="true" />
+			</p:panel>
+		</h:form>
+
+		
+			<p:dialog id="allocationDialogId" header="Current Allocation Edit" widgetVar="allocationDialog" 
+					  modal="true" resizable="false" appendTo="@(body)">
+					  <h:form id="allocationForm" prependId="false">  
+				<p:hotkey immediate="true" bind="esc" handler="PF('allocationDialog').hide();"/>
+				<p:panel id="allocationPanel">
+					<p:messages id="dialogErrorMsgID" showDetail="false" autoUpdate="true" showSummary="true" globalOnly="false"/>
+					<h:panelGrid columns="2" cellpadding="5" onkeydown="onkeydownESC(event,'allocationDialog');">
+						<h:outputText value="Driver" styleClass="ui-label" />
+						<h:outputText value="#{driverAllocationHistoryBean.latestAllocation.driver.driverSurname}, 
+											 #{driverAllocationHistoryBean.latestAllocation.driver.driverForename}" />
+						<h:outputText value="Allocated From" styleClass="ui-label" />					 
+						<h:outputText value="#{driverAllocationHistoryBean.latestAllocation.allocationDate}">
+							<f:convertDateTime pattern="MM/dd/yyyy" />
+						</h:outputText>
+						<h:outputText value="Allocated To" styleClass="ui-label" />
+						<p:calendar id="allocationDateCalendar"
+							value="#{driverAllocationHistoryBean.latestAllocation.deallocationDate}"
+							showOn="button" pattern="MM/dd/yyyy" tabindex="30"
+							converter="DateConverter" size="10" 
+							mindate="#{driverAllocationHistoryBean.latestAllocation.allocationDate}">
+						</p:calendar>
+					</h:panelGrid>
+				<p:separator id="customSeparator" style="width:100%;" /> 				
+				<h:panelGrid id="allocationDialogButtons" columns="3" >
+					<p:commandButton id="allocationDialogSaveButton" value="Save"   
+        	            update=":driverAllocationHistoryForm:allocationHistoryPanel"
+        	            process="@this, allocationPanel" 
+        	            actionListener="#{driverAllocationHistoryBean.processSaveDialog}"
+        	            oncomplete="handleDoneRequest(xhr, status, args)"/>
+					<p:commandButton id="allocationDialogDeleteButton" value="Delete"   
+        	        	oncomplete="PF('confirmation').show();" />    
+					<p:commandButton id="allocationDialogCancel" value="Cancel"
+						onclick="PF('allocationDialog').hide();" type="button" />
+				</h:panelGrid>
+				</p:panel>
+				</h:form>
+			</p:dialog> 	
+		
+
+		<h:form id="confirmForm">
+			<p:confirmDialog id="confirmDialog" appendTo="@(body)"
+				message="Do you want to delete the allocation?" header="Confirm"
+				severity="alert" widgetVar="confirmation">
+				<p:hotkey immediate="true" bind="esc" handler="PF('confirmation').hide();"/>
+				<p:commandButton id="confirm" value="Ok" process="@this"
+					update=":driverAllocationHistoryForm:allocationHistoryPanel"
+					oncomplete="PF('confirmation').hide(); PF('allocationDialog').hide();"
+					actionListener="#{driverAllocationHistoryBean.processDeleteDialog}" 
+					immediate="true" />
+				<p:commandButton id="decline" value="Cancel"
+					onclick="PF('confirmation').hide();" type="button" />
+			</p:confirmDialog>
+		</h:form>
+
+
+		<script type="text/javascript">
+
+		function handleDoneRequest(xhr, status, args) { 			
+			if(!args.failure) { 
+	        	hideDialog('allocationDialog');
+	        }
+	    } 
+
+
+		</script>
+	</ui:define>
+
+</ui:composition>

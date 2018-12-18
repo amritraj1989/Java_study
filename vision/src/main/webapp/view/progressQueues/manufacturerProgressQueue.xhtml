@@ -1,0 +1,388 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"   
+	xmlns:pe="http://primefaces.org/ui/extensions"	  
+    template="../../templates/ui.xhtml" >
+	
+    <ui:define name="content">
+    	    <h:form id="manufactureQueueBreadCrumbForm" prependId="false">
+   			    <p:breadCrumb model="#{manufacturerProgressQueueBean.breadCrumbTrail}" ajax="false" immediate="true" style="min-width:980px;max-width:100%;width:auto;"/>
+   		    </h:form>
+   		        
+    	    <!-- Message display -->
+		    <p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:980px;max-width:100%;width:auto;">
+			    <p:messages id="messages" showSummary="false" showDetail="true" autoUpdate="true" />
+		    </p:scrollPanel>   
+
+		    <h:form id="mainForm" prependId="false" rendered="true">
+					
+	    		<p:panel id="inputPanel">
+	    			<h:panelGrid columns="10">
+	    			
+	    				<h:panelGrid columns="3" styleClass="panelGrid-top">
+		    				<p:outputLabel value="Looking For - " styleClass="ui-label"/>
+							<p:spacer width="50" height="1"/>
+							
+						</h:panelGrid>
+ 						
+ 						<p:commandLink title="Purchase Order Release" action="#{manufacturerProgressQueueBean.navigateToPOReleaseQueue}" immediate="true" ajax="false" onclick="lockScreen()">	
+							 <h:outputText value="Purchase Order Release" rendered="true" />
+						</p:commandLink>
+						<p:spacer width="20" height="1"/>
+ 						<p:commandLink title="Third Party Progress" action="#{manufacturerProgressQueueBean.navigateToThirdPartyQueue}" immediate="true" ajax="false" onclick="lockScreen()">							
+							 <h:outputText value="Third Party Progress"  rendered="true" />
+						</p:commandLink>
+						<p:spacer width="20" height="1"/>
+ 						<p:commandLink title="Manufacturer Progress" action="#{manufacturerProgressQueueBean.performSearch}" immediate="true" ajax="false" onclick="lockScreen()">							
+							 <h:outputText value="Manufacturer Progress" styleClass="ui-label" rendered="true" />
+						</p:commandLink>
+						<p:spacer width="20" height="1"/>
+	 					<p:commandLink title="Upfit Progress" action="#{manufacturerProgressQueueBean.navigateToUpfitterQueue}" immediate="true" ajax="false" onclick="lockScreen()">							
+							 <h:outputText value="Upfit Progress"  rendered="true" />
+						</p:commandLink>
+						<p:spacer width="20" height="1"/>
+						<p:commandLink title="In Service Date Progress" action="#{manufacturerProgressQueueBean.navigateToInServiceQueue}" immediate="true" ajax="false" onclick="lockScreen()">	
+							 <h:outputText value="In Service Date Progress" rendered="true" />
+						</p:commandLink>
+						
+						<p:spacer width="100" height="1"/>
+
+				
+					</h:panelGrid>
+						
+              	</p:panel>
+			</h:form>		    	
+		   <comp:logBook id="logBook" 
+		            entities="#{manufacturerProgressQueueBean.getSelectedFleetMasterList()}" 
+		            logBookTypes="#{manufacturerProgressQueueBean.logBookType}" 
+		            combineLogBooks="true" 
+		            enableFollowUpDate="true" 
+		            enableAddAndClose="false" 
+		            onClose="callRefreshFollowUpDate()" />
+		            
+		   <comp:requestClientContact id="ccRequestClientContact" 
+		            processStageObjects="#{manufacturerProgressQueueBean.selectedProcessStageObjects}" 
+		            targetStage="#{manufacturerProgressQueueBean.targetProcessStage}"  
+		            windowTitle="#{manufacturerProgressQueueBean.requestClientContactWindowTitle()}"
+		             onClose="callRefreshRequestClientContact()" />		            
+		            
+		     <h:form id="RCForm" prependId="false">
+           	  	 <p:remoteCommand name="setSelectedVORC"  actionListener="#{manufacturerProgressQueueBean.setSelectedVORC()}" />
+           	  	 <p:remoteCommand name="refreshData" actionListener="#{manufacturerProgressQueueBean.refreshManufacturerProgressRecord()}" />
+           	  	 <p:remoteCommand name="rowSelectionListener" actionListener="#{manufacturerProgressQueueBean.rowSelectionListener()}" />  
+           	  	 <p:remoteCommand name="refreshRequestClientContact" actionListener="#{manufacturerProgressQueueBean.refreshRequestClientContactListener()}" />           	  	 
+		     </h:form>  
+		                                    
+           <h:form id="manufactureQueueForm" prependId="false">
+           		 <p:remoteCommand name="refreshFollowUpDate" actionListener="#{manufacturerProgressQueueBean.populateFollowUpDate()}" />
+            	<p:panel id="manufactureProgressTablePanel" header="Manufacturer Progress Queue"> 
+            	<p:toolbar id="searchToolbar">  
+				    <p:toolbarGroup align="left">  
+				    	 <p:focus context="searchToolbar"/>	
+				    		<p:separator></p:separator>	
+							<p:outputLabel for="makeId" value="Make : " />								
+							<p:inputText id="makeId" style="width:100px" title="Make" value="#{manufacturerProgressQueueBean.makeFilter}" onkeypress="return doKeypressFilter(event)"/>
+							<p:separator ></p:separator>
+												    		
+				    		<p:outputLabel for="unitNoTxtId" value="Unit No : " />								
+							<p:inputText id="unitNoTxtId" style="width:100px" title="Unit No" value="#{manufacturerProgressQueueBean.unitNoFilter}" onkeypress="return doKeypressFilter(event)"/>
+							<p:separator ></p:separator>
+							
+				    		<p:outputLabel for="clientNameTxtId" value="Client : " />								
+							<p:inputText id="clientNameTxtId" style="width:180px" title="Client" value="#{manufacturerProgressQueueBean.clientNameFilter}" onkeypress="return doKeypressFilter(event)" />
+							
+							<p:separator></p:separator>
+							
+							<p:commandButton  value="Search" id="filter" title="Filter" update="manufactureProgressTablePanel btnPanel" process="manufactureQueueForm"
+												actionListener="#{manufacturerProgressQueueBean.performFilter}" oncomplete="resetUIState();" />
+				    </p:toolbarGroup>  
+				</p:toolbar> 
+			   	<p:dataTable id="DT_UI_ID" var="element" widgetVar="manufactureProgressTableVar"             	  
+				        value="#{manufacturerProgressQueueBean.filteredList}" 
+						scrollable="true" rowIndexVar="elementRowIndex" 
+						scrollHeight="#{manufacturerProgressQueueBean.dataTable.height}"
+						resizableColumns="true" 
+						rowKey="#{element.unitNo}"
+						rows="#{manufacturerProgressQueueBean.recordPerPage}"
+						paginator="true" paginatorPosition="bottom" 
+						sortMode="multiple" sortBy="#{manufacturerProgressQueueBean.preSort}"
+						emptyMessage="#{manufacturerProgressQueueBean.emptyDataTableMessage}"
+						selection="#{manufacturerProgressQueueBean.selectedManufactureQueueList}" >						
+						
+						<p:ajax event="toggleSelect" onstart="adjustBtnState();return false;"  />						 
+						<p:ajax event="rowSelectCheckbox" onstart="adjustBtnState();return false;"  />	
+						<p:ajax event="rowUnselectCheckbox" onstart="adjustBtnState();return false;"  />						
+						<p:ajax event="rowSelect" onstart="adjustBtnState();return false;"  />	
+						<p:ajax event="rowUnselect" onstart="adjustBtnState();return false;"  />	
+						
+						<p:ajax event="sort" update=":manufactureQueueForm:requestClientContactBtn :manufactureQueueForm:maintNotesBtn" listener="#{manufacturerProgressQueueBean.onSortOperation}" oncomplete="resetUIState();moveScrollbarToTop();" />
+						<p:ajax event="page" update=":manufactureQueueForm:requestClientContactBtn :manufactureQueueForm:maintNotesBtn" listener="#{manufacturerProgressQueueBean.onPageChange}"  oncomplete="resetUIState();moveScrollbarToTop();" />
+       					
+       					<p:column selectionMode="multiple" style="text-align:center;padding:0px;" width="#{manufacturerProgressQueueBean.dataTable.col1}" exportable="false"/>
+       					 
+       					<p:column id="MAKE_UI_ID" sortBy="#{element.make}" headerText="Make" width="#{manufacturerProgressQueueBean.dataTable.col2}" exportable="false">				
+							<h:outputText  value="#{element.make}" />
+						</p:column>
+						 
+						<p:column id="UNIT_NO_UI_ID" headerText="Unit No" sortBy="#{element.unitNo}" width="#{manufacturerProgressQueueBean.dataTable.col5}"  exportable="false">				
+						    <h:panelGrid id="unitInfo" column="1" styleClass="ui-noBorder">	
+						   		 <h:panelGroup style="white-space:nowrap;">
+						   		 	<p:commandLink id="noteLink"
+                               				actionListener="#{manufacturerProgressQueueBean.setSelectedFleetMasterVO(element)}"	
+                               				oncomplete="showLogBook();selectCurrentRow('manufactureProgressTableVar',#{elementRowIndex});"						                             
+			                                title="View Notes" immediate="true">
+									 <p:graphicImage value="/images/notes.png" title="Notes" style="border-style: none" />
+									</p:commandLink>
+									<h:outputText value="&#160;" />
+									<h:outputText value="#{element.unitNo}" />
+								 </h:panelGroup>								 
+							</h:panelGrid>
+						</p:column>
+						
+						<p:column headerText="Trim" sortBy="#{element.trim}" width="#{manufacturerProgressQueueBean.dataTable.col4}" exportable="false" 
+									style="white-space: nowrap; text-overflow: ellipsis;" >	
+							<h:outputText id="trimValue" value="#{element.trim}"/><br/>			
+							<p:tooltip value="#{element.trim}" for="trimValue"/>
+						</p:column>
+						
+						<p:column headerText="Client" sortBy="#{element.clientAccountName}" width="#{manufacturerProgressQueueBean.dataTable.col5}" exportable="false">								
+							  <h:panelGroup style="white-space:nowrap;">							  			
+						  			<h:outputText value="#{element.clientAccountName}" styleClass="textWrap" />
+							 </h:panelGroup>
+						</p:column>		
+						
+					 	<p:column id="PODate" sortBy="#{element.poDate}"  headerText="PO Rlsd" width="#{manufacturerProgressQueueBean.dataTable.col10}" exportable="false" >	
+						    <h:outputText value="#{element.poDate}">
+						     <f:convertDateTime type="date" pattern="MM/dd/yy" />
+							</h:outputText>
+						</p:column>
+						
+						<p:column id="LEAD_TIME_UI_ID" sortBy="#{element.leadTime}" style="text-align:right;align:right;" headerText="Lead Time" width="#{manufacturerProgressQueueBean.dataTable.col8}" exportable="false" >	
+						    <h:outputText value="#{element.leadTime}">
+							</h:outputText>
+						</p:column>
+						
+						<p:column id="desiredToDealer" sortBy="#{element.desiredToDealer}" headerText="Desired To Dlr" width="#{manufacturerProgressQueueBean.dataTable.col2}" exportable="false" >	
+						    <h:outputText id="DESIRED_TO_DLR_UI_ID" value="#{element.desiredToDealer}">
+						    	<f:convertDateTime type="date" pattern="MM/dd/yy" />
+							</h:outputText>
+						</p:column>
+						
+						
+						<p:column id="expectedDate" sortBy="#{element.expectedDate}" headerText="ETA" width="#{manufacturerProgressQueueBean.dataTable.col10}" exportable="false">								
+						    <h:outputText id="EXPECTED_DATE_UI_ID" value="#{element.expectedDate}">
+						     <f:convertDateTime type="date" pattern="MM/dd/yy" /> 
+							</h:outputText>
+						</p:column>
+						
+						<p:column id="followUpDate" sortBy="#{element.followUpDate}" headerText="Follow Up" width="#{manufacturerProgressQueueBean.dataTable.col10}" exportable="false">	
+						    <h:outputText  id="FOLLOW_UP_UI_ID" value="#{element.followUpDate}">
+						     	<f:convertDateTime type="date" pattern="MM/dd/yy" /> 
+							</h:outputText>
+						</p:column>
+						
+						<p:column headerText="Reason" sortBy="#{element.toleranceMessage}" width="#{manufacturerProgressQueueBean.dataTable.col11}" exportable="false">	
+							 <h:outputText id="TOLERANCE_MSG_UI_ID" escape="false" value="#{manufacturerProgressQueueBean.formatReasonForDisplay(element.toleranceMessage)}"/>
+						</p:column>
+
+						<f:facet  name="footer"  >
+							Record Count: <h:outputText value="#{manufacturerProgressQueueBean.filteredList.size()}" />
+							<div style= "text-align:right;">
+							     <h:commandLink title="Export To Excel" onclick="monitorDownload('#{manufacturerProgressQueueBean.filteredList.size()}');" >
+					               <p:graphicImage value="/images/excel.png" styleClass="ui-border-none" />	
+					                <p:dataExporter type="xls" target=":manufactureQueueForm:manufactureQueueDld" fileName="client_facing" 
+					                preProcessor="#{manufacturerProgressQueueBean.preProcessDownloadXLS}" postProcessor="#{manufacturerProgressQueueBean.postProcessDownloadXLS}" />
+					            </h:commandLink>
+					        </div>
+						</f:facet>	
+					</p:dataTable>  
+				</p:panel>
+
+				<p:dataTable value="#{manufacturerProgressQueueBean.downloadableRowsData}" var="row"  id="manufactureQueueDld"  rendered="false">
+				    <p:columns value="#{manufacturerProgressQueueBean.downloadableColumns}" var="column">		
+				   	 <f:facet name="header">
+                			<h:outputText value="#{column}" />
+            			</f:facet>		       
+				        <h:outputText value="#{row[column]}" />	
+				    </p:columns>
+				</p:dataTable>
+				
+				<p:panel id="btnPanel">
+					<p:commandButton id="requestClientContactBtn" widgetVar="requestClientContactBtnVar" value="Request Client Contact" actionListener="#{manufacturerProgressQueueBean.requestClientContactListner}"
+						oncomplete="showRequestClientContact()" />
+					<p:spacer width="10" />
+						<p:commandButton id="vehicleOrderStatusBtn" widgetVar="vehicleOrderStatusBtnWidgetVar" value="Veh Status" title="Vehicle Order Status" 
+							onclick="doShowVehicleOrderStatus();" immediate="true" process="@none"
+							rendered="true" />	 
+			        	<p:spacer width="10" rendered="true"/>
+					<p:commandButton id="maintNotesBtn" widgetVar="maintNotesBtnVar"  value="Notes" actionListener="#{manufacturerProgressQueueBean.setSelectedFleetMasterVOs}" 
+						oncomplete="showLogBook();" />
+					<p:spacer width="10" />	
+					<p:commandButton id="done" value="Cancel" action="#{manufacturerProgressQueueBean.cancel}" ajax="false" immediate="true" onclick="lockScreen();" />
+				</p:panel>           
+            </h:form>
+
+	        <p:dialog id="vehicleOrderStatusDialog" 
+				        modal="true" 
+				        header="Vehicle Order Status" 
+				        widgetVar="vehicleOrderStatusWidget" 
+				        resizable="false" 
+				        height="680" 
+				        width="1105" 
+				        closeOnEscape="true"
+				        onHide="refreshUi();"
+				        appendTo="@(body)">
+				 
+				   <comp:maintainVehicleOrderStatus id="maintainVehicleOrderStatusCCId" 
+			    		showSearch ="false" showNotes ="false" showCancel = "true"
+			            mainPODocId="#{manufacturerProgressQueueBean.selectedManufactureQueue.getDocId()}" 	
+			            isStockUnit="#{manufacturerProgressQueueBean.selectedManufactureQueue.isStockOrder()}" 
+			            update ="vehicleOrderStatusDialog" 		
+			            onLoadCallback ="PF('vehicleOrderStatusWidget').show();"  
+			            fmsId = "#{manufacturerProgressQueueBean.selectedManufactureQueue.getFmsId()}"
+			            unitNo = "#{manufacturerProgressQueueBean.selectedManufactureQueue.getUnitNo()}" 
+			            
+			            />
+		   		 			        
+			</p:dialog> 
+	        	        
+		<style type="text/css">
+			.ui-datatable thead th {
+				white-space: normal;
+				text-align: center;
+			}
+			
+			.textWrap {
+				white-space: normal;
+			}
+			.show {
+			    display: block;
+			}
+
+			.hide {
+			    display: none;
+			}
+		</style>  
+			                                                                                               
+        <script type="text/javascript"> 
+        	$(document).ready(function() {
+        		$.cookie("client.excel.download", null, { path: '/'});
+        	});
+        	
+        	function refreshUi(){
+        		var refreshNeeded = document.getElementById('maintainVehicleOrderStatusCCId:hiddenRefresh').value;
+        		if(refreshNeeded == 'true'){
+        			refreshData();	
+        		}
+        	}
+        	
+            function monitorDownload(recordCount) { 
+            	if(recordCount > 0){
+            		if(cookiesEnabled()){
+            			ajaxStatusShow();
+            			setTimeout("checkDownloadStatus();",250); 
+            		}
+            	}
+            }
+            
+            function checkDownloadStatus(){ 
+            	if($.cookie("client.excel.download")){
+            		$.cookie("client.excel.download", null, { path: '/'});
+            		ajaxStatusHide();
+            	}else{
+            		setTimeout("checkDownloadStatus();",250); 
+            	}
+            }   
+            
+            function cookiesEnabled() {
+    			var c = (navigator.cookieEnabled) ? true : false;
+    			if (typeof navigator.cookieEnabled === "undefined") {
+    				if(!c){
+    					document.cookie = "tcookie";
+    					c = (document.cookie.indexOf("tcookie") !== -1) ? true : false;
+    			 	}
+    			}
+    			return (c);
+    		}
+            
+            function callRefreshFollowUpDate(){    
+            	refreshFollowUpDate();  
+            	ajaxStatusHide();
+        	}
+            
+            function callRefreshRequestClientContact(){
+            	refreshRequestClientContact();
+            }
+           	function doKeypressFilter(event){
+    			if (event.keyCode == 13) {
+    				source = event.srcElement.id;
+    			   $('#filter').click();
+    			   return false;
+    			}
+    			return true;	
+    		}
+           	
+            function moveScrollbarToTop() {
+           		$('#DT_UI_ID .ui-datatable-scrollable-body').scrollTop(0);
+           	}
+           	
+            function selectCurrentRow(table,index){
+            	if(index > (Number(50) -1)){//here 50 is rows being display in per page in dt
+            		index = index % 50;	
+            	}
+                PF(table).unselectAllRows();
+              	PF(table).selectRow(index ,false);
+            }
+            
+            function resetUIState() {
+              PF('manufactureProgressTableVar').unselectAllRows();
+              adjustBtnState()
+           	}
+            
+            var  hasPermissionManageVehOrderStatus =  #{manufacturerProgressQueueBean.hasPermission('manage_veh_order_status')};
+            function adjustBtnState() {
+            	//OTD-2992 Disable Request Client Contact feature for stock order units
+            	if(PF('manufactureProgressTableVar').selection.length > 0){
+            		rowSelectionListener([{name: 'UNIT_NO', value: PF('manufactureProgressTableVar').selection}]);            	
+            	}
+            	
+       			if(PF('manufactureProgressTableVar').selection.length == 1){
+       				PF('vehicleOrderStatusBtnWidgetVar').enable();
+       				PF('maintNotesBtnVar').enable();
+       			}else if(PF('manufactureProgressTableVar').selection.length > 1){
+       				PF('vehicleOrderStatusBtnWidgetVar').disable();
+       				if(hasPermissionManageVehOrderStatus == true){
+	       				PF('maintNotesBtnVar').enable();
+	       			}else{
+	       				PF('maintNotesBtnVar').disable();	
+	       			}
+       			}else if(PF('manufactureProgressTableVar').selection.length == 0){
+       				PF('maintNotesBtnVar').disable();
+       				PF('vehicleOrderStatusBtnWidgetVar').disable();
+       				PF('requestClientContactBtnVar').disable()
+       			}
+       			PF('manufactureProgressTableVar').updateHeaderCheckbox();
+           	  }
+            
+            function doShowVehicleOrderStatus(){   
+            	setSelectedVORC([{name: 'UNIT_NO', value: PF('manufactureProgressTableVar').selection}]);
+            	showVehicleOrderStatus();
+            }
+            
+            function handleClientContactReasonSaveBtnRequest(xhr, status, args){
+            	if(!args.failure) {    
+            		PF('requestClientContactDialogWidget').hide();
+            		//ajaxStatusHide();
+                }
+            }
+            
+         	$(window).load(function(){
+         		adjustBtnState();
+			});
+		    </script>
+	</ui:define>
+	
+</ui:composition>

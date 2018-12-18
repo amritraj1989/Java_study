@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.1.0.final using JasperReports Library version 6.1.0  -->
+<!-- 2017-11-28T09:42:45 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="amortizationTable" columnCount="5" pageWidth="550" pageHeight="60" whenNoDataType="AllSectionsNoDetail" columnWidth="109" leftMargin="1" rightMargin="1" topMargin="1" bottomMargin="1" uuid="62d94130-8c66-4cb1-b3a7-79d688d66caa">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="oe-con-rev-amortization-schedule-data-adapter"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<subDataset name="AmortizationTableDataSet" uuid="c4781bda-f35e-447f-a3c7-347ac77476f2">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="oe-con-rev-amortization-schedule-data-adapter"/>
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+		<field name="period" class="java.lang.Long"/>
+		<field name="finalNBV" class="java.math.BigDecimal"/>
+	</subDataset>
+	<parameter name="Parameter1" class="java.util.List"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="13">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<textField>
+				<reportElement x="0" y="0" width="34" height="13" uuid="962efc0d-56b3-494d-8443-ba73aa8adfe6">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Calibri" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Month"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement x="34" y="0" width="60" height="13" uuid="dd67c0f8-8009-4ee6-866f-5d760637a2c4"/>
+				<textElement textAlignment="Left">
+					<font fontName="Calibri" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Book Value*"]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="24" splitType="Immediate">
+			<componentElement>
+				<reportElement x="0" y="0" width="100" height="16" uuid="49aa486c-08b8-450e-b6ac-14cae70333ee">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="AmortizationTableDataSet" uuid="55f1ac56-6919-476e-8e60-2372d0dfedec">
+						<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($P{Parameter1})]]></dataSourceExpression>
+					</datasetRun>
+					<jr:listContents height="16" width="100">
+						<textField isBlankWhenNull="true">
+							<reportElement x="0" y="1" width="34" height="13" uuid="090d3b25-4f7c-4a9a-880a-45c0971c4115">
+								<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							</reportElement>
+							<textElement textAlignment="Left">
+								<font fontName="Calibri"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{period}]]></textFieldExpression>
+						</textField>
+						<textField pattern="¤#,##0.00;¤-#,##0.00" isBlankWhenNull="true">
+							<reportElement x="34" y="1" width="50" height="13" uuid="5a7b8703-215e-4969-8de9-e82c20ce152c">
+								<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							</reportElement>
+							<textElement textAlignment="Right">
+								<font fontName="Calibri"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{finalNBV}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="84" y="0" width="14" height="16" uuid="98067dc5-dbb5-4e7d-9799-2fcf1a368fd6">
+								<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							</reportElement>
+							<textElement textAlignment="Right">
+								<font fontName="Calibri" size="12"/>
+							</textElement>
+							<textFieldExpression><![CDATA["|"]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+		</band>
+	</detail>
+</jasperReport>

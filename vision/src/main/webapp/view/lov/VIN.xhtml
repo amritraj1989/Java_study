@@ -1,0 +1,115 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	<h:form id = "vinLovForm" name ="vinLovForm" prependId = "false">
+		 <p:dialog header="Select VIN" widgetVar="vinLOV" id="VIN_GRID"  dynamic="true" resizable="true" appendTo="@(body)"
+						  width="875" height="400"  modal="true" onShow="setFirstPageVinDetailsTableWidget();setFocus('vinSelectButton');">
+				
+						<p:hotkey immediate="true" bind="esc" handler="PF('vinLOV').hide();"/>
+				
+				        <h:inputHidden id="clickVinLovIndex" name ="clickVinLovIndex" value = "#{vinLovBean.selectionIndex}"/>
+				        <h:form id="vinLovDataTblForm" onkeydown="body_onkeydown(event,'vinSelectButton','vinLOV');">
+						<p:dataTable widgetVar="vinDetailsTableWidget" var="vin" scrollable="true" scrollHeight="270" 
+							lazy="true" value="#{vinLovBean.fleetMasters}" rows="#{vinLovBean.rowsPerPage}" paginator="true" paginatorPosition="bottom"  
+							selection="#{vinLovBean.selectedFleetMaster}" selectionMode="single" 
+						    resizableColumns="true">
+						     
+						     <p:ajax event="rowDblselect" listener="#{vinLovBean.onRowSelect}" 
+									update=":vinLovForm:selectedVin,:vinLovForm:selectedUnitNumberOfVin" 
+									oncomplete="hideVinLov(); setVinValues();"  />
+							 <p:ajax event="rowSelect" listener="#{vinLovBean.onRowSelect}" oncomplete="vinLovSelectButtonEnable();" update=":vinLovForm:clickVinLovIndex" />
+							 <p:ajax event="page" onstart="clearDataTableSelection('vinDetailsTableWidget');" oncomplete="setScrollDivAtTop();" />
+										
+							<h:messages />
+							
+							<p:column  width="175">
+								<f:facet name="header">
+									<h:outputText value="Full VIN" style ="font-weight:bold"/>
+								</f:facet>
+								<h:outputText value="#{vin.vin}"></h:outputText>
+							</p:column>							
+							
+							<p:column  width="150">
+								<f:facet name="header">
+									<h:outputText value="Year/Make/Model " style ="font-weight:bold"/>
+								</f:facet>
+								<h:outputText value="#{vin.model.modelDescription}"></h:outputText>
+							</p:column>
+							<p:column  width="150">
+								<f:facet name="header">
+									<h:outputText value="Client " style ="font-weight:bold"/>
+								</f:facet>
+								<h:outputText value="#{vin.contractLine.contract.externalAccount.accountName}"></h:outputText><br></br>
+								<h:outputText value="#{vin.contractLine.contract.externalAccount.externalAccountPK.accountCode != null ? 'Client No: ' : ' '}"></h:outputText>
+								<h:outputText value="#{vin.contractLine.contract.externalAccount.externalAccountPK.accountCode}"></h:outputText>
+							</p:column>
+							<p:column  width="75">
+								<f:facet name="header">
+									<h:outputText value="Unit Number " style ="font-weight:bold"/>
+								</f:facet>
+								<h:outputText value="#{vin.unitNo}"></h:outputText>
+							</p:column>
+							<p:column  width="100">
+								<f:facet name="header">
+									<h:outputText value="Vehicle Status " style ="font-weight:bold"/>
+								</f:facet>
+								<h:outputText value="#{vin.vehicleStatusV.vehicleStatus}"></h:outputText>
+							</p:column>
+						</p:dataTable>
+						</h:form>
+						<div style="text-align:center;">
+							<h:outputText style="font-weight:bold;" 
+										value="Record Count: #{vinLovBean.fleetMasters.rowCount}">
+							</h:outputText>	
+							<p:commandButton style="float:right;"  value="Select" id = "vinSelectButton" name="vinSelectButton"
+										update=":vinLovForm:selectedVin,:vinLovForm:selectedUnitNumberOfVin" oncomplete="hideVinLov(); setVinValues();"
+										action="#{vinLovBean.setClickSelectedVinRow}" disabled="false"
+										>
+							</p:commandButton>
+									
+             			</div>
+				</p:dialog>	
+					
+					 
+				      <h:inputHidden id="selectedVin" value="#{vinLovBean.VIN}" />
+				      <h:inputHidden id="selectedUnitNumberOfVin" value="#{vinLovBean.unitNumber}" />
+				      <h:inputHidden id="lovRecordsPerPageVIN" value="#{vinLovBean.lovRecordsPerPage}" />
+				
+			</h:form>
+	<script type="text/javascript">
+	
+		function vinLovSelectButtonEnable(){
+			$("#vinSelectButton").prop('disabled', false);
+		}
+	
+		function setVinValues(){
+			var lovNameArray = new Array();
+			var lovValueArray = new Array();
+			lovNameArray[0]='VIN_NUMBER';
+			lovValueArray[0]=document.getElementById('selectedVin').value;
+			
+			lovNameArray[1]='UNIT_NUMBER';
+			lovValueArray[1]=document.getElementById('selectedUnitNumberOfVin').value;
+			<!-- This method need to implement in parent page to populate LOV seletion-->
+			setSelection('vinLOV',lovNameArray,lovValueArray);
+		}
+		function showVinLov(){
+			showDialog('vinLOV');
+		}	
+		
+		function hideVinLov(){
+			hideDialog('vinLOV');
+		}
+		
+				
+		function setFirstPageVinDetailsTableWidget(){
+			setDataTableToFirstPage('vinDetailsTableWidget');
+			// also select the first row, but only if we have data
+			setDataTableToFirstRow('vinDetailsTableWidget');
+		}
+		
+	</script>
+	
+</ui:composition>

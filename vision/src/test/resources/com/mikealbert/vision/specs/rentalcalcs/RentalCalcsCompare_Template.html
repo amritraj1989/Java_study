@@ -1,0 +1,47 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Rental Calcs Automated Compare</title>
+    <body>
+    	
+    		<table>
+    			<tr>
+    				<th><h2>Rental Calcs Automated Compare</h2> </th>    				
+    			</tr>
+    			<tr>
+    				<td>
+    					<table>
+    						<tr>
+    							<th>QMD_ID</th>
+    							<th>Willow Amounts</th>    							
+    							<th>Rate Sheet Rental </th>
+    							<th>Willow vs. VISION </th>
+    							<th>Rate Sheet vs. VISION </th>
+    						</tr>
+    						<tr class="calcItem" concordion:execute="#result = testCalculateBaselineRental(#qmdId)">
+    							<td concordion:set="#qmdId"></td>
+    							<td><span>Willow Rent : </span><span ></span><br/>
+    								<span>Willow Service : </span><span ></span><br/>
+    								<span>Willow Total : </span><span ></span><br/>
+    								
+    								<span>IRR : </span><span></span><br/>    								
+    							</td>
+    							<td>
+    								<span>Rate Sheet Rent: </span><span></span><br/>
+    							</td>
+    							<td>
+    								<span>Willow vs. VISION Rent: </span><span concordion:assertEquals="#result.visionFinanceRental"></span><br/>
+    								<span>Willow vs. VISION Service: </span><span concordion:assertEquals="#result.visionServiceRental"></span><br/>
+    								<span>Willow vs. VISION Total: </span><span concordion:assertEquals="#result.visionTotalRental"></span><br/>    								
+    							</td>
+    							<td>
+    								<span>Rate Sheet  vs. VISION Rent: </span><span concordion:assertEquals="#result.visionFinanceRental"></span><br/>
+    							</td>
+    							
+    						</tr>
+    					</table>
+    				</td>   				
+    				
+    			</tr>
+    		</table>
+    </body>
+</html>

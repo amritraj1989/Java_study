@@ -1,0 +1,110 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Fleet Maintenance / Authorize PO</title>
+    <body>
+    	<h1>Fleet Maintenance / Authorize PO</h1>
+
+    	<h2>Acceptance Tests (Automated)</h2>    
+ 
+        <ul concordion:execute="testAuthorizationLimitWhileAuthorizingPO(#unitPrice, #qty, #clientApprovalInfo)">
+           	<li>Find a unit that is On Contract, will recharge costs, that has MAFS Limit not equal to Null</li>
+			<ul>           	
+	           	<li>User = Recca, Bill (buyer limit of $20000)</li>
+	           	<li>Create Purchase Order for that unit</li>
+				<li>Create PO (service Provider = CSC32, add Maintenance Code = 500-102, Unit Price = <b>$<span concordion:set="#unitPrice">25000</span></b> and Quantity = <span concordion:set="#qty">1</span>)</li>
+				<li >Click Done</li>
+				<li>Click Authorize</li>
+				<li><span concordion:assertFalse="clientRechargeAuthorization">Message Maintenance Authorization limit for this customer has been exceed Approval information must be noted.</span></li>
+				<li><span concordion:assertTrue="waitOnClientApprovalStatus">PO Status is Waiting on Client Approval</span></li>
+				<li concordion:execute="testAuthorizationLimitWhileCompletingPO(#unitPrice, #qty, #clientApprovalInfo)">Click Complete</li>
+				<li><span concordion:assertFalse="clientRechargeAuthorization">Message Maintenance Authorization limit for this customer has been exceed Approval information must be noted.</span></li>
+				<li><span concordion:assertTrue="waitOnClientApprovalStatus">PO Status is Waiting on Client Approval</span></li>
+			</ul>
+		</ul>
+       
+       
+        <ul concordion:execute="testAuthorizationLimitWhileAuthorizingPO(#unitPrice, #qty, #clientApprovalInfo)">
+           	<li>Find a unit that is On Contract, will recharge costs, that has MAFS Limit not equal to Null</li>
+			<ul>           	
+	           	<li>User = Recca, Bill (buyer limit of $20000)</li>
+	           	<li>Create Purchase Order for that unit</li>
+				<li>Create PO (service Provider = CSC32, add Maintenance Code = 500-102, Unit Price =  <b>$<span concordion:set="#unitPrice">25000</span></b> and Quantity = <span concordion:set="#qty">1</span>)</li>
+				<li>Add client approval info <span concordion:set="#clientApprovalInfo">&apos;Approved&apos;</span></li>
+				<li >Click Done</li>
+				<li>Click Authorize</li>
+				<li><span concordion:assertTrue="clientRechargeAuthorization">No Message should appear for Maintenance Authorization limit for this customer.</span></li>
+				<li><span concordion:assertTrue="buyerAuthLimitValidationFailed">Message RECCA_B has exceeded the $20000 authorization limit</span></li>
+				<li><span concordion:assertFalse="waitOnClientApprovalStatus">PO Status should not change to Waiting on Client Approval</span></li>
+				<li concordion:execute="testAuthorizationLimitWhileCompletingPO(#unitPrice, #qty, #clientApprovalInfo)">Click Complete</li>
+				<li><span concordion:assertTrue="clientRechargeAuthorization">No Message should appear for Maintenance Authorization limit for this customer.</span></li>
+				<li><span concordion:assertTrue="buyerAuthLimitValidationFailed">Message RECCA_B has exceeded the $20000 authorization limit</span></li>
+				<li><span concordion:assertFalse="waitOnClientApprovalStatus">PO Status should not change to Waiting on Client Approval</span></li>
+			</ul>
+		</ul>
+		
+         <ul concordion:execute="testAuthorizationLimitWhileAuthorizingPO(#unitPrice, #qty, #clientApprovalInfo)">
+           	<li>Find a unit that is On Contract, will recharge costs, that has MAFS Limit not equal to Null</li>
+			<ul>           	
+	           	<li>User = Recca, Bill (buyer limit of $20000)</li>
+	           	<li>Create Purchase Order for that unit</li>
+				<li>Create PO (service Provider = CSC32, add Maintenance Code = 500-102, Unit Price =  <b>$<span concordion:set="#unitPrice">15000</span></b>(below user authorized limit and above client authorized limit) and Quantity = <span concordion:set="#qty">1</span>)</li>
+				<li>Remove client approval info <span concordion:set="#clientApprovalInfo"></span></li>
+				<li >Click Done</li>
+				<li>Click Authorize</li>
+				<li><span concordion:assertFalse="clientRechargeAuthorization">Message should appear for Maintenance Authorization limit for this customer.</span></li>
+				<li><span concordion:assertFalse="buyerAuthLimitValidationFailed">No Message should appear for RECCA_B has exceeded the $20000 authorization limit</span></li>
+				<li><span concordion:assertTrue="waitOnClientApprovalStatus">PO Status should be Waiting on Client Approval</span></li>
+				<li concordion:execute="testAuthorizationLimitWhileCompletingPO(#unitPrice, #qty, #clientApprovalInfo)">Click Complete</li>
+				<li><span concordion:assertFalse="clientRechargeAuthorization">Message should appear for Maintenance Authorization limit for this customer.</span></li>
+			</ul>
+		</ul>      
+
+ 
+        <ul concordion:execute="testAuthorizationLimitWhileAuthorizingPO(#unitPrice, #qty, #clientApprovalInfo)">
+           	<li>Find a unit that is On Contract, will recharge costs, that has MAFS Limit not equal to Null</li>
+			<ul>           	
+	           	<li>User = Recca, Bill (buyer limit of $20000)</li>
+	           	<li>Create Purchase Order for that unit</li>
+				<li>Create PO (service Provider = CSC32, add Maintenance Code = 500-102, Unit Price =  <b>$<span concordion:set="#unitPrice">2000</span></b>(below user authorized limit and above client authorized limit) and Quantity = <span concordion:set="#qty">1</span>)</li>
+				<li>Add client approval info <span concordion:set="#clientApprovalInfo">&apos;Approved&apos;</span></li>
+				<li >Click Done</li>
+				<li>Click Authorize</li>
+				<li><span concordion:assertFalse="buyerAuthLimitValidationFailed">No Message should appear for RECCA_B has exceeded the $20000 authorization limit</span></li>
+				<li>PO status should equal <span concordion:assertTrue="inProgressStatus">In Progress</span></li>
+				<li concordion:execute="testAuthorizationLimitWhileCompletingPO(#unitPrice, #qty, #clientApprovalInfo)">Click Complete</li>
+				<li>PO status should equal <span concordion:assertTrue="completeStatus">Complete</span></li>
+			</ul>
+		</ul>
+ 		
+        <ul concordion:execute="testAuthorizationLimitWhileAuthorizingPO(#unitPrice, #qty, #clientApprovalInfo)">
+           	<li>Find a unit that is On Contract, will recharge costs, that has MAFS Limit not equal to Null</li>
+			<ul>           	
+	           	<li>User = Recca, Bill (buyer limit of $20000)</li>
+	           	<li>Create Purchase Order for that unit</li>
+				<li>Create PO (service Provider = CSC32, add Maintenance Code = 500-102, Unit Price =  <b>$<span concordion:set="#unitPrice">500</span></b>(below user authorized limit and client authorized limit) and Quantity = <span concordion:set="#qty">1</span>)</li>
+				<li>Remove client approval info <span concordion:set="#clientApprovalInfo"></span></li>
+				<li >Click Done</li>
+				<li>Click Authorize</li>
+				<li><span concordion:assertFalse="buyerAuthLimitValidationFailed">No Message should appear for RECCA_B has exceeded the $20000 authorization limit</span></li>
+				<li>PO status should equal <span concordion:assertTrue="inProgressStatus">In Progress</span></li>
+				<li concordion:execute="testAuthorizationLimitWhileCompletingPO(#unitPrice, #qty, #clientApprovalInfo)">Click Complete</li>
+				<li>PO status should equal <span concordion:assertTrue="completeStatus">Complete</span></li>
+			</ul>
+		</ul>
+
+        <ul concordion:execute="testAuthorizationLimitWhileCompletingPO(#unitPrice, #qty, #clientApprovalInfo)">
+           	<li>Find a unit that is On Contract, will recharge costs, that has MAFS Limit not equal to Null</li>
+			<ul>           	
+	           	<li>User = Recca, Bill (buyer limit of $20000)</li>
+	           	<li>Create Purchase Order for that unit</li>
+				<li>Create PO (service Provider = CSC32, add Maintenance Code = 500-102, Unit Price =  <b>$<span concordion:set="#unitPrice">500</span></b>(below user authorized limit and client authorized limit) and Quantity = <span concordion:set="#qty">1</span>)</li>
+				<li>Remove client approval info <span concordion:set="#clientApprovalInfo"></span></li>
+				<li >Click Done</li>
+				<li>Click Complete</li>
+				<li>PO status should equal <span concordion:assertTrue="completeStatus">Complete</span></li>
+			</ul>
+		</ul>
+		
+														
+	</body>
+</html>            

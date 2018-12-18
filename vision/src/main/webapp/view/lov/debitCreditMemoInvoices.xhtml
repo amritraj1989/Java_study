@@ -1,0 +1,229 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">                          
+	
+				 <p:dialog widgetVar="debitCreditInvoiceLOV" 
+				 			id="DC_MEMO_INVOICE_GRID" 
+				 			dynamic="true" 
+				 			resizable="true" 
+				 			appendTo="@(body)"
+						 	width="1350" height="495"  
+						 	modal="true" 
+						 	onShow="setFirstPageInvoiceDataTableWidget();setFocus('invoiceSelectButton');">
+						 <f:facet name="header">
+       							<h:outputText id="dialogHeader" value="Select Invoice &#160;&#160;&#160;&#160;&#160; #{debitCreditMemoInvoiceLovBean.headerMessage}"/>
+   							</f:facet>
+						
+				        <h:form id="invoiceLovDataTblForm" onkeydown="body_onkeydown(event,'invoiceLovDataTblForm:invoiceSelectButton','debitCreditInvoiceLOV');">
+				        
+				         <p:hotkey immediate="true" bind="esc" handler="PF('debitCreditInvoiceLOV').hide();"/>
+				        
+						<p:dataTable  widgetVar="invoiceDataTableWidget" 
+							lazy="false" 
+							var="invoice" 
+							scrollable="true" 
+							scrollHeight="370" 
+							resizableColumns="true"
+							value="#{debitCreditMemoInvoiceLovBean.resultList}" 
+							rows="#{debitCreditMemoInvoiceLovBean.rowsPerPage}" 
+							paginator="true" 
+							rowKey="#{invoice.rowKey}"
+							paginatorPosition="bottom"
+							selection = "#{debitCreditMemoInvoiceLovBean.selectedInvoice}" 
+							selectionMode="single" >
+							
+							 <p:ajax event="rowDblselect" listener="#{debitCreditMemoInvoiceLovBean.onRowSelect}" 
+									update=":lovAnalysisCode, :lovAnalysisDesc,:lovLineAmount,:lovLineTax,:lovLineTotalAmount,:lovInvoiceNo,:lovTransactionDate,:lovBillingPeriodDate" 
+									oncomplete="hideDCMemoInvoiceLov();setDCMemoInvoicesValues();"  />
+							<p:ajax event="rowSelect" listener="#{debitCreditMemoInvoiceLovBean.onRowSelect}" />
+							<p:ajax event="page" onstart="clearDataTableSelection('invoiceDataTableWidget');" oncomplete="setScrollDivAtTop();"/>
+							<h:messages />
+							
+							
+							<p:column width="90">
+								<f:facet name="header">
+									<h:outputText value="Invoice Date"/>
+								</f:facet>
+								<h:outputText value="#{invoice.invoiceDate}">
+									<f:convertDateTime type="date" pattern="MM/dd/yyyy" /> 
+								</h:outputText>
+							</p:column>
+							<p:column width="90">
+								<f:facet name="header">
+									<h:outputText value="Invoice No" />
+								</f:facet>
+								<h:outputText value="#{invoice.docNo}"></h:outputText>
+							</p:column>
+							<p:column width="90">
+								<f:facet name="header">
+									<h:outputText value="Billing Date" />
+								</f:facet>								
+								<h:outputText value="#{invoice.billingPeriodDate}">
+									<f:convertDateTime type="date" pattern="MM/dd/yyyy" /> 
+							    </h:outputText>
+							    
+							</p:column>
+							<p:column width="90">
+								<f:facet name="header">
+									<h:outputText value="Detail Amount"/>
+								</f:facet>
+								<h:outputText style="float:right"  value="#{invoice.lineAmount}">
+									<f:convertNumber type="number" pattern="$#,##0.00" />                               
+                           		</h:outputText>
+							</p:column>
+							<p:column width="90">
+								<f:facet name="header">
+									<h:outputText value="Detail Tax Amount" />
+								</f:facet>
+								<h:outputText style="float:right"  value="#{invoice.lineTax}">	
+									<f:convertNumber type="number" pattern="$#,##0.00" />                               
+                           		</h:outputText>
+							</p:column>							
+							<p:column width="90">
+								<f:facet name="header">
+									<h:outputText value="Detail Total Amount" />
+								</f:facet>
+								<h:outputText style="float:right"  value="#{invoice.lineTotalAmount}">	
+									<f:convertNumber type="number" pattern="$#,##0.00" />                               
+                           		</h:outputText>
+							</p:column>
+							<p:column width="120">
+								<f:facet name="header">
+									<h:outputText value="Invoice Billing Type/Source" />
+								</f:facet>
+								<h:outputText value="#{invoice.categoryCode}/#{invoice.sourceCode}"></h:outputText>
+							</p:column>	
+							<p:column width="100">
+								<f:facet name="header">
+									<h:outputText value="Detail Transaction Date" />
+								</f:facet>
+								<h:outputText value="#{invoice.lineDocDate}">
+									<f:convertDateTime type="date" pattern="MM/dd/yyyy" /> 
+							    </h:outputText>
+							</p:column>								
+
+							<p:column width="200">
+								<f:facet name="header">
+									<h:outputText value="Detail Description" />
+								</f:facet>
+								<h:outputText value="#{invoice.lineDescription}"></h:outputText>
+							</p:column>							
+					        <p:column width="90">
+								<f:facet name="header">
+									<h:outputText value="Invoice Amount" />
+								</f:facet>
+								<h:outputText style="float:right"  value="#{invoice.invoiceAmount}">
+									<f:convertNumber type="number" pattern="$#,##0.00" />                               
+                           		</h:outputText>	
+							</p:column>
+							<p:column width="90">
+								<f:facet name="header">
+									<h:outputText value="Invoice Tax Amount" />
+								</f:facet>
+								<h:outputText style="float:right"  value="#{invoice.invoiceTax}">	
+									<f:convertNumber type="number" pattern="$#,##0.00" />                               
+                           		</h:outputText>	
+							</p:column>
+							<p:column width="90">
+								<f:facet name="header">
+									<h:outputText value="Invoice Total Amount" />
+								</f:facet>
+								<h:outputText style="float:right"  value="#{invoice.invoiceTotalAmount}">
+									<f:convertNumber type="number" pattern="$#,##0.00" />                               
+                           		</h:outputText>	
+							</p:column>	
+						</p:dataTable>
+						
+						<div style="text-align:center;">
+								
+									 <h:outputText style="font-weight:bold;" 
+										value="Record Count: #{debitCreditMemoInvoiceLovBean.resultList.size()}">
+									</h:outputText>	
+									<p:commandButton style="float:right;"  
+											value="Select" 
+											id = "invoiceSelectButton" 
+											name ="invoiceSelectButton" 
+											update=":lovAnalysisCode, :lovAnalysisDesc, :lovLineAmount, :lovLineTax,:lovLineTotalAmount, :lovInvoiceNo, :lovTransactionDate , :lovBillingPeriodDate"
+											oncomplete="hideDCMemoInvoiceLov();setDCMemoInvoicesValues();" >
+									</p:commandButton> 
+							
+							
+					
+				        		
+             			</div>
+             			</h:form>	 
+					</p:dialog>	
+					
+					 
+				     	<h:inputHidden id="targetDebitCreditMemoInputName" value="debitCreditMemoInvLOV" />
+				        <h:inputHidden id="lovAnalysisCode" value="#{debitCreditMemoInvoiceLovBean.selectedInvoice.analysisCode}" />
+				        <h:inputHidden id="lovAnalysisDesc" value="#{debitCreditMemoInvoiceLovBean.selectedInvoice.analysisCodeDesc}" />
+				        <h:inputHidden id="lovLineAmount" value="#{debitCreditMemoInvoiceLovBean.selectedInvoice.lineAmount}" ><f:convertNumber type="number" pattern="#,##0.00" /> </h:inputHidden>     
+				        <h:inputHidden id="lovLineTax" value="#{debitCreditMemoInvoiceLovBean.selectedInvoice.lineTax}" ><f:convertNumber type="number" pattern="#,##0.00" /> </h:inputHidden>    
+				        <h:inputHidden id="lovLineTotalAmount" value="#{debitCreditMemoInvoiceLovBean.selectedInvoice.lineTotalAmount}" ><f:convertNumber type="number" pattern="#,##0.00" /> </h:inputHidden>    
+				        <h:inputHidden id="lovInvoiceNo" value="#{debitCreditMemoInvoiceLovBean.selectedInvoice.docNo}" />
+				        <h:inputHidden id="lovTransactionDate" value="#{debitCreditMemoInvoiceLovBean.selectedInvoice.getLineDocDateStr()}" />   
+				        <h:inputHidden id="lovBillingPeriodDate" value="#{debitCreditMemoInvoiceLovBean.selectedInvoice.billingPeriodDate}"><f:convertDateTime type="date" pattern="MM/dd/yyyy" /></h:inputHidden> 
+			        
+ 	
+ 		<style type="text/css">
+	      	.ui-datatable thead th {
+	        	white-space: normal;
+	        	text-align: center;
+	        	font-weight: bold;
+	     	}	
+	     	
+    		
+    	</style>  				
+		<script type="text/javascript">
+		
+		function setDCMemoInvoicesValues(){
+			var lovNameArray = new Array();
+			var lovValueArray = new Array();
+			lovNameArray[0]='ANAYSIS_CODE';
+			lovValueArray[0]=document.getElementById('lovAnalysisCode').value;
+		
+			lovNameArray[1]='ANAYSIS_DESC';
+			lovValueArray[1]=document.getElementById('lovAnalysisDesc').value;
+			
+			lovNameArray[2]='LINE_AMOUNT';
+			lovValueArray[2]=document.getElementById('lovLineAmount').value;
+			
+			lovNameArray[3]='TAX_AMOUNT';
+			lovValueArray[3]=document.getElementById('lovLineTax').value;
+			
+			lovNameArray[4]='TOTAL_AMOUNT';
+			lovValueArray[4]=document.getElementById('lovLineTotalAmount').value;
+			
+			lovNameArray[5]='INVOICE_NO';
+			lovValueArray[5]=document.getElementById('lovInvoiceNo').value;
+			
+			lovNameArray[6]='TRANSACTION_DATE';
+			lovValueArray[6]=document.getElementById('lovTransactionDate').value;
+			
+			lovNameArray[7]='BILLING_PERIOD_DATE';
+			lovValueArray[7]=document.getElementById('lovBillingPeriodDate').value;
+			
+			//alert('--'+lovValueArray[0]+'--'+lovValueArray[1]+'--'+lovValueArray[2]+'--'+lovValueArray[3]+'--'+lovValueArray[4]+'--'+lovValueArray[5]+'--'+lovValueArray[6]+'-BP-'+lovValueArray[7]);
+			<!-- This method need to implement in parent page to populate LOV seletion-->			
+			setSelection(document.getElementById('targetDebitCreditMemoInputName').value,lovNameArray,lovValueArray); 
+		}
+		
+		function showDCMemoInvoiceLov(){
+			showDialog('debitCreditInvoiceLOV');
+		}	
+		
+		function hideDCMemoInvoiceLov(){
+			hideDialog('debitCreditInvoiceLOV');
+		}
+		
+		function setFirstPageInvoiceDataTableWidget(){
+			setDataTableToFirstPage('invoiceDataTableWidget');
+			// also select the first row, but only if we have data
+			setDataTableToFirstRow('invoiceDataTableWidget');
+		}
+		
+		</script>
+</ui:composition>

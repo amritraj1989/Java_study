@@ -1,0 +1,118 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">                          
+				 <h:form id="MaintLovForm" name ="MaintLovForm" prependId = "false" >
+				 <p:dialog header="Select Maintenance Code" widgetVar="maintenanceCodeLOV" id="MAINTENANCE_CODE_GRID" dynamic="true" resizable="true" appendTo="@(body)"
+						 width="710" height="355"  modal="true" onShow="setFirstPageMaintDataTableWidget(); setFocus('maintenanceCodeSelectButton');">
+						 
+						 <p:hotkey immediate="true" bind="esc" handler="PF('maintenanceCodeLOV').hide();"/>
+				        
+				        <h:inputHidden id="clickMaintLovIndex" name ="clickMaintLovIndex" value = "#{maintenanceCodeLovBean.selectionIndex}"/>
+				        <h:form id="maintLovDataTblForm" onkeydown="body_onkeydown(event,'maintLovDataTblForm:maintenanceCodeSelectButton','maintenanceCodeLOV');">
+						<p:dataTable  widgetVar="maintDataTableWidget" lazy="true" var="maintenanceCode" scrollable="true" scrollHeight="270" resizableColumns="true"
+							value="#{maintenanceCodeLovBean.maintenanceCode}" rows="#{maintenanceCodeLovBean.rowsPerPage}" paginator="true" paginatorPosition="bottom"  
+						   selection = "#{maintenanceCodeLovBean.selectedMaintenanceCodeContact}" selectionMode="single" 
+						   >
+						   
+						    <p:ajax event="rowDblselect" listener="#{maintenanceCodeLovBean.onRowSelect}" 
+						            update=":MaintLovForm:lovMaintenanceCodeId,:MaintLovForm:lovMaintenanceCode,:MaintLovForm:lovMaintenanceDescription,:MaintLovForm:clickMaintLovIndex" 
+									oncomplete="hideMaintenanceCodeLov();setMaintenanceCodeValues();"  />
+							<p:ajax event="rowSelect" listener="#{maintenanceCodeLovBean.onRowSelect}" oncomplete="maintenanceCodeSelectButtonEnable();" update=":MaintLovForm:clickMaintLovIndex" />
+							<p:ajax event="page" onstart="clearDataTableSelection('maintDataTableWidget');" oncomplete="setScrollDivAtTop();"/>
+							<h:messages />
+														
+							<p:column width="45">
+								<f:facet name="header">
+									<h:outputText value="Code" style ="font-weight:bold"/>
+								</f:facet>
+								<h:outputText value="#{maintenanceCode.code}"></h:outputText>
+							</p:column>
+							<p:column width="100">
+								<f:facet name="header">
+									<h:outputText value="Description" style ="font-weight:bold"/>
+								</f:facet>
+								<h:outputText value="#{maintenanceCode.description}"></h:outputText>
+							</p:column>
+							<p:column width="70">
+								<f:facet name="header">
+									<h:outputText value="Category" style ="font-weight:bold"/>
+								</f:facet>
+								<h:outputText value="#{maintenanceCode.maintCatCode}"></h:outputText>
+							</p:column>	
+							<p:column width="45">
+								<f:facet name="header">
+									<h:outputText value="Part / Labor" style ="font-weight:bold"/>
+								</f:facet>
+								<h:outputText value="#{maintenanceCode.maintCodeType}"></h:outputText>
+							</p:column>	
+													
+						</p:dataTable>
+						
+						<div style="text-align:center;">
+								
+							<h:outputText style="font-weight:bold;" 
+								value="Record Count: #{maintenanceCodeLovBean.maintenanceCode.rowCount}">
+							</h:outputText>	
+
+							<p:commandButton style="float:right;" value="Select" id = "maintenanceCodeSelectButton" name = "maintenanceCodeSelectButton" 
+								update=":MaintLovForm:lovMaintenanceCodeId,:MaintLovForm:lovMaintenanceCode,:MaintLovForm:lovMaintenanceDescription"
+								actionListener = "#{maintenanceCodeLovBean.setClickSelectedMaintenanceCodeRow}" oncomplete="hideMaintenanceCodeLov();setMaintenanceCodeValues();"
+								>
+							</p:commandButton>
+									
+             			</div>
+             			</h:form>	 
+					</p:dialog>
+					
+				 		
+						<h:inputHidden id="targetInputName" value="maintenanceCodeLOV" />
+						<h:inputHidden id="lovMaintenanceCodeId" value="#{maintenanceCodeLovBean.maintCodeId}" />
+				        <h:inputHidden id="lovMaintenanceCode" value="#{maintenanceCodeLovBean.maintCode}" />
+				        <h:inputHidden id="lovMaintenanceDescription" value="#{maintenanceCodeLovBean.maintenanceCodeDescription}" />
+				       
+				        <h:inputHidden id="lovRecordsPerPageMaint" value="#{maintenanceCodeLovBean.lovRecordsPerPage}" />	        
+					</h:form>
+					
+					<script type="text/javascript">
+					
+					function maintenanceCodeSelectButtonEnable(){
+						$("#maintenanceCodeSelectButton").prop('disabled',false);
+					}
+					
+					function setMaintenanceCodeValues(){
+						var lovNameArray = new Array();
+						var lovValueArray = new Array();
+						lovNameArray[0]='MAINTENANCE_CODE';
+						lovValueArray[0]=document.getElementById('lovMaintenanceCode').value;
+						lovNameArray[1]='MAINTENANCE_DESCRIPTION';
+						lovValueArray[1]=document.getElementById('lovMaintenanceDescription').value;
+						lovNameArray[2]='MAINTENANCE_CODE_ID';
+						lovValueArray[2]=document.getElementById('lovMaintenanceCodeId').value;
+						<!-- This method need to implement in parent page to populate LOV seletion-->
+						setSelection(document.getElementById('targetInputName').value,lovNameArray,lovValueArray);
+					}
+					
+					function showMaintenanceCodeLov(){
+						showDialog('maintenanceCodeLOV');
+						$("#maintenanceCodeSelectButton").prop('disabled',true);
+					}	
+					
+					function hideMaintenanceCodeLov(){
+						hideDialog('maintenanceCodeLOV');
+					}
+					
+					function setFirstPageMaintDataTableWidget(){
+						setDataTableToFirstPage('maintDataTableWidget');
+						// also select the first row, but only if we have data
+						setDataTableToFirstRow('maintDataTableWidget');
+					}
+					
+					
+					function selectLovRecord() { 
+			            document.getElementById('maintenanceCodeSelectButton').click();
+			        }
+		
+		</script>
+</ui:composition>

@@ -1,0 +1,76 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"   
+	xmlns:pe="http://primefaces.org/ui/extensions"	  
+    template="../../templates/ui.xhtml" >
+	
+    <ui:define name="content">
+    	    <h:form id="unitProgressBreadCrumbForm" prependId="false">
+   			    <p:breadCrumb model="#{unitProgressSearchBean.breadCrumbTrail}" ajax="false" immediate="true" style="min-width:980px;max-width:100%;width:auto;"/>
+   		    </h:form>
+   		        
+    	    <!-- Message display -->
+		    <p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:980px;max-width:100%;width:auto;">
+			    <p:messages id="messages" showSummary="false" showDetail="true" autoUpdate="true" />
+		    </p:scrollPanel>   
+		    	
+		    <h:form id="mainForm" prependId="false" rendered="#{!unitProgressSearchBean.enquiryMode}">
+					
+	    		<p:panel id="inputPanel">
+	    			<h:panelGrid columns="10">
+	    			
+	    				<h:panelGrid columns="3" styleClass="panelGrid-top">
+		    				<p:outputLabel value="Looking For - " styleClass="ui-label"/>
+							<p:spacer width="50" height="1"/>
+							
+						</h:panelGrid>
+ 						
+						<p:commandLink title="Purchase Order Release" action="#{unitProgressSearchBean.navigateToPOReleaseQueue}" immediate="true" ajax="false" onclick="lockScreen()">	
+							 <h:outputText value="Purchase Order Release" rendered="true" />
+						</p:commandLink>
+						<p:spacer width="20" height="1"/>
+ 						<p:commandLink title="Third Party Progress" action="#{unitProgressSearchBean.navigateToThirdPartyQueue}" immediate="true" ajax="false" onclick="lockScreen()">							
+							 <h:outputText value="Third Party Progress"  rendered="true" />
+						</p:commandLink>
+						<p:spacer width="20" height="1"/>
+ 						<p:commandLink title="Manufacturer Progress" action="#{unitProgressSearchBean.navigateToManufacturerQueue}" immediate="true" ajax="false" onclick="lockScreen()">							
+							 <h:outputText value="Manufacturer Progress"  rendered="true" />
+						</p:commandLink>
+						<p:spacer width="20" height="1"/>
+	 					<p:commandLink title="Upfit Progress" action="#{unitProgressSearchBean.navigateToUpfitterQueue}" immediate="true" ajax="false" onclick="lockScreen()">							
+							 <h:outputText value="Upfit Progress"  rendered="true" />
+						</p:commandLink>
+						<p:spacer width="20" height="1"/>
+						<p:commandLink title="In Service Date Progress" action="#{unitProgressSearchBean.navigateToInServiceQueue}" immediate="true" ajax="false" onclick="lockScreen()">	
+							 <h:outputText value="In Service Date Progress" rendered="true" />
+						</p:commandLink>
+						
+						<p:spacer width="100" height="1"/>
+
+				
+					</h:panelGrid>
+						
+              	</p:panel>
+			</h:form>
+  
+		<style type="text/css">
+			.dateTimeField input {
+				width: 75px;
+			}
+			
+			.ui-datatable thead th {
+				white-space: normal;
+				text-align: center;
+			}
+			
+			.textWrap {
+				white-space: normal;
+			}
+		</style>  
+			                                                                                               
+	</ui:define>
+	
+</ui:composition>

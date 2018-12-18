@@ -1,0 +1,274 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" template="../../templates/ui.xhtml">
+
+	<ui:define name="content">
+		<h:form id="driverAllocationBreadCrumbForm" prependId="false">
+			<p:breadCrumb model="#{driverAllocationBean.breadCrumbTrail}"
+				ajax="false" immediate="true" />
+		</h:form>
+		
+		<!-- Message display -->
+		<p:scrollPanel style="height:50px;" mode="native">
+			<p:messages id="messages" showSummary="false" showDetail="true"
+				autoUpdate="true" />
+		</p:scrollPanel>
+
+		<h:form id="driverAlloctionForm" prependId="false">
+
+			<!-- Unit Detail Panel -->
+			<p:panel id="unitDetailPanel" header="Driver Allocation" styleClass="ui-layout">
+				<p:panelGrid cellpadding="5">
+					<p:row>
+						<p:column>
+							<h:outputLabel for="accountCode" styleClass="ui-label"
+								value="Client Account" />
+						</p:column>
+						<p:column>
+							<h:outputLabel id="accountCode"
+								value="#{driverAllocationBean.selectedAllocation.fleetMaster.contractLine.contract.externalAccount.externalAccountPK.accountCode}" />
+						</p:column>
+
+						<p:column>
+							<h:outputLabel for="accountName" styleClass="ui-label"
+								value="Client Name" />
+						</p:column>
+						<p:column colspan="3">
+							<h:outputLabel id="accountName"
+								value="#{driverAllocationBean.selectedAllocation.fleetMaster.contractLine.contract.externalAccount.accountName}" />
+						</p:column>
+					</p:row>
+
+					<p:row>
+						<p:column>
+							<h:outputLabel for="unitNo" styleClass="ui-label"
+								value="Unit No " />
+						</p:column>
+						<p:column>
+							<h:outputLabel id="unitNo"
+								value="#{driverAllocationBean.selectedAllocation.fleetMaster.unitNo}" />
+						</p:column>
+
+						<p:column>
+							<h:outputLabel for="currentOdoReading" styleClass="ui-label"
+								value="Odo Reading " />
+						</p:column>
+						<p:column>
+							<h:outputLabel id="currentOdoReading"
+								value="#{driverAllocationBean.selectedAllocation.fleetMaster.latestOdometerReading.odoReading}" />
+							<h:inputHidden id="currentOdoReadingHidden"
+								name="currentOdoReadingHidden"
+								value="#{driverAllocationBean.selectedAllocation.fleetMaster.latestOdometerReading.odoReading}" />
+						</p:column>
+
+
+						<p:column style="width:115px">
+							<h:outputLabel for="currentOdoReadingDate" styleClass="ui-label"
+								value="Odo Reading Date " />
+						</p:column>
+						<p:column>
+							<h:outputLabel id="currentOdoReadingDate"
+								value="#{driverAllocationBean.selectedAllocation.fleetMaster.latestOdometerReading.odoReadingDate}">
+								<f:convertDateTime pattern="MM/dd/yyyy" />
+							</h:outputLabel>
+						</p:column>
+					</p:row>
+				</p:panelGrid>
+			</p:panel>
+
+			<!-- Allocation Panel -->
+			<h:panelGrid columns="2" cellpadding="5">
+				<p:panel id="currentDriverPanel" header="Deallocate"
+					style="width:400px">
+					<h:panelGrid columns="2" cellpadding="5">
+						<h:outputLabel for="currentDriver" styleClass="ui-label"
+							value="Current Driver" />
+						<h:outputLabel id="currentDriver"
+							value="#{driverAllocationBean.selectedAllocation.driver.driverSurname}, #{driverAllocationBean.selectedAllocation.driver.driverForename}  " >
+							<h:outputText value="#{driverAllocationBean.selectedAllocation.driver.poolManager}" converter="PoolManagerConverter"/>
+						</h:outputLabel>
+
+						<h:outputLabel for="oldDriverAllocationDate" styleClass="ui-label"
+							value="Allocation Date" />
+						<h:outputLabel id="oldDriverAllocationDate"
+							value="#{driverAllocationBean.selectedAllocation.allocationDate}">
+							<f:convertDateTime pattern="MM/dd/yyyy" />
+						</h:outputLabel>
+
+						<h:outputLabel for="oldDriverDeallocationDate" styleClass="ui-label"
+							value="Deallocation Date" />
+						<h:outputLabel id="oldDriverDeallocationDate">
+							<h:outputText style="color:red"
+								value="#{driverAllocationBean.selectedAllocation.deallocationDate}">
+								<f:convertDateTime pattern="MM/dd/yyyy" />
+							</h:outputText>
+						</h:outputLabel>
+
+						<h:outputLabel value="" />
+						<h:outputLabel value="" />
+
+						<h:outputLabel value="" />
+						<h:outputLabel value="" />
+
+						<h:outputLabel value="" />
+						<h:outputLabel value="" />
+
+						<h:outputLabel value="" />
+						<h:outputLabel value="" />
+
+						<h:outputLabel value="" />
+						<h:outputLabel value="" />
+
+					</h:panelGrid>
+				</p:panel>
+
+				<p:panel id="allocationPanel" header="Allocate" style="width:400px">
+
+					<p:focus context="allocationPanel" />
+
+					<h:panelGrid columns="2" cellpadding="5">
+						<p:outputLabel for="driverName" styleClass="ui-label"
+							value="New Driver *" />
+						<h:panelGroup>
+						<f:validateBean  disabled="true">
+							<p:inputText id="driverName" title="Last name, First name"
+								value="#{driverAllocationBean.driverName}"
+								onchange="clearInputText(['driverId']);"
+								onkeydown="setTargetKeyCode(event);"
+								validator="#{driverAllocationBean.validateCustomNewDriver}"
+								disabled="#{!driverAllocationBean.hasPermission()}" tabindex="10">
+								
+								<p:ajax event="change"  onstart="return proceedAjax();"
+									listener="#{driverAllocationBean.decodeNewDriverByName}" process="@this" 
+									oncomplete="setFocusOnLOV('driverName', 'driverNameLOV')"
+									update="driverName,driverId" />
+									 	
+							</p:inputText>
+							<p:commandButton id="driverNameLOV" icon="icon-lov" title="lov"
+								onstart="return hasMinAlphaNumericCharacters($('#driverName'));"							
+								oncomplete="showDriverLov()"
+								actionListener="#{driverLovBean.fetchLOVData}" immediate="true"
+								process="@this,driverName,customerCode" dynamic="true"
+								async="true" update=":drvLovForm:DRIVER_GRID" tabindex="20"
+								disabled="#{!driverAllocationBean.hasPermission()}">
+								<f:param name="CUSTOMER_CODE_INPUT" value="customerCode" />
+								<f:param name="DRIVER_NAME_INPUT" value="driverName" />
+								<f:param name="DONOT_FETCH_RELATED_DRIVERS" value="Y" />
+								<f:param name="FETCH_RELATED_CUSTOMER_ACCOUNT" value="N" />	
+								<f:param name="FETCH_OPEN_CUSTOMER_ONLY" value="Y" />
+								<f:param name="FETCH_ACTIVE_DRIVER_ONLY" value="Y" />							
+							</p:commandButton>
+							<h:inputHidden id="customerCode" name="customerCode"
+								value="#{driverAllocationBean.selectedAllocation.fleetMaster.contractLine.contract.externalAccount.externalAccountPK.accountCode}" />
+							<h:inputHidden id="driverId" name="driverId"
+								value="#{driverAllocationBean.selectedDriverId}" />
+						 </f:validateBean>	
+						</h:panelGroup>
+
+						<h:outputLabel for="newDriverAllocationDate" styleClass="ui-label"
+							value="Allocation Date *" />						
+						<h:outputLabel id="newDriverAllocationDate"
+							value="#{driverAllocationBean.newAllocation.allocationDate}">
+							<f:convertDateTime pattern="MM/dd/yyyy" />
+						</h:outputLabel>						
+
+						<p:outputLabel for="odoReading" styleClass="ui-label"
+							value="Odo Reading *" />
+						<h:panelGroup>
+							<p:inputText id="odoReading" 
+								value="#{driverAllocationBean.newAllocation.fromOdoReading}" onkeypress="return numericInput(event);"
+								disabled="#{!driverAllocationBean.hasPermission()}" tabindex="40" maxlength="7"
+								onblur="onBlurOdoReading(this);">
+							</p:inputText>
+							<h:outputLabel id="uomCode"
+								value="#{driverAllocationBean.newAllocation.odoUom}" />
+						</h:panelGroup>
+
+						<h:outputLabel value="" />
+						<h:outputLabel value="" />
+
+						<h:outputLabel value="" />
+						<h:outputLabel value="" />
+
+						<h:outputLabel value="" />
+						<h:outputLabel value="" />
+
+					</h:panelGrid>
+				</p:panel>
+				<f:facet name="footer">
+					<p:commandButton id="submit" value="Save"
+						action="#{driverAllocationBean.save}" ajax="false"
+						onclick="lockScreen();" disabled="#{!driverAllocationBean.hasPermission()}"
+						tabindex="50" />
+					<p:spacer width="10" />
+
+					<p:commandButton id="cancel" value="Cancel"
+						action="#{driverAllocationBean.cancel}" ajax="false"
+						immediate="true" onclick="lockScreen();" tabindex="60" />
+				</f:facet>
+			</h:panelGrid>
+		</h:form>
+		
+		<p:confirmDialog id="odometerConfirmDialog" appendTo="@(body)"
+				message="#{msgs.odometer_reading_lower_than_last}" 
+				header="Odometer Message"
+				widgetVar="odometerConfirmationWidgetVar">
+				<p:focus  context="odometerConfirmDialog"/>			
+			
+			<h:form prependId="false">	 
+				<p:hotkey immediate="true" bind="esc" handler="PF('odometerConfirmationWidgetVar').hide();"/>
+				<p:commandButton  value="Ok"	onclick="PF('odometerConfirmationWidgetVar').hide();" type="button" />
+			</h:form>
+		</p:confirmDialog>
+					
+		<div id="DRIVER_LOV_DIV">
+			<ui:include src="../lov/drivers.xhtml" />
+		</div>
+		
+		<div id="inputFieldChecks">
+			<ui:include src="../alert/inputFieldChecks.xhtml" />
+		</div>		
+
+		<script type="text/javascript"> 
+		
+		    /**
+		    * Catching the Odo Reading on paste event
+		    * to prevent nonnumeric character input
+		    */
+		    $('#odoReading').bind('paste', function(e){
+		    	return window.clipboardData.getData('Text').match(/^\s*\d+\s*$/) ? true : false; });
+		    
+		    /**
+		    * Warn the user when the Odo reading they entered is lesser that 
+		    * the lastest one on record.
+		    */
+		    function onBlurOdoReading(o){
+		    	var currOdoReading = $('#currentOdoReadingHidden').val();
+		    	var newOdoReading = o.value;
+		    	
+		    	if( currOdoReading != null &amp;&amp; newOdoReading != null){
+		    		if(parseInt(newOdoReading) &lt; parseInt(currOdoReading)){
+		    			showDialog('odometerConfirmationWidgetVar');
+		    		}
+		    	}
+		    }
+	        
+		    function setSelection( lovName, nameArray, valueArray){	
+			    if(lovName == 'driverLOV'){	
+				    for(var i=0; i  &lt; nameArray.length ; i++){								
+					    if(nameArray[i] == "DRIVER_ID") {
+						    document.getElementById('driverId').value = valueArray[i];	
+						} else if(nameArray[i] == "DRIVER_FULLNAME") {
+							document.getElementById('driverName').value = valueArray[i];							
+						}
+					}
+					setFocus('driverName');					
+				}				
+		    }		    	    
+		    
+		</script>
+	</ui:define>
+
+</ui:composition>

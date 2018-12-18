@@ -1,0 +1,71 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Fleet Maintenance / FM 338 Need to record Lease Plan Service Providers Name, Address and Phone #</title>
+    <body>
+    	<h1>Fleet Maintenance / FM 338 Need to record Lease Plan Service Providers Name, Address and Phone #</h1>
+    	<h2>Acceptance Tests (Automated)</h2>
+
+		    <ul concordion:execute="#result = testLeasePlanAddress(#unitNo,#serviceProvider, #serviceProviderAddress)">
+		    	<li>Create Purchase Order for unit number <span concordion:set="#unitNo">00949476</span>:</li>
+		    	<ul style = "circle">
+		            <li>Service Provider field select: Nwrk - Firestone/Bridgestone as Service Provider , Serv. Prov. No: = <span concordion:set="#serviceProvider">CSC1</span>, expand the service provider address block,
+		            	<span concordion:assertTrue="leasePlanServiceProvider"> field should be available  to enter Service Provider address,</span> input: <span concordion:set="#serviceProviderAddress">C/O Mickey Mouse, St. Petersburgh, FL 12345-0000, Phone # 513-555-5555</span>
+		            </li>
+		            <li>
+		            	add task item line to the PO, click Save, Reopen PO, confirm Service Provider address = <span concordion:assertEquals="savedServiceProviderAddress">C/O Mickey Mouse, St. Petersburgh, FL 12345-0000, Phone # 513-555-5555</span>
+		            </li>
+	        	</ul>
+			</ul>
+			<ul concordion:execute="#result = updateLeasePlanAddress(#serviceProvider, #serviceProviderAddress)">
+			    <ul style = "circle">
+				    <li>
+		           		change the Service Provider to K&amp;D Automotive No: <span concordion:set="#serviceProvider">00159357</span>, expand the service provider address block <span concordion:assertFalse="leasePlanServiceProvider">field should NOT be available  to enter service providers name and address</span>
+		           	</li>
+	           	</ul>
+		    </ul>
+<!-- 
+			<ul concordion:execute="#result = updateLeasePlanAddress(#serviceProvider, #serviceProviderAddress)">
+			    <ul style = "circle">
+		            <li>
+		            	Click Save Reopen PO, change the Service Provider to Nwrk - Goodyear No: <span concordion:set="#serviceProvider">CSC2</span>, expand the service provider address block <span concordion:assertTrue="leasePlanServiceProvider">field should be available  to enter service providers name and address</span>
+		            </li>
+		            <li>
+		            	Enter <span concordion:set="#serviceProviderAddress">Attn: Minnie Mouse, 987 Main St. Blvd., Suite 333, % Pluto, Los Angeles, CA 44444-4444</span>
+		            </li>
+		            <li>
+		            	Click Save Reopen PO, confirm Service Provider address should equal <span concordion:assertEquals="savedServiceProviderAddress">Attn: Minnie Mouse, 987 Main St. Blvd., Suite 333, % Pluto, Los Angeles, CA 44444-4444</span>
+		            </li>
+	           	</ul>
+		    </ul>
+
+		    <ul concordion:execute="#result = testLeasePlanAddress(#unitNo,#serviceProvider, #serviceProviderAddress)">
+		    	<li>Create Purchase Order for unit number <span concordion:set="#unitNo">00938754</span>(inactive unit):</li>
+		    	<ul style = "circle">
+		            <li>Service Provider field select: Surratt &amp; Kennington Auto &amp; Truck Repair - MC, Serv. Prov. No: <span concordion:set="#serviceProvider">MC-SURR</span>, expand the service provider address block,
+		            	<span concordion:assertFalse="leasePlanServiceProvider"> field should NOT be available  to enter Service Provider address,</span>
+		            </li>
+	        	</ul>
+			</ul>		    
+			<ul concordion:execute="#result = updateLeasePlanAddress(#serviceProvider, #serviceProviderAddress)">
+			    <ul style = "circle">
+		            <li>
+		            	add task item line to the PO, Click Save Reopen PO, change the Service Provider to Nwrk Nwrk - GM Direct Network, Serv. Prov. No: <span concordion:set="#serviceProvider">CSC46</span>, expand the service provider address block <span concordion:assertTrue="leasePlanServiceProvider">field should be available  to enter service providers name and address</span>
+		            </li>
+		            <li>
+		            	Enter <span concordion:set="#serviceProviderAddress">Attn: Minnie Mouse, 987 Main St. Blvd., Suite 333, % Pluto, Los Angeles, CA 44444-4444</span>
+		            </li>
+		            <li>
+		            	Click Save Reopen PO, confirm Service Provider address should equal <span concordion:assertEquals="savedServiceProviderAddress">Attn: Minnie Mouse, 987 Main St. Blvd., Suite 333, % Pluto, Los Angeles, CA 44444-4444</span>
+		            </li>		            
+	           	</ul>
+		    </ul>
+ -->
+    	<h2>Manual Tests</h2>
+    	    <ul type = "circle"><b>
+    	       <li>TODO: After entering information in search criteria field: test clicking Enter in search field, test clicking Search, test clicking the LOV.</li>
+    	    </b></ul>
+
+    	<h2>Untested (Out of Scope)</h2>
+    		<ul><li>TODO:</li></ul>
+    </body>
+</html>

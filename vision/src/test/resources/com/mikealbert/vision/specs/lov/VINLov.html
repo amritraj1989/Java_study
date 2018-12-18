@@ -1,0 +1,16 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Fleet Maintenance / Search VIN last 6 LOV Criteria</title>
+    <body>
+    	<h1>Fleet Maintenance / Search VIN last 6 LOV Criteria</h1>
+    	<h2>Acceptance Tests (Automated)</h2>
+    		<ul concordion:execute="#result = testSearchVINByLastSix(#vin)"><li> When searching the lov for a VIN last 6 of <b><span concordion:set="#vin">016568</span></b><span concordion:assertTrue="#result"> the lov search results show at least one </span><span>VIN last 6.</span></li></ul>
+    		<ul concordion:execute="#result = testSearchVINByLastSix(#vin)"><li> When searching the lov for a VIN last 6 of <b><span concordion:set="#vin">5TDBK3EH9AS016568</span></b><span concordion:assertTrue="#result"> the lov search results in one record found.</span></li></ul>
+    		<ul concordion:execute="#result = testSearchVINByLastSix(#vin)"><li> When searching the lov for a VIN last 6 of <b><span concordion:set="#vin">123</span></b><span concordion:assertTrue="#result"> the lov search results show at least one </span><span>VIN last 6.</span></li></ul>
+    	<h2>Manual Tests</h2>
+    		<ul><li>TODO: After entering information in search criteria field: test clicking Enter in search field, test clicking Search, test clicking the LOV.</li></ul>
+    		
+    	<h2>Untested (Out of Scope)</h2>
+    		<ul><li>TODO:</li></ul>
+    </body>
+</html>

@@ -1,0 +1,288 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Fleet Maintenance / Create PO Stories 21, 24, 31, 32, 155</title>
+    <body>
+    	<h1>Fleet Maintenance / Stories 21, 24, 31, 32, 155</h1>
+    	<h2>Acceptance Tests (Automated)</h2>
+    
+        <ul concordion:execute="#po = testCreatePO(#unitNo, #serviceProviderName, #phoneNumber, #contactName, #workOrderNo, #poStatus, #poType, #zipCode)">
+            <li>On Search Vehicles screen, input unit <span concordion:set="#unitNo">00949997</span>, click Enter,</li>
+            <ul type = "circle">
+            <li>Click Create Purchase Order:</li>
+            <li>Add Service Provider <span concordion:set="#serviceProviderName">MC-DONS</span>, Click the Search Icon, LOV pop up of results should appear with <span concordion:assertEquals="serviceProviderLovSize">2</span> line items</li>
+            <li>In Popup input <span concordion:set="#phoneNumber">409-883-6879</span> into Phone Number search field, click Enter, Selected Service Provider should equal <span concordion:assertEquals="serviceProviderName">Don&apos;s Alternator &amp; Starter Service, Inc. - MC</span></li>
+            <li>Click Select, Payee should display <span concordion:assertEquals="payeeName">00160419 - Comdata - Fleet Maintenance</span></li>
+            <li>Add Contact name <span concordion:set="#contactName">Test One</span></li>
+            <li>Tab to Work Order No field, fill in <span concordion:set="#workOrderNo">Work Order One</span></li>
+            <li>PO Status should = <span concordion:assertEquals="poStatus">Booked-In</span></li>
+            <li>PO Type should = <span concordion:assertEquals="#po.getMaintReqType()">MAINT</span></li>
+            <li>Click plus sign (+) to add PO line detail</li>
+			<ul concordion:execute="#poTask = testCreateMaintReqTask(#maintCategory, #maintCode, #qty, #unitPrice, #serviceCode)">
+                <li>Select Maint Category = <span concordion:set="#maintCategory">OIL_CHANGE</span></li>
+				<li>Maint Code = <span concordion:set="#maintCode">110-305</span></li>
+				<li>Qty fill in <span concordion:set="#qty">2</span></li>
+				<li>In Unit Price fill in <span concordion:set="#unitPrice">33</span></li>
+				<li>Total Amount should = <span concordion:assertEquals="#poTask.getTotalCost()">66.00</span></li>
+				<li>Discount Indicator should = <span concordion:assertEquals="#poTask.getDiscountFlag()">Y</span></li>
+				<li>Authorize By should = <span concordion:assertEquals="#poTask.getAuthorizePerson()">SHARMA_R</span></li>
+            </ul>
+                <li>Click Add</li>
+                <ul concordion:execute="#poTask = testCreateMaintReqTask(#maintCategory, #maintCode, #qty, #unitPrice, #serviceCode)">
+                    <li>Select Maint Category = <span concordion:set="#maintCategory">MISC_MAINT</span></li>
+			        <li>Maint Code = <span concordion:set="#maintCode">100-343</span></li>
+			        <li>Qty fill in <span concordion:set="#qty">1</span></li>
+			        <li>In Unit Price fill in <span concordion:set="#unitPrice">10</span></li>
+			        <li>Total Amount should = <span concordion:assertEquals="#poTask.getTotalCost()">10.00</span></li>
+			        <li>Discount Indicator should = <span concordion:assertEquals="#poTask.getDiscountFlag()">Y</span></li>
+                </ul>
+                <li>Click Done</li>
+                <li>PO should = <span concordion:assertEquals="poTotal">76.00</span></li>
+                <li>Mark up Amount should equal <span concordion:assertEquals="#po.getMarkUpAmount()">7.60</span></li>
+                <li>Rech Total should Equal <span concordion:assertEquals="poRecharge">83.60</span></li>
+	            <ul concordion:execute="actionSave()">
+	            </ul>
+            </ul>
+        </ul>
+                     
+        <ul>
+            <ul type = "circle">
+                <li>Click Save</li>
+                <ul concordion:execute="#po = testUpdatePO(#updatedMarkupAmount)">
+	               <li>Change Mark up Amount to <span concordion:set="#updatedMarkupAmount">0.00</span></li>
+	               <li>Rech Total <span concordion:assertEquals="poRecharge">76.00</span></li>
+                </ul>
+	            <ul concordion:execute="actionSave()">
+	            </ul>
+            </ul>
+        </ul>
+	                
+        <ul>
+            <ul>
+	            <li>Click Save</li>
+	            <ul concordion:execute="#po = testUpdatePO(#updatedMarkupAmount)">
+	               <li>Change Mark up Amount to <span concordion:set="#updatedMarkupAmount">33.00</span></li>
+	               <li>Rech Total <span concordion:assertEquals="poRecharge">109.00</span></li>
+                </ul>
+	            <li>Click Save</li>
+	            <ul concordion:execute="actionSave()">
+	            </ul>
+            </ul>
+        </ul>
+
+        <ul>
+            <ul>
+                
+                <li>Click Cancel</li>
+		        <li>Click Service History</li>
+	            <ul concordion:execute="#poHistory = testVerifyMaintServiceHistory()">
+                    <li>The first listed Purchase Order should display Service Provider = <span concordion:assertEquals="#poHistory.getServiceProviderName()">Don&apos;s Alternator &amp; Starter Service, Inc. - MC</span> <span concordion:assertEquals="#poHistory.getServiceProviderNumber()">MC-DONS</span></li>
+		            <li>The first listed Purchase Order should display Categories = <span concordion:assertEquals="allCategories">OIL_CHANGE, MISC_MAINT</span></li>
+		            <li>The first listed Purchase Order should display PO Status = <span concordion:assertEquals="#poHistory.getMaintRequestStatus()">Booked-In</span></li>
+		            <li>The first listed Purchase Order should display PO Total = <span concordion:assertEquals="#poHistory.getTotalCost()">76.00</span></li>
+					<li>The first listed Purchase Order should display Rech Total should equal <span concordion:assertEquals="poRecharge">109.00</span></li>
+					<li>The first listed Purchase Order should display blanks for <span concordion:assertNull="#poHistory.getPayeeInvoiceNumber()">Payee Inv., </span><span concordion:assertNull="#poHistory.getMafsInvoiceNumber()">MAFS Inv. </span><span>And</span><span concordion:assertNull="#poHistory.getCreditFlag()">Credit</span></li>
+                </ul>
+            </ul>
+        </ul>
+
+        <ul>
+            <ul type = "circle">
+                <li>Select and Open the first listed Purchase Order</li>
+				<ul concordion:execute="#po = testViewPO()">
+		          <li>Purchase Order should have <span concordion:assertEquals="taskCount">2</span> line items displayed</li> 
+                </ul>
+            </ul>
+        </ul>
+		            
+        <ul>
+            <ul type = "circle">
+                <ul concordion:execute="#po = testUpdatePO(#updatedMarkupAmount)">
+                    <li>Change Mark up Amount to <span concordion:set="#updatedMarkupAmount">1.33</span></li>
+                </ul>
+                <ul concordion:execute="actionSave()">
+                    <li>Click Save</li>
+                </ul>
+            </ul>
+        </ul>
+ 
+        <ul>
+            <ul type = "circle">
+                <ul concordion:execute="#po = testViewPO()">
+                    <li>PO Total should = <span concordion:assertEquals="totalAmount">76.00</span></li>
+                    <li>Mark up Amount should equal <span concordion:assertEquals="#po.getMarkUpAmount()">1.33</span></li>
+                    <li>Rech Total <span concordion:assertEquals="poRecharge">77.33</span></li>
+                </ul>
+            </ul>
+        </ul>
+
+        <ul concordion:execute="#po = testCreatePO(#unitNo, #serviceProviderName, #phoneNumber, #contactName, #workOrderNo, #poStatus, #poType, #zipCode)">
+            <li>On Search Vehicles screen, input unit <span concordion:set="#unitNo">00946748</span>, click Enter,</li>
+            <ul type = "circle">
+                <li>Click Create Purchase Order:</li>
+                <li>Add Service Provider = <span concordion:set="#serviceProviderName">Nwrk - Goodyear</span></li>
+                <li>Payee should = <span concordion:assertEquals="payeeName">00041851 - Consolidated Service Corp</span></li>
+                <li>Click plus sign (+) to add PO line detail</li>
+                <ul concordion:execute="#poTask = testCreateMaintReqTask(#maintCategory, #maintCode, #qty, #unitPrice, #serviceCode)">
+                    <li>Select Maint Category = <span concordion:set="#maintCategory">TIRE_SVCS</span></li>
+                    <li>Service Code = <span concordion:set="#serviceCode">TK-00-298</span></li>
+                    <li>Maint Code = <span concordion:set="#maintCode">800-322</span></li>
+                    <li>Qty = <span concordion:set="#qty">3</span></li>
+                    <li>Unit Price <span concordion:set="#unitPrice">10</span></li>
+                    <li>Total Amount will display <span concordion:assertEquals="#poTask.getTotalCost()">30.00</span></li>
+                    <li>Discount Indicator should = <span concordion:assertEquals="#poTask.getDiscountFlag()">Y</span></li>
+                </ul>
+                <li>Click Add</li>
+                <ul concordion:execute="#poTask = testCreateMaintReqTask(#maintCategory, #maintCode, #qty, #unitPrice, #serviceCode)">
+                    <li>Select Maint Category = <span concordion:set="#maintCategory">OIL_CHANGE</span></li>
+                    <li>Maint Code = <span concordion:set="#maintCode">110-306</span></li>
+                    <li>Qty  = <span concordion:set="#qty">8</span></li>
+                    <li>Unit Price <span concordion:set="#unitPrice">1</span></li>
+                    <li>Total Amount will display <span concordion:assertEquals="#poTask.getTotalCost()">8.00</span></li>
+                    <li>Discount Indicator should = <span concordion:assertEquals="#poTask.getDiscountFlag()">Y</span></li>
+                    <li>PO Total = <span concordion:assertEquals="poTotal">38.00</span></li>
+                    <li>Markup = <span concordion:assertEquals="#po.getMarkUpAmount()">3.80</span></li>
+                </ul>
+                <li>Click Done</li>
+                <ul concordion:execute="actionSave()">
+                </ul>
+            </ul>
+        </ul>
+        <ul>
+            <ul>
+                <ul concordion:execute="#po = testUpdatePO(#updatedMarkupAmount)">
+                    <li>Change Mark up Amount to <span concordion:set="#updatedMarkupAmount">100</span></li>
+                </ul>
+                <li>Rech Total = <span concordion:assertEquals="poRecharge">138.00</span></li>
+                <ul concordion:execute="actionSave()">
+                </ul>
+            </ul>
+        </ul>
+ 
+        <ul concordion:execute="#po = testCreatePO(#unitNo, #serviceProviderName, #phoneNumber, #contactName, #workOrderNo, #poStatus, #poType, #zipCode)">
+            <li>On Search Vehicles screen, Input unit <span concordion:set="#unitNo">00951026</span>, click Enter,</li>
+            <ul type = "circle">
+                <li>Click Create Purchase Order:</li>
+                <li>Add Service Provider = <span concordion:set="#serviceProviderName">Sprint Lube &amp; Repair</span></li>
+                <li>Click Tab, Service Provider account number returned should be <span concordion:assertEquals="serviceProviderNumber">00159044</span></li>
+                <li>Payee should also automatically display <span concordion:assertEquals="payeeName">00159044 - Sprint Lube &amp; Repair</span></li>
+                <li>Click plus sign (+) to add PO line detail</li>
+                <ul concordion:execute="#poTask = testCreateMaintReqTask(#maintCategory, #maintCode, #qty, #unitPrice, #serviceCode)">
+                    <li>Select Maint Category = <span concordion:set="#maintCategory">OIL_CHANGE</span></li>
+                    <li>Add Maint Code = <span concordion:set="#maintCode">110-305</span></li>
+                    <li>Add Qty = <span concordion:set="#qty">3</span></li>
+                    <li>Add Unit Price = <span concordion:set="#unitPrice">100</span></li>
+                    <li>Total Amount should display <span concordion:assertEquals="#poTask.getTotalCost()">300.00</span></li>
+                    <li>Discount Indicator should = <span concordion:assertEquals="#poTask.getDiscountFlag()">N</span></li>
+                </ul>
+                <li>PO Total should = <span concordion:assertEquals="poTotal">300.00</span></li>
+                <li>Mark up should = <span concordion:assertEquals="#po.getMarkUpAmount()">30.00</span></li>
+                <li>Rech Total should = <span concordion:assertEquals="poRecharge">330.00</span></li>
+                <li>Click plus sign (+) to add PO line detail</li>
+            </ul>
+        </ul>
+        <ul>
+            <ul>
+                <ul concordion:execute="#poTask = testCreateMaintReqTask(#maintCategory, #maintCode, #qty, #unitPrice, #serviceCode)">
+                    <li>Select Maint Category = <span concordion:set="#maintCategory">MISC_MAINT</span></li>
+                    <li>Add Maint Code = <span concordion:set="#maintCode">100-343</span></li>
+                    <li>Add Qty = <span concordion:set="#qty">5</span></li>
+                    <li>Add Unit Price <span concordion:set="#unitPrice">10.10</span></li>
+                    <li>Total Amount should = <span concordion:assertEquals="#poTask.getTotalCost()">50.50</span></li>
+                    <li>Discount Indicator should = <span concordion:assertEquals="#poTask.getDiscountFlag()">N</span></li>
+                </ul>
+                <li>Click Done</li>
+                <li>PO Total should = <span concordion:assertEquals="poTotal">350.50</span></li>
+                <li>Mark up should = <span concordion:assertEquals="#po.getMarkUpAmount()">35</span></li>
+                <li>Rech Total should = <span concordion:assertEquals="poRecharge">385.50</span></li>
+                <li>Click Save</li>
+                <ul concordion:execute="actionSave()">
+                </ul>
+            </ul>
+        </ul>
+ 
+        <ul>
+            <ul type = "circle">
+                <ul concordion:execute="#po = testUpdatePO(#updatedMarkupAmount)">
+                    <li>Change Mark-up to <span concordion:set="#updatedMarkupAmount">50</span></li>
+                    <ul concordion:execute="actionSave()">
+                    </ul>
+                </ul>
+                <li>PO Total should now = <span concordion:assertEquals="poTotal">350.50</span></li>
+	            <li>Mark Up Amount should now = <span concordion:assertEquals="#po.getMarkUpAmount()">50.00</span></li>
+	            <li>Rech Total should now = <span concordion:assertEquals="poRecharge">400.50</span></li>
+            </ul>
+        </ul>
+ 
+        <ul concordion:execute="#po = testCreatePO(#unitNo, #serviceProviderName, #phoneNumber, #contactName, #workOrderNo, #poStatus, #poType, #zipCode)">
+            <li>On Search Vehicles screen, Input unit <span concordion:set="#unitNo">00951026</span>, click Enter,</li>
+            <ul type = "circle">
+                <li>Click Create Purchase Order:</li>
+	            <li>Search for Service Provider = <span concordion:set="#serviceProviderName">MC-PER</span></li>
+	            <li>Result should return <span concordion:assertEquals="serviceProviderLovSize">9</span> line items</li>
+	            <li>In Select Service Provider Pop up search by zip code = <span concordion:set="#zipCode">19440</span></li>
+	            <li>Select the line item returned for <span concordion:assertEquals="serviceProviderName">Peruzzi Toyota - MC</span></li>
+	            <li>Click plus sign (+) to add PO line detail</li>
+	            <ul concordion:execute="#poTask = testCreateMaintReqTask(#maintCategory, #maintCode, #qty, #unitPrice, #serviceCode)">
+	                <li>Select Maint Category = <span concordion:set="#maintCategory">OIL_CHANGE</span></li>
+	                <li>Add Maint Code = <span concordion:set="#maintCode">110-305</span></li>
+	                <li>Add Qty = <span concordion:set="#qty">1</span></li>
+	                <li>Add Unit Price = <span concordion:set="#unitPrice">36.95</span></li>
+	                <li>Total Amount will display <span concordion:assertEquals="#poTask.getTotalCost()">36.95</span></li>
+	                <li>Discount Indicator should = <span concordion:assertEquals="#poTask.getDiscountFlag()">N</span></li>
+	            </ul>
+                <li>Click Add</li>
+	            <ul concordion:execute="#poTask = testCreateMaintReqTask(#maintCategory, #maintCode, #qty, #unitPrice, #serviceCode)">
+	                <li>Select Maint Category = <span concordion:set="#maintCategory">MISC_MAINT</span></li>
+	                <li>Maint Code = <span concordion:set="#maintCode">100-364</span></li>
+	                <li>Qty = <span concordion:set="#qty">1</span></li>
+	                <li>Unit Price <span concordion:set="#unitPrice">38.42</span></li>
+	                <li>Total Amount will display <span concordion:assertEquals="#poTask.getTotalCost()">38.42</span></li>
+	                <li>Discount Indicator should = <span concordion:assertEquals="#poTask.getDiscountFlag()">N</span></li>
+	            </ul>
+                <li>Click Add</li>
+	            <ul concordion:execute="#poTask = testCreateMaintReqTask(#maintCategory, #maintCode, #qty, #unitPrice, #serviceCode)">
+	                <li>Select Maint Category = <span concordion:set="#maintCategory">MISC_MAINT</span></li>
+	                <li>Maint Code = <span concordion:set="#maintCode">100-110</span></li>
+	                <li>Qty = <span concordion:set="#qty">1</span></li>
+	                <li>Unit Price <span concordion:set="#unitPrice">14.95</span></li>
+	                <li>Total Amount will display <span concordion:assertEquals="#poTask.getTotalCost()">14.95</span></li>
+	                <li>Discount Indicator should = <span concordion:assertEquals="#poTask.getDiscountFlag()">N</span></li>
+	            </ul>
+                <li>Click Add</li>
+	            <ul concordion:execute="#poTask = testCreateMaintReqTask(#maintCategory, #maintCode, #qty, #unitPrice, #serviceCode)">
+	                <li>Select Maint Category = <span concordion:set="#maintCategory">MISC_MAINT</span></li>
+	                <li>Maint Code = <span concordion:set="#maintCode">100-415</span></li>
+	                <li>Qty = <span concordion:set="#qty">1</span></li>
+	                <li>Unit Price = <span concordion:set="#unitPrice">88.00</span></li>
+	                <li>Total Amount will display <span concordion:assertEquals="#poTask.getTotalCost()">88.00</span></li>
+	                <li>Discount Indicator should = <span concordion:assertEquals="#poTask.getDiscountFlag()">N</span></li>
+	            </ul>
+                <li>Click Add</li>
+	            <ul concordion:execute="#poTask = testCreateMaintReqTask(#maintCategory, #maintCode, #qty, #unitPrice, #serviceCode)">
+	                <li>Select Maint Category = <span concordion:set="#maintCategory">TIRE_SVCS</span></li>
+	                <li>Maint Code = <span concordion:set="#maintCode">800-322</span></li>
+	                <li>Qty = <span concordion:set="#qty">1</span></li>
+	                <li>Unit Price <span concordion:set="#unitPrice">21.95</span></li>
+	                <li>Total Amount will display <span concordion:assertEquals="#poTask.getTotalCost()">21.95</span></li>
+	                <li>Discount Indicator should = <span concordion:assertEquals="#poTask.getDiscountFlag()">N</span></li>
+	            </ul>
+	            <li>Click Done</li>
+	            <li>PO Total = <span concordion:assertEquals="poTotal">200.27</span></li>
+	            <li>Mark up = <span concordion:assertEquals="#po.getMarkUpAmount()">20.03</span></li>
+	            <li>Rech Total = <span concordion:assertEquals="poRecharge">220.30</span></li>
+            </ul>
+
+	        <ul concordion:execute="actionSave()">
+	            <li>Click Save</li>
+	        </ul>
+        </ul>
+
+    	<h2>Manual Tests</h2>
+    	    <ul type = "circle"><b>
+    	       <li>TODO: Verify the data in the Vehicle Information section of Create Maintenance Purchase Order screen based on the vehicle status.</li>
+    	    </b></ul>
+ 
+    	<h2>Untested (Out of Scope)</h2>
+    		<ul><li>TODO:</li></ul>
+    </body>
+</html>

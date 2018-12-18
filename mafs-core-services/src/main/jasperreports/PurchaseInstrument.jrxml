@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.3.final using JasperReports Library version 6.0.3  -->
+<!-- 2015-09-08T12:41:33 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PurchaseInstrument" pageWidth="612" pageHeight="1008" sectionType="Part" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="30" bottomMargin="30" uuid="d2716064-8ae4-40cf-a575-33afba400e3a">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<property name="net.sf.jasperreports.print.create.bookmarks" value="true"/>
+	<property name="com.jaspersoft.studio.book.group.cover.header" value="Cover and Table of Contents"/>
+	<property name="com.jaspersoft.studio.book.group.cover.footer" value="Backcover"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<parameter name="sendToName" class="java.lang.String"/>
+	<parameter name="sendToLine1" class="java.lang.String"/>
+	<parameter name="sendToLine2" class="java.lang.String"/>
+	<parameter name="sendToLine3" class="java.lang.String"/>
+	<parameter name="sendToLine4" class="java.lang.String"/>
+	<parameter name="phoneNumber" class="java.lang.String"/>
+	<parameter name="driverLimit" class="java.lang.String"/>
+	<parameter name="authorizationNumber" class="java.lang.String"/>
+	<parameter name="driverText" class="java.lang.String"/>
+	<parameter name="vin" class="java.lang.String"/>
+	<parameter name="unitNumber" class="java.lang.String"/>
+	<parameter name="fleetRef" class="java.lang.String"/>
+	<parameter name="unitDescription" class="java.lang.String"/>
+	<parameter name="accountName" class="java.lang.String"/>
+	<parameter name="accountCode" class="java.lang.String"/>
+	<parameter name="authorizationText" class="java.lang.String"/>
+	<parameter name="Table1DS" class="net.sf.jasperreports.engine.data.JRTableModelDataSource"/>
+	<parameter name="Table2DS" class="net.sf.jasperreports.engine.data.JRTableModelDataSource"/>
+	<parameter name="driverNameText" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<detail>
+		<part uuid="c391c499-11a0-4f72-9f17-d3da2d30bb1b">
+			<p:subreportPart xmlns:p="http://jasperreports.sourceforge.net/jasperreports/parts" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/parts http://jasperreports.sourceforge.net/xsd/parts.xsd">
+				<subreportParameter name="REPORT_DATA_SOURCE">
+					<subreportParameterExpression><![CDATA[new net.sf.jasperreports.engine.JREmptyDataSource()]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="sendToName">
+					<subreportParameterExpression><![CDATA[$P{sendToName}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="sendToLine1">
+					<subreportParameterExpression><![CDATA[$P{sendToLine1}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="sendToLine2">
+					<subreportParameterExpression><![CDATA[$P{sendToLine2}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="sendToLine3">
+					<subreportParameterExpression><![CDATA[$P{sendToLine3}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="sendToLine4">
+					<subreportParameterExpression><![CDATA[$P{sendToLine4}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="phoneNumber">
+					<subreportParameterExpression><![CDATA[$P{phoneNumber}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="driverNameText">
+					<subreportParameterExpression><![CDATA[$P{driverNameText}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportExpression><![CDATA["reports/InstructionsPage.jasper"]]></subreportExpression>
+			</p:subreportPart>
+		</part>
+		<part uuid="afeba4bc-18f5-4577-a611-effde6e20343">
+			<p:subreportPart xmlns:p="http://jasperreports.sourceforge.net/jasperreports/parts" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/parts http://jasperreports.sourceforge.net/xsd/parts.xsd">
+				<subreportParameter name="REPORT_DATA_SOURCE">
+					<subreportParameterExpression><![CDATA[new net.sf.jasperreports.engine.JREmptyDataSource()]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="driverLimit">
+					<subreportParameterExpression><![CDATA[$P{driverLimit}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="authorizationNumber">
+					<subreportParameterExpression><![CDATA[$P{authorizationNumber}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="driverText">
+					<subreportParameterExpression><![CDATA[$P{driverText}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="vin">
+					<subreportParameterExpression><![CDATA[$P{vin}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="unitNumber">
+					<subreportParameterExpression><![CDATA[$P{unitNumber}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="fleetRef">
+					<subreportParameterExpression><![CDATA[$P{fleetRef}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="unitDescription">
+					<subreportParameterExpression><![CDATA[$P{unitDescription}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="accountCode">
+					<subreportParameterExpression><![CDATA[$P{accountCode}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="accountName">
+					<subreportParameterExpression><![CDATA[$P{accountName}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="authorizationText">
+					<subreportParameterExpression><![CDATA[$P{authorizationText}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="Table1DS">
+					<subreportParameterExpression><![CDATA[$P{Table1DS}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="Table2DS">
+					<subreportParameterExpression><![CDATA[$P{Table2DS}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportExpression><![CDATA["reports/GridPage.jasper"]]></subreportExpression>
+			</p:subreportPart>
+		</part>
+	</detail>
+</jasperReport>

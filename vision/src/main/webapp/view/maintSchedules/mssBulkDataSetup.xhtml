@@ -1,0 +1,72 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	template="../../templates/ui.xhtml">
+	<ui:define name="content">
+		<h:form id="breadCrumbForm" prependId="false">
+				<p:breadCrumb model="#{mssBulkDataSetupBean.breadCrumbTrail}"
+					style="min-width:1000px;max-width:100%;width:auto" ajax="false"
+					immediate="true" styleClass="ui-layout" />
+		</h:form>
+			<!-- Error message display -->
+		<p:scrollPanel style="height:50px;max-width:100%;width:auto;"
+				mode="native" styleClass="ui-layout">
+				<p:messages id="messages" showSummary="false" showDetail="true"
+					autoUpdate="true" />
+		</p:scrollPanel>
+		<h:form id="mssBulkDataSetupForm" prependId="false">
+			<p:panel header="Master Schedule">
+				<h:panelGrid columns="2">
+					<p:outputLabel>Rec Count:</p:outputLabel>
+					<p:inputNumber decimalPlaces="0" minValue="1" thousandSeparator="" maxValue="10000" value = "#{mssBulkDataSetupBean.scheduleInsertCount}"/>
+					
+					<p:outputLabel>Description:</p:outputLabel>
+					<p:inputText value= "#{mssBulkDataSetupBean.masterScheduleDesc}"/>
+					
+					<p:outputLabel>Master Code:</p:outputLabel>
+					<p:inputText value= "#{mssBulkDataSetupBean.masterCode}"/>
+					
+					<p:outputLabel>Month Frequency:</p:outputLabel>
+					<p:inputNumber decimalPlaces="0" minValue="1" thousandSeparator=""  value = "#{mssBulkDataSetupBean.monthFrequency}"/>
+					
+					<p:outputLabel>Distance Frequency:</p:outputLabel>
+					<p:inputNumber decimalPlaces="0" minValue="1" thousandSeparator="" value = "#{mssBulkDataSetupBean.distanceFrequency}"/>
+					
+					
+				</h:panelGrid>
+				<p:panel>
+					<p:commandButton  value="Add Data" ajax="false" action="#{mssBulkDataSetupBean.addMasterScheduleData}"/>
+					<p:commandButton  value="Delete Data" ajax="false" action="#{mssBulkDataSetupBean.deleteMasterScheduleData}"/>
+				</p:panel>
+			</p:panel>
+			<p:panel header="Vehicle Schedule">
+				<h:panelGrid columns="2">
+					<p:outputLabel>Rec Count:</p:outputLabel>
+					<p:inputNumber decimalPlaces="0" minValue="1" thousandSeparator="" maxValue="10000" value = "#{mssBulkDataSetupBean.vehScheduleInsertCount}"/>
+					
+					
+					<p:outputLabel>Unit Number:</p:outputLabel>
+					<p:inputText value= "#{mssBulkDataSetupBean.unitNumber}"/>
+					
+					<p:outputLabel>Master Schedule Code:</p:outputLabel>
+					<p:inputText value= "#{mssBulkDataSetupBean.masterCodeToVehSch}"/>
+					
+					<p:outputLabel>Active From:</p:outputLabel>
+					<p:calendar value = "#{mssBulkDataSetupBean.activeFrom}" showOn="button" pattern="MM/dd/yyyy"/>
+					
+					<p:outputLabel>Active To:</p:outputLabel>
+					<p:calendar value = "#{mssBulkDataSetupBean.activeTo}" showOn="button" pattern="MM/dd/yyyy"/>
+					
+				</h:panelGrid>
+				<p:panel>
+					<p:commandButton  value="Add Data" ajax="false" action="#{mssBulkDataSetupBean.addVehileScheduleData}"/>
+					<p:commandButton  value="Delete Data" ajax="false" action="#{mssBulkDataSetupBean.deleteVehicleScheduleData}"/>
+				</p:panel>
+			</p:panel>
+		</h:form>
+		
+	</ui:define>
+</ui:composition>

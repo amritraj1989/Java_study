@@ -1,0 +1,922 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.1.0.final using JasperReports Library version 6.1.0  -->
+<!-- 2018-05-25T06:47:41 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="InstructionsPage" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="968" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="93dbf9e4-91c1-42b7-bac2-a4c6dba2ad9f">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<parameter name="phoneNumber" class="java.lang.String">
+		<defaultValueExpression><![CDATA["800.886.2086"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="sendToName" class="java.lang.String"/>
+	<parameter name="sendToLine1" class="java.lang.String"/>
+	<parameter name="sendToLine2" class="java.lang.String"/>
+	<parameter name="sendToLine3" class="java.lang.String"/>
+	<parameter name="sendToLine4" class="java.lang.String"/>
+	<parameter name="driverNameText" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="530">
+			<frame>
+				<reportElement x="12" y="0" width="212" height="420" forecolor="#94C63F" uuid="f067f210-24b8-4d67-9045-0f0b841393d5">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<staticText>
+					<reportElement x="0" y="0" width="200" height="20" forecolor="#94C63F" uuid="c558fc8f-3634-4770-a287-5cde3cc11e74">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="14" isBold="true"/>
+					</textElement>
+					<text><![CDATA[National Network Providers]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="94" width="200" height="13" forecolor="#5F6062" uuid="ea8aedb7-6df4-4581-98b9-abfeaafbf5e4">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Express Oil Change & Tire Engineers*]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="22" width="200" height="13" forecolor="#5F6062" uuid="44b42f88-7b24-4c0d-9667-0ac3b2b1484f">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[AAA Bob Sumerel]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="1" y="301" width="128" height="14" forecolor="#5F6062" uuid="c94ab0b1-6427-4b15-8caa-0805fd5ea26b">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10" isBold="true" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[Quick Lube]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="34" width="200" height="13" forecolor="#5F6062" uuid="751344f1-b8de-479d-b435-e5b3d22bd463">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[AAMCO Transmissions & Total Car Care]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="46" width="200" height="13" forecolor="#5F6062" uuid="259f52bd-f82a-427a-9bb1-b249bc4936f1">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Big O Tires*]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="58" width="200" height="13" forecolor="#5F6062" uuid="25bc8ac4-28da-43b1-ac67-2b1b8a72e02f">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Bridgestone/Firestone Complete Auto Care]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="70" width="200" height="13" forecolor="#5F6062" uuid="04f97895-fcb4-4d76-bcda-ecd6882cc844">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Car-X Tire & Auto*]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="82" width="200" height="13" forecolor="#5F6062" uuid="0d3399e6-650b-4285-b8c2-2e17db863131">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Chrysler Jeep Dodge Dealers*]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="106" width="200" height="13" forecolor="#5F6062" uuid="52d117bd-9bcd-4966-8160-c6785882907c">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[General Motors Dealers*]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="118" width="200" height="13" forecolor="#5F6062" uuid="b518069d-34d1-4b1a-96ca-2f78c0cc8d32">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Goodyear Auto Service Center]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="146" width="200" height="13" forecolor="#5F6062" uuid="eab464ad-29d3-4155-87f3-c88385df1be0">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Michelin Tire Services]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="158" width="200" height="13" forecolor="#5F6062" uuid="1a821f6f-e00d-42b5-8325-7387a1d8fd23">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Midas]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="185" width="200" height="13" forecolor="#5F6062" uuid="b3996a66-d823-4bae-909a-d65574b2146d">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Monro Muffler/Brake & Services]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="197" width="200" height="13" forecolor="#5F6062" uuid="97595a67-17f9-4fc7-8260-1d9c4a79b5f1">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[NTB Tire & Service Centers]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="1" y="315" width="200" height="13" forecolor="#5F6062" uuid="cef7feb1-d49b-48ad-93c2-09f0b29ca7cd">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Grease Monkey*]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="1" y="327" width="200" height="13" forecolor="#5F6062" uuid="4ad0d4d2-d812-4a8d-81ba-6372b635c30f">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Jiffy Lube]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="1" y="339" width="200" height="13" forecolor="#5F6062" uuid="f079ecb9-c7b7-4dd6-a7f2-2721c0656225">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Oil Changers]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="1" y="367" width="200" height="13" forecolor="#5F6062" uuid="3e53c5bb-a39e-44af-af98-aae1ea8b166a">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Valvoline Instant Oil Change]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="209" width="200" height="13" forecolor="#5F6062" uuid="aa9f653c-8734-4733-82d8-06db01e4b44e">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Pep Boys]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="223" width="200" height="13" forecolor="#5F6062" uuid="121286c8-b501-4cc4-8dec-e9a3946df6e5">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Sears Auto Center]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="237" width="200" height="13" forecolor="#5F6062" uuid="284374b0-73ad-49d0-ad0a-63f2e7d437de">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Tire Discounters]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="250" width="200" height="13" forecolor="#5F6062" uuid="a27f8668-489b-4fc8-909c-da77b60ca076">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Tire Kingdom]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="264" width="200" height="13" forecolor="#5F6062" uuid="31e4c332-9f58-4695-b63b-3c6a8a82fa54">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Tires Plus Total Car Care*]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="172" width="200" height="13" forecolor="#5F6062" uuid="e832beef-f22f-411a-9ab4-11f68fe87d3b">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Mike Albert Direct (for the Cincinnati area)]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="1" y="388" width="146" height="13" forecolor="#5F6062" uuid="b0ad73ec-b959-40e3-bae3-725c02c9b89f">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[* Call for participating locations]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="132" width="200" height="13" forecolor="#5F6062" uuid="69a4acbf-3a46-48d6-bf88-2b0e794d59ce">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Meineke Car Care Center]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="1" y="353" width="200" height="13" forecolor="#5F6062" uuid="eaae0ec6-c362-4762-835e-7bd131c53924">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Take 5 Oil Change]]></text>
+				</staticText>
+			</frame>
+			<frame>
+				<reportElement x="250" y="1" width="210" height="308" uuid="107e54e4-884d-4266-b64a-99b628b3fb5c">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<staticText>
+					<reportElement x="0" y="0" width="129" height="19" forecolor="#94C63F" uuid="b4ec2c16-40b1-4eda-8ea1-6b6b88c57223"/>
+					<textElement>
+						<font fontName="Calibri" size="14" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Driver Instructions]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="21" width="210" height="74" forecolor="#5F6062" uuid="bb781d30-dce1-4bdb-b6dd-925c0daa253a">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[For preventative maintenance, go to any of the Network Providers listed on this guide.  Present the Preventative Maintenance Schedule (located on opposite side) and request the services in accordance with the odometer reading on your vehicle.]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="102" width="210" height="14" forecolor="#5F6062" uuid="a1275162-2602-4825-80eb-f65b6cfd6573">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10" isBold="true" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[DO NOT PAY FOR SERVICES]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="114" width="210" height="124" forecolor="#5F6062" uuid="9488fd78-777f-44a1-b2a1-2d5971cf6639">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Your signature releases the vehicle and verifies that all services have been performed to your satisfaction.  The maintenance schedule acts as the purchase order for services identified at each odometer interval.  Any services recommended by the service vendor that are not indicated on the maintenance schedule will require an approval obtained from a Mike Albert maintenance team specialist.  The service vendor can obtain this approval by calling                          .]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="241" width="210" height="62" forecolor="#5F6062" uuid="41dcae38-bb32-4223-827f-5839099942a6">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement markup="none">
+						<font fontName="Calibri" size="10" isUnderline="false"/>
+					</textElement>
+					<text><![CDATA[For ordinary, unscheduled repairs, many of the same Network Providers can be used.  Please call the Mike Albert Maintenance Management team at                           if you have any questions regarding where to take your vehicle.]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="10" y="277" width="57" height="13" forecolor="#5F6062" uuid="c38d37d2-faac-477e-b6e1-56fd19090ff3">
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{phoneNumber}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="78" y="224" width="57" height="13" forecolor="#5F6062" uuid="fe8acbf0-8b95-4044-86da-8a7bf04f0a40"/>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{phoneNumber}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement x="498" y="1" width="216" height="180" forecolor="#94C63F" uuid="2f736550-f418-4f1f-906c-fe4c7b55056f">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<staticText>
+					<reportElement x="0" y="0" width="118" height="19" forecolor="#94C63F" uuid="b1cf3328-7e20-4948-9ebb-c13f34c25d51"/>
+					<textElement>
+						<font fontName="Calibri" size="14" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Vendor Instructions]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="21" width="216" height="100" forecolor="#5F6062" uuid="a18e3680-15bc-4e00-bc19-8e8aec753673">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10" isUnderline="false"/>
+					</textElement>
+					<text><![CDATA[                                               This document serves as purchase order for all scheduled maintenance as indicated for this specific vehicle only.  Any repairs or services not listed on the "Scheduled Maintenance Grid" for current odometer reading (range) will require additional authorization.  Please contact Mike Albert Fleet Solutions at                            for approval and purchase order number.]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="20" width="105" height="14" forecolor="#5F6062" uuid="650ab84d-a446-4e44-8c31-920494ab0132">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10" isBold="true" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[Scheduled Maintenance:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="124" width="216" height="50" forecolor="#5F6062" uuid="914c2739-bc74-4065-9e5e-9d6e9424ae9e">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="local_mesure_unitheight" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10" isUnderline="false"/>
+					</textElement>
+					<text><![CDATA[                                                       Please perform services marked with an "X" at the designated odometer reading.  Use the purchase order number listed as your purchase order number.]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="124" width="123" height="14" forecolor="#5F6062" uuid="f8a225af-cf3f-4786-af69-f89f1c18d1b1">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="local_mesure_unitwidth" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10" isBold="true" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[Scheduled Maintenance Grid:]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="123" y="94" width="57" height="13" forecolor="#5F6062" uuid="dd27c8f4-91e2-43cb-ad92-f1e0fe876795"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{phoneNumber}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement x="750" y="0" width="204" height="457" uuid="6da87dad-d0a9-44bf-a3e5-dc1dae03212e">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<staticText>
+					<reportElement x="2" y="227" width="200" height="25" forecolor="#5F6062" uuid="54fea2b1-bd9c-44fe-baa6-d37ad2b3dea2">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Thank you for choosing the Mike Albert Fleet Solutions Maintenance Management Program.]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="2" y="255" width="200" height="64" forecolor="#5F6062" uuid="fee303ac-2002-4696-a3f1-0a6071cdf25e">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Your company has elected to participate in the Mike Albert Maintenance Management Program.  This program will help you maintain your company vehicle in the most cost-effective and least time consuming manner possible.]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="2" y="321" width="200" height="135" forecolor="#5F6062" uuid="c94b3675-9ebb-411e-86cb-1161fce3f3f8">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[With the Mike Albert Maintenance Management Program, your company will receive national fleet pricing and prompt repair service through the use of a nationwide network of repair and service facilities.  You will also have access to the Mike Albert team of ASE certified maintenance specialists who will provide assistance and consultation to your fleet administrators and maintenance vendors to minimize expenses by reviewing necessary repairs and warranty coverage items.]]></text>
+				</staticText>
+				<image>
+					<reportElement x="0" y="18" width="200" height="50" uuid="68a69166-97e6-4487-92cb-53ee894d7713"/>
+					<imageExpression><![CDATA["Logo.jpg"]]></imageExpression>
+				</image>
+				<image>
+					<reportElement x="0" y="68" width="204" height="153" uuid="903c51e2-600e-4573-8481-6e954c1c20eb"/>
+					<imageExpression><![CDATA["ScheduleBlock.png"]]></imageExpression>
+				</image>
+				<frame>
+					<reportElement mode="Opaque" x="0" y="3" width="204" height="13" forecolor="#5F6062" backcolor="#5F6062" uuid="7328f283-46b6-416a-9d95-6cc94fde9e96">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+				</frame>
+			</frame>
+			<frame>
+				<reportElement x="633" y="341" width="70" height="178" uuid="9839fd84-3a55-4e86-9346-45bff48a40d3">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="0" width="13" height="178" forecolor="#5F6062" uuid="b46427e8-31c8-4585-b88e-98e8f7ef5eb1">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement rotation="Left">
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{sendToName}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="10" y="0" width="13" height="178" forecolor="#5F6062" uuid="245ef45f-2126-40fd-8b5d-f7cac74ff6fe"/>
+					<textElement rotation="Left">
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{sendToLine1}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="21" y="0" width="13" height="178" forecolor="#5F6062" uuid="62ea600f-6c67-40b2-bcf4-3bbb7b559770"/>
+					<textElement rotation="Left">
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{sendToLine2}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="32" y="0" width="13" height="178" forecolor="#5F6062" uuid="0e9f6598-acb7-4bcd-a23b-cdc603238e67"/>
+					<textElement rotation="Left">
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{sendToLine3}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="43" y="0" width="13" height="178" forecolor="#5F6062" uuid="d7166b84-9b28-4f39-b204-aa96fad97f6f"/>
+					<textElement rotation="Left">
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{sendToLine4}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement x="12" y="431" width="212" height="99" uuid="a60fb889-a960-4195-8ad7-b1087405ae41">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<staticText>
+					<reportElement x="0" y="11" width="212" height="38" forecolor="#5F6062" uuid="85b02cbd-6c96-4009-9826-e7d78bf1df41">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement markup="none">
+						<font fontName="Calibri" size="10" isUnderline="false"/>
+					</textElement>
+					<text><![CDATA[Using a non-network vendor may result in out-of-network service fees.  For assistance locating the network vendors nearest you contact us at:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="57" y="58" width="22" height="14" forecolor="#5F6062" uuid="d4800de7-9736-4b10-b3ca-d0e2a60eae72">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font size="11" isBold="false"/>
+					</textElement>
+					<text><![CDATA[Call]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="55" y="72" width="102" height="14" forecolor="#5F6062" uuid="ba284c65-4235-4eb9-bc1e-d59780de04d6">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font size="11" isBold="false"/>
+					</textElement>
+					<text><![CDATA[Visit our website at]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="46" y="85" width="120" height="14" forecolor="#8DC653" uuid="3575b478-b04d-4e14-858a-360b61d5cd0d">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font size="11" isBold="true"/>
+					</textElement>
+					<text><![CDATA[www.mikealbert.com]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="79" y="58" width="68" height="14" forecolor="#8DC653" uuid="e1234d9b-264b-43e6-836b-d72fa81c712c"/>
+					<textElement>
+						<font size="11" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{phoneNumber}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement x="250" y="311" width="210" height="62" uuid="1ef1a02e-349c-4dba-8296-8ef8d06df2da">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<staticText>
+					<reportElement x="0" y="2" width="200" height="18" forecolor="#94C63F" uuid="11a3316a-e7e6-40f8-acc3-5fd1e7d88d01">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[24-Hour Emergency Road Service]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="21" width="210" height="39" forecolor="#5F6062" uuid="b3dbd1da-3c3b-4c59-99bd-84a10648ccca">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[If your company has enrolled in our 24-Hour Emergency Road Service, call                             for assistance in the event of a breakdown.]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="120" y="34" width="62" height="13" forecolor="#8DC653" uuid="e4a1a6c4-c396-4d37-9bdb-94c3d98e713c"/>
+					<textElement>
+						<font size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{phoneNumber}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement x="250" y="375" width="210" height="70" uuid="e835d014-9c6a-4ba4-be53-bdccede3b36a">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<staticText>
+					<reportElement x="0" y="0" width="210" height="16" forecolor="#94C63F" uuid="b16f23a1-856f-430a-b76d-3536f84a45be">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Driver & Vendor Maintenance Assistance]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="18" width="40" height="13" forecolor="#5F6062" uuid="96fcfd61-63bf-4342-8564-e9b8ed46e669">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Phone:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="30" width="40" height="13" forecolor="#5F6062" uuid="193f2138-952e-4210-b543-023cf226f137">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Local:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="42" width="40" height="13" forecolor="#5F6062" uuid="ba53b4e2-328a-4583-8bb2-504d38d5c3b8">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Fax:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="54" width="40" height="13" forecolor="#5F6062" uuid="6aaf32ac-35ba-4d16-9263-dbfe9e3eace6">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Email:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="46" y="30" width="62" height="13" forecolor="#5F6062" uuid="3c60e1fd-1950-48d4-b7fb-dfb7ea42c2bb">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[513.554.2886]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="46" y="42" width="62" height="13" forecolor="#5F6062" uuid="e1cc12af-d5ce-42fd-af4e-2832cb3ee976">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[513.554.2996]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="46" y="54" width="112" height="13" forecolor="#5F6062" uuid="40956a39-56a0-40ca-a65a-269f81691e45">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[maintm@mikealbert.com]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="46" y="18" width="62" height="13" forecolor="#5F6062" uuid="e1c0c5fe-586f-45e9-990b-e67923427f55"/>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{phoneNumber}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement x="750" y="457" width="204" height="68" uuid="ab736e59-3a28-4743-9f86-8e6e8d03fa45">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<staticText>
+					<reportElement x="47" y="2" width="110" height="14" forecolor="#5F6062" uuid="3d49917c-4c24-4382-8ddf-9e602a2daea9">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement markup="none">
+						<font fontName="Calibri" size="10" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[Corporate Headquarters]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="58" y="15" width="89" height="13" forecolor="#5F6062" uuid="6e8fad17-7e02-48a2-bd73-254ebe922f33">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[10340 Evendale Drive]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="59" y="27" width="86" height="13" forecolor="#5F6062" uuid="5857e152-4be4-4625-9388-fdfb9c227679">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[Cincinnati, OH 45241]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="57" y="55" width="91" height="13" forecolor="#5F6062" uuid="fada281d-e300-4ccf-bb2b-7eef33a6d3a9">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10" isBold="true"/>
+					</textElement>
+					<text><![CDATA[www.mikealbert.com]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="74" y="43" width="56" height="13" forecolor="#5F6062" uuid="dad6c8de-dee7-43b4-92ee-c08755560297"/>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{phoneNumber}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement x="499" y="180" width="216" height="112" forecolor="#94C63F" uuid="d9f73382-5f51-4276-904f-b33bd0f47b46">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<staticText>
+					<reportElement x="0" y="0" width="128" height="19" forecolor="#94C63F" uuid="60184ba9-1540-4b4e-b717-6d4aeaf558bc">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="14" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Invoice Requirements]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="133" y="4" width="60" height="13" forecolor="#5F6062" uuid="c3c1a9d9-2763-4f90-9af8-71478f9b5678">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[(must include)]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="71" width="216" height="13" forecolor="#5F6062" uuid="f4d12e18-47e6-406d-b0c2-61e6f640a5df">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[6. Vehicle number]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="39" width="216" height="13" forecolor="#5F6062" uuid="db63f9d5-881e-456d-9119-492ce4262fff">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[3. Purchase Order#]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="82" width="216" height="13" forecolor="#5F6062" uuid="34211533-25b2-4971-8acb-50f083fcdb50">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[7. VIN]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="28" width="216" height="13" forecolor="#5F6062" uuid="319f9b82-6964-4b6c-8eaf-dfae6f7f9f77">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[2. Odometer reading (at date of service)]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="50" width="216" height="13" forecolor="#5F6062" uuid="8abbc383-2185-4221-9a1e-8bf7782bd638">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[4. Driver's full name & client#]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="17" width="216" height="13" forecolor="#5F6062" uuid="2a1219ae-195f-4328-b566-3702b575aa31">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[1. Service Provider (Store) name, address, & phone#]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="61" width="216" height="13" forecolor="#5F6062" uuid="45257ee3-3219-4769-9f6e-c10b2881dfbc">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="10"/>
+					</textElement>
+					<text><![CDATA[5. Date of Service]]></text>
+				</staticText>
+			</frame>
+			<textField isBlankWhenNull="true">
+				<reportElement x="514" y="341" width="16" height="178" forecolor="#5F6062" uuid="ecf328ca-c14e-4db9-b4bd-35474df1804b"/>
+				<textElement rotation="Left">
+					<font fontName="Calibri"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{driverNameText}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="41" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<frame>
+				<reportElement x="15" y="20" width="937" height="21" uuid="d6380fbf-769a-42ca-b645-0b8802b9733e"/>
+				<image scaleImage="FillFrame">
+					<reportElement x="0" y="7" width="937" height="14" uuid="e80815a4-613d-4aad-90d9-e4ebf2dd0d63"/>
+					<imageExpression><![CDATA["BottomBar.jpg"]]></imageExpression>
+				</image>
+			</frame>
+		</band>
+	</pageFooter>
+</jasperReport>

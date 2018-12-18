@@ -1,0 +1,154 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="../../templates/ui.xhtml">
+
+	<ui:define name="content">
+			<h:form id="debitCreditBreadCrumbForm" prependId="false">
+				<p:breadCrumb model="#{debitCreditMemoErrorSearchBean.breadCrumbTrail}"
+					ajax="false" immediate="true" styleClass="ui-layout" />
+			</h:form> 
+
+			<h:form id="debitCreditErrorForm" prependId="false">
+
+				<!-- Error message display -->
+				<p:scrollPanel style="height:50px;" mode="native"
+					styleClass="ui-layout">
+					<p:messages id="messages" showSummary="false"
+						severity="info,error,fatal" showDetail="true" autoUpdate="true" />
+				</p:scrollPanel>
+
+				<p:panel id="debitCreditErrorPanelList" header="Business Validation Errors  &#160;&#160;&#160;&#160;&#160; #{debitCreditMemoErrorSearchBean.headerMessage}" style="min-width:980px;max-width:100%;width:auto;">
+					<h:inputHidden id="hiddenScrollPosition" value="#{debitCreditMemoErrorSearchBean.scrollPosition}" />
+					
+					<p:dataTable id="DT_UI_ID"
+	        	        widgetVar="dcErrorDataTableWidget"
+						var="dcError" 
+						value="#{debitCreditMemoErrorSearchBean.debitCreditTransactionVoErrorList}" 
+						scrollHeight="#{debitCreditMemoErrorSearchBean.dataTable.height}"
+						scrollable="true"
+						resizableColumns="true"						
+						selection="#{debitCreditMemoErrorSearchBean.selectedSearchVOs}"						
+						emptyMessage = "#{debitCreditMemoErrorSearchBean.dataTableMessage}"
+						rowKey="#{dcError.jmsMessageId}"
+						sortMode="multiple" 
+						sortBy="#{debitCreditMemoErrorSearchBean.preSort}">
+						
+						<p:ajax event="rowSelect"  process="DT_UI_ID"  update=":debitCreditErrorForm:btnPanel"  />
+						<p:ajax event="rowUnselect" process="DT_UI_ID"  update=":debitCreditErrorForm:btnPanel"  />
+						<p:ajax event="toggleSelect" process="DT_UI_ID"   update=":debitCreditErrorForm:btnPanel"/>	
+						<p:ajax event="rowSelectCheckbox" process="DT_UI_ID"   update=":debitCreditErrorForm:btnPanel"/>
+						<p:ajax event="rowUnselectCheckbox" process="DT_UI_ID"  update=":debitCreditErrorForm:btnPanel" />	
+						
+						<p:ajax event="sort" process="DT_UI_ID" update=":debitCreditErrorForm:btnPanel" onstart="PF('dcErrorDataTableWidget').unselectAllRows();"  oncomplete="setScrollDivAtTop();"/>
+						<p:ajax event="page" process="DT_UI_ID"  update=":debitCreditErrorForm:btnPanel" onstart="PF('dcErrorDataTableWidget').unselectAllRows(); " oncomplete="setScrollDivAtTop();" />										 
+						
+						<p:column selectionMode="multiple" style="text-align:center;padding:0px" width="16px;"/>						
+						<p:column id="SUBMITTED_DATE" headerText="Submitted Date" sortBy="#{dcError.submittedDate}" width="#{debitCreditMemoErrorSearchBean.dataTable.col1}">
+						    <h:outputText  value="#{dcError.submittedDate}"> 
+						    	<f:convertDateTime type="date" pattern="MM/dd/yy" /> 
+						    </h:outputText>						    
+						</p:column>						
+						<p:column id="SUBMITTER" headerText="Submitted By" sortBy="#{dcError.submitter}" width="#{debitCreditMemoErrorSearchBean.dataTable.col2}">
+						    <h:outputText  value="#{dcError.submitter}" />
+						</p:column>	
+						<p:column headerText="Client" sortBy="#{dcError.accountCode}" width="#{debitCreditMemoErrorSearchBean.dataTable.col3}">
+						    <h:outputText id= "clientValue" value="#{dcError.accountCode}" /> 
+						</p:column>
+						<p:column headerText="Unit No." sortBy="#{dcError.unitNo}" width="#{debitCreditMemoErrorSearchBean.dataTable.col4}">
+						    <h:outputText  value="#{dcError.unitNo}" />
+						</p:column>						
+						<p:column headerText="Type" sortBy="#{dcError.debitCreditType}" width="#{debitCreditMemoErrorSearchBean.dataTable.col5}">
+						    <h:outputText  value="#{dcError.debitCreditType}" />
+						</p:column>	
+						<p:column headerText="Analysis Category" sortBy="#{dcError.category}" width="#{debitCreditMemoErrorSearchBean.dataTable.col6}">
+						    <h:outputText  value="#{dcError.category}" />
+						</p:column>
+						<p:column headerText="Analysis Code" sortBy="#{dcError.analysisCode}" width="#{debitCreditMemoErrorSearchBean.dataTable.col7}">
+						    <h:outputText  value="#{dcError.analysisCode}" />
+						</p:column>	
+						<p:column headerText="Net Amount" sortBy="#{dcError.netAmount}" width="#{debitCreditMemoErrorSearchBean.dataTable.col8}">
+						    <h:outputText style="float:right" value="#{dcError.netAmount}" >	
+						    	<f:convertNumber type="number" pattern="$#,##0.00" />                               
+                            </h:outputText>					   
+						</p:column>	
+						<p:column headerText="Requested Approver" sortBy="#{dcError.selectedApprover}" width="#{debitCreditMemoErrorSearchBean.dataTable.col9}">
+						    <h:outputText  value="#{dcError.selectedApprover}" />
+						</p:column>	
+						<p:column headerText="Ticket No." sortBy="#{dcError.ticketNo}" width="#{debitCreditMemoErrorSearchBean.dataTable.col10}">
+						    <h:outputText  value="#{dcError.ticketNo}" />
+						</p:column>	
+						<p:column headerText="Reason" sortBy="#{dcError.reason}" width="#{debitCreditMemoErrorSearchBean.dataTable.col11}" style="white-space: nowrap; text-overflow: ellipsis;">
+						    <h:outputText id="reasonValue"  value="#{dcError.reason}" />
+						    <p:tooltip value="#{dcError.reason}" for="reasonValue"/>
+						</p:column>	
+						<p:column headerText="Transaction Date" sortBy="#{dcError.transactionDate}" width="#{debitCreditMemoErrorSearchBean.dataTable.col12}">
+						    <h:outputText  value="#{dcError.transactionDate}"> 
+						    	<f:convertDateTime type="date" pattern="MM/dd/yy" /> 
+						    </h:outputText>						    
+						</p:column>
+						<p:column headerText="Invoice No." sortBy="#{dcError.invoiceNo}" width="#{debitCreditMemoErrorSearchBean.dataTable.col13}">
+						    <h:outputText  value="#{dcError.invoiceNo}" />
+						</p:column>											
+						<p:column headerText="Rent Applicable Date" sortBy="#{dcError.rentApplicableDate}" width="#{debitCreditMemoErrorSearchBean.dataTable.col14}">
+						    <h:outputText  value="#{dcError.rentApplicableDate}"> 
+						    	<f:convertDateTime type="date" pattern="MM/dd/yy" /> 
+						    </h:outputText>						    
+						</p:column>
+						<p:column headerText="File Name" sortBy="#{dcError.fileName}" width="#{debitCreditMemoErrorSearchBean.dataTable.col15}">
+						    <h:outputText id="fileNameValue" value="#{dcError.fileName}" />
+						    <p:tooltip value="#{dcError.fileName}" for="fileNameValue"/>
+						</p:column>						
+							
+						<f:facet name="footer">
+							Record Count: <h:outputText value="#{debitCreditMemoErrorSearchBean.totalRecords}" />
+						</f:facet>
+					</p:dataTable>
+				</p:panel>
+				
+				<p:panel id="btnPanel" style="min-width:980px;max-width:100%;width:auto;">
+				    <p:commandButton id="editBtn" value="View/Edit" actionListener="#{debitCreditMemoErrorSearchBean.viewEditDebitCreditMemo}" ajax="false"
+				    	onclick="lockScreen();saveScrollPosition('edit');" widgetVar="editBtnWidgetVar" disabled="#{! debitCreditMemoErrorSearchBean.isEnableEditBtn()}"/>
+				    <p:spacer width="5" />	
+ 					<p:commandButton id="deleteBtn" value="Delete" 
+					    disabled="#{! debitCreditMemoErrorSearchBean.isEnableDeleteBtn()}"
+						onclick="showDialog('deleteConfirmVar');saveScrollPosition('delete');"
+						oncomplete="setScrollDivAtTop();"/>				        
+					<p:spacer width="5" />
+					<p:commandButton id="cancelBtn" value="Cancel" action="#{debitCreditMemoErrorSearchBean.cancel}" ajax="false" immediate="true" onclick="lockScreen();"/>
+				</p:panel>				
+			</h:form>
+			
+		  	<p:confirmDialog id="deleteConfirmDialogId" message="Are you sure?" header="Confirm Delete" appendTo="@(body)"
+					widgetVar="deleteConfirmVar" resizable="false" width="200" height="50" update=":debitCreditErrorForm:btnPanel">    
+	           <h:form prependId="false">
+       				<p:commandButton  value="Yes" ajax="false" process="@this"	onclick="hideDialog('deleteConfirmVar');lockScreen();" 
+       					action="#{debitCreditMemoErrorSearchBean.deleteDebitCreditMemos}"/>	
+					<p:spacer width="10" />       					
+          			<p:commandButton  value="No"  onclick="PF('deleteConfirmVar').hide();"/>
+         		</h:form>
+        	</p:confirmDialog>				
+			
+		<script>
+			function saveScrollPosition(btn) {
+				if(btn == "edit"){
+	        		document.getElementById('hiddenScrollPosition').value = $('#DT_UI_ID .ui-datatable-scrollable-body').scrollTop();
+				}else{
+					document.getElementById('hiddenScrollPosition').value = 0;
+				}
+	        }
+			
+	        function setScrollPosition() {
+	        	$('#DT_UI_ID .ui-datatable-scrollable-body').scrollTop(document.getElementById('hiddenScrollPosition').value);
+	        }	
+		
+		 	$(window).load(function(){
+		 		setFocus('cancelBtn');
+		 		setScrollPosition();
+			});	
+		
+ 		</script>
+	</ui:define>
+</ui:composition>

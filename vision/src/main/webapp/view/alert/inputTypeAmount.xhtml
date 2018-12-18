@@ -1,0 +1,119 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+            xmlns:h="http://java.sun.com/jsf/html"
+            xmlns:f="http://java.sun.com/jsf/core"
+            xmlns:ui="http://java.sun.com/jsf/facelets"
+            xmlns:p="http://primefaces.org/ui">
+            <h:form id= "invalidAmountForm" prependId="false">
+            	<h:inputHidden id = "invalidAmtElement" name = "invalidAmtElement" value= ""/>
+            	<p:dialog  id="invalidAmountDialog" onShow="setElementFocus('alertInvalidAmountOk')" 
+            	 widgetVar="invalidAmountDialogIdVar" closable="false"  severity="alert" dynamic="false"
+            	  width="200"  height="100"  modal="true"  header="Invalid Amount" resizable="false" appendTo="@(body)">
+            				<h:panelGroup style="display:block; text-align:center">			  
+		        			<h:outputText value="Invalid amount "/>
+							<h:outputText id = "invalidAmtlabel" name = "invalidAmtlabel" value=""/>
+						
+        					</h:panelGroup>
+								<br/>
+							<p/>
+	               			<h:panelGroup style="display:block; text-align:center">			  
+		        			<p:commandButton id = "alertInvalidAmountOk" value="Ok"  type="button" onclick="hideDiaglogForInvalidAmount()"/>
+        					</h:panelGroup>
+					
+	   			</p:dialog>	
+	   		</h:form>
+	   		<script type="text/javascript">
+	   		function validateDecimalPrecision(value){
+	   			var indexOfDecimal = value.indexOf('.');
+	   			
+	   			if(indexOfDecimal &gt; -1){
+	   				var str = value.substring(indexOfDecimal+1);
+	   				
+	   				if(str.length &gt; 3){
+	   					return false;
+	   				}
+	   			}
+	   			return true;
+	   		}
+	   		function formatAmountValue(elementToUpdate,labelName, includeDollarSign){
+				var value =document.getElementById(elementToUpdate).value;
+				//check if value is entered
+				if(value.length &gt; 0){
+					
+					if(validateDecimalPrecision(value) == false){
+						showDiaglogForInvalidAmount(elementToUpdate,labelName)
+						return false;
+					}
+					var negativeNumber = false;
+					var indexOfNegative = value.indexOf("-");
+					var indexOfDollar = value.indexOf("$");
+					if(indexOfNegative &gt; -1){
+						negativeNumber = true;
+						var str = value.substring(indexOfNegative+1);
+						if(str.length == 0 ){
+							showDiaglogForInvalidAmount(elementToUpdate,labelName)
+							return false;
+						}else{
+							if(indexOfNegative &gt; 0){
+								showDiaglogForInvalidAmount(elementToUpdate,labelName)
+								return false;
+							}
+						}
+						if(indexOfDollar &gt; -1){
+							value = value.substring(indexOfDollar+1);
+							if(value.length == 0){
+								showDiaglogForInvalidAmount(elementToUpdate,labelName)
+								return false;
+							}
+						}else{
+							value = value.substring(indexOfNegative+1);
+						}
+					}else{
+						if(indexOfDollar &gt; -1){
+							if(indexOfDollar &gt; 0){
+								//invalid amount,dollar sign is not on start
+								showDiaglogForInvalidAmount(elementToUpdate,labelName)
+								return false;
+							}else{
+								value = value.substring(indexOfDollar+1);
+								if(value.length == 0){
+									showDiaglogForInvalidAmount(elementToUpdate,labelName)
+									return false;
+								}
+								
+							}
+						}
+					}
+			
+				value = value.replace(/,/g,'');
+				var valueTemp = Number(value);
+				if(isNaN(valueTemp)){
+					showDiaglogForInvalidAmount(elementToUpdate,labelName)
+					return false;
+				}
+				var returnValue = valueTemp.numberFormat(2,'AMOUNT');
+				if(includeDollarSign) {
+					returnValue = '$'+returnValue;					
+				}
+
+				if(negativeNumber){
+					returnValue = '-'+returnValue;
+				}
+				document.getElementById(elementToUpdate).value = returnValue;
+				
+			}
+				
+		}
+		   		function showDiaglogForInvalidAmount(elementToUpdate,labelName){
+		   			document.getElementById('invalidAmtElement').value = elementToUpdate;
+		   			$('#invalidAmtlabel').text(labelName);
+					showDialog('invalidAmountDialogIdVar');
+					setElementFocus('alertInvalidAmountOk');
+					
+				}
+				function hideDiaglogForInvalidAmount(){
+					hideDialog('invalidAmountDialogIdVar');
+					var elementToSetFocus =document.getElementById('invalidAmtElement').value;
+					setElementFocus(elementToSetFocus);
+				}
+	   		</script>
+ </ui:composition>

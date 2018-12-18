@@ -1,0 +1,129 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	template="../../templates/ui.xhtml">
+
+	<ui:define name="content">
+			<h:form id="breadCrumbForm" prependId="false">
+				<p:breadCrumb model="#{upfitAssessmentBean.breadCrumbTrail}"
+					style="min-width:1000px;max-width:100%;width:auto" ajax="false"
+					immediate="true" styleClass="ui-layout" />
+			</h:form>
+			<!-- Error message display -->
+			<p:scrollPanel style="height:50px;max-width:100%;width:auto;"
+				mode="native" styleClass="ui-layout">
+				<p:messages id="messages" showSummary="false" showDetail="true"
+					autoUpdate="true" />
+			</p:scrollPanel>
+
+			<h:form id="mainForm" prependId="false">
+				<p:panel id="pagePanel" header="Upfit Assessment" >
+					<h:panelGrid columns="6" cellspacing="5" >
+						<p:column>
+							<h:outputLabel id="clientLbl" value="Client:" styleClass="ui-label" />
+						</p:column>
+						<p:column>
+							<h:outputLabel id="clintLabelValue" value="#{upfitAssessmentBean.selectedVehicleConfiguration.externalAccount.externalAccountPK.accountCode} - #{upfitAssessmentBean.selectedVehicleConfiguration.externalAccount.accountName}" />
+						</p:column>
+						<p:column>
+							<p:spacer width="5"/>
+						</p:column>
+						<p:column>
+							<h:outputLabel id="lastUpdatedLbl" value="Last Updated:" styleClass="ui-label" rendered="#{upfitAssessmentBean.hasUpfitAssessment}"/>
+						</p:column>
+						<p:column>
+							<h:outputLabel id="lastUpdatedDate" value="#{upfitAssessmentBean.lastUpdatedDate}" rendered="#{upfitAssessmentBean.hasUpfitAssessment}" >
+								<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+							</h:outputLabel>
+							<p:spacer width="2"/>
+							<h:outputLabel id="lastUpdatedBy" value="(#{upfitAssessmentBean.lastUpdatedBy})" rendered="#{upfitAssessmentBean.hasUpfitAssessment}" />
+						</p:column>
+					</h:panelGrid>
+
+				</p:panel>
+
+				<p:panel id="questionairePanel">
+					<p:focus context="questionairePanel" />
+					<h:panelGrid style="min-width:100%">
+						<p:tabView id="questionaireTab">
+							<p:tab id="fleetQuestionTab" title="Fleet">
+								<p:scrollPanel style="min-width:100%;max-width:100%;width:auto;height:440px" styleClass="ui-layout" mode="native">
+									<p:panelGrid cellpadding="5">
+										<p:repeat var="upfitAssessment" value="#{upfitAssessmentBean.upfitAssessmentListFleet}">
+											<p:row>
+												<p:column>
+													<h:outputText value="#{upfitAssessment.upfitAssessmentQuestion.question}" />
+												</p:column>
+												<p:column>
+													<br/>
+													<p:inputTextarea value="#{upfitAssessment.upfitAssessmentAnswer.answer}" rows="7" cols="75" autoResize="false" maxlength="400" 
+														tabindex="10"	counter="counter" counterTemplate="{0} characters remaining" styleClass="trackDirtyValue" disabled="#{upfitAssessmentBean.readOnly}"/>
+													<br />
+			                                        <h:outputText id="counter" />
+												</p:column>
+											</p:row>
+										</p:repeat>
+									</p:panelGrid>
+								</p:scrollPanel>
+                        	</p:tab>
+                        	<p:tab id="configurationQuestionTab" title="Configuration">
+                            	<p:scrollPanel style="min-width:100%;max-width:100%;width:auto;height:440px" styleClass="ui-layout" mode="native">
+									<p:panelGrid cellpadding="5">
+										<p:repeat var="upfitAssessment" value="#{upfitAssessmentBean.upfitAssessmentListConfig}">
+											<p:row>
+												<p:column>
+													<h:outputText value="#{upfitAssessment.upfitAssessmentQuestion.question}" />
+												</p:column>
+												<p:column>
+													<br/>
+													<p:inputTextarea value="#{upfitAssessment.upfitAssessmentAnswer.answer}" rows="7" cols="75" autoResize="false" maxlength="400" 
+														tabindex="10"	counter="counter1" counterTemplate="{0} characters remaining" styleClass="trackDirtyValue" disabled="#{upfitAssessmentBean.readOnly}"/>
+													<br />
+			                                        <h:outputText id="counter1" />
+												</p:column>
+											</p:row>
+										</p:repeat>
+									</p:panelGrid>
+								</p:scrollPanel>                     
+                        	</p:tab>
+						</p:tabView>
+					</h:panelGrid>
+				</p:panel>
+				
+	    		<p:panel id="buttonsPanel">
+					<h:panelGrid id="buttons">
+						<f:facet name="footer">
+							<p:commandButton id="saveButton" tabindex="30" value="Save" 
+								action="#{upfitAssessmentBean.save}" ajax="false" onclick="lockScreen();" disabled="#{upfitAssessmentBean.readOnly}"/>
+   							<p:spacer width="10" />
+							<p:commandButton id="cancelButton" tabindex="70" value="Cancel"
+								action="#{upfitAssessmentBean.cancel}" ajax="false"
+								onclick="lockScreen();" immediate="true" />
+						</f:facet>
+					</h:panelGrid>
+              	</p:panel>
+
+			</h:form>
+		
+
+
+			
+        
+		<script type="text/javascript">
+		
+		function initializeDirtyDetection() {
+			registerIgnoreButton("saveButton");
+			saveDataForDirtyDetection();
+		}
+		
+
+     	$(window).load(function(){
+     		initializeDirtyDetection();
+		});			
+
+		</script>
+	</ui:define>
+</ui:composition>

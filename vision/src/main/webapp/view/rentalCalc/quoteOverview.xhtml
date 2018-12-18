@@ -1,0 +1,596 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	template="../../templates/ui.xhtml">
+	
+	<ui:define name="content" >
+			<h:form id="quoteOverviewBreadCrumbForm" prependId="false">
+				<h:inputHidden id = "invalidAccessPath"  name = "invalidAccessPath" value = "#{quoteOverviewBean.invalidAccessPath}"/>
+				<p:breadCrumb style ="min-width:1200px;max-width:100%;width:auto" model="#{quoteOverviewBean.breadCrumbTrail}" ajax="false" immediate="true" styleClass="ui-layout"/>
+			</h:form>
+			
+			<p:growl id="growl" for="warnings" severity="warn" escape="false" redisplay="true" showDetail="true" sticky="true" /> 
+			
+			<!-- Error message display -->
+			<p:scrollPanel style="min-width:1200px;max-width:100%;width:auto;height:50px;" mode="native" styleClass="ui-layout">
+				<p:messages id="messages" severity="info,error,fatal" showSummary="false" showDetail="true"	autoUpdate="true" />
+			</p:scrollPanel>			
+
+		 	<h:form id="quoteOverviewForm" prependId="false" rendered="#{!quoteOverviewBean.invalidAccessPath}" >
+		 		<p:hotkey bind="alt+c" 
+		 			update= "calc,save,quoteOverviewStaticPanel,quoteOverviewParameterPanel1,quoteOverviewParameterPanel2,quoteOverviewParameterPanel3" 
+		 			actionListener="#{quoteOverviewBean.reCalculateRental}" async="true"/>  
+				<h:inputHidden id="dirtyData" value="#{quoteOverviewBean.dirtyData}"/>
+				<h:inputHidden id="equipmentResidual" value="#{quoteOverviewBean.quoteOverviewVO.equipmentResidual}"/>
+				<p:panel id="quoteOverviewInformationPanel" style ="min-width:1200px;max-width:100%;width:auto">
+					<h:panelGrid columns="13" cellspacing="10">
+							<h:outputLabel value="Client:"  styleClass="ui-label"/> 
+							<h:outputText value="#{quoteOverviewBean.quoteOverviewVO.accountCode}"/>
+							<h:outputText value="#{quoteOverviewBean.quoteOverviewVO.accountName}"/>
+							<p:spacer width="20" height="1"/>
+							<h:outputLabel value="Quote Profile:" style="white-space:nowrap;" styleClass="ui-label"/>
+							<h:outputText  value="#{quoteOverviewBean.quoteOverviewVO.quoteProfileDesc}"/>
+							<p:spacer width="20" height="1"/>
+							<h:outputLabel value="Cost Treatment:"  styleClass="ui-label"/> 
+							<h:outputText value="#{quoteOverviewBean.quoteOverviewVO.costTreatment}"/>
+							
+							<h:outputLabel value=" "/>
+							<h:outputLabel value=" "/>
+							<h:outputLabel value=" "/>
+							<h:outputLabel value=" "/>
+	
+							<h:outputLabel value="Quote:"  styleClass="ui-label"/> 
+							<h:outputText value="#{quoteOverviewBean.quoteOverviewVO.quote}"/>
+							<h:outputText value="#{quoteOverviewBean.quoteOverviewVO.productName}"/>
+							<p:spacer width="20" height="1"/>
+							<h:outputLabel value="Mileage Program:" style="white-space:nowrap;" styleClass="ui-label"/> 
+							<h:outputText  value="#{quoteOverviewBean.quoteOverviewVO.mileageProgramDesc}"/>
+							<p:spacer width="20" height="1"/>
+							<h:outputLabel value="Interest Treatment:" style="white-space:nowrap;"  styleClass="ui-label"/> 
+							<h:outputText value="#{quoteOverviewBean.quoteOverviewVO.interestTreatment}"/>
+							
+							<h:outputLabel value=" "/>
+							<h:outputLabel value=" "/>
+							<h:outputLabel value=" "/>
+							<h:outputLabel value=" "/>						
+	
+							<h:outputLabel value="Unit:"  styleClass="ui-label"/> 
+							<h:outputText value="#{quoteOverviewBean.quoteOverviewVO.unitNo != null ? quoteOverviewBean.quoteOverviewVO.unitNo : quoteOverviewBean.quoteOverviewVO.accountCode != null ? 'N/A' : null}"/>
+							<h:outputText value="#{quoteOverviewBean.quoteOverviewVO.unitDesc}"/>
+							<p:spacer width="20" height="1"/>
+							<h:outputLabel value="Replacement for:"  styleClass="ui-label"/> 
+							<h:outputText value="#{quoteOverviewBean.quoteOverviewVO.unitNoReplacement}"/>
+							<p:spacer width="20" height="1"/>
+							<h:outputLabel value="Excess Mile Band:" style="white-space:nowrap;" styleClass="ui-label"/>
+							<h:outputText  value="#{quoteOverviewBean.quoteOverviewVO.excessMileBand}"/>
+
+							<h:outputLabel value=" "/>
+							<h:outputLabel value=" "/>
+							<h:outputLabel value=" "/>
+							<h:outputLabel value=" "/>						
+
+							<h:outputLabel value="Order Type:"  styleClass="ui-label"/> 
+							<h:outputText value="#{quoteOverviewBean.quoteOverviewVO.orderType}"/>
+							<p:spacer width="20" height="1"/>
+							<p:spacer width="20" height="1"/>
+							<h:outputLabel value="Grade Group:" style="white-space:nowrap;"  styleClass="ui-label"/> 
+							<h:outputText value="#{quoteOverviewBean.quoteOverviewVO.gradeGroupDescription}"/>
+							<p:spacer width="20" height="1"/>
+							<h:outputLabel value="Plate Code:" style="white-space:nowrap;" styleClass="ui-label"/> 
+							<h:outputText  value="#{quoteOverviewBean.quoteOverviewVO.plateTypeCodeDescription}"/>
+
+
+					</h:panelGrid>
+			</p:panel>	
+
+			<p:panel header="" id="quoteOverviewStaticPanel" style ="min-width:1200px;max-width:100%;width:auto;white-space:nowrap;" >
+				<h:panelGrid columns="15" cellspacing="5">
+					<h:outputLabel value="Total Cost To Place Into Service - Mike Albert:" style="white-space:nowrap;"  styleClass="ui-label"/> 
+					
+   					 <p:commandLink action="#{quoteOverviewBean.viewCapitalCosts}" immediate="true" ajax="false" onclick="lockScreen()">
+						<h:outputText value="#{quoteOverviewBean.quoteOverviewVO.dealCost}" title="View Capital Costs" >
+		 					<f:converter converterId="malDollarValueConverter" />
+	   					 </h:outputText>
+					</p:commandLink>
+   					 
+					<p:spacer width="20" height="1"/>
+					<h:outputLabel value="Client:"  style="white-space:nowrap;"  styleClass="ui-label"/>
+					<h:panelGroup layout="block">
+   					 <p:commandLink action="#{quoteOverviewBean.viewCapitalCosts}"    immediate="true" ajax="false" onclick="lockScreen()">
+						<h:outputText value="#{quoteOverviewBean.quoteOverviewVO.customerCost}" title="View Capital Costs" >
+		 					<f:converter converterId="malDollarValueConverter" />
+	   					 </h:outputText>
+					</p:commandLink>
+					<p:spacer width="4" height="1"/>
+					<p:commandLink disabled="#{quoteOverviewBean.disableCalculateAndSave}"
+					action="#{quoteOverviewBean.editCapitalCosts}" ajax="false"
+					onclick="lockScreen();" immediate="true" >
+						<p:graphicImage style="text-align:right;align:right;border-style:none;" 
+												value="/images/action_edit.png" id="permissionSetDesc"
+												rendered="#{!quoteOverviewBean.disableCalculateAndSave}"
+												title="Edit Capital Costs" />
+					</p:commandLink>
+					
+   					 
+   					 </h:panelGroup>
+   					<p:spacer  width="20" height="1"/> 
+					<p:outputLabel value="Capital Contribution:" style="white-space:nowrap;"  styleClass="ui-label" for = "capitalContribution"  />						
+					<p:inputNumber  id="capitalContribution" style="text-align:right" maxlength="12" size="12" 
+									 disabled="#{quoteOverviewBean.disableCalculateAndSave ? 'true' : quoteOverviewBean.productCode eq 'MAX' ? 'true' : 'false'}"
+									 decimalPlaces="2"  thousandSeparator="," symbol= "$" symbolPosition= "p" 
+                					 minValue="00.00" maxValue="999999999.99"
+									 value="#{quoteOverviewBean.quoteOverviewVO.capitalContribution}"
+									 styleClass="trackDirtyChildValues ui-text-align-right-dev"
+									 onchange="disable('save')"> 
+	   				</p:inputNumber>
+	   				
+   					<p:spacer  width="10" height="1"/>    					
+						<p:outputLabel id="grdDelRcAmtLabel" value="Delivery Recharge Amt:"  styleClass="ui-label" for = "grdDelRcAmt"  />						
+						<p:inplace id="deliveryInplaceId" editor="true"  rendered="true"  widgetVar="deliveryInplaceVar" toggleable="false" 
+					 			label="#{quoteOverviewBean.quoteOverviewVO.grdDeliveryRechargeAmountLabel}" disabled="#{quoteOverviewBean.disableCalculateAndSave}">
+					 
+					 	<h:inputHidden id="deliveryRechargeId" value="#{quoteOverviewBean.quoteOverviewVO.grdDeliveryRechargeAmount}"/>	
+					 	
+					 	<p:ajax event="cancel" listener="#{quoteOverviewBean.cancelSaveGrdDelRecharge}" 
+					 						   oncomplete="resetDeliveryRechargeAmount();showIcon('deliveryReImageId');setFocusOnInterestAdj();" 
+					 						   update="deliveryInplaceId,grdDelRcAmtLabel" />
+						<p:ajax event="save" listener="#{quoteOverviewBean.saveGrdDelRecharge}"  onerror=""
+										 	 oncomplete="handleSaveDeliveryRechargeRequest(xhr, status, args);setFocusOnInterestAdj();" 
+										 	 process="deliveryRechargeId,grdDelRcAmt"	
+										 	 update="deliveryInplaceId,grdDelRcAmtLabel"/>     
+						
+							 <p:inputText id="grdDelRcAmt" maxlength="9" size="13"	value="#{quoteOverviewBean.quoteOverviewVO.grdDeliveryRechargeAmountLabel}" 
+							 	onchange="formatRechargeAmount();" > 
+							 	 <p:keyFilter regEx="/[\d\-\.]/"/>
+							 </p:inputText> 
+										
+						</p:inplace>   
+							
+						<p:commandLink style="cursor: pointer;border:none"  styleClass="#{quoteOverviewBean.quoteOverviewVO.disableGrdDelivery == true ? 'disabledTextButton' : 'enabledTextButton'}"
+								       disabled="#{quoteOverviewBean.quoteOverviewVO.disableGrdDelivery or quoteOverviewBean.disableCalculateAndSave}" >
+							<p:graphicImage id="deliveryReImageId" style="cursor: pointer;border:none"  onclick="PF('deliveryInplaceVar').show();hideIcon('deliveryReImageId');formatRechargeAmount();"
+												value="/images/action_edit.png"  title="Add/Edit Delivery Recharge Amt." rendered="#{!quoteOverviewBean.quoteOverviewVO.disableGrdDelivery and !quoteOverviewBean.disableCalculateAndSave}"/>
+						</p:commandLink>					
+				</h:panelGrid>
+			</p:panel>	
+			<p:panel style ="min-width:1200px;max-width:100%;width:auto"  id="inputDataPanelId" >
+			<p:focus  context="#{quoteOverviewBean.hasPermission('residual_update') eq 'true' ? 'quoteOverviewParameterPanel1' : 'quoteOverviewParameterPanel2'}"/>
+			<h:panelGrid columns="4" cellspacing="5">
+					<p:panel header="Details" id="quoteOverviewParameterPanel1" style ="max-width:100%;width:auto;height:190px;">
+
+						<h:panelGrid columns="2" cellspacing="8" >
+							<h:outputLabel value="Term:"  styleClass="ui-label"/> 
+							<h:outputText value="#{quoteOverviewBean.quoteOverviewVO.term}" styleClass="alignmentRight"/>
+							<h:outputLabel value="Miles:"  styleClass="ui-label"/> 
+							<h:outputLabel value="#{quoteOverviewBean.quoteOverviewVO.distance}" styleClass="alignmentRight">
+								<f:convertNumber type="number" pattern="#,##0" />
+	                        </h:outputLabel>   
+						
+							<p:outputLabel value="Base Residual:" for ="baseResidual" style="white-space:nowrap;"  styleClass="ui-label" />
+							<h:panelGroup style="text-align:right">
+								
+								<p:inputNumber  id="baseResidual" style="text-align:right" value="#{quoteOverviewBean.quoteOverviewVO.baseResidual}" 
+                						decimalPlaces="2"  thousandSeparator="," symbol= "$" symbolPosition= "p"
+                						minValue="0" maxValue="999999999.99"
+                       					disabled="#{quoteOverviewBean.hasPermission('residual_update') eq 'false'?'true':quoteOverviewBean.disableCalculateAndSave ? 'true': quoteOverviewBean.productCode eq 'MAX' ? 'true' : 'false'}"
+										size="10" widgetVar="baseResidualId"
+                						emptyValue="empty" onblur="updateTotalResidual();"
+                						styleClass="trackDirtyChildValues ui-text-align-right-dev"
+                						onchange="disable('save')">
+                						
+                				</p:inputNumber>
+								
+							</h:panelGroup>
+						
+							<h:outputLabel value="Equipment Residual:"  style="white-space:nowrap;" styleClass="ui-label"/>
+							<h:outputLabel  id="equipResidual" value="#{quoteOverviewBean.quoteOverviewVO.equipmentResidual}" size="10" styleClass="alignmentRight">
+									<f:converter converterId="malDollarValueConverter" />
+							</h:outputLabel>
+						
+							<h:outputLabel value="Total Residual:"  style="white-space:nowrap;"  styleClass="ui-label"/>
+							<h:outputLabel  id="residual" value="#{quoteOverviewBean.quoteOverviewVO.totalResidual}" size="10" styleClass="alignmentRight">
+									<f:converter converterId="malDollarValueConverter" />
+							</h:outputLabel>
+									
+							<h:outputLabel value=" "/>
+							<h:outputLabel value=" "/>						
+						</h:panelGrid>
+					</p:panel>		
+
+					<p:panel header="Adjustments" visible="#{!quoteOverviewBean.hideAdjustmentsArea}" id="adjustmentsPanel" style ="max-width:100%;width:auto;height:190px;">
+						<f:facet name="header" >
+								<p:outputLabel value="Adjustments" />
+							    <p:spacer height="15px;"/>
+						</f:facet>
+						<h:panelGrid columns="2" cellspacing="5" >
+							<p:outputLabel value="Pur Inv Adj:"  for = "invoiceAdj"  styleClass="ui-label"/> 
+							<p:inputNumber  id="invoiceAdj" style="text-align:right" 
+	   					 				value="#{quoteOverviewBean.quoteOverviewVO.invoiceAdjustment}" size="10"
+	   					 				disabled="#{quoteOverviewBean.quoteOverviewVO.disableInvoiceAdjustment}"
+                						decimalPlaces="2"  thousandSeparator="," symbol= "$" symbolPosition= "p"
+                						minValue="-999999.99"
+                						maxValue="999999.99" 
+                                     	emptyValue="empty"
+                                     	styleClass="trackDirtyChildValues ui-text-align-right-dev"/>
+							<h:panelGroup>
+								<p:spacer width="30"/>
+								<p:outputLabel value="Hide Inv Adj:"  for = "hideInvoiceAdjustment" styleClass="ui-label-smallfont" title="Hide the adjustment on documents seen by the client"/>
+							</h:panelGroup>
+							<h:selectBooleanCheckbox id="hideInvoiceAdjustment" value="#{quoteOverviewBean.hideInvoiceAdjustment}" 
+										title="Hide the adjustment on documents seen by the client" disabled="#{quoteOverviewBean.disableCalculateAndSave}"
+										styleClass = "trackDirtyCheckbox" />
+						</h:panelGrid>
+					</p:panel>
+					
+					
+
+					<p:panel header="Profitability" id="quoteOverviewParameterPanel2" style ="max-width:100%;width:auto;height:190px;">		
+						<h:panelGrid columns="2" cellspacing="8">	
+							<h:outputLabel id = "minIrrLabel" value="Minimum IRR:" style="white-space:nowrap;"  styleClass="ui-label"/>
+							<h:panelGroup styleClass="alignmentRight">
+								<h:outputLabel  id = "minIrrValue" value="#{quoteOverviewBean.quoteOverviewVO.minimumIrr}" >
+									<f:convertNumber maxFractionDigits="5" minFractionDigits="5" />
+								</h:outputLabel>
+								<p:outputLabel value="%" />					
+							</h:panelGroup>
+							<p:outputLabel value="IRR:" for="irr" styleClass="ui-label"/> 
+	   					 	<p:inputNumber	id="irr" style="text-align:right" 
+	   					 					value="#{quoteOverviewBean.quoteOverviewVO.actualIrrValue}" size="10"
+	   					 					disabled="#{quoteOverviewBean.disableCalculateAndSave ? 'true':quoteOverviewBean.rentalCalculationApplicable ? 'false':'true'}" maxlength="10"
+                							decimalPlaces="5"  thousandSeparator="," symbol= "%" symbolPosition= "s"
+                							minValue="-999999.999"
+                							maxValue="999999.999" onkeyup="return restrictUserInput('irr',event)"
+                                     		emptyValue="empty"
+                                     		styleClass="trackDirtyChildValues ui-text-align-right-dev"
+                                     		onchange="disable('save')"/>
+
+                            <p:spacer height="5"/>
+                            <p:spacer height="5"/>         		
+	   						<p:outputLabel id="appMinIrrLabelId" value="Approved Minimum IRR:" style="white-space:nowrap;"   styleClass="ui-label" for = "appMinIrrTxtId" />
+								<h:panelGroup styleClass="alignmentRight">
+		   					 		<p:inplace id="appMinIrrInplaceId" editor="true" rendered="true" widgetVar="appIrrMinInplaceVar" toggleable="false"
+		   					 			    label="#{quoteOverviewBean.quoteOverviewVO.irrApprovedLimit}" disabled="#{quoteOverviewBean.disableCalculateAndSave}" >
+		   					 			    
+
+		   					 		 		<p:ajax event="cancel" listener="#{quoteOverviewBean.cancelSaveAppIrrMin}" 
+										 						   oncomplete="resetAppIrrMinAmt();showIcon('appIrrMinReImageId');setFocusOnIRR();" 
+										 						   success="appMinIrrTxtId"	
+										 						   update="appMinIrrInplaceId,appMinIrrLabelId,appMinIrrUserInfoPanelId"
+										 						  />
+											<p:ajax event="save" listener="#{quoteOverviewBean.saveAppIrrMin}"  
+															 	 oncomplete="handleSaveAppIrrMinRequest(xhr, status, args);setFocusOnIRR();" 
+															 	 success="appMinIrrTxtId"	
+															 	 update="appMinIrrInplaceId,appMinIrrLabelId,appMinIrrUserInfoPanelId"
+															    
+															 	 />     
+											
+												 <p:inputText	id="appMinIrrTxtId" style="text-align:right" maxlength="10" size="10" 
+													  	value="#{quoteOverviewBean.quoteOverviewVO.irrApprovedLimit}" 
+													  	onblur="formatPercentValue('appMinIrrTxtId','Approved Minimum IRR')"
+											  		  	disabled="#{quoteOverviewBean.disableCalculateAndSave ? 'true' : quoteOverviewBean.quoteOverviewVO.disableApprovedMinIrr ?'true' : quoteOverviewBean.productCode eq 'MAX' ? 'true' : 'false'}"
+											  			> 
+												 		 <p:keyFilter regEx="/[\d\-\.]/"/>
+				   					 			</p:inputText>
+		   					 		</p:inplace>   
+                           		   					 			    
+			   					 <p:commandLink style="cursor: pointer;border:none"  styleClass="#{quoteOverviewBean.quoteOverviewVO.disableApprovedMinIrr == true ? 'disabledTextButton' : 'enabledTextButton'}"
+										       disabled="#{quoteOverviewBean.quoteOverviewVO.disableApprovedMinIrr or quoteOverviewBean.disableCalculateAndSave}" >
+									<p:graphicImage id="appIrrMinReImageId" style="cursor: pointer;border:none"  onclick="PF('appIrrMinInplaceVar').show();hideIcon('appIrrMinReImageId');"
+														value="/images/action_edit.png"  title="Add/Edit Approved Minimum IRR" rendered="#{!quoteOverviewBean.quoteOverviewVO.disableApprovedMinIrr and !quoteOverviewBean.disableCalculateAndSave}"/>
+								</p:commandLink>
+							
+								
+							</h:panelGroup>
+							
+						</h:panelGrid>
+						
+					   <h:panelGrid id="appMinIrrUserInfoPanelId" columns="1"  cellspacing="0"  >	
+	 					
+	 							<h:panelGroup >		 					
+		 							<p:spacer width="17" height="0"/>
+		 							<h:outputLabel style="white-space:nowrap;" styleClass="ui-label-smallfont" rendered="#{quoteOverviewBean.quoteOverviewVO.irrApprovedUser != null}" value="(Approved by: #{quoteOverviewBean.quoteOverviewVO.irrApprovedUser} ," />
+		 							<h:outputText style="white-space:nowrap;" styleClass="ui-label-smallfont" rendered="#{quoteOverviewBean.quoteOverviewVO.irrApprovedUser != null}"  value="#{quoteOverviewBean.quoteOverviewVO.irrApprovedDate})">
+		 								<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+		 							</h:outputText>
+		 							 
+								</h:panelGroup>
+	 					</h:panelGrid>
+	 					
+	 					
+				</p:panel>	
+
+				<p:panel header="Payment" id="quoteOverviewParameterPanel3" style ="max-width:100%;width:auto;height:190px;">		
+					<h:panelGrid columns="1" cellspacing="8">
+						<h:panelGroup >	
+							<h:outputLabel value="Minimum Lease Rate:"  style="white-space:nowrap;"  styleClass="ui-label"/> 
+							<h:outputText styleClass="alignmentRight" value="#{quoteOverviewBean.quoteOverviewVO.minimumLeaseRate}">
+		 						<f:converter converterId="malDollarValueConverter" />
+	   					 	</h:outputText>
+	   					 </h:panelGroup>	
+   					 	<h:outputLabel value=""/>
+   					 	
+   					 	<h:panelGrid columns="2" cellspacing="2" >	
+							<p:outputLabel value="Lease Rate:" for="rate"  style="white-space:nowrap;"  styleClass="ui-label"/> 
+							
+	   					 	<p:inputNumber  id="rate" style="text-align:right"  
+	   					 					disabled="#{quoteOverviewBean.disableCalculateAndSave ? 'true':quoteOverviewBean.rentalCalculationApplicable ? 'false':'true'}"
+	                						decimalPlaces="2"  thousandSeparator="," symbol= "$" symbolPosition= "p"
+	                						minValue="-999999999.99" maxValue="999999999.99" onkeyup="return restrictUserInput('rate',event)"
+	                						value="#{quoteOverviewBean.quoteOverviewVO.actualLeaseRate}" 
+											size="#{quoteOverviewBean.leaseRateTextSize}" 
+	                						emptyValue="empty"
+	                						styleClass="alignmentRight trackDirtyChildValues ui-text-align-right-dev"
+	                						onchange="disable('save')"/>
+	   					 	
+							<h:outputLabel value="Service Elements:"  style="white-space:nowrap;"  styleClass="ui-label"/>
+							 
+							<p:commandLink action="#{quoteOverviewBean.viewServiceElements}" immediate="true" ajax="false" style="text-align : right;float: right;" >
+								<h:outputText value="#{quoteOverviewBean.quoteOverviewVO.serviceElementRate}" title="View Service Element Details">
+			 						<f:converter converterId="malDollarValueConverter" />
+	   						 	</h:outputText>
+							</p:commandLink>
+							<h:outputLabel value=""/>
+							<hr class="ui-hr"  />
+							
+							<h:outputLabel value="Monthly Payment:"  style="white-space:nowrap;"  styleClass="ui-label"/> 
+							<h:panelGroup >
+								
+								<h:outputText value="#{quoteOverviewBean.quoteOverviewVO.monthlyPayment}"  styleClass="alignmentRight" style="vertical-align:top"  >
+	 	 							<f:converter converterId="malDollarValueConverter" />
+	  					 		</h:outputText>
+							</h:panelGroup>
+						</h:panelGrid>
+						<h:outputLabel value=""/>
+					</h:panelGrid>
+				</p:panel>	
+			</h:panelGrid>
+			</p:panel>
+			<p:panel id="controlPanel" styleClass="ui-layout" style ="min-width:1200px;max-width:100%;width:auto">
+				<p:commandButton id="calc"  value="Recalculate"   
+					action="#{quoteOverviewBean.reCalculateRental}"  ajax="false"
+					disabled="#{quoteOverviewBean.disableCalculateAndSave }"
+					onclick="lockScreen();" />
+				<p:spacer width="10" />	
+				
+				<p:commandButton  id="save"  value="Save"  
+					disabled="#{quoteOverviewBean.disableCalculateAndSave or quoteOverviewBean.reCalculated != true}"
+					action="#{quoteOverviewBean.save}"  ajax="false"
+					onclick="lockScreen();"  />
+				
+				<p:spacer width="10" />
+				
+				<p:commandButton value="Cancel" rendered="#{quoteOverviewBean.forwaredPage == false}"
+					 onclick="window.close();" />
+				
+				<p:commandButton  value="Cancel"  rendered="#{quoteOverviewBean.forwaredPage == true}"
+					action="#{quoteOverviewBean.cancel}" ajax="false" immediate="true" />
+					   
+			</p:panel>
+		
+			 <p:tooltip  id="hoverPanel" for="minIrrValue" showEffect="blind"  >  
+        		<h:panelGrid columns="2"  cellspacing="10"  >	
+					<h:outputLabel style="white-space:nowrap;" styleClass="ui-label" value="Global Rate:" />
+					<h:panelGroup>
+		 				<h:outputText  value="#{quoteOverviewBean.quoteOverviewVO.baseIrr}"  >
+		 					<f:convertNumber maxFractionDigits="5" minFractionDigits="5" />
+		 				</h:outputText>
+						<h:outputLabel value="%" styleClass="alignmentRight"/>					
+					</h:panelGroup>
+	 				<h:outputLabel style="white-space:nowrap;" styleClass="ui-label" value="Client Adjustment:"  />
+					<h:panelGroup>
+		 				<h:outputText  value="#{quoteOverviewBean.quoteOverviewVO.profitAdj}" >
+		 					<f:convertNumber maxFractionDigits="5" minFractionDigits="5" />
+		 				</h:outputText>				
+						<h:outputLabel value="%" styleClass="alignmentRight"/>					
+					</h:panelGroup>
+ 				</h:panelGrid>
+    		</p:tooltip >  
+			
+		</h:form>
+
+		<p:dialog id="irrLeaseDialog"  widgetVar="irrLeaseDialogVar" closable="false" severity="alert" dynamic="false" width="400"  height="100"  modal="true"  header="Invalid Action" resizable="false" appendTo="@(body)" >
+			<h:form id = "irrLeaseDialogForm" prependId="false">
+				
+							<h:panelGroup  style="display:block; text-align:center">			  
+		        			<h:outputText value="Only one change is allowed at a time. IRR or Lease Rate"/>
+        					</h:panelGroup>
+				
+							<br/>
+							<p/>
+	               			<h:panelGroup  style="display:block; text-align:center">			  
+		        			<p:commandButton id = "alertIrrLeaseOk" value="Ok" onclick="hideIrrLeaseDialog()"/>
+        					</h:panelGroup>
+			</h:form>
+	
+	   			</p:dialog>
+	   		
+		
+		<div id="inputTypeAmount">
+			<ui:include src="../alert/inputTypeAmount.xhtml" />
+		</div>	
+		<div id="inputTypePercent">
+			<ui:include src="../alert/inputTypePercent.xhtml" />
+		</div>	
+		
+		
+		<script type="text/javascript">
+			var	origionalIrr;
+			var origionalLeaseRate;
+			
+			function setOriginalValues(){
+				origionalIrr = document.getElementById('irr_input').value;
+				//alert(origionalIrr);
+				origionalLeaseRate  = document.getElementById('rate_input').value;
+			}			
+			
+			function disable(id){			
+				document.getElementById(id).disabled = true;
+			}
+			
+			function restrictUserInput(fieldName,event){
+				var keyCode = event.keyCode;
+				
+				//allow non numeric/non alpha/non operators keys to act as they should be
+				if(keyCode &lt;48){
+					if(keyCode != 46 	&#38;&#38; keyCode != 8){//delete key
+						return true;
+					}
+				}
+				if(keyCode &gt; 111){
+					if(keyCode &lt; 184){
+						return true;
+					}
+				}
+				if('irr' == fieldName){
+					var currentVal = document.getElementById('rate_input').value;
+					
+					if(origionalLeaseRate != currentVal){
+						document.getElementById('irr_input').value = origionalIrr;	
+						event.returnValue = false;
+						setTimeout('showRestrictDialog()',50);
+						return false;
+						
+					}
+				}else if('rate' == fieldName){
+					var currentVal = document.getElementById('irr_input').value;
+					if(origionalIrr != currentVal){
+						event.returnValue = false;		
+						document.getElementById('rate_input').value = origionalLeaseRate;
+						setTimeout('showRestrictDialog()',50);
+						return false;
+						
+					}
+				}else{
+					return true;
+				}
+			}
+			
+			function hideIrrLeaseDialog(){
+				hideDialog('irrLeaseDialogVar');
+				setElementFocus('irr_input');
+			}
+			
+			function showRestrictDialog(){
+				showDialog('irrLeaseDialogVar');
+				setElementFocus('alertIrrLeaseOk');				
+			}
+		
+		
+			$("#minIrrValue").hover(function() {
+				    $(this).css('cursor','pointer');
+				}, function() {
+				    $(this).css('cursor','auto');
+			});
+			
+			function changeInputValue(fieldName){
+				var value = document.getElementById(fieldName).value;
+				if(value.length &lt; 0 ){
+					return false;
+				}else{
+					return true;
+				}
+			}
+
+
+			function updateTotalResidual() {
+				var equipVal = Number(document.getElementById('equipmentResidual').value);
+				var baseVal = Number(document.getElementById('baseResidual_hinput').value);
+
+				if(isNaN(equipVal)) {
+					equipVal = 0;
+				}
+				if(isNaN(baseVal)) {
+					baseVal = 0;
+				}
+				var total = equipVal + baseVal;
+				var totalFormatted = '$' + total.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,");
+
+				document.getElementById('residual').value = total;
+				document.getElementById('residual').innerHTML = totalFormatted;
+			}
+			
+			function initializeDirtyDetection() {
+				registerIgnoreButton("save");
+				registerIgnoreButton("calc");
+				setDirtyDataById('dirtyData');
+				saveDataForDirtyDetection();
+			}
+			function handleSaveDeliveryRechargeRequest(xhr, status, args) { 
+                if(!args.failure) { 
+                	PF('deliveryInplaceVar').hide();  
+                	showIcon('deliveryReImageId');
+                }else{
+                	PF('deliveryInplaceVar').show();  
+                	hideIcon('deliveryReImageId');
+                	setFocusOnInterestAdj();
+                }
+		}
+			
+		function handleSaveAppIrrMinRequest(xhr, status, args) { 
+                if(!args.failure) {                 	
+                	PF('appIrrMinInplaceVar').hide();  
+                	showIcon('appIrrMinReImageId');
+                	
+                }else{
+                	PF('appIrrMinInplaceVar').show();  
+                	hideIcon('appIrrMinReImageId');
+                	setFocusOnIRR();
+                }
+		}
+			
+		function formatRechargeAmount(){			
+			var inputV  = document.getElementById('grdDelRcAmt').value;
+			if($.trim(inputV).length == 0){
+			   document.getElementById('deliveryRechargeId').value =  '';	
+			  return;
+			}
+				
+			var outPut  ;
+			try{					
+				outPut = Number(inputV);				
+		   		if(isNaN(outPut))
+		   		    throw new Error("Not a number");
+		   	}catch(err) {			   		
+				outPut = parseFloat(inputV.replace(/[^0-9-.]/g, ''));
+			}			  
+		 
+		  var formattedInput =  '$' +  outPut.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,")  ;
+		  document.getElementById('grdDelRcAmt').value = formattedInput;
+	
+		}
+		
+		function setFocusOnInterestAdj(){	
+			$(function(){PrimeFaces.focus('interestAdj');});
+		}
+		
+		function setFocusOnIRR(){	
+			$(function(){PrimeFaces.focus('irr');});
+		}
+		
+		function showIcon(id){	
+			document.getElementById(id).style.display = "block";	
+		}
+		
+		function hideIcon(id){	
+			document.getElementById(id).style.display = "none";
+		}
+		function resetDeliveryRechargeAmount(){
+			$('#grdDelRcAmtLabel').removeClass('ui-state-error');
+		}
+		
+		function resetAppIrrMinAmt(){
+			$('#appMinIrrLabelId').removeClass('ui-state-error');
+		}
+     	$(window).load(function(){
+     		if(document.getElementById('invalidAccessPath').value == 'true')return false;
+     		setOriginalValues();
+     		initializeDirtyDetection();
+		});			
+		
+		</script>
+	</ui:define>
+
+</ui:composition>

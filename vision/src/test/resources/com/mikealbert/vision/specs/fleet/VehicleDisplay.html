@@ -1,0 +1,42 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Fleet Maintenance / FM-5 Vehicle Display for Maintenance PO Entry</title>
+    <body>
+    	<h1>Fleet Maintenance / FM-5 Vehicle Display for Maintenance PO Entry</h1>
+    	<h2>Acceptance Tests (Automated)</h2>
+
+		    <ul concordion:execute="#result = testVehicleSearchResultsPOButtonEnabled(#unitNo, #status)"><li>When searching for a unit number of <b><span concordion:set="#unitNo">00942122</span></b> with Unit Status = <b><span concordion:set="#status">Active</span></b><span concordion:assertTrue="#result"> the search result show with Create Purchase Order button enabled</span>.</li></ul>
+ 			
+ 			<ul concordion:execute="#result = testVehicleInformation(#unitNo, #status)">
+ 				<li>When searching for a unit number of <b><span concordion:set="#unitNo">00184243</span></b> with Unit Status = <b><span concordion:set="#status">Active</span> and click Create Purchase Button </b>
+ 					the search result show in the Unit column as <span concordion:assertEquals="#result.unitNo">00184243</span> and in Product Type column as <span concordion:assertEquals="#result.productType">CE_LTD</span>
+ 					 and in Client Number column as <span concordion:assertEquals="#result.clientAccountNumber">00009160</span>
+ 					 and in Client Name column as <span concordion:assertEquals="#result.clientAccountName">The Hillman Group, Inc.</span>
+ 					 and in Most Recent Contract Start Date column as <span concordion:assertEquals="#result.contractStartDate">2008-03-01 00:00:00.0</span>
+ 					 and in Most Recent Contract End Date column as <span concordion:assertEquals="#result.contractEndDate">2010-02-28 00:00:00.0</span> 					  
+ 				</li>
+ 				<li>When searching for a unit number of <b><span concordion:set="#unitNo">00184243</span></b> with Unit Status = <b><span concordion:set="#status">Active</span> and click Create Purchase Button and then clicking on the "+Detail" link </b>
+ 					the search result show in the Unit column as <span concordion:assertEquals="#result.unitNo">00184243</span> and in Product Type column as <span concordion:assertEquals="#result.productType">CE_LTD</span>
+ 					 and in Client Number column as <span concordion:assertEquals="#result.clientAccountNumber">00009160</span>
+ 					 and in Client Name column as <span concordion:assertEquals="#result.clientAccountName">The Hillman Group, Inc.</span>
+ 					 and in Most Recent Contract Start Date column as <span concordion:assertEquals="#result.contractStartDate">2008-03-01 00:00:00.0</span>
+ 					 and in Most Recent Contract End Date column as <span concordion:assertEquals="#result.contractEndDate">2010-02-28 00:00:00.0</span>
+ 					 and in VIN column as <span concordion:assertEquals="#result.vin">1GCDM19X23B128616</span>
+ 					 and in Fleet Reference No column as <span concordion:assertEquals="#result.clientFleetReferenceNumber">(null)</span>
+ 					 and in License Plate No column as <span concordion:assertEquals="#result.licensePlateNo">H159310</span>
+ 					 and in Driver Name column as <span concordion:assertEquals="#result.driverFullNameDisplay">Seaford, Steve</span>
+ 					 and in Driver Cost Center column as <span concordion:assertEquals="#result.driverCostCenter">NASHVILLE</span>
+ 					  					 																  
+ 				</li>
+			</ul>
+ 			
+ 			
+    	<h2>Manual Tests</h2>
+    	    <ul type = "circle"><b>
+    	       <li>TODO: Verify the data in the Vehicle Information section of Create Maintenance Purchase Order screen based on the vehicle status.</li>
+    	    </b></ul>
+
+    	<h2>Untested (Out of Scope)</h2>
+    		<ul><li>TODO:</li></ul>
+    </body>
+</html>

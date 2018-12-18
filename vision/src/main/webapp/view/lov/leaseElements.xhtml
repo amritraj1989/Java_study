@@ -1,0 +1,105 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	 <p:dialog header="Select Service Element" widgetVar="leaseElementLOV" id="LEASEELEMENT_GRID" dynamic="true" resizable="true" appendTo="@(body)" closeOnEscape="true"
+						 width="510" height="380"  modal="true"  onShow="setFirstPageLeaseElementDataTableWidget();setFocus('leaseElementSelectButton');" onHide="setFocusToLovOnPage()">
+		<h:form id="leaseElementLovToolbarForm" name ="leaseElementLovToolbarForm" prependId = "false" onkeydown="filter_onkeydown(event,'refresh')">	
+		</h:form>
+		 <h:form id="leaseElementLovForm" name ="leaseElementLovForm" prependId = "false" onkeydown="body_onkeydown(event,'leaseElementSelectButton','leaseElementLOV');">
+				
+				<p:dataTable  id="leaseElementDataTableId"   widgetVar="leaseElementDataTableWidget" var="leaseElement" scrollable="true" scrollHeight="270" resizableColumns="true"
+                          value="#{leaseElementLovBean.leaseElementList}" rows="#{leaseElementLovBean.rowsPerPage}" paginator="true" paginatorPosition="bottom"  lazy="true"
+                           selection = "#{leaseElementLovBean.selectedLeaseElement}" selectionMode="single"
+                           rowIndexVar="leaseElementRowIndex"  rowKey="#{leaseElement.elementName}">
+                       <p:ajax event="rowDblselect" listener="#{leaseElementLovBean.onRowSelect}" 
+                                    update=":leaseElementLovForm:lovLeaseElementName :leaseElementLovForm:lovLeaseElementDescription :leaseElementLovForm:rowIndexOnParent" 
+                                    oncomplete="hideLeaseElementLov();setLeaseElementValues();"  />
+                         
+                       <p:ajax event="rowSelect" listener="#{leaseElementLovBean.onRowSelect}" oncomplete="enableLeaseElementButton();"
+                            	update=":leaseElementLovForm:lovLeaseElementName :leaseElementLovForm:lovLeaseElementDescription :leaseElementLovForm:rowIndexOnParent"/>
+                            	
+                      <p:ajax event="page" onstart="clearDataTableSelection('leaseElementDataTableWidget');" oncomplete="setScrollDivAtTop();"/>
+                         
+                    	<p:column width="100" >
+                                <f:facet name="header">
+                                    <h:outputText value="Element Name"/>
+                                </f:facet>
+                                <h:outputText value="#{leaseElement.elementName}"></h:outputText>
+                        </p:column> 
+                        <p:column width="180" >
+                                <f:facet name="header">
+                                    <h:outputText value="Description"/>
+                                </f:facet>
+                                <h:outputText value="#{leaseElement.description}"></h:outputText>
+                        </p:column>   
+                </p:dataTable>
+                <p:panel id="leaseElementSelectPanel" style="text-align:center; border:none">
+                            <h:outputText style="font-weight:bold;" 
+                                value="Record Count:#{leaseElementLovBean.totalRecord}">
+                            </h:outputText>
+                            
+                            <p:commandButton  value="Select" id = "leaseElementSelectButton" name ="leaseElementSelectButton" style="float:right;" 
+                             oncomplete="hideLeaseElementLov();setLeaseElementValues();" disabled="false" >
+                            </p:commandButton>
+                            <h:inputHidden id ="rowIndexOnParent" />
+               </p:panel>
+                     <h:inputHidden id="inputLeaseElement" value="leaseElementLOV" />		
+    			 	<h:inputHidden id="lovRecordsPerPageLeaseElement" value="#{leaseElementLovBean.rowsPerPage}" />
+    			 	<h:inputHidden id ="lovLeaseElementName"  value = "#{leaseElementLovBean.leaseElementName}"/>
+    			 	<h:inputHidden id ="lovLeaseElementDescription"  value = "#{leaseElementLovBean.leaseElementDescription}"/>
+    			 	
+		</h:form>				        
+							
+	</p:dialog>	
+	<script type="text/javascript">
+		function enableLeaseElementButton(){
+			$("#leaseElementSelectButton").prop('disabled', false);
+		}	
+	
+		function setLeaseElementValues(){
+			var lovNameArray = new Array();
+			var lovValueArray = new Array();
+			lovNameArray[0]='LEASE_ELEMENT_NAME';
+			lovValueArray[0]=document.getElementById('lovLeaseElementName').value;
+			lovNameArray[1]='LEASE_ELEMENT_DESCRIPTION';
+			lovValueArray[1]=document.getElementById('lovLeaseElementDescription').value;
+			lovNameArray[2]='LEASE_ELEMENT_ROWINDEX_PARENT';
+			lovValueArray[2]=document.getElementById('rowIndexOnParent').value;
+			
+			
+			
+			<!-- This method need to implement in parent page to populate LOV seletion-->
+			setSelectionLeaseElement(document.getElementById('inputLeaseElement').value,lovNameArray,lovValueArray); 
+		}
+		
+		function showLeaseElementLov(){
+			showDialog('leaseElementLOV');
+		}	
+		
+		function hideLeaseElementLov(){
+			hideDialog('leaseElementLOV');
+		}
+		
+		function setFirstPageLeaseElementDataTableWidget(){
+			setDataTableToFirstPage('leaseElementDataTableWidget');
+			// also select the first row, but only if we have data
+			setDataTableToFirstRow('leaseElementDataTableWidget');
+		}
+		
+		
+		
+		function filter_onkeydown(event,buttonName) 
+	    {	
+		 	if(event.keyCode==13 &amp;&amp; document.getElementById(buttonName)) 
+	        {
+				document.getElementById(buttonName).click();	
+	        }
+		 	if( event.keyCode==27){
+		 		PF('leaseElementLOV').hide();
+			}
+	    }
+	
+		</script>					    
+</ui:composition>

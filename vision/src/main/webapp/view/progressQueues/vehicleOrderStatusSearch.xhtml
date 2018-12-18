@@ -1,0 +1,27 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"   
+	xmlns:pe="http://primefaces.org/ui/extensions"	  
+    template="../../templates/ui.xhtml" >
+    
+    
+    <ui:define name="content">
+	      	<h:form id="vehicleOrderStatusSearchCrumbForm" prependId="false">
+	   				<p:breadCrumb model="#{vehicleOrderStatusSearchBean.breadCrumbTrail}" ajax="false" immediate="true" styleClass="ui-layout"/>
+	   		</h:form>
+	        <comp:maintainVehicleOrderStatus id="maintainVehicleOrderStatusCCId" 
+		    		showSearch = "#{not vehicleOrderStatusSearchBean.enquiryMode}"
+		    		showNotes = "true" 
+		    		showCancel = "false"
+		    		enquiryMode = "#{vehicleOrderStatusSearchBean.enquiryMode}"
+		    		mainPODocId = "#{vehicleOrderStatusSearchBean.mainPODocId}" 
+		    		addNotes = "#{vehicleOrderStatusSearchBean.addNotes}" />
+    
+    		<script type="text/javascript">	
+	
+			</script> 
+	</ui:define>
+</ui:composition>

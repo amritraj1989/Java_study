@@ -1,0 +1,670 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="../../templates/ui.xhtml">
+
+	<ui:define name="content">
+			<h:form id="debitCreditBreadCrumbForm" prependId="false">
+				<p:breadCrumb model="#{debitCreditMemoSearchBean.breadCrumbTrail}"
+					ajax="false" immediate="true" styleClass="ui-layout" />
+			</h:form> 
+
+			<h:form id="debitCreditSearchForm" prependId="false">
+
+				<!-- Error message display -->
+				<p:scrollPanel style="height:50px;" mode="native"
+					styleClass="ui-layout">
+					<p:messages id="messages" showSummary="false"
+						severity="info,error,fatal" showDetail="true" autoUpdate="true" />
+				</p:scrollPanel>
+				<p:panel id="debitCreditPanelSearch" header="Search" style="min-width:980px;max-width:100%;width:auto;">
+					<p:focus context="debitCreditPanelSearch" />
+					<!-- Top -->					
+					<p:panelGrid columns="8" cellpadding="5">
+						<h:outputLabel for="dcNumber" value="DC No:" styleClass="ui-label" />	
+						<h:panelGroup>
+							<p:inputText id="dcNumber" title="DC No" value="#{debitCreditMemoSearchBean.searchCriteria.dcNo}" onkeypress="return doKeypressSearch(event)"/>
+						</h:panelGroup>	
+						<h:outputLabel for="unitNo" value="Unit No:" styleClass="ui-label" />
+						<h:panelGroup>
+							<p:inputText id="unitNo" title="Unit No" value="#{debitCreditMemoSearchBean.searchCriteria.unitNo}" onkeypress="return doKeypressSearch(event)"/>
+						</h:panelGroup>
+						<p:outputLabel styleClass="ui-label" value = "Analysis Category:" for="analysisCategory"/>
+						<h:panelGroup>	
+							<p:selectOneMenu id="analysisCategory" styleClass="ui-select-dropdown" style="width: 100px;"
+									widgetVar="analysisCategoryWidgetVar"
+									value="#{debitCreditMemoSearchBean.searchCriteria.analysisCategory}"
+									converter="AnalysisCategoryConverter">
+								<f:selectItem itemLabel="--Select One--" itemValue=""/>
+								<f:selectItems value="#{debitCreditMemoSearchBean.analysisCategories}" 
+									var="category"
+									itemLabel="#{category.analysisCategory}"
+									itemValue="#{category}" />
+							</p:selectOneMenu>
+						</h:panelGroup>						
+						<h:outputLabel styleClass="ui-label" value = "Status:" for="status"/>
+						<h:panelGroup>	
+							<p:selectOneMenu id="status" styleClass="ui-select-dropdown" style="width: 100px;"
+									widgetVar="statusWidgetVar"
+									value="#{debitCreditMemoSearchBean.searchCriteria.statusCode}">
+								<f:selectItem itemLabel="--Select One--" itemValue=""/>
+								<f:selectItems value="#{debitCreditMemoSearchBean.debitCreditStatusCodes}" var="status" itemLabel="#{status.statusDesc}" itemValue="#{status.dcStatusCode}" />								
+							</p:selectOneMenu>
+						</h:panelGroup>						
+						<h:outputLabel for="client" value="Client:" styleClass="ui-label"  />
+						<h:panelGroup>
+							<p:inputText id="client" title="Client"  value="#{debitCreditMemoSearchBean.client}" onkeypress="return doKeypressSearch(event)" />
+							<p:commandButton id='clientLOV'  icon="icon-lov" title="lov"
+									oncomplete="showCustomerLov();" immediate="true"
+									actionListener="#{customerLovBean.fetchLOVDataByCustomerName}"
+									process="@this,client" dynamic="true" async="true"
+									onstart="return hasMinAlphaNumericCharacters($('#client'));"
+									update=":custLovForm:CUSTOMER_GRID">
+									<f:param name="CUSTOMER_LOV_INPUT" value="client" />
+							</p:commandButton>
+						</h:panelGroup>	
+						
+						<p:outputLabel styleClass="ui-label" value = "Submitter:" for="submitterNameOrEmpNo"/>
+						<h:panelGroup style="white-space:nowrap;">							
+							<p:inputText id="submitterNameOrEmpNo"  title="Submitter" value="#{debitCreditMemoSearchBean.searchCriteria.submitterNameOrEmpNo}" onchange="clearSubmitter();" onkeypress="return doKeypressSearch(event);"/>
+							<p:commandButton id='submitterLOVId' icon="icon-lov" title="lov"
+								oncomplete="showWillowUserLov();" immediate="true"
+								actionListener="#{willowUserLovBean.fetchLOVData}"
+								process="@this,submitterNameOrEmpNo" dynamic="true" async="true"
+								onstart="return hasMinAlphaNumericCharacters($('#submitterNameOrEmpNo'));"
+								update=":WILLOW_USER_GRID">
+								<f:param name="WILLOW_USER_LOV_NAME" value="submitterLOV" />
+								<f:param name="WILLOW_USER_LOV_INPUT_HEADER" value="Select Submitter" />
+								<f:param name="WILLOW_USER_LOV_INPUT_NAME" value="submitterNameOrEmpNo" />
+								<f:param name="WILLOW_USER_LOV_INPUT_NO" value="submitter" />
+							</p:commandButton>
+							<h:inputHidden id ="submitter" name="submitter" value="#{debitCreditMemoSearchBean.searchCriteria.submitter}"/>
+						</h:panelGroup>
+						<p:outputLabel for="submittedSinceDate" styleClass="ui-label"
+								value="Submitted Since:" />
+						<h:panelGroup>	                  	
+							<p:calendar title="Submitted Since" id="submittedSinceDate"  
+									size="12" 
+									pattern="MM/dd/yyyy" 
+									value="#{debitCreditMemoSearchBean.searchCriteria.submittedSinceDate}" 
+									showOn="button" 
+									styleClass="ui-input-number-size-dev"
+									onchange="formatDate(this);"
+									autocomplete="off"
+									onkeypress="return doKeypressSearch(event)"> 
+								<f:convertDateTime pattern="MM/dd/yyyy" />
+							</p:calendar>							
+						</h:panelGroup>		
+						
+						<p:outputLabel styleClass="ui-label" value = "Requested Approver:" for="selectedApproverNameOrEmpNo"/>
+						<h:panelGroup style="white-space:nowrap;">							
+							<p:inputText id="selectedApproverNameOrEmpNo"  title="Selected Approver" value="#{debitCreditMemoSearchBean.searchCriteria.selectedApproverNameOrEmpNo}" onchange="clearSelectedApprover();" onkeypress="return doKeypressSearch(event);"/>
+							<p:commandButton id='selectedApproverLOVId' icon="icon-lov" title="lov"
+								oncomplete="showWillowUserLov();" immediate="true"
+								actionListener="#{willowUserLovBean.fetchLOVData}"
+								process="@this,selectedApproverNameOrEmpNo" dynamic="true" async="true"
+								onstart="return hasMinAlphaNumericCharacters($('#selectedApproverNameOrEmpNo'));"
+								update=":WILLOW_USER_GRID">
+								<f:param name="WILLOW_USER_LOV_NAME" value="selectedApproverLOV" />
+								<f:param name="WILLOW_USER_LOV_INPUT_HEADER" value="Select Selected Approver" />
+								<f:param name="WILLOW_USER_LOV_INPUT_NAME" value="selectedApproverNameOrEmpNo" />
+								<f:param name="WILLOW_USER_LOV_INPUT_NO" value="selectedApprover" />
+							</p:commandButton>
+							<h:inputHidden id ="selectedApprover" name="Selected Approver" value="#{debitCreditMemoSearchBean.searchCriteria.selectedApprover}"/>
+						</h:panelGroup>
+						
+										
+						<p:outputLabel styleClass="ui-label" value = "Approver:" for="approver"/>
+						<h:panelGroup style="white-space:nowrap;">							
+							<p:inputText id="approverNameOrEmpNo" title="Approver" value="#{debitCreditMemoSearchBean.searchCriteria.approverNameOrEmpNo}" onchange="clearApprover();" onkeypress="return doKeypressSearch(event);"/>
+							<p:commandButton id='approverLOVId'  icon="icon-lov" title="lov"
+								oncomplete="showWillowUserLov();" immediate="true"
+								actionListener="#{willowUserLovBean.fetchLOVData}"
+								process="@this,approverNameOrEmpNo" dynamic="true" async="true"
+								onstart="return hasMinAlphaNumericCharacters($('#approverNameOrEmpNo'));"
+								update=":WILLOW_USER_GRID">
+								<f:param name="WILLOW_USER_LOV_NAME" value="approverLOV" />
+								<f:param name="WILLOW_USER_LOV_INPUT_HEADER" value="Select Approver" />
+								<f:param name="WILLOW_USER_LOV_INPUT_NAME" value="approverNameOrEmpNo" />
+								<f:param name="WILLOW_USER_LOV_INPUT_NO" value="approver" />
+							</p:commandButton>
+							<h:inputHidden id ="approver" name="approver" value="#{debitCreditMemoSearchBean.searchCriteria.approver}"/>
+						</h:panelGroup>
+						<p:outputLabel styleClass="ui-label" value = "Processor:" for="processor"/>						
+						<h:panelGroup style="white-space:nowrap;">							
+							<p:inputText id="processorNameOrEmpNo" title="Processor" value="#{debitCreditMemoSearchBean.searchCriteria.processorNameOrEmpNo}" onchange="clearProcessor();" onkeypress="return doKeypressSearch(event);"/>
+							<p:commandButton id='processorLOVId'  icon="icon-lov" title="lov"
+								oncomplete="showWillowUserLov();" immediate="true"
+								actionListener="#{willowUserLovBean.fetchLOVData}"
+								process="@this,processorNameOrEmpNo" dynamic="true" async="true"
+								onstart="return hasMinAlphaNumericCharacters($('#processorNameOrEmpNo'));"
+								update=":WILLOW_USER_GRID">
+								<f:param name="WILLOW_USER_LOV_NAME" value="processorLOV" />
+								<f:param name="WILLOW_USER_LOV_INPUT_HEADER" value="Select Processor" />
+								<f:param name="WILLOW_USER_LOV_INPUT_NAME" value="processorNameOrEmpNo" />
+								<f:param name="WILLOW_USER_LOV_INPUT_NO" value="processor" />
+							</p:commandButton>
+							<h:inputHidden id ="processor" name="processor" value="#{debitCreditMemoSearchBean.searchCriteria.processor}"/>
+						</h:panelGroup>
+						<p:outputLabel styleClass="ui-label" value = "Ticket No:" for="ticketNoId"/>						
+						<h:panelGroup>
+							<p:inputText id="ticketNoId" title="Ticket No" value="#{debitCreditMemoSearchBean.searchCriteria.ticketNo}" onkeypress="return doKeypressSearch(event)"/>
+						</h:panelGroup>	
+						<p:outputLabel />					
+						<p:commandButton id="searchBtn" value="Search" 
+			        		ajax="true"	
+			        		onstart="return validateSearch(event);" 
+			        		actionListener="#{debitCreditMemoSearchBean.performSearch}" 			        	
+			        		update="debitCreditPanelList,debitCreditBthPanel"	/>
+					</p:panelGrid>			
+				</p:panel>
+
+				<p:panel id="debitCreditPanelList" header="Debit/Credit Memos" style="min-width:980px;max-width:100%;width:auto;">
+					<h:inputHidden id="hiddenScrollPosition" value="#{debitCreditMemoSearchBean.scrollPosition}" />				
+				
+					<p:dataTable id="dcMemoDataTable"
+	        	        widgetVar="dcMemoDataTableWidget"
+	        			lazy="true"
+						var="dcMemo" 
+						value="#{debitCreditMemoSearchBean.debitCreditMemoLazyList}" 
+						scrollable="true" 
+						scrollHeight="#{debitCreditMemoSearchBean.dataTable.height}"
+						selection="#{debitCreditMemoSearchBean.selectedSearchVOs}"
+						emptyMessage = "#{debitCreditMemoSearchBean.dataTableMessage}"
+						rows="#{debitCreditMemoSearchBean.resultPerPage}" 
+ 						paginator="true" 
+ 						paginatorPosition="bottom" 
+						resizableColumns="true"
+						>
+									
+						<p:ajax event="rowSelect"  process="dcMemoDataTable"  update=":debitCreditSearchForm:debitCreditBthPanel"  />
+						<p:ajax event="rowUnselect" process="dcMemoDataTable"  update=":debitCreditSearchForm:debitCreditBthPanel"  />
+						<p:ajax event="toggleSelect" process="dcMemoDataTable"   update=":debitCreditSearchForm:debitCreditBthPanel"/>	
+						<p:ajax event="rowSelectCheckbox" process="dcMemoDataTable"   update=":debitCreditSearchForm:debitCreditBthPanel"/>
+						<p:ajax event="rowUnselectCheckbox" process="dcMemoDataTable"  update=":debitCreditSearchForm:debitCreditBthPanel" />	
+						
+						<p:ajax event="sort" process="dcMemoDataTable" update=":debitCreditSearchForm:debitCreditBthPanel" onstart="PF('dcMemoDataTableWidget').unselectAllRows();"  oncomplete="setScrollDivAtTop();"/>
+						<p:ajax event="page" process="dcMemoDataTable" update=":debitCreditSearchForm:debitCreditBthPanel" onstart="PF('dcMemoDataTableWidget').unselectAllRows(); " oncomplete="setScrollDivAtTop();" />										 
+						
+						
+						
+						<p:column selectionMode="multiple" style="text-align:center;padding:0px" width="16"/>
+						
+						<p:column headerText="DC No" sortBy="#{dcMemo.dcNumber}" width="#{debitCreditMemoSearchBean.dataTable.col1}" 
+								style="#{dcMemo.warningInd ? debitCreditMemoSearchBean.warningStyle : ''}">
+						    <h:outputText id="DcNumber" value="#{dcMemo.dcNumber}" />
+						    <p:tooltip value="#{dcMemo.reason}" for="DcNumber" />
+						</p:column>
+						
+						<p:column headerText="Client" sortBy="#{dcMemo.clientCode}" width="#{debitCreditMemoSearchBean.dataTable.col2}" style="white-space: nowrap; text-overflow: ellipsis;" >
+						    <h:outputText  value="#{dcMemo.clientCode}" /> <br />
+						    <h:outputText id= "clientValue" value="#{dcMemo.clientName}" />
+						    <p:tooltip value="#{dcMemo.clientName}" for="clientValue"/>
+						</p:column>
+						
+						<p:column headerText="Unit No" sortBy="#{dcMemo.unitNo}" width="5%">
+						    <h:outputText  value="#{dcMemo.unitNo}" />
+						</p:column>
+						
+						<p:column headerText="Status" sortBy="#{dcMemo.status}" width="#{debitCreditMemoSearchBean.dataTable.col4}" 
+																				rendered="#{! debitCreditMemoSearchBean.searchCriteria.isProcessedTransactionSearch()}">
+						    <h:outputText  value="#{dcMemo.status}" />
+						</p:column>
+						
+						<p:column headerText="Type" sortBy="#{dcMemo.type}" width="#{debitCreditMemoSearchBean.dataTable.col5}" 
+																			rendered="#{! debitCreditMemoSearchBean.searchCriteria.isProcessedTransactionSearch()}">
+						    <h:outputText  value="#{dcMemo.type}" />
+						</p:column>
+						
+						<p:column headerText="Analysis Category" sortBy="#{dcMemo.categoryCode}" 
+																width="#{debitCreditMemoSearchBean.searchCriteria.isProcessedTransactionSearch() ? debitCreditMemoSearchBean.dataTable.col4 : debitCreditMemoSearchBean.dataTable.col6}" >
+						    <h:outputText  value="#{dcMemo.categoryCode}" />
+						</p:column>
+						
+						<p:column headerText="Analysis Code" sortBy="#{dcMemo.analysisCode}" style=" text-overflow: ellipsis;"
+															 width="#{debitCreditMemoSearchBean.searchCriteria.isProcessedTransactionSearch() ? debitCreditMemoSearchBean.dataTable.col5 : debitCreditMemoSearchBean.dataTable.col7}" >
+						    <h:outputText  id= "analysisCodeValue"  value="#{dcMemo.analysisCode}" />
+						    <p:tooltip value="#{dcMemo.analysisCode}" for="analysisCodeValue"/>						   
+						</p:column>	
+						<p:column headerText="Net Amount" sortBy="#{dcMemo.netAmount}" 
+															 width="#{debitCreditMemoSearchBean.searchCriteria.isProcessedTransactionSearch() ? debitCreditMemoSearchBean.dataTable.col6 : debitCreditMemoSearchBean.dataTable.col8}" >
+						    <h:outputText style="float:right" value="#{dcMemo.netAmount}" >	
+						    	<f:convertNumber type="number" pattern="$#,##0.00" />                               
+                            </h:outputText>					   
+						</p:column>	
+						
+					   <p:column headerText="State" sortBy="#{dcMemo.driverAddressState}" width="3%" 
+																							rendered="#{! debitCreditMemoSearchBean.searchCriteria.isProcessedTransactionSearch()}" >
+						    <h:outputText  value="#{dcMemo.driverAddressState}" />
+						</p:column>					
+						<p:column headerText="Submitted" sortBy="#{dcMemo.submitter}" width="#{debitCreditMemoSearchBean.dataTable.col10}" 
+																					 rendered="#{! debitCreditMemoSearchBean.searchCriteria.isProcessedTransactionSearch()}">
+						    <h:outputText  value="#{dcMemo.submitter}" />
+						</p:column>		
+						
+						<p:column headerText="Submitted Date" sortBy="#{dcMemo.submittedDate}" width="#{debitCreditMemoSearchBean.dataTable.col11}" 
+															 									rendered="#{! debitCreditMemoSearchBean.searchCriteria.isProcessedTransactionSearch()}">
+						    <h:outputText  value="#{dcMemo.submittedDate}" >
+						    	<f:convertDateTime type="date" pattern="MM/dd/yy" /> 
+						    </h:outputText>
+						</p:column>	
+						
+						<p:column headerText="Requested Approver" sortBy="#{dcMemo.selectedApprover}" width="#{debitCreditMemoSearchBean.dataTable.col12}" 
+																					 rendered="#{! debitCreditMemoSearchBean.searchCriteria.isProcessedTransactionSearch()}">
+						    <h:outputText  value="#{dcMemo.selectedApprover}" />
+						</p:column>
+						
+						<p:column headerText="Approved" sortBy="#{dcMemo.approver}" width="6%" 
+								rendered="#{! debitCreditMemoSearchBean.searchCriteria.isProcessedTransactionSearch()}">
+
+						    <h:outputText  value="#{dcMemo.approver}" /> <br/>
+						    <h:outputText  value="#{dcMemo.approvedDate}" >
+						    	<f:convertDateTime type="date" pattern="MM/dd/yy" /> 
+						    </h:outputText>
+
+						</p:column>
+						
+						<p:column headerText="Processed" sortBy="#{dcMemo.processor}" width="6%" 
+								rendered="#{! debitCreditMemoSearchBean.searchCriteria.isProcessedTransactionSearch()}">
+						    <h:outputText  value="#{dcMemo.processor}" /><br/>
+						    <h:outputText  value="#{dcMemo.processedDate}" >
+						    	<f:convertDateTime type="date" pattern="MM/dd/yy" /> 
+						    </h:outputText>
+						</p:column>
+						
+						<p:column headerText="Ticket No" sortBy="#{dcMemo.ticketNo}" width="7%" > 
+						    <h:outputText id="ticketNoId" value="#{dcMemo.ticketNo}" />
+						    <p:tooltip value="#{dcMemo.ticketNo}" for="ticketNoId"/> 																					 	
+						</p:column>
+						
+						<p:column headerText="File Name" sortBy="#{dcMemo.source}" width="8%" style="white-space: nowrap; text-overflow: ellipsis;" >
+						    <h:outputText id= "fileNameId" value="#{dcMemo.source}" /> 
+						    <p:tooltip value="#{dcMemo.source}" for="fileNameId"/>
+						</p:column>
+				
+			
+						<p:column headerText="Invoice No" sortBy="#{dcMemo.invoiceNo}" width="#{debitCreditMemoSearchBean.dataTable.col8}"  
+																						rendered="#{debitCreditMemoSearchBean.searchCriteria.isProcessedTransactionSearch()}" >
+						    <h:outputText  value="#{dcMemo.invoiceNo}" />
+						</p:column>
+						
+						<p:column headerText="Line Description" sortBy="#{dcMemo.lineDescription}" width="#{debitCreditMemoSearchBean.dataTable.col9}" style="white-space: nowrap; text-overflow: ellipsis;"
+																									rendered="#{debitCreditMemoSearchBean.searchCriteria.isProcessedTransactionSearch()}">
+						    <h:outputText id="lineDescriptionValue"  value="#{dcMemo.lineDescription}" />
+						    <p:tooltip value="#{dcMemo.lineDescription}" for="lineDescriptionValue"/>
+						</p:column>
+						
+						<f:facet name="footer">
+							Record Count: <h:outputText value="#{debitCreditMemoSearchBean.debitCreditMemoLazyList.rowCount}" />
+							<div style= "text-align:right;">
+							     <h:commandLink title="Export To Excel" onclick="return exportValidation(event,'#{debitCreditMemoSearchBean.exportList.size()}');" >
+					               <p:graphicImage value="/images/excel.png" styleClass="ui-border-none" />	
+					                <p:dataExporter type="xls" target=":debitCreditSearchForm:debit_credit_memos" fileName="debit_credit_memos" 
+					                preProcessor="#{debitCreditMemoSearchBean.preProcessDownloadXLS}" postProcessor="#{debitCreditMemoSearchBean.postProcessDownloadXLS}" />
+					            </h:commandLink>
+					        </div>
+						</f:facet>		
+					</p:dataTable>
+				</p:panel>
+				<p:dataTable value="#{debitCreditMemoSearchBean.downloadableRowsData}" var="row"  id="debit_credit_memos"  rendered="false">
+					<p:columns value="#{debitCreditMemoSearchBean.downloadableColumns}" var="column">		
+				   	 <f:facet name="header">
+                			<h:outputText value="#{column}" />
+            			</f:facet>		       
+				        <h:outputText value="#{row[column]}" />	
+				    </p:columns>
+				</p:dataTable>
+				<p:panel id="debitCreditBthPanel" style="min-width:980px;max-width:100%;width:auto;">
+					<p:commandButton id="addBtn" value="Add" actionListener="#{debitCreditMemoSearchBean.addDebitCreditMemo}"  ajax="false"
+						onclick="lockScreen();" widgetVar="addBtnVar" /> 
+					<p:spacer width="5"/>				
+				    <p:commandButton id="editBtn" value="View/Edit" actionListener="#{debitCreditMemoSearchBean.viewEditDebitCreditMemo}" ajax="false"
+				    	onclick="lockScreen();saveScrollPosition('edit');" widgetVar="seditBtnWidgetVar" disabled="#{! debitCreditMemoSearchBean.canEnableEditBtn()}"/>	
+       				<p:spacer width="5" />
+				    <p:commandButton id="approveBtn" value="Approve" action="#{debitCreditMemoSearchBean.approveDebitCreditMemos}" update="messages, debitCreditPanelList, debitCreditBthPanel"
+				        onclick="lockScreen();"  widgetVar="approveBtnWidgetVar" disabled="#{! debitCreditMemoSearchBean.canEnableApproveBtn()}"
+				        oncomplete="setScrollDivAtTop();"/>	
+				    <p:spacer width="5" />
+					<p:commandButton id="processBtn" value="Process"  update="messages, debitCreditPanelList, debitCreditBthPanel" 
+				        widgetVar="processBtnWidgetVar" 
+				        action="#{debitCreditMemoSearchBean.processDebitCreditTransactions}"
+				        disabled="#{! debitCreditMemoSearchBean.isEnableProcessBtn()}"
+				        onclick="lockScreen();"
+				        ajax="false"
+				        oncomplete="setScrollDivAtTop();"/>	
+					<p:spacer width="5" />				        				    
+				    <p:commandButton id="allocateBtn" value="Allocate" action="#{debitCreditMemoSearchBean.allocateDebitCreditMemos}" update="messages, debitCreditPanelList, debitCreditBthPanel" 
+				        onclick="lockScreen();" widgetVar="allocateBtnWidgetVar" disabled="#{! debitCreditMemoSearchBean.canEnableAllocateBtn()}"
+				        oncomplete="setScrollDivAtTop();"/>	
+					<p:spacer width="5" />
+                    <p:commandButton id="uploadBtn" 
+                    	widgetVar="uploadFileWidgetVar" 
+                    	value="Upload" title="Upload File" 
+                    	process="@this" 
+                    	actionListener="#{debitCreditMemoSearchBean.clearDialog}"
+                    	oncomplete="showDialog('uploadFileDialogWidget')" 
+                    	disabled="#{!debitCreditMemoSearchBean.enableUploadFileBtn}">
+                    </p:commandButton> 				    
+				    <p:spacer width="5" />				    				    
+					<p:commandButton id="cancelBtn" value="Cancel" action="#{debitCreditMemoSearchBean.cancel}" ajax="false" immediate="true" onclick="lockScreen();"/>
+				</p:panel>	
+			</h:form>
+			
+		<div id="CUSTOMER_LOV_DIV">
+			<ui:include src="../lov/customers.xhtml" />
+		</div>	
+		
+		<div id="WILLOW_USER_LOV_DIV">
+			<ui:include src="../lov/willowUsers.xhtml" />
+		</div>		
+		
+		<div id="inputFieldChecks">
+			<ui:include src="../alert/inputFieldChecks.xhtml" />
+		</div>
+		
+		<style type="text/css">
+	      	.ui-datatable thead th {
+	        	white-space: normal;
+	        	text-align: center;
+	     	}	
+	     	
+    		
+    	</style>  
+    	
+		<p:confirmDialog id="minFieldsDialog" appendTo="@(body)"
+			message="Please complete at least two search fields" header="Alert" 
+			widgetVar="minFieldsWidgetVar">
+			<p:focus context="minFieldsDialog" />
+	
+			<h:form prependId="false">
+				<p:hotkey immediate="true" bind="esc"
+					handler="PF('minFieldsWidgetVar').hide(); focusSourceElement()" />
+				<p:commandButton id="cancelMinFieldsAlert" value="Ok"
+					onclick="PF('minFieldsWidgetVar').hide(); focusSourceElement()"  />
+			</h:form>
+		</p:confirmDialog>  
+		
+		<p:dialog id="uploadFileDialog" header="Upload Debit/Credit File" widgetVar="uploadFileDialogWidget"   
+			  modal="true" resizable="false" appendTo="@(body)" style="min-width: 650px; max-width: 650px;" dynamic="true">
+			  
+			<p:ajax event="close" update="uploadFileDialog"/>
+				
+			<p:hotkey immediate="true" bind="esc" handler="hideDialog('uploadFileDialogWidget');"/>				  
+			  
+			<p:messages id="uploadFileDialogErrorMsgId" severity="error,fatal" showDetail="false" autoUpdate="true" showSummary="true" globalOnly="false"/>
+			
+            	<h:form id="uploadFileDialogForm" prependId="false">
+				    <p:fileUpload fileUploadListener="#{debitCreditMemoSearchBean.fileUploadListener}" 
+					        mode="advanced"  
+					        skinSimple="true"	
+					        auto="true"	
+					        process="@form"	
+					        update="@form"	          
+					        sizeLimit="50000000"
+					        label="Browse"
+					        fileLimit="1"
+					        oncomplete="setUploadFileDialogFocus();"/>
+			        <p:panel id="panelId" style="min-height:40px; max-height:40px;overflow: auto;">
+				        <h:panelGrid id="panelGridId">										
+					        <ui:repeat value="#{debitCreditMemoSearchBean.documentFileVO}" var="file">	
+						        <h:outputText value="#{file.fileName}" style="vertical-align: top;"/>
+							    <p:spacer width="10"/>
+							    <p:commandLink  rendered="#{!file.uploadDoc}"  style="vertical-align: top"
+				                        actionListener="#{debitCreditMemoSearchBean.deleteUploadedFile(file)}"
+		                                process="@this" 
+		                                update="@form"
+				                        title="Delete File">   
+				                    <p:graphicImage value="/images/action_delete.png" styleClass="ui-border-none" />                                
+				                </p:commandLink>
+	                            <p:spacer width="20"/>
+							    <br />
+						    </ui:repeat>									    
+					    </h:panelGrid>
+			        </p:panel>
+					<p:panel>
+						<p:commandButton id="uploadFileUploadBtn" 
+							widgetVar="uploadFileUploadBtnWidgetVar" 
+							value="Upload" 
+							actionListener="#{debitCreditMemoSearchBean.copyFile}" 
+							disabled="#{!debitCreditMemoSearchBean.enableDialogUploadBtn}"
+							onclick="lockScreen();"
+					        ajax="false"/> 
+						<p:spacer width="5" />
+	                	<p:commandButton id="uploadFileCancelBtn" 
+	                		value="Cancel" 
+	                		onclick="hideDialog('uploadFileDialogWidget');"/>                        
+	               	</p:panel>                
+              	</h:form>				
+	    </p:dialog>
+    		
+
+
+
+    	<style type="text/css">
+			.ui-tooltip{
+				max-width: 350px;
+			}
+			.ui-datatable tbody td {
+			 	padding: 2px;
+			 }	
+		</style>
+
+
+		<script>
+		
+		function doKeypressSearch(event){
+			if (event.keyCode == 13) {
+				setFocus('searchBtn');
+			   $('#searchBtn').click();
+			   return false;
+			}
+			return true;	
+		}
+		
+	    /**
+	    * The LOV calls this function to pass back the selected
+	    * values to the view's controls.
+	    */
+ 		function setSelection( lovName, nameArray, valueArray){		
+	    	if(lovName == 'customerLOV'){
+				for(var i=0; i  &lt; nameArray.length ; i++){
+					if(nameArray[i] == 'CUSTOMER_NAME'){
+						document.getElementById('client').value = valueArray[i];
+					}
+				}
+				setFocus('client');
+			}
+	    	
+	    	if(lovName == 'selectedApproverLOV'){
+				for(var i=0; i  &lt; nameArray.length ; i++){
+					
+					if(nameArray[i] == 'EMPLOYEE_NO'){
+						document.getElementById('selectedApprover').value = valueArray[i];
+					}
+					
+					if(nameArray[i] == 'EMPLOYEE_NAME'){
+						document.getElementById('selectedApproverNameOrEmpNo').value = valueArray[i];
+					}
+			
+				}
+				setFocus('submitterNameOrEmpNo');
+			}
+	    	
+			if(lovName == 'submitterLOV'){
+				for(var i=0; i  &lt; nameArray.length ; i++){
+					
+					if(nameArray[i] == 'EMPLOYEE_NO'){
+						document.getElementById('submitter').value = valueArray[i];
+					}
+					
+					if(nameArray[i] == 'EMPLOYEE_NAME'){
+						document.getElementById('submitterNameOrEmpNo').value = valueArray[i];
+					}
+			
+				}
+				setFocus('submitterNameOrEmpNo');
+			}	
+			
+			if(lovName == 'processorLOV'){
+				for(var i=0; i  &lt; nameArray.length ; i++){
+					
+					if(nameArray[i] == 'EMPLOYEE_NO'){
+						document.getElementById('processor').value = valueArray[i];
+					}
+					
+					if(nameArray[i] == 'EMPLOYEE_NAME'){
+						document.getElementById('processorNameOrEmpNo').value = valueArray[i];
+					}
+			
+				}
+				setFocus('processorNameOrEmpNo');
+			}
+			
+			if(lovName == 'approverLOV'){
+				for(var i=0; i  &lt; nameArray.length ; i++){
+					
+					if(nameArray[i] == 'EMPLOYEE_NO'){
+						document.getElementById('approver').value = valueArray[i];
+					}
+					
+					if(nameArray[i] == 'EMPLOYEE_NAME'){
+						document.getElementById('approverNameOrEmpNo').value = valueArray[i];
+					}
+			
+				}
+				setFocus('approverNameOrEmpNo');
+			}
+			
+			if(lovName == 'allocatorLOV'){
+				for(var i=0; i  &lt; nameArray.length ; i++){
+					
+					if(nameArray[i] == 'EMPLOYEE_NO'){
+						document.getElementById('allocator').value = valueArray[i];
+					}
+					
+					if(nameArray[i] == 'EMPLOYEE_NAME'){
+						document.getElementById('allocatorNameOrEmpNo').value = valueArray[i];
+					}
+			
+				}
+				setFocus('allocatorNameOrEmpNo');
+			}
+	    }
+	    
+		/**
+		* Handles the search button's client side validation before the ajax search happens. 
+		*/
+		function validateSearch(event){	
+			var displayAlert = false;
+			
+			if( $('#dcNumber').val().length > 0 || $('#unitNo').val().length > 0 || $('#ticketNoId').val().length > 0){
+				displayAlert = false;
+			} else {
+				var selected = 0;
+				var allInputRows = $("input[type=text]");
+				
+				for (var i= 0 ; i &lt; allInputRows.length; i++){
+					if(String(allInputRows[i].value).length > 0){
+						selected++
+					}					
+				}
+				if (PF('analysisCategoryWidgetVar').getSelectedValue().length > 0){
+					selected++
+				}
+				if (PF('statusWidgetVar').getSelectedValue().length > 0){
+					selected++
+				}				
+				if (selected &lt; 2){
+					displayAlert = true;
+				} else {
+					displayAlert = false;
+				}
+			}
+			if(displayAlert){
+                showDialog('minFieldsWidgetVar');	
+                setFocus('cancelMinFieldsAlert');
+                return false
+			}
+			return true;
+		}	    
+	    
+		function clearSubmitter(){
+		 	document.getElementById('submitter').value = '';
+		}
+		
+		function clearApprover(){
+			 document.getElementById('approver').value = '';
+		}
+		
+		function clearProcessor(){
+			 document.getElementById('processor').value = '';
+		}
+		
+		function clearAllocator(){
+			 document.getElementById('allocator').value = '';
+		}
+		
+		function clearSelectedApprover(){
+			 document.getElementById('selectedApprover').value = '';
+		}
+	
+		function setUploadFileDialogFocus(){
+			setFocus('uploadFileUploadBtn');
+		}
+		
+		function saveScrollPosition(btn) {
+			if(btn == "edit"){
+        		document.getElementById('hiddenScrollPosition').value = $('#dcMemoDataTable .ui-datatable-scrollable-body').scrollTop();
+			}else{
+				document.getElementById('hiddenScrollPosition').value = 0;
+			}
+        }
+		
+        function setScrollPosition() {
+        	$('#dcMemoDataTable .ui-datatable-scrollable-body').scrollTop(document.getElementById('hiddenScrollPosition').value);
+        }	
+        
+	 	$(window).load(function(){
+	 		setScrollPosition();
+		});        
+		
+	 	function monitorDownload(recordCount) { 
+        	if(recordCount > 0){
+        		if(cookiesEnabled()){
+        			ajaxStatusShow();
+        			setTimeout("checkDownloadStatus();",250); 
+        		}
+        	}
+        }
+	 	 function checkDownloadStatus(){ 
+         	if($.cookie("client.excel.download")){
+         		$.cookie("client.excel.download", null, { path: '/'});
+         		ajaxStatusHide();
+         	}else{
+         		setTimeout("checkDownloadStatus();",250); 
+         	}
+         }   
+         
+         function cookiesEnabled() {
+ 			var c = (navigator.cookieEnabled) ? true : false;
+ 			if (typeof navigator.cookieEnabled === "undefined") {
+ 				if(!c){
+ 					document.cookie = "tcookie";
+ 					c = (document.cookie.indexOf("tcookie") !== -1) ? true : false;
+ 			 	}
+ 			}
+ 			return (c);
+ 		}
+         
+         function exportValidation(event,recordCount){
+        	if(validateSearch(event)){
+        	 	monitorDownload(recordCount);
+        	}else{
+        		return false;
+        	}
+         }
+ 		</script>
+	</ui:define>
+</ui:composition>

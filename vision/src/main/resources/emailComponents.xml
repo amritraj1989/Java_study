@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        ">
+
+	<!-- ======= Property Configurers ======= -->
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	  <property name="location" value="file:///${mafs_conf}//vision/email.properties" />
+	  <property name="placeholderPrefix" value="$email{" />
+	</bean>	
+	
+	<!-- ======= Mail Sender Beans ======= -->	
+	<bean id="javaMailSenderSimple" class="org.springframework.mail.javamail.JavaMailSenderImpl" scope="prototype">
+		<property name="host" value="$email{email.host}" />
+	</bean>
+	
+	<bean id="emailService" class="com.mikealbert.service.util.email.EmailServiceSpringImpl" scope="prototype">
+		<property name="mailSender" ref="javaMailSenderSimple" />
+	</bean>
+
+	<!-- ======= Exceeded Auth Limit Email Components ======= -->
+	<bean id="from" class="com.mikealbert.service.util.email.EmailAddress">
+		<property name="address" value="$email{email.from.address}" />	
+	</bean>		
+	
+	
+	<bean id="emailInline" class="com.mikealbert.service.util.email.ResourceEmailInline">
+		<property name="contentId" value="contentId1" />
+		<property name="content" value="classpath:logo.png" />
+	</bean>	
+	
+	
+	<bean id="exceededAuthLimitEmail" class="com.mikealbert.service.util.email.Email" >
+		<property name="from" ref="from" />
+		<property name="htmlFmt" value="true" />
+		<property name="inline" ref="emailInline" />
+	</bean>
+	
+	<!-- ======= Purchasing Email Components ======= -->		
+	<bean id="clientOrderConfirmationEmail" class="com.mikealbert.service.util.email.Email" >
+		<property name="htmlFmt" value="true" />
+	</bean>		
+	
+	<bean id="vehicleReadyNotificationEmail" class="com.mikealbert.service.util.email.Email" >
+		<property name="htmlFmt" value="true" />
+		<property name="inline" ref="emailInline" />		
+	</bean>					
+
+	<!-- ======= Quoting Email Components ======= -->
+	<bean id="quotingEmailfrom" class="com.mikealbert.service.util.email.EmailAddress">
+		<property name="address" value="$email{email.quoting.from.address}" />	
+        <property name="displayName" value="$email{email.quoting.display.name}" />			
+	</bean>
+		
+	<bean id="quoteRequestEmail" class="com.mikealbert.service.util.email.Email" >
+		<property name="from" ref="quotingEmailfrom" />	
+		<property name="htmlFmt" value="true" />
+	</bean>
+				 
+</beans>

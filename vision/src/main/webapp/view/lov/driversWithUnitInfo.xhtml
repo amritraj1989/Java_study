@@ -1,0 +1,164 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">                          
+	
+
+				 <h:form id="drvUnitInfoLovForm" name ="drvUnitInfoLovForm" prependId = "false">
+				 <p:dialog header="Select Driver" widgetVar="driverInfoLOV" id="DRIVER_UNIT_INFO_GRID" dynamic="true" resizable="false" appendTo="@(body)"
+				         closeOnEscape="true" width="1100" height="520"  modal="true" onShow="setFirstPageDriverInfoDataTableWidget();setFocus('driverInfoSelectButton');">
+						 
+				        
+				        <h:form id="drvInfoLovDataTblForm" onkeydown="body_onkeydown(event,'drvInfoLovDataTblForm:driverInfoSelectButton','driverInfoLOV');">
+						<p:dataTable  widgetVar="driverInfoDataTableWidget" 
+									lazy="true" 
+									var="driverInfo" 
+									rowIndexVar="elementRowIndex"
+									scrollable="true" 
+									scrollHeight="430"
+		    						emptyMessage="No records found."
+									resizableColumns="true"
+									value="#{driversWithUnitInfoLovBean.drivers}" 
+									rows="#{driversWithUnitInfoLovBean.rowsPerPage}" 
+									paginator="true" 
+									paginatorPosition="bottom"  
+						   			selection = "#{driversWithUnitInfoLovBean.selectedDriver}" 
+						   			selectionMode="single"
+						   			rowKey="#{driverInfo.drvId}-#{driverInfo.allocatedUnit}">
+						   
+						    <p:ajax event="rowDblselect" listener="#{driversWithUnitInfoLovBean.onRowSelect}" 
+									update=":drvUnitInfoLovForm:targetName, :drvUnitInfoLovForm:lovDriverId :drvUnitInfoLovForm:lovSelectedFmsId"
+									oncomplete="hideDriverWithUnitInfoLov();setDriverInfoValues();"  />
+							<p:ajax event="rowSelect" listener="#{driversWithUnitInfoLovBean.onRowSelect}" />
+							<p:ajax event="page" onstart="clearDataTableSelection('driverInfoDataTableWidget');" oncomplete="setScrollDivAtTop();"/>
+							<h:messages />
+							
+							<p:column headerText="Driver" width="17%">
+			    					<h:outputText value="#{driverInfo.driverSurName},  #{driverInfo.driverForeName} "/><br/>
+			    					<h:outputText value="#{driverInfo.driverPhone}"/>
+			    			</p:column>
+			    			<p:column headerText="Address" width="23%">
+			    				<h:outputText value="#{driverInfo.businessAddressLine}"/><br/>
+			    				<h:outputText value="#{driverInfo.addressLine1}"/><br/>
+						    	<h:outputText value="#{driverInfo.addressLine2}"/><br/>
+						    	<h:outputText value="#{driverInfo.town}, #{driverInfo.region} #{driverInfo.postCode}"/>
+			    			</p:column>
+			    			
+			    			<p:column headerText="Unit" width="38%">
+			    				<h:outputText  value="Unit No : #{driverInfo.allocatedUnit}" style="font-weight:bold;" rendered="#{not empty driverInfo.allocatedUnit}" />
+			    				<p:commandLink id="drvUnitEquipInfoLink" 
+			    						actionListener="#{driversWithUnitInfoLovBean.populateSelectedUnitEquipments(driverInfo)}"	process="@this" rendered="#{not empty driverInfo.allocatedUnit}"
+                              			oncomplete="PF('drvUnitEquipmentDialogWidget').show();selectCurrentRow('driverInfoDataTableWidget',#{elementRowIndex});"					                              
+		                                update=":drvUnitEquipmentDialog" 
+		                                title="View Equipment" immediate="true">
+										<p:graphicImage value="/images/custins.png" style="border-style:none" />	
+								</p:commandLink><br/>
+			    				<h:outputText id="trim" value="#{driverInfo.trim}" rendered="#{not empty driverInfo.allocatedUnit}" /><br/>
+			    				<h:outputText  value="VIN : #{driverInfo.vin}" rendered="#{not empty driverInfo.allocatedUnit}" /><br/>
+			    				<h:outputText id="eolDateLabel" value="EOL Date : " rendered="#{not empty driverInfo.allocatedUnit}">
+								</h:outputText>
+								<h:outputText id="eolDate" value="#{driverInfo.eolDate}" rendered="#{not empty driverInfo.allocatedUnit}">
+									<f:convertDateTime type="date" pattern="MM/dd/yyyy" /> 
+								</h:outputText>
+			    			</p:column>
+			    			<p:column headerText="Product Type" width="12%">
+			    				<h:outputText value="#{driverInfo.productType}" escape="false"/>
+			    			</p:column>
+			    			<p:column headerText="Term" width="10%">
+			    				<h:outputText value="#{driverInfo.term}" escape="false"/>
+			    			</p:column>
+						
+						</p:dataTable>
+						
+						<div style="text-align:center;">
+								
+									<h:outputText style="font-weight:bold;" 
+										value="Record Count: #{driversWithUnitInfoLovBean.drivers.rowCount}">
+									</h:outputText>	
+									<p:commandButton style="float:right;"  value="Select" id = "driverInfoSelectButton" name ="driverInfoSelectButton"
+										 oncomplete="hideDriverWithUnitInfoLov();setDriverInfoValues();"
+										 update=":drvUnitInfoLovForm:targetName, :drvUnitInfoLovForm:lovDriverId :drvUnitInfoLovForm:lovSelectedFmsId"
+										>
+									</p:commandButton>
+									
+             			</div>
+             			</h:form>	 
+					</p:dialog>	
+					
+					<p:dialog id="drvUnitEquipmentDialog" widgetVar="drvUnitEquipmentDialogWidget" modal="true"
+		                header="Accessories" resizable="false" appendTo="@(body)" style="min-width:450px; max-width:800px;"
+		                closeOnEscape="true" onShow="setFocus('equipInfoDialogDoneBtn');">		               
+						 		                
+			            <h:form id="drvUnitEquipmentForm" prependId="false">
+							<p:panel id="drvUnitEquipmentPanel" style="max-height:300px;overflow:auto;" >
+								<h:panelGroup>						     
+								    <h:outputText styleClass="ui-label" value="Standard Equipment" />
+								    <br/>
+								    <ui:repeat value="#{driversWithUnitInfoLovBean.selectedUnitStandardEquipments}" var="stdEquipment">	
+									     <h:outputText value="#{stdEquipment}" /><br/>						     
+								    </ui:repeat>
+								    <h:outputText value="None" rendered="#{driversWithUnitInfoLovBean.selectedUnitStandardEquipments.size() eq 0}" /><br/>
+								    
+								    <h:outputText styleClass="ui-label" value="Factory Options " /><br/>
+								    <h:outputText value="#{driversWithUnitInfoLovBean.selectedUnitFactoryOptionalEquipments}" style="white-space:pre;" />
+								    <h:outputText value="None" rendered="#{empty driversWithUnitInfoLovBean.selectedUnitFactoryOptionalEquipments}" /><br/>
+								    
+								    <h:outputText styleClass="ui-label" value="Dealer Accessories" />
+								    <br/>
+								    <ui:repeat value="#{driversWithUnitInfoLovBean.selectedUnitDealerAccessories}" var="dlrAccessories">	
+									     <h:outputText value="#{dlrAccessories}" /><br/>						     
+								    </ui:repeat>
+								    <h:outputText value="None" rendered="#{driversWithUnitInfoLovBean.selectedUnitDealerAccessories.size() eq 0}" /><br/>
+							    </h:panelGroup>
+							    <br/>
+			                </p:panel>
+				    	  	<br/>
+						 	<p:commandButton id="equipInfoDialogDoneBtn" value="Done" onclick="PF('drvUnitEquipmentDialogWidget').hide();" />               
+			            </h:form>
+			        </p:dialog>
+					
+					<h:inputHidden id="targetName" value="driverInfoLOV" />
+					<h:inputHidden id="lovDriverId" value="#{driversWithUnitInfoLovBean.selectedDriver.drvId}" />
+					<h:inputHidden id="lovSelectedFmsId" value="#{driversWithUnitInfoLovBean.selectedDriver.fmsId}" />
+			        
+					</h:form>
+					<script type="text/javascript">
+		
+		function setDriverInfoValues(){
+			var lovNameArray = new Array();
+			var lovValueArray = new Array();
+			lovNameArray[0]='DRIVER_ID';
+			lovValueArray[0]=document.getElementById('lovDriverId').value;
+			
+			lovNameArray[1]='FMS_ID';
+			lovValueArray[1]=document.getElementById('lovSelectedFmsId').value;
+			
+			<!-- This method need to implement in parent page to populate LOV seletion-->
+			setSelection(document.getElementById('targetName').value,lovNameArray,lovValueArray);
+		}
+		
+		function showDriverWithUnitInfoLov(){
+			showDialog('driverInfoLOV');
+		}	
+		
+		function hideDriverWithUnitInfoLov(){
+			hideDialog('driverInfoLOV');
+		}
+		
+		function setFirstPageDriverInfoDataTableWidget(){
+			setDataTableToFirstPage('driverInfoDataTableWidget');
+			// also select the first row, but only if we have data
+			setDataTableToFirstRow('driverInfoDataTableWidget');
+		}
+		
+		function selectCurrentRow(table,index){
+	    	if(index > (Number(500) -1)){//here 50 is rows being display in per page in dt
+        		index = index % 500;	
+        	}
+            PF(table).unselectAllRows();
+          	PF(table).selectRow(index ,false);
+        }
+		
+		</script>
+</ui:composition>

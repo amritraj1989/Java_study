@@ -1,0 +1,350 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	template="../../templates/ui.xhtml">
+	
+	<ui:define name="content">
+			<h:form id="breadCrumbForm" prependId="false">
+				<p:breadCrumb model="#{unitReconciliationBean.breadCrumbTrail}"  
+				 style="min-width:900px;max-width:100%;width:auto" 
+				ajax="false" immediate="true" styleClass="ui-layout"/>
+			</h:form>
+			<!-- Error message display -->
+			<p:scrollPanel style="height:50px;max-width:100%;width:auto;" 
+				mode="native" styleClass="ui-layout">
+				<p:messages id="messages" showSummary="false" showDetail="true"	autoUpdate="true" />
+			</p:scrollPanel>			
+			
+			<h:form id="mainForm" prependId="false">
+					
+	    		<p:panel id="inputPanel">
+					    		
+	    			<h:panelGrid columns="5">
+
+	    				<h:panelGrid columns="3" styleClass="panelGrid-top">
+		    				<p:outputLabel value="Filter By - " styleClass="ui-label" />
+							<p:spacer width="10" height="1"/>
+							<h:panelGrid columns="3" styleClass="panelGrid-middle">
+								<p:outputLabel value="Unit: " for="unit" styleClass="ui-label"/>
+								<p:spacer width="2" height="1"/>
+								<p:inputText id="unit" value="#{unitReconciliationBean.unitNumber}" size="12" tabindex="10" onkeypress="return doKeypressSearch(event)"/>
+								<p:outputLabel value="VIN Last 6: " for="vin" styleClass="ui-label"/>
+								<p:spacer width="2" height="1"/>
+								<p:inputText id="vin" value="#{unitReconciliationBean.vin6}"  onchange="makeUpperCase(this)" size="12" tabindex="20" 
+								onkeypress="return doKeypressSearch(event)"/>
+							</h:panelGrid>
+	    				</h:panelGrid>
+
+						<p:spacer width="100" height="1"/>
+
+	    				<h:panelGrid columns="3" styleClass="panelGrid-top">
+		    				<p:outputLabel value="Looking For - " styleClass="ui-label"/>
+							<p:spacer width="10" height="1"/>
+							<h:panelGrid columns="1">
+						        <h:selectOneRadio id="radioOptions" value="#{unitReconciliationBean.searchType}" layout="pageDirection" tabindex="30">  
+						            <f:selectItem itemLabel="POs to Process" itemValue="1" />
+						            <f:selectItem itemLabel="Vehicles to Finalize" itemValue="2" />  
+						        </h:selectOneRadio>  
+							</h:panelGrid>
+						</h:panelGrid>
+
+						<p:spacer width="100" height="1"/>
+
+						<p:commandButton id="search" tabindex="40" value="Search" onstart="return validateSearch(event);"
+							actionListener="#{unitReconciliationBean.search}" update=":resultForm:resultsPanel,:resultForm:buttonsPanel" 
+							process="inputPanel"	ajax="false"
+							onclick="lockScreen();" />
+
+
+					</h:panelGrid>
+						
+              	</p:panel>
+			</h:form>
+			
+			<h:form id="resultForm" prependId="false" >
+	    		<p:panel id="resultsPanel">
+	    			 
+	                <p:dataTable  id="resultsTable" var="result" 
+	                	widgetVar="resultVar"
+	                	value="#{unitReconciliationBean.processQueueLazyList}" 
+	                	emptyMessage="#{unitReconciliationBean.resultsMessage}"
+	                	scrollable="true"  
+	                	scrollHeight="#{unitReconciliationBean.dataTable.height}"
+	                	rowKey="#{rowIndex}" 
+	                	rowIndexVar="rowIndex"
+						selection="#{unitReconciliationBean.selectedResult}" 
+						selectionMode="single"
+						paginator= "true"
+						rows="#{unitReconciliationBean.resultPerPage}"
+						paginatorPosition="bottom"
+						lazy="true"
+						>
+						
+						<p:ajax event="sort"  oncomplete="setScrollDivAtTop();" />
+			          	<p:ajax event="page" onstart="clearDataTableSelection('resultVar');" oncomplete="setDataTableToFirstRow('resultVar');setScrollDivAtTop();" />
+			          	<p:ajax event="rowSelect" listener="#{unitReconciliationBean.onRowSelect}" update="updateInServ" />
+			          	
+			        	
+	                   	 <p:column width="#{unitReconciliationBean.dataTable.col1}"  rendered="#{unitReconciliationBean.searchType == 1 ? 'true' : 'false'}" >
+	                    	<f:facet name="header">
+								<h:outputText value="Unit" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputText value="#{result.unitNumber} - #{result.unitDescription}" />
+	                   	</p:column>
+	                   	
+	                   	 <p:column width="#{unitReconciliationBean.dataTable.col1}" 
+	                   	 sortBy="#{unitNo}"
+	                   	 rendered="#{unitReconciliationBean.searchType == 2 ? 'true' : 'false'}" >
+	                    	<f:facet name="header">
+								<h:outputText value="Unit" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputText value="#{result.unitNumber} - #{result.unitDescription}" />
+	                   	</p:column>
+	                   	
+	                   	
+	                   	<p:column width="#{unitReconciliationBean.dataTable.col2}">
+	                    	<f:facet name="header">
+								<h:outputText value="VIN" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputText value="#{result.vin}" />
+	                   	</p:column> 
+
+	                    <p:column width="#{unitReconciliationBean.dataTable.col3}" rendered="#{unitReconciliationBean.searchType == 1 ? 'true' : 'false'}">  
+	                    	<f:facet name="header">
+								<h:outputText value="Vendor" style ="font-weight:bold" />
+							</f:facet>
+	                    	<h:outputLabel value="#{result.vendorCode} - #{result.vendorName}" />
+	                   	</p:column> 
+
+	                    <p:column width="#{unitReconciliationBean.dataTable.col3}"  sortBy="#{accountName}"
+	                    rendered="#{unitReconciliationBean.searchType == 2 ? 'true' : 'false'}">  
+	                    	<f:facet name="header">
+								<h:outputText value="Client" style ="font-weight:bold" />
+							</f:facet>
+	                    	<h:outputLabel value="#{result.accountCode} - #{result.accountName}" />
+	                   	</p:column> 
+
+
+	                    <p:column width="#{unitReconciliationBean.dataTable.col4}" rendered="#{unitReconciliationBean.searchType == 1 ? 'true' : 'false'}">  
+	                    	<f:facet name="header">
+								<h:outputText value="PO Amount" style ="font-weight:bold" />
+							</f:facet>
+	                    	<h:outputText value="#{result.poAmount}" styleClass="alignmentRight" >
+								<f:converter converterId="malDollarValueConverter" />	                    	
+	                    	</h:outputText>
+	                   	</p:column> 
+
+	                    <p:column width="#{unitReconciliationBean.dataTable.col4}" style="text-align:center" 
+	                    sortBy="#{lastUpdate}"
+	                    rendered="#{unitReconciliationBean.searchType == 2 ? 'true' : 'false'}">  
+	                    	<f:facet name="header">
+								<h:outputText value="Last Updated" style="font-weight:bold" />
+							</f:facet>
+	                    	<h:outputText value="#{result.lastUpdate}" > 
+	                    		<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+	                    	</h:outputText>
+	                   	</p:column> 
+	                    
+						<f:facet name="footer" >
+							Total Records:#{unitReconciliationBean.totalRecords }
+						</f:facet>
+	                </p:dataTable>
+	    			
+
+              	</p:panel>
+
+	    		<p:panel id="buttonsPanel">
+					<h:panelGrid id="buttons">
+						<f:facet name="footer">
+							<p:commandButton id="processButton" tabindex="60" value="Process"								
+								actionListener="#{unitReconciliationBean.process}" ajax="false" 
+								disabled="#{!unitReconciliationBean.processFlag or !unitReconciliationBean.hasPermission('postReconcileUnitCosts')}"
+								onclick="lockScreen();" immediate="true" />
+								
+							<p:spacer width="10" height="1" />
+							
+							<p:commandButton id="deleteInvoice" process="resultForm" tabindex="61" value="Delete Invoice"	action="#{unitReconciliationBean.setSelectedPo}"
+							rendered="#{unitReconciliationBean.searchType == '1'}" ajax="true" disabled="#{!unitReconciliationBean.processFlag or !unitReconciliationBean.hasPermission('postReconcileUnitCosts')}"
+							oncomplete="showDialog('delInvoiceWidgetVar')">
+								
+							</p:commandButton>
+							
+							<p:spacer width="10" height="1" rendered="#{unitReconciliationBean.searchType == '1'}" />
+						     
+						    <p:commandButton id="updateInServ" process="resultForm" tabindex="62" value="Update In Service Date"
+							 ajax="true" disabled="#{!unitReconciliationBean.processFlag or !unitReconciliationBean.inservexist or !unitReconciliationBean.hasPermission('updateInService')}" actionListener="#{unitReconciliationBean.populateInservDate}"
+							oncomplete="handlePopulateInSrvDateRequest(xhr, status, args)" update=":updateInServiceDateDialog">
+								
+							</p:commandButton>
+						    <p:spacer width="10" height="1" />
+							<p:commandButton id="cancelButton" tabindex="70" value="Cancel"
+								action="#{unitReconciliationBean.cancel}" ajax="false"
+								onclick="lockScreen();" immediate="true" />
+						</f:facet>
+					</h:panelGrid>
+              	</p:panel>
+
+				                
+			</h:form>
+			<p:dialog  id="delInvoiceDialogId" onShow="setFocusOnDelInvoicePopup()"
+				header="Delete Invoice" closeOnEscape="true" modal="true" appendTo="@(body)"
+				widgetVar="delInvoiceWidgetVar" resizable="false" width="250" height="100" >
+				<h:form id="delInvoiceDialogForm" prependId="false">
+	               		
+	               		<h:panelGrid columns="1" style="margin: auto;">
+	               			<h:outputFormat  value="#{msgs.confim_delete}">
+                    			<f:param value="invoice"/>
+                   			</h:outputFormat>
+                   			<p:spacer height="20"></p:spacer>
+	               			<h:panelGroup>
+	               				<p:commandButton  value="Yes" id="yesDelInvoice" ajax="true"  
+		       							process="@this"	 oncomplete="hideDialog('delInvoiceWidgetVar');" 
+		       							action="#{unitReconciliationBean.deleteInvoice}"/>
+		       					<h:outputText value="&#160;"/>	 		  
+		        				<p:commandButton  value="Cancel" id="noDelInvoice" 
+		        		 		onclick="hideDialog('delInvoiceWidgetVar');" type="button" />
+	               			</h:panelGroup>
+	               		</h:panelGrid>
+        		</h:form> 
+        	</p:dialog>
+        	
+			<p:dialog id="updateInServiceDateDialog"  widgetVar="updateInServiceDateWidget" dynamic="true" modal="true"
+                header=" Update In Service Date"  resizable="false" appendTo="@(body)" style="min-width: 500px; max-width: 600px;"
+                closeOnEscape="true" onShow="setFocus('inServiceDateCal');" >
+              
+              <p:ajax event="close" listener ="#{unitReconciliationBean.cancelInService}" immediate="true" 
+               					update=":updateInServiceDateForm:updateInServiceDatePanel"  />
+              			      		   
+			<p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:100%;max-width:100%;width:auto;">
+					<p:messages id="messagesdialogue" style="height:50px;" showDetail="false" autoUpdate="true" showSummary="true" globalOnly="false"/>
+				</p:scrollPanel> 
+	            <h:form id="updateInServiceDateForm" prependId="false" >	         
+	              <p:focus context="updateInServiceDateForm" />			     
+					<p:panel id="updateInServiceDatePanel">  
+					    <h:panelGrid  columns="2" cellpadding="5" style="white-space:nowrap;">					                    	    								
+				    				<p:outputLabel for="inServiceDateCal" value="In Service Date:*" styleClass="ui-label"/>			    				
+				    				<p:calendar id="inServiceDateCal" size="12" autocomplete="off"		
+								value="#{ unitReconciliationBean.inservdate}"
+								onchange="formatDate(this);" title="In service Date"
+	                      		pattern="MM/dd/yyyy" showOn="button" 
+								styleClass="dateTimeField">
+									</p:calendar>		                      				                    
+			                    </h:panelGrid>
+	                </p:panel>
+		    	  	<br/><br/>	
+		    	  	<p:commandButton id="save"  value="Save" ajax="true" actionListener="#{unitReconciliationBean.updateInSrvDate}" oncomplete="handleupdateInSrvDateRequest(xhr, status, args);setFocusPF('inServiceDateCal');"
+		    	  		update=":updateInServiceDateForm:updateInServiceDatePanel" />
+		    	  	<p:spacer width="10" height="1" />			  
+					<p:commandButton id="cancel"  value="Cancel" onclick="PF('updateInServiceDateWidget').hide()" update=":updateInServiceDateForm:updateInServiceDatePanel"/>											   
+	            </h:form>
+	        </p:dialog> 			
+			
+			<p:confirmDialog id="vinMinimumCharactersDialog" appendTo="@(body)" closeOnEscape="true"
+								message="#{msgs.vin_minimum_characters}" header="Alert"
+								widgetVar="vinMinimumCharactersVar">
+					<p:focus context="vinMinimumCharactersDialog" />
+					
+						<h:form prependId="false">
+							<p:hotkey immediate="true" bind="esc"
+								handler="PF('vinMinimumCharactersVar').hide();" />
+							<p:commandButton id="cancelVINAlert" value="Ok"
+								onclick="PF('vinMinimumCharactersVar').hide();"
+								type="button" />
+						</h:form>
+				</p:confirmDialog>
+			<script>	
+			// added for Bug 16598
+			function handlePopulateInSrvDateRequest(xhr, status, args) { 
+                if(!args.failure) {                 	
+                	showDialog('updateInServiceDateWidget');               	
+                }
+               
+			}    // added for Bug 16598
+		    function handleupdateInSrvDateRequest(xhr, status, args) { 
+                if(!args.failure) {                 	
+                	hideDialog('updateInServiceDateWidget');               	
+                }
+               
+			}
+					
+			function setFocusOnDelInvoicePopup(){
+				if(document.getElementById('yesDelInvoice')){
+					setFocus('yesDelInvoice');
+				}
+			}
+		
+			function setScrollDivAtTop() {	
+				jQuery("div").scrollTop(0);
+				jQuery("div").scrollLeft(0);	
+		    }
+						
+			//These 2 functions are being used in java code
+			function markRedForError(elementId){				
+				document.getElementById(elementId).style.borderColor="#CC3300";
+			}
+			
+			function unMarkRedForError(elementId){				
+				document.getElementById(elementId).style.borderColor="transparent";
+			}
+			
+			function doKeypressSearch(event){
+				if (event.keyCode == 13) {
+					source = event.srcElement.id;
+				   $('#search').click();
+				   focus();
+				   return false;
+				}
+				return true;	
+			}
+			
+			function validateSearch(event){	
+				var VIN = $('#vin');		
+				var searchCriteria;
+				
+				searchCriteria += $('#vin').val() + $('#fleetRefNo').val(); 
+				if(!hasMinVINCharacters(VIN, VIN.val())) {	
+					ajaxStatusHide();
+					return false;
+					
+				} else {
+					return true;
+				}		
+			}
+			
+			function hasMinVINCharacters(o, str) {
+				
+				var displayAlert = false;				
+				if(str.length &gt; 0){
+					if(str.length &gt; 5){
+						displayAlert = false;
+					} else {
+						displayAlert = true;
+					}
+				}
+
+				if(displayAlert){
+	                sourceElement = o;
+	                showDialog('vinMinimumCharactersVar');	
+	                setFocus('cancelVINAlert');
+	                return false
+				}
+
+				return true;
+			}
+			
+	     	$(window).load(function(){
+	     		setFocus('unit');	
+	     		setScrollDivAtTop();
+	     		var rowCount = #{unitReconciliationBean.totalRecords};
+	     		if(rowCount > 0){
+	     			PF('resultVar').selectRow(#{unitReconciliationBean.selectedRowIndex});
+	     		}
+			});				
+			
+			</script>
+
+	</ui:define>
+</ui:composition>

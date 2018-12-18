@@ -1,0 +1,652 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"   
+	xmlns:pe="http://primefaces.org/ui/extensions"	  
+    template="../../templates/ui.xhtml" >
+	
+    <ui:define name="content">
+    	    <h:form id="maintainPurchaseOrderBreadCrumbForm" prependId="false">
+   			    <p:breadCrumb model="#{maintainPurchaseOrderBean.breadCrumbTrail}" ajax="false" immediate="true" style="min-width:980px;max-width:100%;width:auto;"/>
+   		    </h:form>
+   		        
+    	    <!-- Message display -->
+		    <p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:980px;max-width:100%;width:auto;">
+			    <p:messages id="messages" showSummary="false" showDetail="true" autoUpdate="true" />
+		    </p:scrollPanel> 
+		    
+		    <comp:documentListDialog id="documentListDialog" documentVOs="#{maintainPurchaseOrderBean.documentListItems}" initialMessage="#{maintainPurchaseOrderBean.documentListMessage}" onClose="navigateToPreviousPage()" unitNumber="#{maintainPurchaseOrderBean.maintainPoVO.unitNumber}" />		     
+		     
+  			<h:form id="maintainPOForm" prependId="false" rendered="true">
+  				<h:inputHidden id="dirtyData" value="#{maintainPurchaseOrderBean.dirtyData}"/>
+	  			<p:panel id="maintainPOPanelMain" header="Maintain Purchase Order" styleClass="ui-layout">
+					<p:focus context="maintainPOPanelMain" />
+					<!-- Driver Details Top -->
+					<p:panelGrid cellpadding="5">
+						<p:row>
+							<p:column>
+								<p:outputLabel for="unitNo" value="Unit No:" style="font-weight:bold"/>
+							</p:column>
+							<p:column>
+								<h:outputText id="unitNo" value="#{maintainPurchaseOrderBean.maintainPoVO.unitNumber.concat(' - ').concat(maintainPurchaseOrderBean.maintainPoVO.vehicleDescription)}" />
+							</p:column>
+								<p:spacer width="20"/>
+							<p:column>
+								<p:outputLabel for="poNumber"  value="Purchase Order:" style="font-weight:bold"/>
+							</p:column>
+							<p:column>
+								<h:outputText id="poNumber" value="#{maintainPurchaseOrderBean.maintainPoVO.poNumber}" />
+							</p:column>
+								<p:spacer width="20"/>
+							<p:column styleClass="vertAlign">
+								<p:outputLabel id="orderingDealerLabel" for="orderingDealer" value="Ordering Dealer:*"  style="font-weight:bold"/>
+							</p:column>
+							<p:column styleClass="vertAlign" rowspan="2">
+								<h:panelGroup style="white-space:nowrap;">
+								<p:inputText id="orderingDealer"  value="#{maintainPurchaseOrderBean.maintainPoVO.orderingDealerCode}" autocomplete="off"
+								 			onkeydown="setTargetKeyCode(event);" onchange="clearLabels(['orderingDealerName']);clearOrderingDealerNameHidden();clearLabels(['orderingDealerEmail']);clearOrderingDealerEmailHidden();setDirtyData(true);"  tabindex="1"
+								 			disabled="#{maintainPurchaseOrderBean.maintainPoVO.orderType eq 'L' or maintainPurchaseOrderBean.maintainPoVO.poStatus eq 'R'}">
+								 			 
+								 	<p:ajax event="change" partialSubmit="true" onstart="return proceedAjax();"
+											listener="#{maintainPurchaseOrderBean.decodeOrderingDealerByNameOrCode}"
+											process="@this , orderingDealer" oncomplete="setFocusOnLOV('orderingDealer', 'orderingDealerLOV')"
+											update="orderingDealerLabel , orderingDealer ,orderingDealerName , orderingDealerNameHidden , orderingDealerIdHidden, orderingDealerEmail, orderingDealerEmailHidden" />
+											
+								</p:inputText>	
+										 
+								<p:commandButton id='orderingDealerLOV' icon="icon-lov" title="lov"
+										onclick="onClickVendorLOV('ORDERING_LOV')"  oncomplete="showVendorLov();" immediate="true"
+										actionListener="#{supplierLovBean.fetchLOVData}" onstart="return hasMinAlphaNumericCharacters($('#orderingDealer'));"
+										process="@this, orderingDealer" partialSubmit="true"
+										disabled="#{maintainPurchaseOrderBean.maintainPoVO.orderType eq 'L' or maintainPurchaseOrderBean.maintainPoVO.poStatus eq 'R'}" 
+										dynamic="true" async="true" update=":SUPPLIER_GRID, orderingDealerName, orderingDealerEmail" tabindex="2">
+										<f:param name="VENDOR_INPUT" value="orderingDealer" />
+										<f:param name="VENDOR_WORKSHOP_INPUT" value="ORDERING" />
+										<f:param name="QUOTE_ORDER_TYPE" value="#{maintainPurchaseOrderBean.maintainPoVO.orderType}" />
+								</p:commandButton>	
+								 <br/>						
+								 <h:outputText id="orderingDealerName" value="#{maintainPurchaseOrderBean.maintainPoVO.orderingDealerName}"  />
+								 <br/>						
+								 	
+			                     <h:outputLink id="orderingDealerEmail" disabled="#{maintainPurchaseOrderBean.maintainPoVO.orderingDealerEmail == 'NO EMAIL AVAILABLE' ? 'true': 'false'}" onclick="loadClientEmail('#{maintainPurchaseOrderBean.maintainPoVO.orderingDealerEmail}'); return false;">#{maintainPurchaseOrderBean.maintainPoVO.orderingDealerEmail}</h:outputLink>			                     	
+								  <h:inputHidden id="orderingDealerNameHidden"  value="#{maintainPurchaseOrderBean.maintainPoVO.orderingDealerName}" />	
+								  <h:inputHidden id="orderingDealerIdHidden"  value="#{maintainPurchaseOrderBean.maintainPoVO.orderingDealerId}" />
+								  <h:inputHidden id="orderingDealerEmailHidden" value="#{maintainPurchaseOrderBean.maintainPoVO.orderingDealerEmail}"  />							 	 					 	 
+								</h:panelGroup>
+							</p:column>							
+						</p:row>
+						<p:row>
+							<p:column styleClass="vertAlign">
+								<p:outputLabel for="color"  value="Color:" style="font-weight:bold"/>
+							</p:column>
+							<p:column styleClass="vertAlign">
+								<h:outputText id="color" value="#{maintainPurchaseOrderBean.maintainPoVO.color}" />
+							</p:column>
+								<p:spacer width="20"/>
+							<p:column styleClass="vertAlign">
+								<p:outputLabel for="numThdPtyPOs"  value="No. of 3rd Party POs:" style="font-weight:bold"/>
+							</p:column>
+							<p:column styleClass="vertAlign">
+								<h:outputText id="numThdPtyPOs" value="#{maintainPurchaseOrderBean.maintainPoVO.numOfThdPtyPos}" />
+							</p:column>
+								<p:spacer width="20"/>
+							<p:column>
+							</p:column>
+							<p:column>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel for="trim"  value="Trim:" style="font-weight:bold"/>
+							</p:column>
+							<p:column>
+								<h:outputText id="trim" value="#{maintainPurchaseOrderBean.maintainPoVO.trim}" />
+							</p:column>	
+								<p:spacer width="20"/>
+							<p:column>
+								<p:outputLabel for="releasedDate"  value="Released Date:" style="font-weight:bold"/>
+							</p:column>
+							<p:column>
+								<h:outputText id="releasedDate" value="#{maintainPurchaseOrderBean.maintainPoVO.releasedDate}">
+									<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+								</h:outputText>
+							</p:column>
+								<p:spacer width="20"/>
+							<p:column styleClass="vertAlign">
+								<p:outputLabel for="deliveryAddress"  value="Delivery Address:" style="font-weight:bold"/>
+							</p:column>
+							<p:column styleClass="vertAlign" rowspan="2" >
+								<h:outputText id="deliveryAddress" escape="false"  
+								value="#{maintainPurchaseOrderBean.maintainPoVO.fullDeliveryAddress}" />
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column styleClass="vertAlign">
+								<p:outputLabel for="returningUnit"  value="Returning Unit:" style="font-weight:bold"/>
+							</p:column>
+							<p:column styleClass="vertAlign">
+								<h:outputText id="returningUnit" value="#{maintainPurchaseOrderBean.maintainPoVO.returningUnit}" />
+							</p:column>	
+								<p:spacer width="20"/>
+							<p:column styleClass="vertAlign">
+								<p:outputLabel for="requestedDate" value="Requested Date:" style="font-weight:bold"/>
+							</p:column>
+							<p:column styleClass="vertAlign">
+								<h:outputText id="requestedDate" value="#{maintainPurchaseOrderBean.maintainPoVO.requestedDate}" />
+							</p:column>
+								<p:spacer width="20"/>
+						</p:row>
+						<p:row>
+							<p:column styleClass="vertAlign">
+								<p:outputLabel for="vin"  value="VIN:" style="font-weight:bold"/>
+							</p:column>
+							<p:column>
+								<p:inputText id="vin" tabindex="3" style="text-transform:uppercase;" autocomplete="off" onchange="makeUpperCase(this);checkForSpecialChar(this);setDirtyData(true);"
+									 maxlength="17" value="#{maintainPurchaseOrderBean.maintainPoVO.vin}" size="30">
+									<p:keyFilter regEx="/[a-z0-9]/i" preventPaste="false"/>
+								</p:inputText>
+							</p:column>
+								<p:spacer width="20"/>
+							<p:column styleClass="vertAlign">
+								<p:outputLabel for="factoryOrderNum"  value="Factory No:" style="font-weight:bold"/>
+							</p:column>
+							<p:column>
+								<p:inputText id="factoryOrderNum" tabindex="4" size="10" value="#{maintainPurchaseOrderBean.maintainPoVO.factoryOrderNumber}" autocomplete="off" onchange="makeUpperCase(this);checkForSpecialChar(this);setDirtyData(true);" maxlength="80">
+									<p:keyFilter regEx="/[a-z0-9]/i" preventPaste="false"/>
+								</p:inputText>
+							</p:column>
+								<p:spacer width="20"/>
+							<p:column styleClass="vertAlign">
+								<p:outputLabel id="deliveringDealerLabel" for="deliveringDealer" value="Delivering Dealer:"  style="font-weight:bold"/>
+							</p:column>
+							<p:column styleClass="vertAlign" rowspan="2">
+								<h:panelGroup style="white-space:nowrap;">
+								<p:inputText id="deliveringDealer"  value="#{maintainPurchaseOrderBean.maintainPoVO.deliveringDealerCode}" autocomplete="off"
+								 			 onkeydown="setTargetKeyCode(event);" onchange="clearLabels(['deliveringDealerName']); clearDeliveringDealerNameHidden();clearLabels(['deliveringDealerEmail']); clearDeliveringDealerEmailHidden();setDirtyData(true);"  tabindex="5">
+									<p:ajax event="change" partialSubmit="true" onstart="return proceedAjax();"
+											listener="#{maintainPurchaseOrderBean.decodeDeliveringDealerDealerByNameOrCode}"
+											process="@this , deliveringDealer " oncomplete="setFocusOnLOV('deliveringDealer', 'deliveringDealerLOV')"
+											update="deliveringDealerLabel , deliveringDealer, deliveringDealerName , deliveringDealerNameHidden , deliveringDealerIdHidden, deliveringDealerEmail , deliveringDealerEmailHidden" />
+											
+								</p:inputText>	 			 
+								<p:commandButton id='deliveringDealerLOV' icon="icon-lov" title="lov"								       
+										onclick="onClickVendorLOV('DELIVERING_LOV')"  oncomplete="showVendorLov();" immediate="true"
+										actionListener="#{supplierLovBean.fetchLOVData}" onstart="return hasMinAlphaNumericCharacters($('#deliveringDealer'));"
+										process="@this, deliveringDealer " partialSubmit="true" 
+										dynamic="true" async="true" update=":SUPPLIER_GRID, deliveringDealerName, deliveringDealerEmail" tabindex="6">
+										<f:param name="VENDOR_INPUT" value="deliveringDealer" />
+										<f:param name="VENDOR_WORKSHOP_INPUT" value="DELIVERING" />
+										<f:param name="ORDER_TYPE" value="#{maintainPurchaseOrderBean.maintainPoVO.orderType}" />
+								</p:commandButton>	
+								<p:spacer width="5"/>
+								<p:commandButton id="locatorBtn" 
+								        widgetVar="locatorBtnVar"   
+								        value="Locator" 
+								        tabindex="7" 
+								        actionListener="#{maintainPurchaseOrderBean.loadLocatorListener()}" />
+								 <br/>									
+								 <h:outputText id="deliveringDealerName" value="#{maintainPurchaseOrderBean.maintainPoVO.deliveringDealerName}"  />	
+								 <br/>									
+								 <h:outputLink id="deliveringDealerEmail" disabled="#{maintainPurchaseOrderBean.maintainPoVO.deliveringDealerEmail == 'NO EMAIL AVAILABLE' ? 'true': 'false'}"  onclick="loadClientEmail('#{maintainPurchaseOrderBean.maintainPoVO.deliveringDealerEmail}'); return false;" >#{maintainPurchaseOrderBean.maintainPoVO.deliveringDealerEmail}</h:outputLink>		
+								 <h:inputHidden id="deliveringDealerNameHidden"  value="#{maintainPurchaseOrderBean.maintainPoVO.deliveringDealerName}" />	
+								 <h:inputHidden id="deliveringDealerIdHidden"  value="#{maintainPurchaseOrderBean.maintainPoVO.deliveringDealerId}" />
+								 <h:inputHidden id="deliveringDealerEmailHidden" value="#{maintainPurchaseOrderBean.maintainPoVO.deliveringDealerEmail}"  />									 	
+								</h:panelGroup>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column styleClass="vertAlign">
+								<p:outputLabel for="acquisitionType" value="Acquisition Type:"  style="font-weight:bold"/>
+							</p:column>
+							<p:column styleClass="vertAlign">
+								<h:inputHidden id="vehOrderTypeHidden"  value="#{maintainPurchaseOrderBean.maintainPoVO.orderType}" />
+								<h:inputHidden id="standardDeliveryLeadTimeHidden"  value="#{maintainPurchaseOrderBean.maintainPoVO.standardDeliveryLeadTime}" />	
+								<p:selectOneMenu id="acquisitionType" widgetVar="acquisitionTypeVar" tabindex="8" value="#{maintainPurchaseOrderBean.maintainPoVO.acquisitionType}"
+								   		onchange="handleAcquisitionTypeChange();setDirtyData(true);" style="width:100px">
+								   		<p:ajax listener="#{maintainPurchaseOrderBean.acquisitionTypeListner}" update="confirmPOBtn, equipmentInfoForm, verifyPOBtn"  />
+									<f:selectItem itemLabel="" itemValue="" />
+									<f:selectItems value="#{maintainPurchaseOrderBean.acquisitionTypeList}" var="acq" itemLabel="#{acq}" itemValue="#{acq}" />
+								</p:selectOneMenu>
+							</p:column>
+							
+								<p:spacer width="20"/>
+							
+							<p:column styleClass="vertAlign">
+								<p:outputLabel for="totalCost"  value="Total Cost:" style="font-weight:bold"/>
+							</p:column>
+							<p:column styleClass="vertAlign">
+                				<p:inputNumber  id="totalCost" style="text-align:right" value="#{maintainPurchaseOrderBean.maintainPoVO.totalCost}" autocomplete="false"
+                						decimalPlaces="2"  thousandSeparator=","
+                						maxValue="999999999.99" 
+										size="10" tabindex="9"
+                						emptyValue="empty" onchange="setDirtyData(true);">
+                						
+                				</p:inputNumber>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column styleClass="vertAlign">
+								<p:outputLabel for="orderingLeadTime" value="Ordering Lead Time:"  style="font-weight:bold"/>
+							</p:column>
+							<p:column styleClass="vertAlign">
+                				<p:inputText id="orderingLeadTime" tabindex="10" style="text-align:right" value="#{maintainPurchaseOrderBean.maintainPoVO.orderingLeadTime}" autocomplete="off"
+                					 onchange="makeUpperCase(this);checkForSpecialChar(this);setDirtyData(true);" size="10">
+									<p:keyFilter regEx="/[0-9]/i" preventPaste="false"/>
+								</p:inputText>
+							</p:column>
+								<p:spacer width="20"/>
+							<p:column styleClass="vertAlign">
+							    <p:outputLabel for="confirmDateCal" value="Confirm Date:" styleClass="ui-label"/>			    				
+							</p:column>
+							<p:column styleClass="vertAlign">
+								<p:calendar id="confirmDateCal" size="10" autocomplete="off"		
+								         value="#{maintainPurchaseOrderBean.confirmDate}" 
+								        onchange="formatDate(this);" title="Confirm Date"
+	                      		         pattern="MM/dd/yyyy" showOn="button" 
+								      styleClass="dateTimeField"
+								      disabled="#{maintainPurchaseOrderBean.maintainPoVO.poStatus != 'R'}">
+								</p:calendar>
+							</p:column>
+						</p:row>
+						
+					</p:panelGrid>
+				</p:panel>
+  			
+  			 
+				<p:panel id="btnPanel">					
+					<p:commandButton id="saveBtn" widgetVar="saveBtnVar"  value="Save"  ajax="false" action="#{maintainPurchaseOrderBean.saveAction}" onclick="performSubmitSettings(); lockScreen();" onsuccess="setDirtyData(false);" tabindex="11"/>
+					<p:spacer width="10" />	
+					<p:commandButton id="logisticsBtn" widgetVar="logisticsBtnVar" value="View Logistics" disabled="#{empty maintainPurchaseOrderBean.maintainPoVO.logisticNotes}" 
+						onclick="showDialog('viewLogisticsDialogWidget'); lockScreen();" tabindex="12"/>
+					<p:spacer width="10" />	
+					<p:commandButton id="releasePOBtn" widgetVar="releasePOBtnVar" ajax="false"  value="Release PO" action="#{maintainPurchaseOrderBean.releasePOAction}" tabindex="13" onclick="performSubmitSettings();lockScreen();"
+									 disabled="#{maintainPurchaseOrderBean.maintainPoVO.poStatus eq 'R'}" onsuccess="setDirtyData(false);"/>
+					<p:spacer width="10" />	
+					<p:commandButton id="verifyPOBtn" widgetVar="verifyBtnVar" value="Verify PO" tabindex="14" onclick="showDialog('equipmentInfoWidget');"
+									 disabled="#{(maintainPurchaseOrderBean.maintainPoVO.poStatus eq 'O' or maintainPurchaseOrderBean.equipmentVerified == true) ? 'true' : 'false'}" onsuccess="setDirtyData(false);"/>
+					<p:spacer width="10" />	
+					<p:commandButton id="confirmPOBtn" widgetVar="confirmPOBtnVar" value="Confirm PO" ajax='false' actionListener="#{maintainPurchaseOrderBean.confirmPOAction}" onclick="performSubmitSettings(); lockScreen();"
+									disabled="#{(maintainPurchaseOrderBean.maintainPoVO.poStatus eq 'R' and maintainPurchaseOrderBean.equipmentVerified == true) ? 'false' : 'true'}" onsuccess="setDirtyData(false);"></p:commandButton>
+					<p:spacer width="10" />					
+					<p:commandButton id="cancelBtn" widgetVar="cancelBtnVar"  value="Cancel" action="#{maintainPurchaseOrderBean.cancel}" ajax="false" immediate="true" tabindex="14"/>
+				</p:panel>  
+				<h:inputHidden id="showWarning" name= "showWarning" value="#{maintainPurchaseOrderBean.showWarning}"/>
+				<h:inputHidden id="showConfirmDocuments" name= "showConfirmDocuments" value="#{maintainPurchaseOrderBean.showConfirmDocuments}"/>
+				<h:inputHidden id="postConfirmCompleted" name= "postConfirmCompleted" value="#{maintainPurchaseOrderBean.postConfirmCompleted}"/>				
+		        <p:commandButton id="hiddenCancelBtn" value="Cancel" action="#{maintainPurchaseOrderBean.navigateToPreviousPagePostConfirm}" ajax="false" style="display:none"/>
+		        				
+		    </h:form> 						
+		  
+		  <p:dialog id="equipmentInfoDialog" widgetVar="equipmentInfoWidget"  modal="true"
+                header="Verification List" resizable="false" appendTo="@(body)" style="min-width: 700px; max-width: 800px;"
+                closeOnEscape="true" onShow="setFocus('equipmentInfoDialogDoneBtn');">
+	            <h:form id="equipmentInfoForm" prependId="false">
+	            
+	            	<p:outputLabel value="Please validate all vehicle specifications against the manufacturer's confirmation in order to proceed." styleClass="ui-label"/>
+						<br/>
+						<br/>
+	            	<p:scrollPanel id="vehcileDetailpanel" mode="native" style="width:98%;max-height:700px; padding:.3em; padding-right:.9em;" >  
+						
+						<p:outputLabel value="Vehicle Details:" styleClass="ui-label" style="white-space:nowrap;"/>
+						<p:panel style="width:100%;"  mode="native" >
+						    <h:panelGrid  columns="1" cellpadding="5" style="white-space:nowrap;">
+			                    <p:column>
+				                    <p:selectManyCheckbox id="vehicleInfoCheckList" value="#{maintainPurchaseOrderBean.selectedVehicleInfoList}" layout="grid" columns="1">
+								       <f:selectItems value="#{maintainPurchaseOrderBean.vehicleInfoList}" var="acc" itemLabel="#{acc}" itemValue="#{acc}" />
+								       	<p:ajax listener="#{maintainPurchaseOrderBean.checkVehicleAndEquipmentVerify}" update="equipmentInfoDialogDoneBtn" />
+								    </p:selectManyCheckbox>
+							    </p:column> 
+			                </h:panelGrid>
+	                	</p:panel>
+	                	
+	                	<h:outputText value="&lt;br/&gt;" escape="false" rendered="#{maintainPurchaseOrderBean.logisticsList.size() > 0}" />
+	                	<p:outputLabel value="Logistics:" styleClass="ui-label" style="white-space:nowrap;" rendered="#{maintainPurchaseOrderBean.logisticsList.size() > 0}"/>
+	                	<p:panel style="width:100%;"  mode="native" rendered="#{maintainPurchaseOrderBean.logisticsList.size() > 0}">
+						    <h:panelGrid  columns="1" cellpadding="5" style="white-space:nowrap;">
+					    		<p:column>
+						    		<p:selectManyCheckbox id="logisticsListList" value="#{maintainPurchaseOrderBean.selectedLogisticsList}" layout="grid" columns="1" 
+						    								style="white-space: pre;"  >
+								       <f:selectItems value="#{maintainPurchaseOrderBean.logisticsList}" var="acc1" itemLabel="#{acc1}" itemValue="Y"   />
+								       <p:ajax listener="#{maintainPurchaseOrderBean.checkVehicleAndEquipmentVerify}" update="equipmentInfoDialogDoneBtn"/>
+								    </p:selectManyCheckbox> 
+							    </p:column>
+			                </h:panelGrid>
+	                	</p:panel>
+	                	
+	                	<h:outputText value="&lt;br/&gt;" escape="false" rendered="#{maintainPurchaseOrderBean.maintainPoVO.powertrainInfo.size() > 0}" />
+	                	<p:outputLabel value="Powertrain:" styleClass="ui-label" style="white-space:nowrap;" rendered="#{maintainPurchaseOrderBean.maintainPoVO.powertrainInfo.size() > 0}"/>
+	                	<p:panel style="width:100%;"  mode="native" rendered="#{maintainPurchaseOrderBean.maintainPoVO.powertrainInfo.size() > 0}">
+						    <h:panelGrid  columns="1" cellpadding="5" style="white-space:nowrap;">
+					    		<p:column>
+						    		<p:selectManyCheckbox id="powertrainCheckList" value="#{maintainPurchaseOrderBean.selectedPowertrainInfoList}" layout="grid" columns="1">
+								       <f:selectItems value="#{maintainPurchaseOrderBean.maintainPoVO.powertrainInfo}" var="acc" itemLabel="#{acc}" itemValue="#{acc}" />
+								       <p:ajax listener="#{maintainPurchaseOrderBean.checkVehicleAndEquipmentVerify}" update="equipmentInfoDialogDoneBtn"/>
+								    </p:selectManyCheckbox> 
+							    </p:column>
+			                </h:panelGrid>
+	                	</p:panel>
+	                	
+		                <h:outputText value="&lt;br/&gt;" escape="false" rendered="#{maintainPurchaseOrderBean.maintainPoVO.optionalAccessories.size()>0}" />
+		                <p:outputLabel value="Optional Equipment:" styleClass="ui-label" style="white-space:nowrap;" rendered="#{maintainPurchaseOrderBean.maintainPoVO.optionalAccessories.size()>0}"/>
+						<p:panel id="optionalEquipmentPanel"   rendered="#{maintainPurchaseOrderBean.maintainPoVO.optionalAccessories.size()>0}"
+								style="width:100%;" mode="native" >  
+						    <h:panelGrid  columns="1" cellpadding="5" style="white-space:nowrap;" >	
+					    		<p:column>
+							    	<p:selectManyCheckbox id="optionalEquipmentPanelCheckBox" value="#{maintainPurchaseOrderBean.selectedOptionalAccessories}" layout="grid" columns="1">
+								       <f:selectItems value="#{maintainPurchaseOrderBean.maintainPoVO.optionalAccessories}" 
+								       				var="acc" itemLabel="#{acc.replaceAll('#:#', '&#160;&#160;')}" itemValue="#{acc}" escape="false"  />
+								       <p:ajax listener="#{maintainPurchaseOrderBean.checkVehicleAndEquipmentVerify}" update="equipmentInfoDialogDoneBtn"/>
+								    </p:selectManyCheckbox>
+						    	</p:column>
+			                </h:panelGrid>
+		                </p:panel>
+		                
+		                <h:outputText value="&lt;br/&gt;" escape="false" rendered="#{maintainPurchaseOrderBean.maintainPoVO.dealerInstalledAccessories.size()>0}" />
+		                <p:outputLabel value="Dealer Installed Options:" styleClass="ui-label" style="white-space:nowrap;" 
+		                				rendered="#{maintainPurchaseOrderBean.maintainPoVO.dealerInstalledAccessories.size()>0}" />
+						<p:panel id="dealerInsatalledPanel"   rendered="#{maintainPurchaseOrderBean.maintainPoVO.dealerInstalledAccessories.size()>0}"
+								style="width:100%;" mode="native" >  
+						    <h:panelGrid  columns="1" cellpadding="5" style="white-space:nowrap;" >	
+					    		<p:column>
+							    	<p:selectManyCheckbox id="dealerInsatalledPanelCheckbox" value="#{maintainPurchaseOrderBean.selectedDealerInstalledAccessories}" layout="grid" columns="1">
+								       <f:selectItems value="#{maintainPurchaseOrderBean.maintainPoVO.dealerInstalledAccessories}" var="acc" itemLabel="#{acc}" itemValue="#{acc}" />
+								       <p:ajax listener="#{maintainPurchaseOrderBean.checkVehicleAndEquipmentVerify}" update="equipmentInfoDialogDoneBtn"/>
+								    </p:selectManyCheckbox>
+						    	</p:column>
+			                </h:panelGrid>
+		                </p:panel>
+		                
+		                <h:outputText value="&lt;br/&gt;" escape="false" rendered="#{maintainPurchaseOrderBean.maintainPoVO.portInstalledAccessories.size()>0}" />
+		                <p:outputLabel value="Port Installed Options:" styleClass="ui-label" style="white-space:nowrap;" rendered="#{maintainPurchaseOrderBean.maintainPoVO.portInstalledAccessories.size()>0}"/>
+						<p:panel id="equipmentInfoPanel"   rendered="#{maintainPurchaseOrderBean.maintainPoVO.portInstalledAccessories.size()>0}"
+								style="width:100%;" mode="native" >  
+						    <h:panelGrid  columns="1" cellpadding="5" style="white-space:nowrap;" >	
+					    		<p:column>
+							    	<p:selectManyCheckbox id="equipmentInfoPanelCheckbox" value="#{maintainPurchaseOrderBean.selectedPortInstalledAccessories}" layout="grid" columns="1">
+								       <f:selectItems value="#{maintainPurchaseOrderBean.maintainPoVO.portInstalledAccessories}" var="acc" itemLabel="#{acc}" itemValue="#{acc}" />
+								       <p:ajax listener="#{maintainPurchaseOrderBean.checkVehicleAndEquipmentVerify}" update="equipmentInfoDialogDoneBtn" />
+								    </p:selectManyCheckbox>
+						    	</p:column>
+			                </h:panelGrid>
+		                </p:panel>
+	                </p:scrollPanel>
+	                <br/>
+				 	<p:commandButton id="equipmentInfoDialogDoneBtn" value="Done" onclick="hideDialog('equipmentInfoWidget')"
+				 						disabled="#{!maintainPurchaseOrderBean.verifyDialogDoneButtonEnabled}" 
+				 						action="#{maintainPurchaseOrderBean.verifyEquipmentAction}" update="confirmPOBtn, equipmentInfoForm, verifyPOBtn" />
+				 	<p:spacer width="10"></p:spacer>
+				 	<p:commandButton id="equipmentInfoDialogCancelBtn" value="Cancel" 
+				 					action="#{maintainPurchaseOrderBean.clearSelectedLists}" onclick="hideDialog('equipmentInfoWidget')"
+				 					update="equipmentInfoForm" />                
+	            </h:form>
+	        </p:dialog>              	    
+	 
+		 <p:dialog id="dirtyCheckDialog" modal="true" header="Save Changes" onShow="setFocus('dirtyCheckDialogOkBtn')" dynamic="true"
+			        widgetVar="dirtyCheckDialogVar" resizable="false" width="520" height="auto" closeOnEscape="true" appendTo="@(body)">
+			    <br />
+			    <h:outputFormat value="Are you sure want to navigate away from this dialog?" />
+			    <br /> <br />
+			    <h:outputFormat value="You have unsaved data and will lose it" />
+			    <br /> <br />			    
+			    <h:outputFormat value="Press OK to continue, or Cancel to stay on the current page." />			    
+			    <h:form id="dirtyCheckDialogForm" prependId="false">
+				    <br />
+				    <br />
+				    <p:commandButton id="dirtyCheckDialogOkBtn" value="Ok" onclick="dirtyCheckDialogOkBtnHandler();"/>
+				    <h:outputText value="&#160;"/>
+				    <p:commandButton id="dirtyCheckDialogCancelBtn" value="Cancel" onclick="hideDialog('dirtyCheckDialogVar');" />
+			    </h:form>
+		 </p:dialog>
+		 
+		 <p:dialog id="viewLogisticsDialog" widgetVar="viewLogisticsDialogWidget" modal="true"
+                header="View Logistics" resizable="false" appendTo="@(body)" style="min-width: 500px; max-width: 800px;"
+                closeOnEscape="true" onShow="setFocus('viewLogisticsDoneBtn')">
+	            <h:form id="viewLogisticsDialogForm" prependId="false">
+					<p:panel id="viewLogisticsDialogHeaderPanel">  
+					
+					    <h:panelGrid  columns="2" cellpadding="5" style="white-space:nowrap;">
+					    		<p:column styleClass="vertAlign">	
+				    				<p:outputLabel value="Note: " styleClass="ui-label" style="white-space:nowrap;"/>
+				    			</p:column>
+			                    <p:column styleClass="vertAlign">	
+			                      	<p:inputTextarea rows="12" cols="110" autoResize="false" readonly="true" disabled="true"
+			                      	 value="#{maintainPurchaseOrderBean.maintainPoVO.logisticNotes}"/>
+			                    </p:column>          					
+		                </h:panelGrid>
+	                </p:panel>
+		    	  	<br/><br/>
+					<p:commandButton id="viewLogisticsDoneBtn" value="Done" type="button" onclick="hideDialog('viewLogisticsDialogWidget')" />
+	            </h:form>
+	        </p:dialog>	          
+                  	        
+		 <p:confirmDialog id="confirmDialogId"  message="#{maintainPurchaseOrderBean.warningMessage}. Continue?"
+				header="VIN Confirmation" closeOnEscape="True" appendTo="@(body)"  widgetVar="confirmWidgetVar" resizable="false" width="500" height="60" onShow="setFocus('okBtnId');">    
+        	<p:focus context="confirmDialogId" />
+	           <h:form id="confirmDialogForm" prependId="false">
+	               		<p:hotkey immediate="true" bind="esc" handler="hideDialog('confirmWidgetVar');setFocus('vin')"/>
+		       				<p:commandButton  value="Ok" id="okBtnId" ajax="false"
+		       							onclick="hideDialog('confirmWidgetVar'); lockScreen();" action="#{maintainPurchaseOrderBean.saveOnConfirmAction}"/>
+		       				<h:outputText value="&#160;"/>			  
+		        			<p:commandButton  value="Cancel"  id="cancelVinBtnId" ajax="false" action="#{maintainPurchaseOrderBean.cancelOnConfirmAction}" onclick="hideDialog('confirmWidgetVar'); setFocus('vin'); lockScreen();" />
+        			
+        		</h:form>
+        </p:confirmDialog>
+              
+		<style type="text/css">
+			.ui-datatable thead th {
+				white-space: normal;
+				text-align: center;
+			}
+			
+			.textWrap {
+				white-space: normal;
+			}
+			.vertAlign {
+			    vertical-align: top
+			}
+			.ui-panelgrid-cell{
+					width: 300px !important
+				}
+		</style>  
+			                                                                                               
+		<div id="SUPPLIER_LOV_DIV" >
+			<ui:include src="../lov/suppliers.xhtml"/>
+		</div>
+		<div id="inputFieldChecks">
+			<ui:include src="../alert/inputFieldChecks.xhtml" />
+		</div>
+		
+		                                                                                               
+        <script type="text/javascript"> 
+	        
+			$(document).ready(function() {
+				PF('confirmWidgetVar').closeIcon.unbind('click');
+				PF('confirmWidgetVar').closeIcon.click(function(e) {document.getElementById('cancelVinBtnId').click();})
+				
+				PF('viewLogisticsDialogWidget').closeIcon.unbind('click');
+				PF('viewLogisticsDialogWidget').closeIcon.click(function(e) {document.getElementById('viewLogisticsDoneBtn').click();})
+				
+				
+			});
+	        
+	        function  performSubmitSettings(){  	
+	       	  $('[id$=orderingLeadTime]').removeAttr('disabled');//Need to do it so that it's can be submitted although its disabled.
+	        }
+        	function  handleAcquisitionTypeChange(){        		
+        		var selection = PF('acquisitionTypeVar').getSelectedValue();        	
+        		var vehOrderType =  $('[id$=vehOrderTypeHidden]').val();
+        		var standardDeliveryLeadTime =  $('[id$=standardDeliveryLeadTimeHidden]').val();
+        		if(vehOrderType == 'F' ){
+        			if(selection == '' ){  
+        				$('[id$=orderingLeadTime]').val(standardDeliveryLeadTime);
+        				$('[id$=orderingLeadTime]').prop('disabled', 'disabled');
+        				document.getElementById('orderingLeadTime').style.color = "darkgray";
+        			}else{        		
+        				$('[id$=orderingLeadTime]').removeAttr('disabled');
+        				document.getElementById('orderingLeadTime').style.color = "black";
+        			}
+        			
+        		}      
+        	}
+        	
+	        function checkForSpecialChar(obj) {
+				sourceElement = obj;
+				var pattern = new RegExp(/[^a-z0-9]/i); 
+			    if (pattern.test(obj.value)) {
+			    	obj.value = '';
+			    	showDialog('specialCharacterWidgetVar');
+	    	        document.getElementById('cancelSpAlert').focus();
+			    }
+			}
+	        
+	        function initializeDirtyDetection() {
+		    	registerIgnoreButton("saveBtn");
+		    	registerIgnoreButton("logisticsBtn");
+		    	registerIgnoreButton("releasePOBtn");
+		    	registerIgnoreButton("confirmPOBtn");
+		    	registerIgnoreButton("verifyPOBtn");
+		    	setDirtyDataById("dirtyData");
+			}
+	        
+	        function cancelMaintainPoBtnHandler(){
+				if(dirtyCheck()) {
+					showDialog('dirtyCheckDialogVar');
+					return false;
+				}
+				return true;
+		    }
+	        
+	        function dirtyCheckDialogOkBtnHandler(){
+		    	setDirtyData(false); 
+		    	hideDialog('dirtyCheckDialogVar'); 
+		    }
+	        
+	        function showWarning(){
+				var showWarning = document.getElementById('showWarning').value;
+				
+				if(showWarning == 'true'){
+					showDialog('confirmWidgetVar');
+				}
+			}
+	        function showConfirmDocuments(){
+				var showConfirmDocuments = document.getElementById('showConfirmDocuments').value;
+				var postConfirmCompleted = document.getElementById('postConfirmCompleted').value; 
+				
+				if(postConfirmCompleted == 'true') {
+					navigateToPreviousPage();
+				} else {
+				    if(showConfirmDocuments == 'true'){
+					    showCCDocumentListDialog();
+				    }
+				}
+			}
+	        
+	        var lovCaller;		   
+		    function onClickVendorLOV(caller) {	    	
+		    	lovCaller = caller;	
+		    }
+		    
+		 
+		    function setSelection( lovName, nameArray, valueArray){	
+				if(lovName == 'vendorLOV'){
+                    for(var i=0; i  &lt; nameArray.length ; i++){
+                        if(nameArray[i] == 'VENDOR_CODE'){
+                        	 if(lovCaller == 'ORDERING_LOV') {
+	                            $('[id$=orderingDealer]').val(valueArray[i]);		                            
+                        	 }else if(lovCaller == 'DELIVERING_LOV'){
+                        		$('[id$=deliveringDealer]').val(valueArray[i]); 
+                        	 }
+                        }
+                        if(nameArray[i] == 'VENDOR_ID'){
+                       		if(lovCaller == 'ORDERING_LOV') {
+	                        	$('[id$=orderingDealerIdHidden]').val(valueArray[i]);		 
+                       	 	}else if(lovCaller == 'DELIVERING_LOV'){
+                       			$('[id$=deliveringDealerIdHidden]').val(valueArray[i]); 
+                       		}
+                       }
+                        if(nameArray[i] == 'VENDOR_NAME'){
+                        	 if(lovCaller == 'ORDERING_LOV') {
+                            	$('[id$=orderingDealerName]').html(valueArray[i]);
+                            	$('[id$=orderingDealerNameHidden]').val(valueArray[i]);
+                        	 }else if(lovCaller == 'DELIVERING_LOV'){
+                        		 $('[id$=deliveringDealerName]').html(valueArray[i]); 
+                        		 $('[id$=deliveringDealerNameHidden]').val(valueArray[i]); 
+                        	 }
+                            
+                        }
+                        if(nameArray[i] == 'VENDOR_EMAIL'){
+                       	 if(lovCaller == 'ORDERING_LOV') {
+                         	$('[id$=orderingDealerEmail]').html(valueArray[i]);
+                        	$('[id$=orderingDealerEmailHidden]').val(valueArray[i]);
+
+                        	if(valueArray[i] == 'NO EMAIL AVAILABLE'){
+                        		$('[id$=orderingDealerEmail]').removeAttr('href');        				
+                			}else{     
+                				var hreffAttrOrd = "mailto:" + valueArray[i];
+                 				$('[id$=orderingDealerEmail]').attr("href", hreffAttrOrd);
+                			}
+                       	 }else if(lovCaller == 'DELIVERING_LOV'){
+                    		 $('[id$=deliveringDealerEmail]').html(valueArray[i]); 
+                    		 $('[id$=deliveringDealerEmailHidden]').val(valueArray[i]);
+                    		 if(valueArray[i] == 'NO EMAIL AVAILABLE'){
+                         		$('[id$=deliveringDealerEmail]').removeAttr("href");        				
+                 			}else{       
+                 				var hreffAttrDel = "mailto:" + valueArray[i];
+                 				$('[id$=deliveringDealerEmail]').attr("href", hreffAttrDel);
+                 			}
+                    	 }
+                           
+                       }
+                       
+                    }
+                }
+				
+			}
+		    
+		    function clearOrderingDealerNameHidden(){	
+		    	$('[id$=orderingDealerNameHidden]').val(''); 
+		    }
+		    function clearOrderingDealerEmailHidden(){	
+		    	$('[id$=orderingDealerEmailHidden]').val(''); 
+		    }
+		    function clearDeliveringDealerNameHidden(){	
+		    	$('[id$=deliveringDealerNameHidden]').val(''); 
+		    }
+		    function clearDeliveringDealerEmailHidden(){	
+		    	$('[id$=deliveringDealerEmailHidden]').val(''); 
+		    }
+		    
+		    function moveScrollbarToTop() {
+           		$('#DT_UI_ID .ui-datatable-scrollable-body').scrollTop(0);
+           	} 
+ 			function navigateToPreviousPage(){
+			    $('[id$=hiddenCancelBtn]').click(); 				
+ 			}
+ 			
+ 			function loadLocatorApp(url){
+ 				var title = '_blank';
+ 				var specs = 'menubar=no, toolbar=no, resizable=yes, scrollbars=yes';
+ 				window.open(url, title, specs); 				
+ 			}
+           
+            $(window).load(function(){
+         		 showWarning();
+         		 setTimeout(function(){ showConfirmDocuments(); }, 1500);
+         		 handleAcquisitionTypeChange();
+         		 initializeDirtyDetection();
+			});  
+           
+            function disable(id){
+            	document.getElelmentById(id).disabled=true;            	
+            }
+            
+            function enable(id){
+            	document.getElelmentById(id).disabled=false;            	
+            }
+            
+		    </script>
+	</ui:define>
+	
+</ui:composition>

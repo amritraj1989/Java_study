@@ -1,0 +1,308 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"    
+    template="../../templates/ui.xhtml" >
+
+    <ui:define name="content"> 
+	    <h:form id="clientAgreementBreadCrumbForm" prependId="false">
+	    <p:breadCrumb model="#{clientAgreementBean.breadCrumbTrail}"
+	        ajax="false" immediate="true" />
+	    </h:form>   
+	      <!-- Message display -->
+	    <p:scrollPanel style="height:50px;" mode="native">
+	      <p:messages id="messages" severity="info,error,fatal" showSummary="false" showDetail="true" 
+	        autoUpdate="true" />
+	    </p:scrollPanel>
+   		
+   		<h:form id="clientAgreementForm" prependId="false">
+			<p:panel id="clientAgreementPanel" header="Agreements for Parent Company: #{clientAgreementBean.clientAccount.externalAccountPK.accountCode} - #{clientAgreementBean.clientAccount.accountName}">  
+          		<p:dataTable id="clientAgreementTable" value="#{clientAgreementBean.clientAgreementList}" var="clientAgreementParam" style="width:1000px">
+          		  <f:facet name="header"><h:outputLabel  style="vertical-align:10px" value="Agreements" />
+          		  	<p:commandLink id="addTaskLnkAgreement" style="float:right; border:thin solid gray; text-decoration:none; cursor:pointer;"
+          	    	    process="@this" update=":agreementDialog"
+          	    	    actionListener="#{clientAgreementBean.addAgreement()}" rendered="#{clientAgreementBean.hasPermission()}"
+				        oncomplete="PF('agreementDialogWidget').show();"
+				        tabindex="10">						   
+				            <p:graphicImage style="border-style: none;" value="/images/action_add.png"/>
+				            <h:outputLabel  style="vertical-align:5px" value="Add &#160;" />
+				            <p:resetInput target=":agreementDialogForm"/> 						            							            
+				    </p:commandLink>
+          		  </f:facet>
+			      <p:column style="width:30%">
+			        <f:facet name="header">
+			          <h:outputLabel value="Agreement Description"/>
+			        </f:facet>
+			        <h:outputLabel value="#{clientAgreementParam.contractAgreement.agreementDescription}"/>
+			      </p:column>
+			      <p:column style="width:15%">
+			        <f:facet name="header">
+			          <h:outputLabel value="Agreement Number"/>
+			        </f:facet>
+	            	<h:outputLabel value="#{clientAgreementParam.agreementNumber}"/>
+	          	  </p:column>
+	              <p:column style="width:5%">
+	                <f:facet name="header">
+	                  <h:outputLabel value="Agreement Date"/>
+	                </f:facet>
+	                <h:outputLabel value="#{clientAgreementParam.agreementDate}">
+	                	<f:convertDateTime pattern="MM/dd/yyyy"/>
+	                </h:outputLabel>
+		          </p:column>
+		          <p:column headerText="" width="5%">
+					<p:commandLink id="editLnkAgreement" oncomplete="PF('agreementDialogWidget').show();" process="@this" update=":agreementDialog"
+					    title="Edit" actionListener="#{clientAgreementBean.editAgreement(clientAgreementParam)}" rendered="#{clientAgreementBean.hasPermission()}" tabindex="20">
+					    <p:graphicImage value="/images/action_edit.png" style="border-style: none"/>
+					    <p:resetInput target=":agreementDialogForm"/>
+					</p:commandLink>
+				</p:column>
+			  </p:dataTable>
+			</p:panel>
+			
+			<p:panel id="clientAgreementServiceElementsPanel" header="Contracted Service Elements for Parent Company: #{clientAgreementBean.clientAccount.externalAccountPK.accountCode} - #{clientAgreementBean.clientAccount.accountName}">  
+          		<p:dataTable id="clientAgreementServiceElementsTable" value="#{clientAgreementBean.clientContractServiceElementList}" 
+          			var="clientAgreementServiceElementParam" style="width:700px">
+          		  <f:facet name="header"><h:outputLabel  style="vertical-align:10px" value="Contracted Service Elements" />
+          		  	<p:commandLink id="addTaskLnkServiceElement" style="float:right; border:thin solid gray; text-decoration:none; cursor:pointer;"
+				           process="@this" update=":serviceElementDialog"
+          	    	 	   actionListener="#{clientAgreementBean.addClientContractServiceElement()}"
+				           oncomplete="PF('serviceElementDialogWidget').show();"
+				           rendered="#{clientAgreementBean.hasPermission()}"
+				           tabindex="50">						   
+				            <p:graphicImage style="border-style: none;" value="/images/action_add.png" />
+				            <h:outputLabel  style="vertical-align:5px" value="Add &#160;" />
+				            <p:resetInput target=":serviceElementDialogForm"/> 						            							            
+				    </p:commandLink>
+          		  </f:facet>
+			      <p:column style="width:30%">
+			        <f:facet name="header">
+			          <h:outputLabel value="Service Element"/>
+			        </f:facet>
+			        <h:outputLabel value="#{clientAgreementServiceElementParam.leaseElement.elementName} - #{clientAgreementServiceElementParam.leaseElement.description}"/>
+			      </p:column>
+			      <p:column style="width:15%">
+			        <f:facet name="header">
+			          <h:outputLabel value="Agreement Number"/>
+			        </f:facet>
+	            	<h:outputLabel value="#{clientAgreementServiceElementParam.clientAgreement.agreementNumber}"/>
+	          	  </p:column>
+	          	  <p:column headerText="" width="5%">
+					<p:commandLink id="editLnkServiceElement" oncomplete="PF('serviceElementDialogWidget').show();" process="@this" update=":serviceElementDialog"
+					    title="Edit" actionListener="#{clientAgreementBean.editClientContractServiceElement(clientAgreementServiceElementParam)}"
+					    rendered="#{clientAgreementBean.hasPermission()}" tabindex="60">
+					    <p:graphicImage value="/images/action_edit.png" style="border-style: none"/>
+					    <p:resetInput target=":serviceElementDialogForm"/>
+					</p:commandLink>
+				</p:column>
+     </p:dataTable>
+			</p:panel>
+			<p:panel id="agreementMainButtonPanel">
+				<p:commandButton id="doneBtn" value="Done" action="#{clientAgreementBean.done}" ajax="false" immediate="true" tabindex="90"/>								
+			</p:panel>
+   		</h:form>
+   		
+		<p:dialog id="agreementDialog" header="#{clientAgreementBean.dialogHeader} Agreement" 
+			widgetVar="agreementDialogWidget" modal="true"
+			appendTo="@(body)" dynamic="true" height="160" width="600" closeOnEscape="true" onShow="setTimeout('setFocus(\'contractAgreement_input\')',500)">
+			<h:form id="agreementDialogForm" prependId = "false">
+			<p:focus/>
+			<p:messages id="agreementMessages" severity="info,error,fatal" showSummary="true" showDetail="false" autoUpdate="true" />
+			<p:panelGrid id="agreementDialogPanel">
+			    <p:row>
+				    <p:column>
+						<p:outputLabel for="contractAgreement" styleClass="ui-label" value="Agreement: " />
+						<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>
+					</p:column>
+					<p:column>
+		                <p:selectOneMenu id="contractAgreement" 
+		                        tabindex="100" 
+		                        widgetVar="contractAgreementWidget"
+			                    value="#{clientAgreementBean.selectedContractAgreement}"
+			                    converter="ContractAgreementConverter"
+			                    disabled="#{clientAgreementBean.disableContractAgreementSelectOneMenu}">
+			                <f:selectItem itemLabel="--------------------" itemValue="" />
+			                <f:selectItems var="contractAgreement" 
+				                     value="#{clientAgreementBean.contractAgreementList}" 
+				                     itemLabel="#{contractAgreement.agreementDescription}"
+				                     itemValue="#{contractAgreement}" />
+		                </p:selectOneMenu>							                    
+	                </p:column>
+                </p:row>
+                <p:row>
+                	<p:column>
+						<p:outputLabel for="agreementNumber" styleClass="ui-label" value="Agreement Number: " />
+						<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>
+					</p:column>
+					<p:column>
+						<f:validateBean  disabled="true">
+							<p:inputText id="agreementNumber" tabindex="110" value="#{clientAgreementBean.selectedClientAgreement.agreementNumber}" maxlength="25"/>
+						</f:validateBean>
+					</p:column>
+                </p:row>
+                <p:row>
+                	<p:column>
+						<p:outputLabel for="agreementDate" styleClass="ui-label" value="Agreement Date: "/>
+						<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>
+					</p:column>
+          <p:column>
+            <p:calendar id="agreementDate" widgetVar="agreementDateWidget" tabindex="120" size="20"   
+						  onchange="formatDate(this);" title="Calendar"
+						  onfocus="selectText(this.id);"
+							pattern="MM/dd/yyyy"  value="#{clientAgreementBean.selectedClientAgreement.agreementDate}" showOn="button"> 
+							<f:convertDateTime pattern="MM/dd/yyyy" />                          
+            </p:calendar>
+					</p:column>
+        </p:row>	
+			</p:panelGrid>
+			<p:panel id="agreementDialogButtonPanel">
+				<p:commandButton id="saveAgreementDialog" value="Save" action="#{clientAgreementBean.saveClientAgreement}" 
+					process="@form" update="@form" oncomplete="handleClientAgreementSaveRequest(xhr, status, args);" tabindex="130" immediate="false"/>
+				<p:spacer width="10" />
+				<p:commandButton id="saveAndAddAgreementDialog" value="Save and Add" action="#{clientAgreementBean.saveAndAddClientAgreement}" 
+					process="@form" update="@form" oncomplete="handleClientAgreementSaveAndAddRequest(xhr, status, args);" tabindex="135" immediate="false"/>
+				<p:spacer width="10" />
+				<p:commandButton id="cancelAgreementDialog" actionListener="#{clientAgreementBean.closeAgreementDialog}" value="Cancel" ajax="false" tabindex="140"/>
+			</p:panel>
+			</h:form>
+			<p:ajax event="close" listener="#{clientAgreementBean.closeAgreementDialog}" update=":clientAgreementForm"/>
+		</p:dialog>
+		
+		<p:dialog id="serviceElementDialog" header="#{clientAgreementBean.dialogHeader} Contracted Service Element" 
+			widgetVar="serviceElementDialogWidget" modal="true"
+			appendTo="@(body)" dynamic="true" closeOnEscape="true" onShow="setFocus('serviceElement')">
+			<h:form id="serviceElementDialogForm" prependId="false">
+			<p:focus/>
+			<p:messages id="serviceElementMessages" severity="info,error,fatal" showSummary="true" showDetail="false" autoUpdate="true" />
+			<p:panelGrid id="serviceElementDialogPanel">
+			    <p:row>
+				    <p:column>
+						<p:outputLabel for="serviceElement" styleClass="ui-label" value="Service Element: " />
+						<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>
+					</p:column>
+					<p:column>
+						<p:inputText id="serviceElement" value="#{clientAgreementBean.selectedServiceElement.elementName}" disabled="#{clientAgreementBean.disableServiceElementLOV}" maxlength="10"/>	                    
+	                	<p:commandButton id="serviceElementLOV" icon="icon-lov"
+										title="lov"
+	                                    oncomplete="showLeaseElementLov();" immediate="true"
+	                                    actionListener="#{leaseElementLovBean.fetchLOVData(clientAgreementBean.listOfLeaseElementsToExcludeFromLov)}"
+	                                    process="@this,serviceElement" 
+	                                    update=":leaseElementLovForm"
+	                                    dynamic="true" async="true"
+	                                    disabled="#{clientAgreementBean.disableServiceElementLOV}">								
+										<f:param name="LEASE_ELEMENT_NAME_INPUT" value="serviceElement" />
+										
+						</p:commandButton>
+	                </p:column>
+                </p:row>
+                <p:row>
+                	<p:column>
+						<p:outputLabel for="agreementNumberDlg" styleClass="ui-label" value="Agreement Number: " />
+						<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>
+					</p:column>
+					<p:column>
+						<p:selectOneMenu id="agreementNumberDlg"
+		                        widgetVar="agreementNumberDlgWidget"
+			                    value="#{clientAgreementBean.selectedClientContractServiceElement.clientAgreement}"
+			                    converter="ClientAgreementConverter">
+			                <f:selectItem itemLabel="--------------------" itemValue="" />
+			                <f:selectItems var="clientAgreement" 
+				                     value="#{clientAgreementBean.distinctClientAgreementNumberList}" 
+				                     itemLabel="#{clientAgreement.agreementNumber}"
+				                     itemValue="#{clientAgreement}" />
+		                </p:selectOneMenu>		
+					</p:column>
+                </p:row>
+                <p:row>
+                	<p:column>
+                	</p:column>
+                </p:row>	
+			</p:panelGrid> 
+			<p:panel id="serviceElementDialogButtonPanel">
+				<p:commandButton id="saveServiceElementDialog" value="Save" actionListener="#{clientAgreementBean.saveServiceElementAgreement}" 
+					process="@form" update="@form" oncomplete="handleServiceElementAgreementSaveRequest(xhr, status, args);" immediate="false"/>
+				<p:spacer width="10" />
+				<p:commandButton id="saveAndAddServiceElementDialog" value="Save and Add" actionListener="#{clientAgreementBean.saveAndAddServiceElementAgreement}" 
+					process="@form" update="@form" oncomplete="handleServiceElementAgreementSaveAndAddRequest(xhr, status, args);" immediate="false"/>
+				<p:spacer width="10" />
+				<p:commandButton id="cancelServiceElementDialog" actionListener="#{clientAgreementBean.closeServiceElementDialog}" value="Cancel" ajax="false"/>					
+			</p:panel>
+			</h:form>
+			<p:ajax event="close" listener="#{clientAgreementBean.closeServiceElementDialog}" update=":clientAgreementForm"/>
+		</p:dialog> 
+		
+		<div id="LEASE_ELEMENT_LOV_DIV">
+            	<ui:include src="../../view/lov/leaseElements.xhtml" />
+       	</div>
+		
+		
+		<script type="text/javascript">
+			function handleClientAgreementSaveRequest(xhr, status, args) {
+		        if(args.failure) { 
+		        	PF('agreementDialogWidget').show();		        	
+		        }else{
+		        	PF('agreementDialogWidget').hide();
+		        }
+			}
+			
+			function handleClientAgreementSaveAndAddRequest(xhr, status, args) {
+		        if(args.failure) { 
+		        	PF('agreementDialogWidget').show();		        	
+		        }else{
+		        	PF('agreementDialogWidget').hide();
+		        	setTimeout(function(){PF('agreementDialogWidget').show()}, 500);
+		        }
+			}
+			
+			function handleServiceElementAgreementSaveRequest(xhr, status, args) {
+		        if(args.failure) { 
+		        	PF('serviceElementDialogWidget').show();		        	
+		        }else{
+		        	PF('serviceElementDialogWidget').hide();
+		        }
+			}
+			
+			function handleServiceElementAgreementSaveAndAddRequest(xhr, status, args) {
+		        if(args.failure) { 
+		        	PF('serviceElementDialogWidget').show();		        	
+		        }else{
+		        	PF('serviceElementDialogWidget').hide();
+		        	PF('serviceElementDialogWidget').show();
+		        }
+			}
+			
+			function revertNullDate(oCalendar){			
+				var date = new Date(oCalendar.value);
+				if (isNaN(date)) {
+					oCalendar.value = oCalendar.defaultValue;					
+				}
+			}
+			
+			/**
+	 		    * The LOV calls this function to pass back the selected
+	 		    * values to the view's controls.
+	 		    */
+	 		function setSelectionLeaseElement( lovName, nameArray, valueArray){	
+	 				if(lovName =='leaseElementLOV'){
+						var leaseElementID ="serviceElement";
+						for(var i=0; i  &lt; nameArray.length ; i++){
+
+	                        if(nameArray[i] == 'LEASE_ELEMENT_NAME'){
+	                        	document.getElementById(leaseElementID).value = valueArray[i];
+	                        }
+	                        
+	                    }
+					}
+	 			}
+			
+	 		function setFocusToLovOnPage(){
+	 			setFocusOnLOV('serviceElement', 'serviceElementLOV');
+	 		}
+	 		
+	     	$(window).load(function(){
+	     		setFocus('addTaskLnkAgreement');
+			});		 		
+		</script>
+	</ui:define>
+</ui:composition>    

@@ -1,0 +1,65 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Fleet Maintenance / FM-27 Display - Warranty Data</title>
+    <body>
+    	<h1>Fleet Maintenance / FM-27 Display - Warranty Data (#7)</h1>
+    	<h2>Acceptance Tests (Automated)</h2>
+
+		    <ul concordion:execute="#warrantyInfo = testWarrantyInfo(#unitNo)">
+		      <li>Search on <span concordion:set="#unitNo">00946748</span> and click on Create Purchase Order button.</li>
+		      The Vehicle Information section of Create Maint.PO screen is displayed the Warranty Information as follows: 
+		      <span concordion:assertEquals="#warrantyInfo">60 Months / 60000 Miles</span>
+		    </ul>
+		    
+		    <ul concordion:execute="#warrantyInfo = testWarrantyInfo(#unitNo)">
+              <li>Search on <span concordion:set="#unitNo">00946748</span> and click on Service History button.</li>
+              The Vehicle Information section of Service History screen is displayed the Warranty Information as follows: 
+              <span concordion:assertEquals="#warrantyInfo">60 Months / 60000 Miles</span>
+            </ul>
+            
+            <ul concordion:execute="#warrantyInfo = testWarrantyInfo(#unitNo)">
+              <li>Search on <span concordion:set="#unitNo">00948242</span> and click on Create Purchase Order button.</li>
+              The Vehicle Information section of Create Maint.PO screen is displayed the Warranty Information as follows: 
+              <span concordion:assertEquals="#warrantyInfo">Unlimited Months / Unlimited Miles</span>
+            </ul>
+            
+            <ul concordion:execute="#warrantyInfo = testWarrantyInfo(#unitNo)">
+              <li>Search on <span concordion:set="#unitNo">00948242</span> and click on Service History button.</li>
+              The Vehicle Information section of Service History screen is displayed the Warranty Information as follows: 
+              <span concordion:assertEquals="#warrantyInfo">Unlimited Months / Unlimited Miles</span>
+            </ul>
+            
+            <ul concordion:execute="#warrantyInfo = testWarrantyInfo(#unitNo)">
+              <li>Search on <span concordion:set="#unitNo">00966369</span> and click on Create Purchase Order button.</li>
+              The Vehicle Information section of Create Maint.PO screen is displayed the Warranty Information as follows: 
+              <span concordion:assertEquals="#warrantyInfo">60 Months / 96600 Kilometres</span>
+            </ul>
+            
+            <ul concordion:execute="#warrantyInfo = testWarrantyInfo(#unitNo)">
+              <li>Search on <span concordion:set="#unitNo">00966369</span> and click on Service History button.</li>
+              The Vehicle Information section of Service History screen is displayed the Warranty Information as follows: 
+              <span concordion:assertEquals="#warrantyInfo">60 Months / 96600 Kilometres</span>
+            </ul>
+            
+            <ul concordion:execute="#warrantyInfo = testWarrantyInfo(#unitNo)">
+              <li>Search on <span concordion:set="#unitNo">00937589</span> and click on Create Purchase Order button.</li>
+              The Vehicle Information section of Create Maint.PO screen did not displayed the Warranty Information
+              <span concordion:assertNull="#warrantyInfo"></span>
+            </ul>
+            
+            <ul concordion:execute="#warrantyInfo = testWarrantyInfo(#unitNo)">
+              <li>Search on <span concordion:set="#unitNo">00937589</span> and click on Service History button.</li>
+              The Vehicle Information section of Service History screen did not displayed the Warranty Information 
+              <span concordion:assertNull="#warrantyInfo"></span>
+            </ul>
+ 			
+ 			
+    	<h2>Manual Tests</h2>
+    	    <ul type = "circle"><b>
+    	       <li>TODO: Verify the other combinations of Months/Miles of Warranty Information.</li>
+    	    </b></ul>
+
+    	<h2>Untested (Out of Scope)</h2>
+    		<ul><li>TODO:</li></ul>
+    </body>
+</html>

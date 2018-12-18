@@ -1,0 +1,417 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"   
+	xmlns:pe="http://primefaces.org/ui/extensions"	  
+    template="../../templates/ui.xhtml" >
+	
+    <ui:define name="content">
+    	    <h:form id="thirdPartyProgressQueueBreadCrumbForm" prependId="false">
+   			    <p:breadCrumb model="#{thirdPartyProgressQueueBean.breadCrumbTrail}" ajax="false" immediate="true" style="min-width:980px;max-width:100%;width:auto;"/>
+   		    </h:form>
+   		        
+    	    <!-- Message display -->
+		    <p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:980px;max-width:100%;width:auto;">
+			    <p:messages id="messages" showSummary="false" showDetail="true" autoUpdate="true" />
+		    </p:scrollPanel>   
+
+		    <comp:documentListDialog id="documentListDialog" 
+		            documentVOs="#{thirdPartyProgressQueueBean.documentListItems}" 
+		            onClose="documentListCloseListner()" 
+		            unitNumber="#{thirdPartyProgressQueueBean.unitNo}"/>
+		    
+		   <comp:upfitProgress id="ccUpfitProgress"
+		            quotationModel="#{thirdPartyProgressQueueBean.selectedQuotationModel}"
+		            mainPODocId = "#{thirdPartyProgressQueueBean.selectedThirdPartyPoQueueV.docId}" 
+		            upfitPOStatuses="${thirdPartyProgressQueueBean.upfitPOStatuses}" 
+		            enableBailment="${not empty thirdPartyProgressQueueBean.selectedThirdPartyPoQueueV.acquisitionType and thirdPartyProgressQueueBean.selectedThirdPartyPoQueueV.acquisitionType.equals('Bailment')}" 
+		            readOnly="${not thirdPartyProgressQueueBean.hasPermission()}"
+		            onClose="upfitProgressOnClose(xhr, status, args)"
+		            windowTitle="Vendor Sequence - " />
+		            
+		    <h:form id="mainForm" prependId="false" rendered="true">		    
+			
+	    		<p:panel id="inputPanel">
+	    			<h:panelGrid columns="10">
+	    			
+	    				<h:panelGrid columns="3" styleClass="panelGrid-top">
+		    				<p:outputLabel value="Looking For - " styleClass="ui-label"/>
+							<p:spacer width="50" height="1"/>
+							
+						</h:panelGrid>
+ 						
+						<p:commandLink title="Purchase Order Release" action="#{thirdPartyProgressQueueBean.navigateToPOReleaseQueue}" immediate="true" ajax="false" onclick="lockScreen()">	
+							 <h:outputText value="Purchase Order Release" rendered="true" />
+						</p:commandLink>
+						<p:spacer width="20" height="1"/>
+ 						<p:commandLink title="Third Party Progress" action="#{thirdPartyProgressQueueBean.loadTableWithoutData}" immediate="true" ajax="false" onclick="lockScreen()">							
+							 <h:outputText value="Third Party Progress" styleClass="ui-label" rendered="true" />
+						</p:commandLink>
+						<p:spacer width="20" height="1"/>
+ 						<p:commandLink title="Manufacturer Progress" action="#{thirdPartyProgressQueueBean.navigateToManufacturerQueue}" immediate="true" ajax="false" onclick="lockScreen()">							
+							 <h:outputText value="Manufacturer Progress" rendered="true" />
+						</p:commandLink>
+						<p:spacer width="20" height="1"/>
+	 					<p:commandLink title="Upfit Progress" action="#{thirdPartyProgressQueueBean.navigateToUpfitterQueue}" immediate="true" ajax="false" onclick="lockScreen()">							
+							 <h:outputText value="Upfit Progress"  rendered="true" />
+						</p:commandLink>
+						<p:spacer width="20" height="1"/>
+						<p:commandLink title="In Service Date Progress" action="#{thirdPartyProgressQueueBean.navigateToInServiceQueue}" immediate="true" ajax="false" onclick="lockScreen()">	
+							 <h:outputText value="In Service Date Progress" rendered="true" />
+						</p:commandLink>
+						
+						<p:spacer width="100" height="1"/>
+
+				
+					</h:panelGrid>
+						
+              	</p:panel>
+			</h:form>		    		            
+		            
+		    <h:form id="RCForm" prependId="false">
+           	     <p:remoteCommand name="refreshData" update=":thirdPartyProgressQueueForm:DT_UI_ID" actionListener="#{thirdPartyProgressQueueBean.refreshUnitVendorList()}" oncomplete="setScrollPosition();" />
+           	     <p:remoteCommand name="upfitProgressOnCloseRC" actionListener="#{thirdPartyProgressQueueBean.upfitProgressOnCloseListener}" update=":thirdPartyProgressQueueForm:DT_UI_ID" oncomplete="setScrollPosition(); adjustBtnState();" />
+           	     <p:remoteCommand name="documentListOnCloseListenerRC" actionListener="#{thirdPartyProgressQueueBean.documentListOnCloseListener}" update=":thirdPartyProgressQueueForm:DT_UI_ID" oncomplete="setScrollPosition(); adjustBtnState();" />           	     		     
+		    </h:form>  
+		                                    
+           <h:form id="thirdPartyProgressQueueForm" prependId="false">
+            	<p:panel id="thirdPartyProgressTablePanel" header="Third Party Progress Queue"> 
+            	<h:inputHidden id="hiddenScrollPosition" value="#{thirdPartyProgressQueueBean.scrollPosition}" />
+				<h:inputHidden id="showReleaseDocuments" name= "showReleaseDocuments" value="#{thirdPartyProgressQueueBean.showReleaseDocuments}"/> 
+            	<p:toolbar id="searchToolbar">  
+				    <p:toolbarGroup align="left">  
+				    	 <p:focus context="searchToolbar"/>	
+				    		<p:separator></p:separator>	
+				    		
+				    		<p:outputLabel for="unitNoTxtId" value="Unit No : " />								
+							<p:inputText id="unitNoTxtId" style="width:100px" title="Unit No" value="#{thirdPartyProgressQueueBean.unitNoFilter}" autocomplete="off" onkeypress="return doKeypressFilter(event)"/>
+							<p:separator ></p:separator>
+							
+				    		<p:outputLabel for="clientNameTxtId" value="Client : " />								
+							<p:inputText id="clientNameTxtId" style="width:180px" title="Client" value="#{thirdPartyProgressQueueBean.clientNameFilter}" autocomplete="off" onkeypress="return doKeypressFilter(event)" />
+							
+							<p:separator></p:separator>
+							<p:outputLabel for="vendorNameTxtId" value="Vendor : " />								
+							<p:inputText id="vendorNameTxtId" style="width:180px" title="Client" value="#{thirdPartyProgressQueueBean.vendorNameFilter}" autocomplete="off" onkeypress="return doKeypressFilter(event)" />
+							<p:separator></p:separator>
+							
+							<p:commandButton  value="Search" id="filter" title="Filter" update="thirdPartyProgressTablePanel btnPanel" actionListener="#{thirdPartyProgressQueueBean.performFilter}" oncomplete="resetUIState();" />
+				    </p:toolbarGroup>  
+				</p:toolbar> 
+			   	<p:dataTable id="DT_UI_ID" var="element" widgetVar="thirdPartyProgressTableVar"             	  
+				        value="#{thirdPartyProgressQueueBean.filteredList}" 
+						scrollable="true" rowIndexVar="elementRowIndex" 
+						scrollHeight="#{thirdPartyProgressQueueBean.dataTable.height}"
+						resizableColumns="true" 
+						rowKey="#{element.rowKey}"
+						rows="25"	
+						paginator="true" paginatorPosition="bottom" 
+						selectionMode="single"
+						emptyMessage="#{thirdPartyProgressQueueBean.emptyDataTableMessage}"
+						selection="#{thirdPartyProgressQueueBean.selectedThirdPartyPoQueueV}" >						
+						
+						<p:ajax event="rowSelect" onstart="adjustBtnState();return false;"  />	
+						<p:ajax event="rowUnselect" onstart="adjustBtnState();return false;"  />
+						<p:ajax event="page" oncomplete="moveScrollbarToTop();resetUIState();" />		            
+		                <p:ajax event="sort"  oncomplete="moveScrollbarToTop();resetUIState();" />
+		        		 
+	                
+       				    <p:column width="24"  style="text-align:center;padding:0px;" exportable="false">               
+		            	   <p:graphicImage value="/images/overdue.png" title="Overdue" style="border-style: none; visibility: #{element.toleranceYN eq 'N' ? 'visible' : 'hidden'}" onclick="selectCurrentRow('thirdPartyProgressTableVar',#{elementRowIndex});"  />
+		                </p:column>   
+		                       					 
+						<p:column id="UNIT_NO_UI_ID" headerText="Unit No" sortBy="#{element.unitNo}" width="#{thirdPartyProgressQueueBean.dataTable.col2}"  exportable="false">				
+						    <h:outputText value="#{element.unitNo}" style="height:10px;"/>
+						</p:column>
+						
+						<p:column headerText="Client" width="#{thirdPartyProgressQueueBean.dataTable.col3}" exportable="false" sortBy="#{element.clientAccountName}">								
+							  <h:panelGroup style="white-space:nowrap;">							  			
+						  			<h:outputText value="#{element.clientAccountName}" styleClass="textWrap" />
+							 </h:panelGroup>
+						</p:column>
+						
+						<p:column headerText="Lead Time - Vendor" width="#{thirdPartyProgressQueueBean.dataTable.col4}" exportable="false">								
+							<ui:repeat value="#{element.vendorInfoVOList}" var="unit">
+		                       	    <h:panelGroup style="white-space:nowrap;">		                       	    	
+						                 <p:commandLink id="vendorContactInfoLink"
+		                               				actionListener="#{thirdPartyProgressQueueBean.getSelectedVendorContactAccessories(element,unit)}"		
+		                               				oncomplete="showDialog('contactInfoWidget');selectCurrentRow('thirdPartyProgressTableVar',#{elementRowIndex});"					                              
+					                                update=":contactInfoDialog" 
+					                                title="View Vendor Contact and Upfit Info" immediate="true">
+											<p:graphicImage value="/images/custins.png" style="border-style: none" />	
+										</p:commandLink>
+										<h:outputText value="&#160;" />
+										<h:outputText value="#{unit.leadTime}" styleClass="textWrap" />
+										<h:outputText value="&#160;-&#160;" />
+										<h:outputText id="vendorName" value="#{unit.name}" styleClass="textWrap" />
+								  </h:panelGroup>									
+								 <p></p>						
+							</ui:repeat> 
+						</p:column>		
+						
+						<p:column id="ORDER_TYPE_UI_ID" sortBy="#{element.orderType}" headerText="Order Type" width="#{thirdPartyProgressQueueBean.dataTable.col5}" exportable="false">				
+							<h:outputText  value="#{element.orderType}" />
+						</p:column>
+						
+						<p:column headerText="Acquisition Type" sortBy="#{element.acquisitionType}" width="#{thirdPartyProgressQueueBean.dataTable.col6}" exportable="false">								
+							  <h:panelGroup style="white-space:nowrap;">							  			
+						  			<h:outputText value="#{element.acquisitionType}" styleClass="textWrap" />
+							 </h:panelGroup>
+						</p:column>		
+						
+						<f:facet  name="footer"  >
+							Record Count: <h:outputText value="#{thirdPartyProgressQueueBean.filteredList.size()}" />
+							<div style= "text-align:right;">
+							     <h:commandLink title="Export To Excel" onclick="monitorDownload('#{thirdPartyProgressQueueBean.filteredList.size()}');" >
+					               <p:graphicImage value="/images/excel.png" styleClass="ui-border-none" />	
+					                <p:dataExporter type="xls" target=":thirdPartyProgressQueueForm:thirdPartyProgressDld" fileName="third_party_progress" 
+					                preProcessor="#{thirdPartyProgressQueueBean.preProcessDownloadXLS}" postProcessor="#{thirdPartyProgressQueueBean.postProcessDownloadXLS}" />
+					            </h:commandLink>
+					        </div>
+						</f:facet>	
+					</p:dataTable>  
+				</p:panel>
+				
+				<p:dataTable value="#{thirdPartyProgressQueueBean.downloadableRowsData}" var="row"  id="thirdPartyProgressDld"  rendered="false">
+				    <p:columns value="#{thirdPartyProgressQueueBean.downloadableColumns}" var="column">		
+				   	 <f:facet name="header">
+                			<h:outputText value="#{column}" />
+            			</f:facet>		       
+				        <h:outputText value="#{row[column]}" />	
+				    </p:columns>
+				</p:dataTable>
+
+				<p:panel id="btnPanel">					
+					
+					<p:commandButton id="upfitLogisticsBtn" widgetVar="upfitProgressBtnVar" value="Vendor Sequence" onclick="saveScrollPosition();" actionListener="#{thirdPartyProgressQueueBean.upfitLogisticsListener}" oncomplete="doShowUpfitProgress();" update=":ccUpfitProgress:ccUpfitProgressDialog" />					
+					<p:spacer width="10" />	
+					<p:commandButton id="releasePOBtn" widgetVar="releasePOBtnVar"  value="Release PO" onclick="lockScreen();"
+						  				 action="#{thirdPartyProgressQueueBean.releasePO}" update="DT_UI_ID showReleaseDocuments :documentListDialog:ccDocumentListDialog" oncomplete="adjustBtnState(); doShowReleaseDocuments();"/>
+					<p:spacer width="10" />	
+					<p:commandButton id="done" widgetVar="mainDoneBtnVar" value="Cancel" action="#{thirdPartyProgressQueueBean.cancel}" ajax="false" immediate="true" onclick="lockScreen();" />					
+			 	
+				</p:panel>
+				
+            </h:form> 
+            
+            <p:dialog id="contactInfoDialog" widgetVar="contactInfoWidget"  modal="true"
+                header="#{thirdPartyProgressQueueBean.showAccessories ? 'Contact and Accessory Information' :'Contact Information'} - #{thirdPartyProgressQueueBean.dealerVendorNameOfRequest}" resizable="false" appendTo="@(body)" style="min-width: 400px; max-width: 800px;"
+                closeOnEscape="true" onShow="setFocus('contactInfoDialogDoneBtn');">
+	            <h:form id="contactInfoForm" prependId="false">
+					<p:panel id="contactInfoPanel" >  
+					    <h:panelGrid  columns="2" cellpadding="#{thirdPartyProgressQueueBean.showAccessories ? 2 : 5}" style="white-space:nowrap;" rendered="#{thirdPartyProgressQueueBean.requestedContactInfo != null ? 'true': 'false'}">			    
+								<p:column>	
+				    				<p:outputLabel value="Contact Name: " styleClass="ui-label" style="white-space:nowrap;"/>
+				    			</p:column>
+				    			<p:column>	 
+			                      	<p:outputLabel value="#{thirdPartyProgressQueueBean.requestedContactInfo.name}" />
+			                    </p:column>
+			                    <p:column>	
+			                      	<p:outputLabel value="Contact Phone: " styleClass="ui-label" style="white-space:nowrap;"/>
+			                    </p:column>
+			                    <p:column>	
+			                      	<p:outputLabel value="#{thirdPartyProgressQueueBean.requestedContactInfo.phone}" />		                 
+              					</p:column>   
+              					 <p:column>	
+			                      	<p:outputLabel value="Contact Email: " styleClass="ui-label" style="white-space:nowrap;"/>
+			                    </p:column>
+			                    <p:column>	
+			                      	<h:outputLink onclick="loadClientEmail('#{thirdPartyProgressQueueBean.requestedContactInfo.email}'); return false;" rendered="#{thirdPartyProgressQueueBean.requestedContactInfo.email ne 'NO EMAIL AVAILABLE'}">#{thirdPartyProgressQueueBean.requestedContactInfo.email}</h:outputLink>
+			                      	<p:outputLabel value="#{thirdPartyProgressQueueBean.requestedContactInfo.email}" rendered="#{thirdPartyProgressQueueBean.requestedContactInfo.email eq 'NO EMAIL AVAILABLE'}" />
+              					</p:column>
+              					<p:column>	
+			                      	<p:outputLabel value="Address: " styleClass="ui-label" style="font-size: 90%;"/>
+			                    </p:column>
+	             				<p:column>	
+			                      	<p:outputLabel value="#{thirdPartyProgressQueueBean.selectedVendorDealerAddressDetails}" style="white-space:pre;font-size: 90%;"/>
+			                    </p:column>
+		                </h:panelGrid>
+		                
+		                <h:panelGrid columns="2" cellpadding="5" style="white-space:nowrap;" rendered="#{thirdPartyProgressQueueBean.requestedContactInfo != null ? 'false': 'true'}">			    
+							<p:column colspan="2">	
+			    				<p:outputLabel value="NO CONTACT AVAILABLE" styleClass="ui-label" style="white-space:nowrap;"/>
+			    			</p:column>
+			    			<br/>
+			    			<h:panelGrid columns="2" styleClass="panelGrid-top">
+			    				<p:column>	
+			                      	<p:outputLabel value="Address: " styleClass="ui-label" style="font-size: 90%;"/>
+			                    </p:column>
+	             					<p:column>	
+			                      	<p:outputLabel value="#{thirdPartyProgressQueueBean.selectedVendorDealerAddressDetails}" style="white-space:pre;font-size:90%;"/>
+			                    </p:column>
+							</h:panelGrid>
+		                </h:panelGrid>
+	                </p:panel>
+	                <br/>
+				 	
+					<p:panel id="accessoriesPanel" style="max-height:250px;overflow:auto;" rendered="#{thirdPartyProgressQueueBean.showAccessories}">  
+						<ui:repeat value="#{thirdPartyProgressQueueBean.requestedVendorQuoteNoList}" var="vendorQuoteNo">	
+						     <h:outputText styleClass="ui-label" value="Vendor Quote Number : "/><h:outputText value="#{empty vendorQuoteNo ? 'Not Provided' : vendorQuoteNo}"/><br/>
+						     <ui:repeat value="#{thirdPartyProgressQueueBean.getSelectedVendorQuoteNumberAccessories(vendorQuoteNo)}" var="access">	
+							     <p:spacer width="5"/> <h:outputText value="&#8226;"/> <h:outputText value="&#160;"/> <h:outputText id="accessory" value="#{access}" /><br/>						     
+						    </ui:repeat>						     
+					    </ui:repeat> 
+	                </p:panel>
+	                <br/>
+		    	  	
+				 	<p:commandButton id="contactInfoDialogDoneBtn" value="Done" onclick="hideDialog('contactInfoWidget')" />  				 	 				 	             
+	            </h:form>
+	        </p:dialog>
+	    
+	            
+		<style type="text/css">
+			.ui-datatable thead th {
+				white-space: normal;
+				text-align: center;
+			}
+			
+			.textWrap {
+				white-space: normal;
+			}
+		</style>  
+			                                                                                               
+        <script type="text/javascript"> 
+        
+	        $(window).load(function(){
+	        	adjustBtnState();
+	        	setScrollPosition();
+			});
+        
+        	$(document).ready(function() {
+        		$.cookie("client.excel.download", null, { path: '/'});
+        	});
+        	
+        	function monitorDownload(recordCount) { 
+            	if(recordCount > 0){
+            		if(cookiesEnabled()){
+            			ajaxStatusShow();
+            			setTimeout("checkDownloadStatus();",250); 
+            		}
+            	}
+            }
+            
+            function checkDownloadStatus(){ 
+            	if($.cookie("client.excel.download")){
+            		$.cookie("client.excel.download", null, { path: '/'});
+            		ajaxStatusHide();
+            	}else{
+            		setTimeout("checkDownloadStatus();",250); 
+            	}
+            }   
+            
+            function cookiesEnabled() {
+    			var c = (navigator.cookieEnabled) ? true : false;
+    			if (typeof navigator.cookieEnabled === "undefined") {
+    				if(!c){
+    					document.cookie = "tcookie";
+    					c = (document.cookie.indexOf("tcookie") !== -1) ? true : false;
+    			 	}
+    			}
+    			return (c);
+    		}
+            
+           	function doKeypressFilter(event){
+    			if (event.keyCode == 13) {
+    				source = event.srcElement.id;
+    			   $('#filter').click();
+    			   return false;
+    			}
+    			return true;	
+    		}
+           	
+            function moveScrollbarToTop() {
+           		$('#DT_UI_ID .ui-datatable-scrollable-body').scrollTop(0);
+           	}
+           	
+            function selectCurrentRow(table,index){
+            	if(index > (Number(50) -1)){//here 50 is rows being display in per page in dt
+            		index = index % 50;	
+            	}
+                PF(table).unselectAllRows();
+              	PF(table).selectRow(index ,false);
+            }
+            
+            function resetUIState() {
+              PF('thirdPartyProgressTableVar').unselectAllRows();
+              adjustBtnState()
+           	}
+            
+            
+            var  hasPermission =  #{thirdPartyProgressQueueBean.hasPermission()};
+            function adjustBtnState() {
+        		//Added this IF block for scenarios that don't need hasPermission
+            	if(PF('thirdPartyProgressTableVar').selection.length == 1){        			
+        			PF('upfitProgressBtnVar').enable();        			
+        		} else {
+        			PF('upfitProgressBtnVar').disable();        			
+        		}
+        		
+            	if(hasPermission == true){
+            		if(PF('thirdPartyProgressTableVar').selection.length == 1){
+            			PF('releasePOBtnVar').enable();
+            		} else {
+            			PF('releasePOBtnVar').disable();
+            		}
+            	} else {
+            		PF('releasePOBtnVar').disable();
+            	}
+            	
+            	PF('mainDoneBtnVar').enable();
+           	  }
+            
+            
+            function doShowUpfitProgress(){             	
+            	showUpfitProgress();
+            	disableAllButtons();
+            }        
+            
+            function saveScrollPosition() {
+            	document.getElementById('hiddenScrollPosition').value = $('#DT_UI_ID .ui-datatable-scrollable-body').scrollTop();
+            }
+            function setScrollPosition() {
+            	$('#DT_UI_ID .ui-datatable-scrollable-body').scrollTop(document.getElementById('hiddenScrollPosition').value);
+            }
+            
+            function upfitProgressOnClose(xhr, status, args){
+            	if(refreshAfterUpfitProgress == 'true'){
+            		upfitProgressOnCloseRC([{name:'success', value:args.success}]);
+            		refreshAfterUpfitProgress = false;
+            	}else{
+            		setScrollPosition(); 
+            		adjustBtnState();
+            	}
+            }
+            function setRefreshNeeded(refreshNeeded){
+				if(refreshNeeded == 'true'){
+					refreshAfterUpfitProgress = refreshNeeded;
+				}
+			}
+            var refreshAfterUpfitProgress = false; 
+            
+            function disableAllButtons(){
+        		PF('releasePOBtnVar').disable();
+        		PF('upfitProgressBtnVar').disable();
+        		PF('mainDoneBtnVar').disable();
+            } 
+            
+           
+	        function doShowReleaseDocuments(){
+	        	var oShowReleaseDocuments = document.getElementById('showReleaseDocuments');
+			
+				if(oShowReleaseDocuments.value == 'true') {
+				    showCCDocumentListDialog();
+				    oShowReleaseDocuments.value = 'false';
+                }
+			}  
+            
+            function documentListCloseListner(){
+            	documentListOnCloseListenerRC();
+            }
+         
+            
+		</script>
+	</ui:define>
+	
+</ui:composition>

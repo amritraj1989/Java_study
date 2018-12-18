@@ -1,0 +1,393 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:comp="http://java.sun.com/jsf/composite/view/component"   
+  xmlns:pe="http://primefaces.org/ui/extensions"    
+    template="../../templates/ui.xhtml" >
+ 
+    <ui:define name="content">
+			<h:form id="acceptanceQueueBreadCrumbForm" prependId="false">
+				<p:breadCrumb model="#{acceptanceQueueBean.breadCrumbTrail}" ajax="false" immediate="true" style="min-width:980px;max-width:100%;width:auto;"/>
+          	</h:form>
+              
+          <!-- Message display -->
+		<p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:980px;max-width:100%;width:auto;">
+			<p:messages id="messages" showSummary="false" showDetail="true" autoUpdate="false" />
+        </p:scrollPanel>   
+
+	    <comp:documentListDialog id="documentListDialog" documentVOs="#{acceptanceQueueBean.documentListItems}" initialMessage="" 
+	    	onClose="" unitNumber="#{acceptanceQueueBean.selectedAcceptanceQueueItem.unitNo}" />		     
+
+		<h:form id="maintainAcceptanceQueueForm" prependId="false">
+			<h:inputHidden id="hiddenScrollPosition" value="#{acceptanceQueueBean.scrollPosition}" />
+			<h:inputHidden id="hiddenSelectedRowAcceptanceType" value="#{acceptanceQueueBean.selectedRowAcceptanceType}" />
+			
+        	<p:panel id="acceptanceTablePanel" header="Acceptance Queue"> 
+	            <p:toolbar id="searchToolbar">  
+		            <p:toolbarGroup align="left">  
+			            <p:focus context="searchToolbar"/> 
+			            <p:separator></p:separator> 
+			            <p:outputLabel for="filterQuoteIdTxt" value="Quote # : " />                
+			            <p:inputText id="filterQuoteIdTxt" style="width:100px" title="Quote #" value="#{acceptanceQueueBean.quoteNumberFilter}" onkeypress="return doKeypressFilter(event)"/>
+			            <p:separator ></p:separator>
+			            <p:outputLabel for="filterAcceptTypeTxt" value="Acceptance Type : " />                
+			            <p:inputText id="filterAcceptTypeTxt" style="width:100px" title="Acceptance Type" value="#{acceptanceQueueBean.acceptanceTypeFilter}" onkeypress="return doKeypressFilter(event)"/>
+			            <p:separator ></p:separator>
+			              
+			            <p:outputLabel for="filterClientTxt" value="Client : " />               
+						<p:inputText id="filterClientTxt" style="width:200px" title="Client" value="#{acceptanceQueueBean.clientNameFilter}" onkeypress="return doKeypressFilter(event)" />
+			            <p:separator></p:separator>
+			              
+			            <p:commandButton  value="Search" id="filter" title="Filter" update="acceptanceTablePanel actionBtnPanel messages" actionListener="#{acceptanceQueueBean.performFilter}" 
+			            	oncomplete="resetUIState();" /> 
+		            </p:toolbarGroup>  
+				</p:toolbar> 
+				<p:dataTable id="acceptanceTable" var="element" widgetVar="acceptanceTableVar"
+							 value="#{acceptanceQueueBean.filteredList}" 
+	            			 scrollable="true" rowIndexVar="elementRowIndex" 
+	            			 scrollHeight="#{acceptanceQueueBean.dataTable.height}"
+	            			 resizableColumns="true" 
+	            			 rowKey="#{element.quoteNumber}"
+	            			 rows="#{acceptanceQueueBean.resultPerPage}" 
+	            			 paginator="true" paginatorPosition="bottom"
+	            			 selectionMode="single"
+	            			 selection="#{acceptanceQueueBean.selectedAcceptanceQueueItem}">            
+	
+		            <p:ajax event="rowSelect" listener="#{acceptanceQueueBean.rowSelectlistner}" update="hiddenSelectedRowAcceptanceType messages" oncomplete="adjustBtnState();return false;" />
+		            <p:ajax event="rowUnselect" onstart="adjustBtnState();return false;" update="messages" />
+		            <p:ajax event="page" oncomplete="moveScrollbarToTop();resetUIState();" update="messages" />		            
+		            <p:ajax event="sort"  oncomplete="moveScrollbarToTop();resetUIState();" update="messages" />
+		            
+	                <p:column width="24" sortBy="#{element.toleranceYN}" style="text-align:center;padding:0px;" exportable="false">               
+		            	<p:graphicImage value="/images/overdue.png" title="Overdue" style="border-style: none" onclick="selectCurrentRow('acceptanceTableVar',#{elementRowIndex});" rendered="#{element.toleranceYN eq 'N' ? 'true' : 'false'}" />
+		            </p:column>
+	                
+		            <p:column headerText="Quote No/&lt;br/&gt;Unit No" sortBy="#{element.quoId}" width="#{acceptanceQueueBean.dataTable.col1}" exportable="false" escape="false" style="white-space:pre-line;width:25px;">               
+		            	<h:outputText value="#{element.quoteNumber} #{element.unitNo}" styleClass="textWrap" />
+		            </p:column>   
+	            
+	                <p:column headerText="Order Type" sortBy="#{element.orderType}" width="#{acceptanceQueueBean.dataTable.col2}" exportable="false">       
+	              		<h:outputText value="#{element.orderType}" rendered="#{element.quoteAcceptanceTypeCode ne 'OER'}"/>
+	            	</p:column>
+
+	            	<p:column headerText="Acceptance Type" sortBy="#{element.requestForAcceptType}" width="#{acceptanceQueueBean.dataTable.col3}"  exportable="false">       
+	                	<h:outputText value="#{element.requestForAcceptType}">
+	                	</h:outputText>
+	            	</p:column>
+	             
+	            	<p:column headerText="Submitted for Acceptance" sortBy="#{element.requestForAcceptDate}" width="#{acceptanceQueueBean.dataTable.col4}"  exportable="false">       
+	                	<h:outputText value="#{element.requestForAcceptDate}">
+	                		<f:convertDateTime type="date" pattern="MM/dd/yy hh:mm a" />
+	                	</h:outputText>
+	            	</p:column>
+	            
+		            <p:column headerText="Submitted By user" sortBy="#{element.requestForAcceptBy}" width="#{acceptanceQueueBean.dataTable.col5}" exportable="false">        
+						<h:outputText value="#{element.requestForAcceptBy}" />
+		            </p:column>
+
+		            <p:column headerText="Client" sortBy="#{element.clientAccountName}" width="#{acceptanceQueueBean.dataTable.col6}" exportable="false" > 
+		                <h:outputText value="#{element.clientAccountName}"/>
+		            </p:column>
+	            
+		            <p:column headerText="Trim" sortBy="#{element.modelDescription}" width="#{acceptanceQueueBean.dataTable.col7}" exportable="false">
+						<p:commandLink id="milesVinInfoLink" 
+									rendered="#{element.productCode eq 'MAX' ? true : false}"
+									actionListener="#{acceptanceQueueBean.populateMilesVinQuoteNo(element)}"
+                           			oncomplete="PF('milesVinInfoWidget').show();selectCurrentRow('acceptanceTableVar',#{elementRowIndex});"	
+                               		update=":milesVinInfoDialog" 
+                               		title="View Miles and VIN details" immediate="true">
+							<p:graphicImage value="/images/custins.png" style="border-style:none" />	
+						</p:commandLink>
+						<h:outputText id="idTrim" value="#{element.modelDescription}"/>
+		            </p:column>
+
+		            <p:column headerText="Term/Miles" width="#{acceptanceQueueBean.dataTable.col8}" exportable="false">                
+		                <h:panelGroup id="pgTermMiles">
+							<h:outputText value="#{element.contractPeriod}"/> 
+							<h:outputText value="/"/> 
+							<h:outputText value="#{element.contractDistance}"/>
+						</h:panelGroup>
+		            </p:column>
+	            
+		            <p:column headerText="Reqd By" sortBy="#{element}" sortFunction="#{acceptanceQueueBean.reqdByCustomSort}" width="#{acceptanceQueueBean.dataTable.col9}"  exportable="false">       
+	                	<h:outputText value="#{element.quoteAcceptanceTypeCode eq 'OER' ? element.revisionExpDate : element.clientRequestDate}">
+	                		<f:convertDateTime type="date" pattern="MM/dd/yy" />
+	                	</h:outputText>
+	            	</p:column>
+		            
+		            <p:column headerText="Returning Unit" sortBy="#{element.returningUnitNumber}" width="#{acceptanceQueueBean.dataTable.col10}" exportable="false">        
+		              <h:outputText value="#{element.returningUnitNumber}" rendered="#{element.quoteAcceptanceTypeCode ne 'OER'}"/>
+		            </p:column>
+		            
+		            <p:column headerText="Interior/Exterior Color" width="#{acceptanceQueueBean.dataTable.col11}" exportable="false">        
+		              <h:outputText value="#{element.interiorColor}" />  <h:outputText value="/"  rendered="#{element.interiorColor != null}"/>
+		              <br/>
+		              <h:outputText value="#{element.exteriorColor}" />
+		            </p:column>
+		            
+		            <p:column headerText="Driver" sortBy="#{element.driverName}" width="#{acceptanceQueueBean.dataTable.col12}" exportable="false">               
+		                <h:outputText value="#{element.driverName}"/>
+		            </p:column>
+	            	
+	            	<p:column headerText="Product" sortBy="#{element.productCode}" width="#{acceptanceQueueBean.dataTable.col13}"  exportable="false">
+	                	<h:outputText value="#{element.productCode}">
+	                	</h:outputText>
+	            	</p:column>
+	
+		            <f:facet  name="footer"  >
+		              Record Count: <h:outputText value="#{acceptanceQueueBean.filteredList.size()}" />
+		            </f:facet>  
+	          	</p:dataTable>
+	        </p:panel>
+
+	        <p:panel id="actionBtnPanel">
+	        	<p:commandButton id="acceptReqBtn" widgetVar="acceptReqBtnVar" value="Accept Quote" action="#{acceptanceQueueBean.acceptQuotation}" 
+					ajax="false" onclick="lockScreen();" oncomplete="moveScrollbarToTop();" />
+				<p:spacer width="5"/> 
+				<p:commandButton id="rejectReqBtn" widgetVar="rejectReqBtnVar"  value="Reject Quote"  title="Reject Quote" 
+					action="#{acceptanceQueueBean.onLoadRejectReason}" oncomplete="doShowRejectReason();" update="messages"/>
+				<p:spacer width="5"/> 
+				<p:commandButton id="quoteOverviewBtn" widgetVar="quoteOverviewBtnVar" process="@form" value="Quote Overview" update="hiddenScrollPosition"  
+					action="#{acceptanceQueueBean.quoteOverviewAction}" ajax="false" onclick="saveScrollPosition();lockScreen();" />
+				<p:spacer width="5"/> 
+				
+				<p:commandButton id="revisionQuoteBtn" widgetVar="revisionQuoteVar" process="@form" value="Revision Quote"  title="Revision Quote" ajax="false"
+								 update="hiddenScrollPosition"  action="#{acceptanceQueueBean.navigateToOpenEndRevisionPage}" onclick="saveScrollPosition();lockScreen();" />
+				<p:spacer width="5"/> 
+				
+				<p:commandButton  value="Cancel" action="#{acceptanceQueueBean.cancel}" ajax="false" immediate="true" />
+	        </p:panel>           
+		</h:form> 
+		
+		
+        <p:dialog id="rejectReasonDialog" widgetVar="rejectReasonDialogWidget" modal="true"
+              header="Choose Reject Reason " resizable="false" appendTo="@(body)" style="width:350px;"
+              closeOnEscape="true" onShow="setFocus('rejectReasonDialogSaveBtn');">
+           <h:form id="rejectReasonForm" prependId="false">
+			<p:panel id="rejectReasonPanel">  
+			    <h:panelGrid  columns="2" cellpadding="5" style="white-space:nowrap;">			    
+						<p:column>	
+		    				<p:outputLabel value="Reject Reason: " styleClass="ui-label" style="white-space:nowrap;"/>
+		    			</p:column>
+		    			<p:column>	 
+	                      	<p:selectOneMenu id="rejectReasonId" style= "width:250px" value="#{acceptanceQueueBean.selectedRejectReason}" converter="RejectReasonConverter" >
+				            	<f:selectItem itemLabel="" itemValue=""></f:selectItem>
+				                <f:selectItems value="#{acceptanceQueueBean.rejectReasonList}" var="rejectReasons"
+				                       			itemLabel="#{rejectReasons.rejectReasonDescription}" itemValue="#{rejectReasons}"/>
+				            </p:selectOneMenu>
+	                    </p:column>
+                </h:panelGrid>
+               </p:panel>
+    	  	<br/><br/>		    	   
+    	  	<p:commandButton id="rejectReasonDialogSaveBtn" value="Save"  actionListener="#{acceptanceQueueBean.rejectQuote}" 
+    	  		oncomplete="PF('rejectReasonDialogWidget').hide(); resetUIState();moveScrollbarToTop();" update="messages"/>  
+			<p:spacer width="5"> </p:spacer>
+			<p:commandButton id="rejectReasonDialogCancelBtn" value="Cancel" immediate="true" type="button" onclick="PF('rejectReasonDialogWidget').hide();" />               
+			              
+           </h:form>
+       </p:dialog> 
+		                                  
+		<p:dialog id="milesVinInfoDialog" widgetVar="milesVinInfoWidget"
+			modal="true" header= "Quote# #{acceptanceQueueBean.quoteNumber}" resizable="false"
+			appendTo="@(body)" style="min-width:250px; max-width:400px;"
+			closeOnEscape="true"
+			onShow="setFocus('milesVinInfoDialogDoneBtn');">
+			<h:form id="milesVinForm" prependId="false">
+				<p:panel id="milesVinPanel" style="max-height:200px;overflow:auto;">
+	               	<h:panelGrid columns="2" cellspacing="5">
+	               		<h:outputLabel value="Miles:"  style="font-weight:bold"/> 
+						<h:outputText value="#{acceptanceQueueBean.miles}"/>
+	               		<h:outputLabel value="VIN:"  style="font-weight:bold"/> 
+						<h:outputText value="#{acceptanceQueueBean.tmpVinNo}"/>							
+	               	</h:panelGrid>
+	             </p:panel>  	
+				<br />
+				<p:commandButton id="milesVinInfoDialogDoneBtn" value="Done" type="button" onclick="PF('milesVinInfoWidget').hide();" />
+			</h:form>
+		</p:dialog>
+		
+		<p:confirmDialog id="activeQuotesDialog" widgetVar="activeQuotesDialogWidget" modal="true" severity="alert"
+				header="Confirm"
+				resizable="false" appendTo="@(body)" style="min-width: 180px; max-width: 800px;"
+				closeOnEscape="true">
+			     <f:facet name="message">
+			        <h:outputText value="There are outstanding active quotes for other contract changes for this vehicle." />
+			        <br />
+			        <h:outputText value="Do you wish to reject these quotes and accept this revision?" />
+			     </f:facet>				
+			<h:form id="activeQuotesDialogForm" prependId="false">
+				<p:focus context="activeQuotesDialog" />			
+				<p:panel id="activeQuotesDialogPanel">  
+					<p:dataTable 
+						var="quotes" 
+						value="#{acceptanceQueueBean.quoteList}"
+						scrollable="true" scrollHeight="300"
+						selectionMode="single"
+						rowKey="#{quotes.rowKey}">
+
+						<p:column width="20%">
+			                <f:facet name="header">
+			                	<h:outputText value="Quote Type"/>
+			                </f:facet>
+			                <h:outputText  value="#{quotes.statusDescription}"  />
+						</p:column>						
+						<p:column width="20%">
+			                <f:facet name="header">
+			                	<h:outputText value="Quote No"/>
+			                </f:facet>
+			                <h:outputText  value="#{quotes.quoId}"/>
+			                <h:outputText  value="/#{quotes.quoteNo}" rendered="#{quotes.statusCode ne 'ET'}"/>
+			                <h:outputText  value="/#{quotes.revisionNo}" rendered="#{quotes.statusCode ne 'ET'}"/>
+						</p:column>	
+						<p:column width="15%">
+			                <f:facet name="header">
+			                	<h:outputText value="Quote Date"/>
+			                </f:facet>
+			                <h:outputText  value="#{quotes.quoteDate}" >
+			                	<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+			                </h:outputText>
+						</p:column>							
+					</p:dataTable>
+				</p:panel>
+				<br/><br/>	
+				<p:commandButton id="activeQuotesDialogYesBtn" widgetVar="activeQuotesDialogYesBtnVar" value="Yes" 
+					onclick="PF('activeQuotesDialogYesBtnVar').disable();PF('activeQuotesDialogNoBtnVar').disable();PF('activeQuotesDialogWidget').hide();" 
+					actionListener="#{acceptanceQueueBean.rejectOutstandingQuotes}" 
+					oncomplete="resetUIState();moveScrollbarToTop();" update="messages"/>               
+				<p:spacer width="5"> </p:spacer>
+				<p:commandButton id="activeQuotesDialogNoBtn" widgetVar="activeQuotesDialogNoBtnVar" value="No" immediate="true" type="button" onclick="PF('activeQuotesDialogWidget').hide();" />               
+			</h:form>
+		</p:confirmDialog> 		
+      
+    	<style type="text/css">
+	      	.ui-datatable thead th {
+	        	white-space: normal;
+	        	text-align: center;
+	     	}
+	      
+	      	.textWrap {
+	        	white-space: normal;
+	      	}
+      		
+      		.ui-datatable th {
+			    vertical-align : top;
+			}
+			
+			.ui-datatable .ui-datatable-data td:nth-child(1) {
+    			padding: 0 0 0 0 !important;
+    		}
+    		
+    	</style>  
+                                                                                                     
+        <script type="text/javascript"> 
+            
+            $.cookie("primefaces.download", null);            
+            function monitorDownload(recordCount) { 
+              if(recordCount > 0){
+                if(cookiesEnabled()){
+                  ajaxStatusShow();
+                  setTimeout("checkDownloadStatus();",250); 
+                }
+              }
+            }
+            function doShowRejectReason(){               
+            	//setSelectedVORC([{name: 'UNIT_NO', value: acceptanceTableVar.selection}]);
+            	 PF('rejectReasonDialogWidget').show();
+            }            
+            function checkDownloadStatus(){  
+              if($.cookie("primefaces.download")){
+                 $.cookie("primefaces.download", null);
+                 ajaxStatusHide();
+              }else{
+                setTimeout("checkDownloadStatus();",250); 
+              }
+            }   
+            
+            function cookiesEnabled  () {
+          var c = (navigator.cookieEnabled) ? true : false;
+          if (typeof navigator.cookieEnabled === "undefined") {
+            if(!c){
+              document.cookie = "testcookie";
+              c = (document.cookie.indexOf("testcookie") !== -1) ? true : false
+            }
+          }
+          return (c)
+        }
+            
+       	function doKeypressFilter(event){
+          if (event.keyCode == 13) {
+            source = event.srcElement.id;
+             $('#filter').click();
+             return false;
+          }
+          return true;  
+        }
+            
+        function moveScrollbarToTop() {
+        	$('#acceptanceTable .ui-datatable-scrollable-body').scrollTop(0);
+		}
+            
+        function selectCurrentRow(table,index){
+        	if(index > (Number(50) -1)){//here 50 is rows being display in per page in dt
+        		index = index % 50;	
+        	}
+        	PF(table).unselectAllRows();
+            PF(table).selectRow(index ,false);
+		}
+        
+        function resetUIState() {
+        	PF('acceptanceTableVar').unselectAllRows();
+            adjustBtnState()
+         	}
+        
+        var  hasPermissionAcceptQuote = #{acceptanceQueueBean.hasPermission('acceptQuote')};
+        function adjustBtnState(){        	
+        	if(PF('acceptanceTableVar').selection.length == 1){        	
+        		if(hasPermissionAcceptQuote == true){
+	        		PF('acceptReqBtnVar').enable();
+	        		PF('rejectReqBtnVar').enable();
+	        	 }        		
+        		PF('quoteOverviewBtnVar').enable();
+        		var acceptanceType = document.getElementById('hiddenSelectedRowAcceptanceType').value;
+        		if(acceptanceType == "OER"){
+        			PF('revisionQuoteVar').enable();
+        			PF('rejectReqBtnVar').disable();
+        		}else{
+        			PF('revisionQuoteVar').disable();
+        		}
+			}else{
+				PF('acceptReqBtnVar').disable();
+        		PF('rejectReqBtnVar').disable();
+        		PF('quoteOverviewBtnVar').disable();
+        		PF('revisionQuoteVar').disable();
+			}
+        }
+        		
+        function showConfirmDocuments(){
+        	
+        	showCCDocumentListDialog();
+        	
+		}
+
+			
+        function saveScrollPosition() {
+        	document.getElementById('hiddenScrollPosition').value = $('#acceptanceTable .ui-datatable-scrollable-body').scrollTop();
+        }
+        function setScrollPosition() {
+        	$('#acceptanceTable .ui-datatable-scrollable-body').scrollTop(document.getElementById('hiddenScrollPosition').value);
+        }
+        
+     	$(window).load(function(){
+     		adjustBtnState();
+     		setScrollPosition();
+     		if($("#activeQuotesDialog").is(":visible")){
+     			setTimeout('setFocus(\'activeQuotesDialogYesBtn\')', 300);
+     		}
+		});        
+        
+        </script>
+  </ui:define>
+  
+</ui:composition>

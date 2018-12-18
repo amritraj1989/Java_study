@@ -1,0 +1,220 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	template="../../templates/ui.xhtml">
+	
+	<ui:define name="content">
+			<h:form id="breadCrumbForm" prependId="false">
+				<p:breadCrumb model="#{schedulesBean.breadCrumbTrail}"  
+				 style="min-width:900px;max-width:100%;width:auto" 
+				ajax="false" immediate="true" styleClass="ui-layout"/>
+			</h:form>
+		
+			<!-- Error message display -->
+			<p:scrollPanel style="height:50px;max-width:100%;width:auto;" 
+				mode="native" styleClass="ui-layout">
+				<p:messages id="messages" showSummary="false" showDetail="true"	autoUpdate="true" />
+			</p:scrollPanel>			
+			
+			<h:form id="mainForm" prependId="false">
+
+	    		<p:panel id="resultsPanel" >
+	    		
+		    		<f:facet name="header" >
+	    				<h:outputText value="Master Schedules"/>
+		    		</f:facet>
+	    			
+	    			<h:inputHidden id="hiddenScrollPosition" value="#{schedulesBean.scrollPosition}" />
+	                
+	                <p:dataTable  id="resultsTable" var="result" 
+	                	widgetVar="resultVar"  
+	                	value="#{schedulesBean.finalRowList}" 
+	                	scrollable="true"  
+	                	scrollHeight="#{schedulesBean.dataTable.height}"
+						paginator= "true"
+						rows="500"
+						paginatorPosition="bottom" 
+						rowIndexVar="selectedRowIndex"
+						selection="#{schedulesBean.selectedSchedule}"   
+						sortBy="#{result.masterSchedule.clientScheduleType.scheduleType}"
+						sortOrder="ascending"
+						rowKey="#{result}" 
+						selectionMode="single">
+
+					
+	                   	<p:column width="#{schedulesBean.dataTable.col4}" sortBy="#{result.masterSchedule.clientScheduleType.scheduleType}">
+	                    	<f:facet name="header">
+								<h:outputText value="Type" style ="font-weight:bold"/>
+								<p:spacer width="4" />
+								<p:commandLink  oncomplete="PF('filterDialogVar').show();" actionListener="#{schedulesBean.processDialogRequest}" 
+	                    				  update=":filterDialog,:filterForm:filterPanel" >
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: middle" 
+													value="/images/filtered-red.png"
+													rendered="#{schedulesBean.typeFilter != 'ALL'}"
+													title="Filtered" />
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: middle" 
+													value="/images/non-filtered.png"
+													rendered="#{schedulesBean.typeFilter == 'ALL'}"
+													title="Unfiltered" />
+								</p:commandLink>
+							</f:facet>
+	                    	<h:outputText value="#{result.masterSchedule.clientScheduleType.scheduleType}" />
+	                   	</p:column> 
+	                   	
+	                   	<p:column width="#{schedulesBean.dataTable.col1}" sortBy="#{result.masterSchedule.masterCode}">
+	                    	<f:facet name="header">
+								<h:outputText value="Schedule ID" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputText value="#{result.masterSchedule.masterCode}" />
+	                   	</p:column> 
+
+	                   	<p:column style="word-wrap: break-word" width="#{schedulesBean.dataTable.col2}" sortBy="#{result.masterSchedule.description}">
+	                    	<f:facet name="header">
+								<h:outputText value="Schedule Description" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputText value="#{result.masterSchedule.description}" />
+	                   	</p:column> 
+
+	                   	<p:column width="#{schedulesBean.dataTable.col3}" sortBy="#{result.masterSchedule.distanceFrequency}">
+	                    	<f:facet name="header">
+								<h:outputText value="Miles" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputText value="#{result.masterSchedule.distanceFrequency}" styleClass="alignmentRight" />
+	                   	</p:column>
+	                   	
+	                   	<p:column width="#{schedulesBean.dataTable.col5}" sortBy="#{result.masterSchedule.monthFrequency}">
+	                    	<f:facet name="header">
+								<h:outputText value="Months" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputText value="#{result.masterSchedule.monthFrequency}" styleClass="alignmentRight" />
+	                   	</p:column> 
+	                   	
+	                    <!--  get rules and vehicles column next -->
+	                    <p:column width="#{schedulesBean.dataTable.col6}" sortBy="#{result.ruleCount}">
+	                    	<f:facet name="header">
+								<h:outputText value="Rules" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputText value="#{result.ruleCount}" styleClass="alignmentRight" />
+	                   	</p:column>
+	                   	
+	                   	<p:column width="#{schedulesBean.dataTable.col7}" sortBy="#{result.vehicleCount}">
+	                    	<f:facet name="header">
+								<h:outputText value="Vehicles" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputText value="#{result.vehicleCount}" styleClass="alignmentRight" />
+	                   	</p:column>
+
+	                   	<p:column width="#{schedulesBean.dataTable.col8}" style="text-align:center" sortBy="#{result.masterSchedule.hiddenFlag}">
+	                    	<f:facet name="header">
+								<h:outputText value="Hidden" style ="font-weight:bold"/>
+								<p:spacer width="4" />
+								
+								<p:commandLink oncomplete="PF('filterDialogVar').show();" actionListener="#{schedulesBean.processDialogRequest}" 
+	                    				  update=":filterDialog,:filterForm:filterPanel" >
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: middle" 
+													value="/images/filtered-red.png"
+													rendered="#{schedulesBean.hiddenFilter != 'ALL'}"
+													title="Filtered" />
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: middle" 
+													value="/images/non-filtered.png"
+													rendered="#{schedulesBean.hiddenFilter == 'ALL'}"
+													title="Unfiltered" />
+								</p:commandLink>								
+
+							</f:facet>
+	                    	<h:outputText value="#{result.masterSchedule.hiddenFlag == 'Y' ? 'Yes' : 'No'}" />
+	                   	</p:column> 
+	                    
+						<f:facet name="footer" >
+							<h:outputText value="Total Records: #{schedulesBean.totalRecords}" />
+						</f:facet>
+
+	                </p:dataTable>	    			
+
+              	</p:panel>
+
+	    		<p:panel id="buttonsPanel">
+					<h:panelGrid id="buttons">
+						<f:facet name="footer">
+							<p:commandButton disabled="#{!schedulesBean.hasEditPermission}" id="addButton" tabindex="30" value="Add"
+								action="#{schedulesBean.add}" ajax="false"
+								onclick="lockScreen();" />
+   							<p:spacer width="10" />
+   							<p:commandButton id="editButton" tabindex="40" value="View/Edit" disabled="#{schedulesBean.totalRecords == 0}"
+								action="#{schedulesBean.edit}" ajax="false"
+								onclick="lockScreen(); saveScrollPosition();" />
+							<p:spacer width="10" />
+							<p:commandButton disabled="#{!schedulesBean.hasEditPermission or schedulesBean.totalRecords == 0}" id="copyButton" tabindex="43" value="Copy"
+								action="#{schedulesBean.copy}" ajax="false"
+								onclick="lockScreen(); saveScrollPosition();" />
+							<p:spacer width="10" />
+							<p:commandButton id="cancelBtn" value="Cancel" action="#{schedulesBean.cancel}" ajax="false" immediate="true" />
+							<!-- taking out preview button until further investigation for selected row not updating
+							<p:spacer width="10" />
+							<p:button id="preview" tabindex="43" value="Preview" disabled="#{schedulesBean.totalRecords == 0}"
+								onclick="window.open('#{request.contextPath}/view/maintSchedules/report.xhtml?scheduleId=#{schedulesBean.selectedSchedule.masterSchedule.mschId}'); return false"/>
+							-->
+						</f:facet>
+					</h:panelGrid>
+              	</p:panel>
+
+			</h:form>
+
+
+			<p:dialog id="filterDialog" header="Filters"  widgetVar="filterDialogVar"   
+					   modal="true" resizable="false" appendTo="@(body)" style="min-width: 425px; max-width: 425px;"> 
+			  	
+			  	<h:form id="filterForm" prependId="false">   					  
+				<p:hotkey immediate="true" bind="esc" handler="PF('filterDialogVar').hide();"/>	
+					<p:panel id="filterPanel">
+						
+					
+						<p:panelGrid columns="2">
+							<h:outputText value="Type" />
+							<h:selectOneMenu id="typeFilter" value="#{schedulesBean.typeFilter}">
+					            <f:selectItems value="#{schedulesBean.availableScheduleTypes}" />
+					        </h:selectOneMenu>
+							
+							<h:outputText value="Hidden:" />
+							<h:selectOneMenu id="hiddenFilter" value="#{schedulesBean.hiddenFilter}">
+					            <f:selectItems value="#{schedulesBean.availableHiddenFlags}" />
+					        </h:selectOneMenu>
+						</p:panelGrid>
+						<hr />
+						<p:commandButton value="Apply filters" ajax="true" update=":mainForm:resultsTable, :mainForm:buttonsPanel" process="@form" 
+							  		oncomplete="PF('filterDialogVar').hide();" actionListener="#{schedulesBean.filterRowList}"/>
+						<p:spacer width="10"/>
+						<p:commandButton value="Clear filters" ajax="true" update=":mainForm:resultsTable, :mainForm:buttonsPanel, filterForm" process="@form" 
+					  		oncomplete="PF('filterDialogVar').hide();" actionListener="#{schedulesBean.removeAllFilters}"/>
+						<p:spacer width="10"/>
+						
+						<p:commandButton value="Cancel" onclick="PF('filterDialogVar').hide();"/>
+												
+
+
+
+
+					</p:panel>	    	
+				</h:form>		
+		  	</p:dialog>  				 
+
+
+			<script>	
+			function saveScrollPosition() {
+            	document.getElementById('hiddenScrollPosition').value = $('#resultsTable .ui-datatable-scrollable-body').scrollTop();
+            }
+            function setScrollPosition() {
+            	$('#resultsTable .ui-datatable-scrollable-body').scrollTop(document.getElementById('hiddenScrollPosition').value);
+            }
+            $(window).load(function(){
+       		 setScrollPosition();
+		  	});
+			
+			</script>
+			
+			
+	</ui:define>
+</ui:composition>

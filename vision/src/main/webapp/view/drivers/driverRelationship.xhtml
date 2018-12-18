@@ -1,0 +1,393 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" template="../../templates/ui.xhtml">
+
+	<ui:define name="content">
+		<h:form id="driverRelationBreadCrumbForm" prependId="false">
+			<p:breadCrumb model="#{driverRelationshipBean.breadCrumbTrail}"
+				ajax="false" immediate="true" />
+		</h:form>
+		<!-- Message display -->
+		<p:scrollPanel style="height:50px;" mode="native">
+			<p:messages id="messages" showSummary="false" showDetail="true"
+				autoUpdate="true" />
+		</p:scrollPanel>
+
+		<!-- Main Driver Detail Panel -->
+		<p:panel id="mainDriver" styleClass="ui-layout"
+			header="Primary Driver">
+			<p:panelGrid cellpadding="5">
+				<p:row>
+					<p:column>
+						<h:outputLabel for="mainDriverName" styleClass="ui-label"
+							value="Driver" />
+					</p:column>
+					<p:column>
+						<h:outputLabel id="mainDriverName"
+							value="#{driverRelationshipBean.mainDriver.driverSurname}, #{driverRelationshipBean.mainDriver.driverForename} " />
+					</p:column>
+
+					<p:column>
+						<h:outputLabel for="mainClientAccount" styleClass="ui-label"
+							value="Client Account" />
+					</p:column>
+					<p:column>
+						<h:outputLabel id="mainClientAccount"
+							value="#{driverRelationshipBean.mainDriver.externalAccount.externalAccountPK.accountCode}" />
+					</p:column>
+
+					<p:column>
+						<h:outputLabel for="mainClientName" styleClass="ui-label"
+							value="Client Name" />
+					</p:column>
+					<p:column>
+						<h:outputLabel id="mainClientName"
+							value="#{driverRelationshipBean.mainDriver.externalAccount.accountName}" />
+					</p:column>
+					
+					<p:column>
+						<h:outputLabel styleClass="ui-label"
+							value="Active Ind" />
+					</p:column>
+					<p:column>
+		                <h:outputLabel value="ACTIVE" rendered="#{driverRelationshipBean.mainDriver.activeInd == 'Y'}" />
+						<h:outputLabel value="INACTIVE" rendered="#{driverRelationshipBean.mainDriver.activeInd == 'N'}" />	
+					</p:column>
+					
+				</p:row>
+			</p:panelGrid>
+		</p:panel>
+
+		<h:form id="driverRelationshipForm" prependId="false">
+			<!-- Search Available Driver Panel -->
+			<p:panel id="driverSearchPanel" header="Relate Drivers">
+				<p:focus for="driverName" />
+				<p:panelGrid cellpadding="5">
+					<p:row>
+
+						<p:column>
+							<p:outputLabel for="driverName" value="Last Name"
+								style="font-weight:bold" />
+						</p:column>
+						<p:column>
+							<p:inputText id="driverName" tabindex="10"
+								value="#{driverRelationshipBean.driverName}"
+								onkeypress="return doSubmitButton(event, 'search')"							
+								title="Last Name" 
+								disabled="#{!driverRelationshipBean.hasPermission() or driverRelationshipBean.mainDriverIsInactive}"
+								/>
+						</p:column>
+
+						<p:column>
+							<p:commandButton id="search" value="Search"
+								actionListener="#{driverRelationshipBean.search}"
+								process="@this, driverName" partialSubmit="true"
+								update="availableDrivers" tabindex="20"
+								onclick="return verifyDriverLastName($('#driverName'));" 
+								disabled="#{!driverRelationshipBean.hasPermission() or driverRelationshipBean.mainDriverIsInactive}"
+								/>
+						</p:column>
+
+					</p:row>
+				</p:panelGrid>
+			</p:panel>
+
+			<!-- Pick list -->
+			<p:panel id="driverPickListPanel" styleClass="ui-layout">
+				<p:panelGrid cellpadding="5">
+					<p:row>
+						<p:column>
+							<p:dataTable id="availableDrivers" var="availableDriver" styleClass="ui-panelgrid-border"
+								value="#{driverRelationshipBean.availableDrivers}"
+								widgetVar="availableDriversWidget"
+								rowKey="#{availableDriver.drvId}"
+								selection="#{driverRelationshipBean.selectedDriver}"
+								rowIndexVar="availableDriverRowIndex" selectionMode="single"
+								scrollable="true"
+								scrollHeight="#{driverRelationshipBean.dataTable.height}">
+
+								<p:ajax event="rowSelect"
+									listener="#{driverRelationshipBean.onRowSelect}"
+									update=":driverRelationshipForm:relatedDrivers" />
+
+								<f:facet name="header">Available Drivers</f:facet>
+
+								<p:column width="#{driverRelationshipBean.dataTable.col1}"
+									sortBy="#{availableDriver.driverSurname}">
+									<f:facet name="header">
+										<h:outputText value="Driver Name" style="font-weight:bold" />
+									</f:facet>
+									<h:outputText
+										value="#{availableDriver.driverSurname}, #{availableDriver.driverForename}" />
+								</p:column>
+
+								<p:column width="#{driverRelationshipBean.dataTable.col2}"
+									sortBy="#{availableDriver.externalAccount.externalAccountPK.accountCode}">
+									<f:facet name="header">
+										<h:outputText value="Client Account" style="font-weight:bold" />
+									</f:facet>
+									<h:outputText
+										value="#{availableDriver.externalAccount.externalAccountPK.accountCode}" />
+									<br />
+									<h:outputText
+										value="#{availableDriver.externalAccount.accountName}" />
+								</p:column>
+
+								<p:column width="#{driverRelationshipBean.dataTable.col3}">
+									<f:facet name="header">
+										<h:outputText value="Detail" style="font-weight:bold" />
+									</f:facet>
+
+									<p:commandLink id="detail" value="Detail"
+										actionListener="#{driverRelationshipBean.editDriver(availableDriver,null)}"
+										ajax="false" immediate="true"
+										onclick="PF('availableDriversWidget').unselectAllRows();PF('availableDriversWidget').selectRow(#{availableDriverRowIndex},false);lockScreen()" />
+								</p:column>
+
+								<f:facet name="footer"> Record Count: #{driverRelationshipBean.availableDriversCount}</f:facet>
+							</p:dataTable>
+						</p:column>
+
+						<p:column>
+							<p:commandButton id="addRelation" icon="ui-icon-arrowthick-1-e"
+							    disabled="#{!driverRelationshipBean.hasPermission() or driverRelationshipBean.mainDriverIsInactive}"
+								actionListener="#{driverRelationshipBean.addRelationship}"
+								update="availableDrivers relatedDrivers" title="Add"
+								process="@this, availableDrivers" 
+								onstart="moveRecordCheck('Add')"/>
+							<br />
+							<br />
+							<p:commandButton id="addRelations"
+							    disabled="#{!driverRelationshipBean.hasPermission() or driverRelationshipBean.mainDriverIsInactive}"
+								icon="ui-icon-arrowthickstop-1-e"
+								actionListener="#{driverRelationshipBean.addRelationships}"
+								update="availableDrivers relatedDrivers" title="Add All"
+								process="@this, availableDrivers" />
+							<br />
+							<br />
+							<p:commandButton id="removeRelation"
+							    disabled="#{!driverRelationshipBean.hasPermission() or driverRelationshipBean.mainDriverIsInactive}"
+								icon="ui-icon-arrowthick-1-w"
+								actionListener="#{driverRelationshipBean.removeRelationship}"
+								update="availableDrivers relatedDrivers" title="Remove"
+								process="@this, relatedDrivers" 
+								onstart="moveRecordCheck('Remove')"/>
+							<br />
+							<br />
+							<p:commandButton id="removeRelations"
+							    disabled="#{!driverRelationshipBean.hasPermission() or driverRelationshipBean.mainDriverIsInactive}"
+								icon="ui-icon-arrowthickstop-1-w"
+								actionListener="#{driverRelationshipBean.removeRelationships}"
+								update="availableDrivers relatedDrivers" title="Remove All"
+								process="@this, relatedDrivers" />
+							<br />
+							<br />
+						</p:column>
+
+						<p:column>
+							<p:dataTable id="relatedDrivers" var="relationship" styleClass="ui-panelgrid-border"
+								value="#{driverRelationshipBean.driverRelationships}"
+								widgetVar="relatedDriversWidget"
+								rowKey="#{relationship.secondaryDriver.drvId}"
+								selection="#{driverRelationshipBean.selectedDriverRelationship}"
+								rowIndexVar="relatedDriverRowIndex" selectionMode="single"
+								scrollable="true"
+								scrollHeight="#{driverRelationshipBean.dataTable.height}">
+
+								<p:ajax event="rowSelect"
+									listener="#{driverRelationshipBean.onRowSelect}"
+									update=":driverRelationshipForm:availableDrivers" />
+
+								<f:facet name="header">Related Drivers</f:facet>
+
+								<p:column width="#{driverRelationshipBean.dataTable.col1}"
+									sortBy="#{relationship.secondaryDriver.driverSurname}">
+									<f:facet name="header">
+										<h:outputText value="Driver Name" style="font-weight:bold" />
+									</f:facet>
+									<h:outputText
+										value="#{relationship.secondaryDriver.driverSurname}, #{relationship.secondaryDriver.driverForename}" />
+								</p:column>
+
+								<p:column width="#{driverRelationshipBean.dataTable.col2}"
+									sortBy="#{relationship.secondaryDriver.externalAccount.externalAccountPK.accountCode}">
+									<f:facet name="header">
+										<h:outputText value="Client Account" style="font-weight:bold" />
+									</f:facet>
+									<h:outputText
+										value="#{relationship.secondaryDriver.externalAccount.externalAccountPK.accountCode}" />
+									<br />
+									<h:outputText
+										value="#{relationship.secondaryDriver.externalAccount.accountName}" />
+								</p:column>
+
+								<p:column width="#{driverRelationshipBean.dataTable.col4}">
+									<f:facet name="header">
+										<h:outputText value="Relationship" style="font-weight:bold" />
+									</f:facet>
+									<p:selectOneMenu id="relationshipType" tabindex="4" 
+										value="#{relationship.relationshipType}"
+										disabled="#{!driverRelationshipBean.hasPermission() or driverRelationshipBean.mainDriverIsInactive}">
+										<f:selectItem itemLabel="-----" itemValue="" />
+										<f:selectItems
+											value="#{driverRelationshipBean.relationshipTypes}"
+											var="relationshipType"
+											itemLabel="#{relationshipType.description}"
+											itemValue="#{relationshipType.code}" />
+									</p:selectOneMenu>
+								</p:column>
+
+								<p:column width="#{driverRelationshipBean.dataTable.col3}">
+									<f:facet name="header">
+										<h:outputText value="Detail" style="font-weight:bold" />
+									</f:facet>
+
+									<p:commandLink value="Detail"
+										actionListener="#{driverRelationshipBean.editDriver(null,relationship)}"
+										rendered="#{!driverRelationshipBean.mainDriverIsInactive}"
+										ajax="false"
+										onclick="PF('relatedDriversWidget').unselectAllRows();PF('relatedDriversWidget').selectRow(#{relatedDriverRowIndex},false);lockScreen()" />
+								</p:column>
+
+								<f:facet name="footer"> Record Count: #{driverRelationshipBean.relatedDriversCount}</f:facet>
+
+							</p:dataTable>
+						</p:column>
+					</p:row>
+				</p:panelGrid>
+			</p:panel>
+
+			<p:panel id="controlPanel" styleClass="ui-layout">
+
+				<p:commandButton id="saveChanges" value="Save" oncomplete="save()"
+					disabled="#{!driverRelationshipBean.hasPermission() or driverRelationshipBean.mainDriverIsInactive}"
+					tabindex="30" />
+				<p:spacer width="10" />
+
+				<p:commandButton id="addDriver" value="Add Driver"
+					action="#{driverRelationshipBean.addDriver}" ajax="false"
+					immediate="true" onclick="lockScreen();"
+					disabled="#{!driverRelationshipBean.hasPermission() or driverRelationshipBean.mainDriverIsInactive}"
+					tabindex="40" />
+				<p:spacer width="10" />
+
+				<p:commandButton id="cancel" value="Cancel"
+					action="#{driverRelationshipBean.cancel}" ajax="false"
+					immediate="true" onclick="lockScreen();" tabindex="50" />
+
+			</p:panel>
+		</h:form>
+
+		<!-- Alert and Confirmation Dialogs -->
+		<p:confirmDialog id="differentLastNameDialog" appendTo="@(body)"
+			message="#{msgs.driver_relationships_different_last_name}"
+			header="Different Last Names"
+			widgetVar="differentLastNameConfirmationWidgetVar">
+			<p:focus context="differentLastNameDialog" />
+
+			<h:form prependId="false">
+				<p:hotkey immediate="true" bind="esc"
+					handler="PF('differentLastNameConfirmationWidgetVar').hide();" />
+				<p:commandButton id="okConfirmation" tabindex="60" value="Ok"
+					action="#{driverRelationshipBean.save}" onclick="lockScreen()"
+					ajax="false" process=":driverRelationshipForm:relatedDrivers" />
+				<p:commandButton id="cancelConfirmation" value="Cancel"
+					onclick="PF('differentLastNameConfirmationWidgetVar').hide();"
+					type="button" />
+			</h:form>
+		</p:confirmDialog>
+		
+		<p:confirmDialog id="selectDriverAlertDialog" appendTo="@(body)"
+			message="#{msgs.select_driver}" header="Alert"
+			widgetVar="selectDriverAlertWidgetVar">
+			<p:focus context="selectDriverAlertDialog" />
+
+			<h:form prependId="false">
+				<p:hotkey immediate="true" bind="esc"
+					handler="PF('selectDriverAlertWidgetVar').hide(); setFocus('driverName')" />
+				<p:commandButton id="cancelSelectDriverAlertDialog" value="Ok"
+					onclick="PF('selectDriverAlertWidgetVar').hide(); setFocus('driverName')" />
+			</h:form>
+		</p:confirmDialog>	
+		
+		<div id="inputFieldChecks">
+			<ui:include src="../alert/inputFieldChecks.xhtml" />
+		</div>				
+
+		<script type="text/javascript"> 
+		    
+		    /**
+		    * Handles the Save button's click event. The Related Drivers list
+		    * is traversed to compare the related driver's last name with that
+		    * of the primary driver. If the last name differs, a confirmation
+		    * dialog is displayed making the user aware of the difference. The
+		    * user will have the option to continue or cancel the save. If there
+		    * are no differences in last names, the dialog is not displayed.
+		    * However, the 'Ok' button on the dialog is programatically clicked
+		    * to continue the save.
+		    */
+            function save(){
+            	var releatedDriverName;
+            	var identifier = ", ";
+            	var primaryDriverName = $('#mainDriverName').text();
+            	var isDifferent = false;
+            	
+            	primaryDriverName = primaryDriverName.substr(0, primaryDriverName.indexOf(identifier));
+            	
+            	$('#relatedDrivers tr').each(function(){
+            		relatedDriverName = $(this).children().first().text();
+            		if(relatedDriverName.indexOf(identifier) &gt; 0) {
+            			relatedDriverName = relatedDriverName.substr(0, relatedDriverName.indexOf(identifier));
+            			if(primaryDriverName != relatedDriverName){
+            				isDifferent = true;
+            				return false;
+            			}
+            		}
+            	})
+            	 
+            	if(isDifferent){
+            	    showDialog('differentLastNameConfirmationWidgetVar');            	    
+            	} else {
+            		$('#okConfirmation').click();
+            	}
+            }
+		    
+		    /**
+		    * At least one character is required to perform a search. If a 
+		    * character is not specified, a dialog is displayed. The search
+		    * is then canceled.
+		    */
+		    function verifyDriverLastName(o){
+		    	if(!hasMinAlphaNumericCharacters(o)){
+		    		return false;
+		    	} else {
+		    		return true;
+		    	}
+		    }
+		    
+		    /**
+		    * Prior to moving record from one pick list to another, this function
+		    * will check for a selected record to move. If one does not exist, an
+		    * alert is displayed to inform the user that they must select a driver
+		    * in order to move a row.
+		    */
+		    function moveRecordCheck(mode){	    
+		    	var display = false;
+		    	
+		    	if((mode == 'Add' &amp;&amp; PF('availableDriversWidget').getSelectedRowsCount() &lt; 1)
+		    	        || (mode == 'Remove' &amp;&amp; PF('relatedDriversWidget').getSelectedRowsCount() &lt; 1)) {
+            	    display = true;
+		        }
+		    	
+		        if(display){
+		        	showDialog('selectDriverAlertWidgetVar');	
+		        	setFocus('cancelSelectDriverAlertDialog');
+		        }
+		    }
+		    
+		</script>
+	</ui:define>
+
+</ui:composition>

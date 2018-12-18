@@ -1,0 +1,154 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<style type="text/css">
+   	 	.noBorderGrid tr, .noBorderGrid td {
+    border: none;
+     border-style: none !important
+}
+   </style>
+	<h:form id="maintenanceProfileForm" prependId="false">		
+		<p:dialog id="maintenanceProfileDialog" header="Maintenance Profile" 
+					widgetVar="maintenanceProfileDialogWidget" 
+					modal="true" 
+					appendTo="@(body)" 
+					dynamic="true" 
+					resizable="true" 
+					height="500" 
+					width="1070">
+			<p:hotkey immediate="true" bind="esc" handler="PF('maintenanceProfileDialogWidget').hide();"/>
+			<p:panelGrid id="maintenanceProfilePanel">
+				<p:row>			    
+			        <p:column>
+			        	<h:outputLabel for="accountNumber" styleClass="ui-label" value="Client:"/> 
+		        	</p:column>
+					<p:column> 
+						<h:outputText id="accountNumber" value="#{maintenanceProfileBean.vehicleInfo.clientAccountNumber} - #{maintenanceProfileBean.vehicleInfo.clientAccountName}" />
+			        </p:column>	
+		        	<p:column>
+		        		<h:outputLabel for="mafsAuthLimit" styleClass="ui-label" value="MAFS Authorization Limit:"/>
+	        		</p:column>
+	        		<p:column> 
+						<h:outputText id="mafsAuthLimit" value="#{maintenanceProfileBean.mafsAuthorizationLimit}" style="float:right">
+							<f:convertNumber type="currency" currencySymbol="$" />
+						</h:outputText>
+					</p:column>	
+					
+					 	        
+		        </p:row>
+				<p:row>
+			        <p:column colspan="2"></p:column>	
+		        	<p:column>
+		        		<h:outputLabel for="driverAuthLimit" styleClass="ui-label" value="Driver Authorization Limit:"/>
+	        		</p:column>
+	        		<p:column> 
+						<h:outputText id="driverAuthLimit" value="#{maintenanceProfileBean.driverAuthorizationLimit}" style="float:right">
+							<f:convertNumber type="currency" currencySymbol="$" />
+						</h:outputText>
+					</p:column>			        				
+				</p:row>
+				<p:row>
+					 <p:column>
+			        	<h:outputLabel for="clientDedicatedPh" styleClass="ui-label" value="Client Dedicated Phone:"/> 
+		        	</p:column>
+		        	<p:column>
+		        		<h:outputLabel id="clientDedicatedPh"  value="#{maintenanceProfileBean.maintPrefAcct.clientDedicatedPhone}"/>
+	        		</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+			        	<h:outputLabel for="scheduleType" styleClass="ui-label" value="Client Schedule Type:"/> 
+		        	</p:column>
+					<p:column colspan="3"> 
+						<h:outputText id="scheduleType" value="#{maintenanceProfileBean.scheduleType}" />
+			        </p:column>	
+				</p:row>
+				<p:row>
+		        	<p:column>
+		        		<h:outputLabel for="acctSpecialInstructions" styleClass="ui-label" value="Special Instructions:"/>
+	        		</p:column>
+	        		<p:column colspan="3"> 
+						<h:outputText id="acctSpecialInstructions" value="#{maintenanceProfileBean.maintPrefAcct.acctSpecInstr}" />
+		        	</p:column>	
+				</p:row>				
+   			</p:panelGrid> 
+   			
+			<p:panel id="maintenanceProgramDataTablePanel" header="Maintenance Programs" >
+   				<p:dataTable id="maintenanceProgramDataTable" value="#{maintenanceProfileBean.maintPrograms}" var="maintPrograms">
+		        	<p:column headerText="Element Code" width="14%">
+		        		<h:outputText value="#{maintPrograms.elementName}" />
+	        		</p:column>	
+	        		<p:column headerText="Special Instructions">
+		        		<h:outputText value="#{maintPrograms.specialInstructions}" style="white-space: normal"/>
+	        		</p:column>	
+	        	</p:dataTable>
+        	</p:panel>
+        	
+			<p:panel id="maintenancePreferencesDataTablePanel" header="Additional Preferences" >
+   				<p:dataTable id="maintenancePreferencesDataTable" value="#{maintenanceProfileBean.maintPreferences}" var="maintPreferences" >
+		        	<p:column headerText="Program Name" width="20%">
+		        		<h:outputText value="#{maintPreferences.preferenceDescription}" />
+	        		</p:column>	
+		        	<p:column headerText="Approval Required" width="16%">
+		        		<h:outputText value="#{maintPreferences.approval}" />
+	        		</p:column>	
+		        	<p:column headerText="Maintenance Packet" width="17%">
+		        		<h:outputText value="#{maintPreferences.maintPack}" />
+	        		</p:column>		        			        		
+	        		<p:column headerText="Preference Instructions">
+		        		<h:outputText value="#{maintPreferences.specialInstructions}" style="white-space: normal"/>
+	        		</p:column>	
+	        	</p:dataTable>
+        	</p:panel> 
+        	
+        	<p:panel id="maintenanceContactsDataTablePanel" header="Contact Information" >
+   				<p:dataTable id="maintenanceContactsDataTable" value="#{maintenanceProfileBean.maintContacts}" var="maintContacts" >
+   					<p:column headerText="POC Description">
+		        		<h:outputText value="#{maintContacts.pocDescription}" />
+	        		</p:column>
+		        	<p:column headerText="Contact Type" width="12%">
+		        		<h:panelGrid columns="1" styleClass="noBorderGrid" cellspacing="2">
+		        			<h:outputText value="#{maintContacts.contactType}" rendered="#{!maintContacts.driverInd}"/>
+		        			<h:outputText value="Driver" rendered="#{maintContacts.driverInd}"/>
+		        		</h:panelGrid>
+		        		
+	        		</p:column>	
+		        	<p:column headerText="Name" width="12%">
+		        		<h:outputText value="#{maintContacts.firstName} #{maintContacts.lastName}" />
+	        		</p:column>	
+	        		<p:column headerText="Home Phone" width="12%">
+		        		<h:outputText value="(#{maintContacts.homeAreaCode}) " rendered="#{maintContacts.homeAreaCode != null ? 'true' : 'false'}" escape="false" />
+		        		<h:outputText value="#{maintContacts.homeNumber}" />
+		        		<h:outputText value=" Ext:#{maintContacts.homeExtension}" rendered="#{maintContacts.homeExtension != null ? 'true' : 'false'}" escape="false" />
+		        		
+		        		<h:outputText value=" (Preferred)" style="font-style:italic; vertical-align:top;" rendered="#{maintContacts.homeNumberPref}"/>
+	        		</p:column>	
+		        	<p:column headerText="Work Phone" width="12%">
+		        		<h:outputText value="(#{maintContacts.workAreaCode}) " rendered="#{maintContacts.workAreaCode != null ? 'true' : 'false'}" escape="false" />
+		        		<h:outputText value="#{maintContacts.workNumber}" />
+		        		<h:outputText value=" Ext:#{maintContacts.workExtension}" rendered="#{maintContacts.workExtension != null ? 'true' : 'false'}" escape="false" />
+		        		
+		        		<h:outputText value=" (Preferred)" style="font-style:italic; vertical-align:top;" rendered="#{maintContacts.workNumberPref}"/>
+	        		</p:column>	
+		        	<p:column headerText="Cell Phone" width="12%">
+		        		<h:outputText value="(#{maintContacts.cellAreaCode}) " rendered="#{maintContacts.cellAreaCode != null ? 'true' : 'false'}" escape="false" />
+		        		<h:outputText value="#{maintContacts.cellNumber}" />
+		        		<h:outputText value=" Ext:#{maintContacts.cellExtension}" rendered="#{maintContacts.cellExtension != null ? 'true' : 'false'}" escape="false" />
+		        		
+		        		<h:outputText value=" (Preferred)" style="font-style:italic; vertical-align:top;" rendered="#{maintContacts.cellNumberPref}"/>
+	        		</p:column>	
+		        	<p:column headerText="Email Address" width = "16%">
+		        		<h:outputText value="#{maintContacts.email}" style="white-space: nowrap"/>
+	        		</p:column>		        			        			        			        		
+	        	</p:dataTable>
+        	</p:panel>
+			    
+			<f:facet name="footer">
+				<p:commandButton id="cancelMaintenanceProfileDialog" value="Cancel" onclick="PF('maintenanceProfileDialogWidget').hide();"/>
+			</f:facet>						
+		</p:dialog>	
+	</h:form>
+
+</ui:composition>	

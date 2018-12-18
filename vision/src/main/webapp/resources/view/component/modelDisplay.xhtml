@@ -1,0 +1,62 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:composite="http://java.sun.com/jsf/composite">
+	
+    <composite:interface>
+	    <composite:attribute name="entities" required="false" type="java.util.List" />	  			            
+	</composite:interface>
+	
+	<composite:implementation>
+	    <h:form id="modelDisplayHiddenForm" prependId="false">           
+		</h:form>
+		        	  	
+	  	<div id="#{cc.clientId}">	        
+		    <h:form prependId="false">
+		        <p:dataTable id="modelDisplayDataTable" 
+		                var="trim" 
+		                value="#{modelDisplayBean.trims}"
+		                style="width:auto" rendered="#{modelDisplayBean.tableDisplay}">
+		        
+			        <p:column headerText="Year" width="5%">
+                        <p:outputLabel value="#{trim.modelMarkYear.modelMarkYearDesc}"/>
+			        </p:column>	
+			            
+		           	<p:column headerText="Make"  width="10%">
+                           <p:outputLabel value="#{trim.make.makeDesc}"/>
+		            </p:column>	
+		            
+		           	<p:column headerText="Model"  width="15%">
+                           <p:outputLabel value="#{trim.makeModelRange.description}"/>
+		            </p:column>	
+		            
+		           	<p:column headerText="Trim"  width="75%">
+                           <p:outputLabel value="#{trim.modelDescription}"/>
+		            </p:column>	
+		            
+		           	<p:column headerText="Quote Permitted"  width="5%">
+		                <p:outputLabel value="#{trim.quotePermittedInd == 'Y' ? 'Yes' : 'No'}"/>
+		            </p:column>				            
+ 			            			            			            	        
+		        </p:dataTable> 
+		        
+		        <p:panelGrid columns="4" rendered="#{not modelDisplayBean.tableDisplay}">
+	                <h:outputLabel value="Trim:" styleClass="ui-label" />
+	                <h:outputLabel value="#{modelDisplayBean.trim.modelDescription}" />
+	                
+	                <h:outputLabel value="Quote Permitted:" styleClass="ui-label" />
+	                <h:outputLabel value="#{modelDisplayBean.trim.quotePermittedInd == 'Y' ? 'Yes' : 'No'}" />	                		        
+		        </p:panelGrid>  
+		        
+			</h:form>							        
+	  	</div>
+	  	
+		
+	  	<script type="text/javascript">
+			
+		</script>
+	  	
+    </composite:implementation>
+</html>

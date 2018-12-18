@@ -1,0 +1,131 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	
+		<p:dialog header="#{willowUserLovBean.dialogHeader}"  
+		        widgetVar="willowUserLOV"
+			    id="WILLOW_USER_GRID" 
+			    dynamic="true" 
+			    resizable="false" 
+				appendTo="@(body)"			    
+			    width="600"
+			    height="355" 
+			    modal="true"
+			    onShow="disableWillowUserLovSelectBtn();setFirstPageWillowUserDataTableWidget();" >
+
+		<h:form id="willowUserLovForm" name="willowUserLovForm" prependId="false"
+			onkeydown="body_onkeydown(event,'willowUserSelectButton','willowUserLOV');resetSelection();">
+			
+			<p:hotkey immediate="true" bind="esc" handler="PF('willowUserLOV').hide();"/>
+			
+			<p:dataTable widgetVar="willowUserDataTableWidget" 
+			        var="willowUser"
+			        lazy="true"
+				    scrollable="true" 
+				    scrollHeight="270" 
+				    resizableColumns="true"
+				    value="#{willowUserLovBean.willowUsers}" 
+				    rows="#{willowUserLovBean.rowsPerPage}"
+				    paginator="true" 
+				    paginatorPosition="bottom" 
+				    selection="#{willowUserLovBean.lovSelectedWillowUser}" 
+				    selectionMode="single">
+
+				<p:ajax event="page" oncomplete="clearDataTableSelection('willowUserDataTableWidget');" />
+				
+				<p:ajax event="rowDblselect" 
+				        listener="#{willowUserLovBean.onRowSelect}"
+					    update=":willowUserLovForm:lovEmployeeNo,:willowUserLovForm:lovFirstName,:willowUserLovForm:lovLastName"
+					    oncomplete="hideWillowUserLov();setWillowUserValues();" />				
+				
+				<p:ajax event="rowSelect" 
+				        listener="#{willowUserLovBean.onRowSelect}"
+					    update=":willowUserLovForm:lovEmployeeNo,:willowUserLovForm:lovFirstName,:willowUserLovForm:lovLastName"
+					    oncomplete="enableWillowUserLovSelectBtn();"/>				
+					
+				<h:messages />
+				
+				<p:column width="30%">
+					<f:facet name="header">
+						<h:outputText value="Employee No" style="font-weight:bold" />
+					</f:facet>
+					<h:outputText value="#{willowUser.employeeNo}"></h:outputText>
+				</p:column>
+				<p:column width="60%">
+					<f:facet name="header">
+						<h:outputText value="Employee Name" style="font-weight:bold" />
+					</f:facet>
+					<h:outputText value="#{willowUser.firstName} #{willowUser.lastName}"></h:outputText>
+				</p:column>
+			</p:dataTable>
+			
+			<div style="text-align: center;">
+				<h:outputText style="font-weight:bold;" value="Record Count: #{willowUserLovBean.willowUsers.rowCount}"/>
+				
+				<p:commandButton style="float:right;" value="Select"
+					id="willowUserSelectButton" name="willowUserSelectButton" widgetVar="willowUserSelectButtonWidgetVar"
+					actionListener="#{willowUserLovBean.performLovSelection}"
+					update=":willowUserLovForm:lovEmployeeNo,:willowUserLovForm:lovFirstName,:willowUserLovForm:lovLastName"
+					oncomplete="hideWillowUserLov();setWillowUserValues();">
+				</p:commandButton>
+				
+			</div>
+			<h:inputHidden id="targetWillowUserLov" value="#{willowUserLovBean.lovName}"/>
+			<h:inputHidden id="lovEmployeeNo" value="#{willowUserLovBean.lovSelectedWillowUser.employeeNo}"/>
+			<h:inputHidden id="lovFirstName" value="#{willowUserLovBean.lovSelectedWillowUser.firstName}"/>
+			<h:inputHidden id="lovLastName" value="#{willowUserLovBean.lovSelectedWillowUser.lastName}"/>
+			
+			</h:form>
+		</p:dialog>
+
+		
+	
+	<script language="javascript">
+		
+		function setWillowUserValues(){
+			var lovParamArray = new Array();
+			var lovParamValueArray = new Array();
+			
+			lovParamArray[0]='EMPLOYEE_NO';
+			lovParamValueArray[0]=document.getElementById('lovEmployeeNo').value;
+			
+			lovParamArray[1]='EMPLOYEE_NAME';
+			lovParamValueArray[1]= document.getElementById('lovLastName').value + ", " +document.getElementById('lovFirstName').value  ;
+			
+			<!-- This method need to implement in parent page to populate LOV seletion-->
+			setSelection(document.getElementById('targetWillowUserLov').value, lovParamArray, lovParamValueArray);
+		}
+		
+		function showWillowUserLov(){
+			showDialog('willowUserLOV');			
+		}
+		
+		function hideWillowUserLov(){
+			hideDialog('willowUserLOV');			
+		}
+		
+		function resetSelection(){
+			jQuery("div").scrollTop(0);
+			jQuery("div").scrollLeft(0);
+			disableWillowUserLovSelectBtn();
+		}
+		
+		function enableWillowUserLovSelectBtn() {
+			PF('willowUserSelectButtonWidgetVar').enable();
+			setFocus('willowUserSelectButton');
+		}
+		
+		function disableWillowUserLovSelectBtn() {
+			PF('willowUserSelectButtonWidgetVar').disable();
+		}
+		
+		function setFirstPageWillowUserDataTableWidget(){
+			setDataTableToFirstPage('willowUserDataTableWidget');
+			setDataTableToFirstRow('willowUserDataTableWidget');
+		}
+		
+		</script>
+</ui:composition>

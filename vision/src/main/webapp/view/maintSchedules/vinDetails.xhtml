@@ -1,0 +1,164 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"   	
+	template="../../templates/ui.xhtml">
+
+	<ui:define name="content">
+		<h:form id="vinDetailsBreadCrumbForm" prependId="false">
+			<p:breadCrumb model="#{vinDetailsBean.breadCrumbTrail}" ajax="false" immediate="true" styleClass="ui-layout"/>
+		</h:form>
+			
+		<!-- Error message display -->
+		<p:scrollPanel style="height:50px;" mode="native" styleClass="ui-layout">
+			<p:messages id="messages" severity="info,error,fatal" showSummary="false" showDetail="true"	autoUpdate="true" />
+		</p:scrollPanel>
+		
+		<h:form id="vinDetailsForm" prependId="false">
+		<p:panel id="vinDetailsPanelMain" header="VIN Decoder Details" styleClass="ui-layout">
+				<p:focus context="vinDetailsPanelMain" />
+				<p:panelGrid cellpadding="5">
+					<p:row>
+						<p:column>	
+							<p:outputLabel for="client" styleClass="ui-label"
+								value="Client: " />
+						</p:column>
+						<p:column>
+							<p:outputLabel id="client"
+								value="#{vinDetailsBean.externalAccount.externalAccountPK.accountCode} - #{vinDetailsBean.externalAccount.accountName}" />
+						</p:column>
+						<p:column>	
+							<p:outputLabel for="unitNo" styleClass="ui-label"
+								value="Unit No: " />
+						</p:column>
+						<p:column>
+							<p:outputLabel id="unitNo"
+								value="#{vinDetailsBean.unit}" />
+						</p:column>
+						<p:column>	
+							<p:outputLabel for="vin" styleClass="ui-label"
+								value="VIN: " />
+						</p:column>
+						<p:column>
+							<p:outputLabel id="vin"
+								value="#{vinDetailsBean.fleetMasterVinDetails.vin}" />
+						</p:column>						
+					</p:row>
+					<p:row>						
+						<p:column>	
+							<p:outputLabel for="modelYear" styleClass="ui-label"
+								value="Year: " />
+						</p:column>
+						<p:column>
+							<p:outputLabel id="modelYear"
+								value="#{vinDetailsBean.fleetMasterVinDetails.year}" />
+						</p:column>
+						<p:column>	
+							<p:outputLabel for="make" styleClass="ui-label"
+								value="Make: " />
+						</p:column>
+						<p:column>
+							<p:outputLabel id="make"
+								value="#{vinDetailsBean.fleetMasterVinDetails.makeDesc}" />
+						</p:column>
+						<p:column>	
+							<p:outputLabel for="model" styleClass="ui-label"
+								value="Model: " />
+						</p:column>
+						<p:column>
+							<p:outputLabel id="model"
+								value="#{vinDetailsBean.fleetMasterVinDetails.modelDesc}" />
+						</p:column>
+					</p:row>
+					<p:row>							
+						<p:column>	
+							<p:outputLabel for="trimDesc" styleClass="ui-label"
+								value="Trim: " />
+						</p:column>
+						<p:column>
+							<p:outputLabel id="trimDesc"
+								value="#{vinDetailsBean.fleetMasterVinDetails.trimDesc}" />
+						</p:column>	
+						<p:column>	
+							<p:outputLabel for="modelType" styleClass="ui-label"
+								value="Model Type: " />
+						</p:column>
+						<p:column>
+							<p:outputLabel id="modelType"
+								value="#{vinDetailsBean.fleetMasterVinDetails.modelTypeDesc}" />
+						</p:column>
+						<p:column>	
+							<p:outputLabel for="styleDesc" styleClass="ui-label"
+								value="Style: " />
+						</p:column>
+						<p:column>
+							<p:outputLabel id="styleDesc"
+								value="#{vinDetailsBean.fleetMasterVinDetails.styleDesc}" />
+						</p:column>
+					</p:row>
+					<p:row>						
+						<p:column>	
+							<p:outputLabel for="engineDesc" styleClass="ui-label"
+								value="Engine Desc: " />
+						</p:column>
+						<p:column>
+							<p:outputLabel id="engineDesc"
+								value="#{vinDetailsBean.fleetMasterVinDetails.engineDesc}" />
+						</p:column>
+						<p:column>	
+							<p:outputLabel for="fuelType" styleClass="ui-label"
+								value="Fuel Type:* " />
+						</p:column>
+						<p:column>
+							<p:selectOneMenu styleClass = "trackDirtySelect" id="fuelType" tabindex="100" widgetVar="fuelTypeWidget"
+								value="#{vinDetailsBean.fleetMasterVinDetails.fuelType}"
+								disabled="#{!vinDetailsBean.hasPermission()}" >
+								<f:selectItem itemLabel="--Select One--" itemValue=""/>
+								<f:selectItems
+									value="#{vinDetailsBean.fuelTypeValues}"
+									var="fuelTypeValue" itemLabel="#{fuelTypeValue.fuelType}"
+									itemValue="#{fuelTypeValue.fuelType}"/>
+							</p:selectOneMenu>
+						</p:column>
+					</p:row>
+				</p:panelGrid>
+			
+			<p:panel id="controlPanel" styleClass="ui-layout" >
+				
+				
+				<p:commandButton id="save" styleClass="button_spacer"
+				    value="Save"
+				    action="#{vinDetailsBean.save}" 
+					ajax="false"
+					onclick="lockScreen();"
+					disabled="#{!vinDetailsBean.hasPermission()}"
+					tabindex="200"/>
+					
+				<p:spacer width="10" />
+
+				<p:commandButton id="cancel" styleClass="button_spacer"
+				    value="Cancel"
+					action="#{vinDetailsBean.cancel}" 
+					ajax="false" 
+					immediate="true"
+					onclick="lockScreen();" 
+					tabindex="300"/>	
+			</p:panel>			
+			</p:panel>					
+		</h:form>
+		
+		<script>
+			function initializeDirtyDetection() {
+				registerIgnoreButton("save");
+				saveDataForDirtyDetection();
+			}	
+			
+		 	$(window).load(function(){
+		 		initializeDirtyDetection();
+		 		setFocus('fuelType');		
+			});				
+		</script>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,400 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="../../templates/ui.xhtml">
+
+	<ui:define name="content">
+		<h:form id="updateProjectedMonthsBreadCrumbForm" prependId="false">
+			<p:breadCrumb model="#{updateProjectedMonthsBean.breadCrumbTrail}"
+				ajax="false" immediate="true" styleClass="ui-layout" />
+		</h:form>
+		<!-- Message display -->
+		<p:scrollPanel style="height:50px;" mode="native"
+			styleClass="ui-layout">
+			<p:messages id="messages" showSummary="false"
+				severity="info,error,fatal" showDetail="true" autoUpdate="true" />
+			<h:inputHidden id="hiddenScrollPosition"
+				value="#{updateProjectedMonthsBean.scrollPosition}" />
+		</p:scrollPanel>
+		<h:form id="updateProjectedMonthsForm" prependId="false">
+			<p:panel id="searchPanel" header="Search Quotation"
+				styleClass="ui-layout">
+				<p:focus context="searchPanel" />
+				<h:panelGrid columns="10" cellspacing="5">
+					<h:outputLabel for="unitNo" value="Unit No: " styleClass="ui-label" />
+					<h:panelGroup style="white-space:nowrap;">
+						<p:inputText id="unitNo" title="Unit No" tabindex="10"
+							value="#{updateProjectedMonthsBean.unitNo}"
+							onkeypress="return doKeypressSearch(event)" />
+					</h:panelGroup>
+					<h:outputLabel for="vin" value="VIN Last 6: " styleClass="ui-label" />
+					<h:panelGroup style="white-space:nowrap;">
+						<p:inputText id="vin"
+							title="Enter 6 or more of the last characters " tabindex="20"
+							value="#{updateProjectedMonthsBean.vin}"
+							onkeypress="return doKeypressSearch(event)" />
+					</h:panelGroup>
+					<h:outputLabel for="client" value="Client:" styleClass="ui-label" />
+					<h:panelGroup style="white-space:nowrap;">
+						<p:inputText id="client" title="Client" tabindex="30"
+							value="#{updateProjectedMonthsBean.client}"
+							onkeypress="return doKeypressSearch(event)" />
+						<p:commandButton id='clientLOV' tabindex="40" icon="icon-lov"
+							title="View Client List" oncomplete="showCustomerLov();"
+							immediate="true"
+							actionListener="#{customerLovBean.fetchLOVDataByCustomerName}"
+							process="@this,client" dynamic="true" async="true"
+							onstart="return hasMinAlphaNumericCharacters($('#client'));"
+							update=":custLovForm:CUSTOMER_GRID">
+							<f:param name="CUSTOMER_LOV_INPUT" value="client" />
+						</p:commandButton>
+					</h:panelGroup>
+					<h:outputLabel for="projectedMonthsId" value="Proj. Repl. Month:" styleClass="ui-label" />
+					<h:panelGroup style="white-space:nowrap;">
+						<p:inputText id="projectedMonthsId"
+							title="Current Projected Replacement Month" tabindex="50"
+							size="10" value="#{updateProjectedMonthsBean.projectedMonths}"
+							onkeypress="return doKeypressSearch(event)" />
+					</h:panelGroup>
+					<h:outputLabel value="" />
+					<p:commandButton ajax="true" id="search" title="Search"
+						tabindex="100" value="Search"
+						onstart="return validateSearch(event);" style="float:right"
+						actionListener="#{updateProjectedMonthsBean.performSearch}"
+						oncomplete="setDefaultSearchRowSelection(); resetUIState();"
+						update="resultsPanel,commandPanel, :messages" />
+				</h:panelGrid>
+			</p:panel>
+
+			<p:panel id="resultsPanel" header="Quotations" styleClass="ui-layout">
+
+				<h:inputHidden id="selectedRecordIndex" name="selectedRecordIndex"
+					value="#{updateProjectedMonthsBean.selectionIndex}" />
+				<h:inputHidden id="clickIndex" name="clickIndex"
+					value="#{updateProjectedMonthsBean.selectionIndex}" />
+
+				<p:dataTable id="quotationDataTable" var="quotationUnit"
+					style="word-wrap: break-word;"
+					value="#{updateProjectedMonthsBean.quotationUnitLazyList}"
+					scrollable="true"
+					scrollHeight="#{updateProjectedMonthsBean.dataTable.height}"
+					selection="#{updateProjectedMonthsBean.selectedResultVOs}"
+					emptyMessage="#{updateProjectedMonthsBean.dataTableMessage}"
+					rows="#{updateProjectedMonthsBean.resultPerPage}" paginator="true"
+					paginatorPosition="bottom" lazy="true" resizableColumns="true"
+					widgetVar="quotationDataTableWidget">
+
+					<p:ajax event="toggleSelect"
+						update=":updateProjectedMonthsForm:updProjMonthsBtn"
+						listener="#{updateProjectedMonthsBean.onRowSelect}" />
+					<p:ajax event="rowSelectCheckbox"
+						update=":updateProjectedMonthsForm:updProjMonthsBtn"
+						listener="#{updateProjectedMonthsBean.onRowSelect}" />
+					<p:ajax event="rowUnselectCheckbox"
+						update=":updateProjectedMonthsForm:updProjMonthsBtn"
+						listener="#{updateProjectedMonthsBean.onRowUnSelect}" />
+					<p:ajax event="rowSelect"
+						update=":updateProjectedMonthsForm:updProjMonthsBtn"
+						listener="#{updateProjectedMonthsBean.onRowSelect}" />
+					<p:ajax event="rowUnselect"
+						update=":updateProjectedMonthsForm:updProjMonthsBtn"
+						listener="#{updateProjectedMonthsBean.onRowUnselect}" />
+					<p:ajax event="sort" oncomplete="setDefaultSearchRowSelection();" />
+					<p:ajax event="page"
+						oncomplete="setScrollDivAtTop();"
+						onstart="clearDataTableSelection('quotationDataTableWidget');"
+						update=":updateProjectedMonthsForm:clickIndex, :updateProjectedMonthsForm:commandPanel" />
+
+					<p:column selectionMode="multiple" style="text-align:center" width="#{updateProjectedMonthsBean.dataTable.col1}" />
+					<p:column sortBy="#{quotationUnit.unitNo}" width="#{updateProjectedMonthsBean.dataTable.col2}">
+						<f:facet name="header">
+							<h:outputText value="Unit" style="font-weight:bold" />
+						</f:facet>
+						<h:outputText value="Unit No : #{quotationUnit.unitNo}"
+							style="font-weight:bold;" />
+						<br />
+						<h:outputText value="Model : #{quotationUnit.modelDescription}" />
+						<br />
+						<h:outputText value="VIN : #{quotationUnit.vinNumber}" />
+						<br />
+					</p:column>
+					<p:column sortBy="#{quotationUnit.accountName}" width="#{updateProjectedMonthsBean.dataTable.col3}">
+						<f:facet name="header">
+							<h:outputText value="Client" style="font-weight:bold" />
+						</f:facet>
+						<h:outputText value="#{quotationUnit.accountName}"
+							style="font-weight:bold;" />
+						<br />
+						<h:outputText value="Client No: #{quotationUnit.accountCode}" />
+					</p:column>
+					<p:column width="#{updateProjectedMonthsBean.dataTable.col4}">
+						<f:facet name="header">
+							<h:outputText value="Fleet Ref No" style="font-weight:bold" />
+						</f:facet>
+						<h:outputText styleClass="" value="#{quotationUnit.fleetRefNo}" />
+						<br />
+					</p:column>
+					<p:column width="#{updateProjectedMonthsBean.dataTable.col5}">
+						<f:facet name="header">
+							<h:outputText value="Contract Start Date"
+								style="font-weight:bold" />
+						</f:facet>
+						<h:outputText value="#{quotationUnit.contractStartDate}">
+							<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+						</h:outputText>
+						<br />
+					</p:column>
+					<p:column width="#{updateProjectedMonthsBean.dataTable.col6}"
+						style="text-align:right">
+						<f:facet name="header">
+							<h:outputText value="Term Months" style="font-weight:bold" />
+						</f:facet>
+						<h:outputText id="contractPeriodId"
+							value="#{quotationUnit.contractPeriod}" />
+					</p:column>
+					<p:column width="#{updateProjectedMonthsBean.dataTable.col7}"
+						style="text-align:right">
+						<f:facet name="header">
+							<h:outputText value="Proj. Repl. Month" style="font-weight:bold" />
+						</f:facet>
+						<h:outputText value="#{quotationUnit.projectedMonths}" />
+					</p:column>
+					<f:facet name="footer">
+						Record Count: <h:outputText
+							value="#{updateProjectedMonthsBean.quotationUnitLazyList.rowCount}" />
+					</f:facet>
+				</p:dataTable>
+
+				<p:panel id="commandPanel" styleClass="ui-layout">
+					<p:commandButton id="updProjMonthsBtn" tabindex="200"
+						value="Update Proj. Repl. Month"
+						title="Update Projected Replacement Month"
+						actionListener="#{updateProjectedMonthsBean.setItemsOnDialog}"
+						update=":updateProjectedMonthsDialog :updateProjectedMonthsDialogForm"
+						oncomplete="showDialog('updateProjectedMonthsDialogWidget');"
+						disabled="#{!updateProjectedMonthsBean.updateButtonDisabled}"
+						immediate="true" onclick="saveScrollPosition();" />
+				</p:panel>
+			</p:panel>
+		</h:form>
+
+		<p:dialog id="updateProjectedMonthsDialog"
+			widgetVar="updateProjectedMonthsDialogWidget"
+			header="Update Projected Replacement Month" dynamic="true"
+			modal="true" resizable="false" appendTo="@(body)"
+			style="min-width: 500px; max-width: 600px;" closeOnEscape="true"
+			onHide="setScrollPosition();">
+			<h:form id="updateProjectedMonthsDialogForm" prependId="false">
+				<p:focus context="updateProjectedMonthsDialogForm" />
+				<p:scrollPanel mode="native" styleClass="ui-layout"
+					style="height:50px;min-width:100%;max-width:100%;width:auto;">
+					<p:messages id="popupDialogMessages" severity="info,error,fatal"
+						showSummary="true" showDetail="false" autoUpdate="true" />
+				</p:scrollPanel>
+				<p:panel id="updateProjectedMonthsDialogPanel">
+					<h:panelGrid columns="2" cellpadding="5"
+						style="table-layout:fixed;">
+						<p:outputLabel for="newProjectedMonthsId"
+							value="New Proj. Repl. Month:* " styleClass="ui-label"
+							style="white-space:nowrap;" />
+						<p:inputText id="newProjectedMonthsId" maxlength="3" size="10"
+							value="#{updateProjectedMonthsBean.newProjectedMonths}">
+							<p:keyFilter regEx="/[0-9]/i" preventPaste="false" />
+						</p:inputText>
+					</h:panelGrid>
+				</p:panel>
+				<br />
+				<br />
+				<p:commandButton id="updateProjectedMonthsSaveBtn" value="Save"
+					widgetVar="saveBtnWidgetVar"
+					actionListener="#{updateProjectedMonthsBean.updateRecords}"
+					update="@form"
+					process="@form"
+					onclick="lockScreen();"
+					onstart="PF('saveBtnWidgetVar').disable(); PF('cancelBtnWidgetVar').disable()"					
+					oncomplete="setScrollPosition(); if (!args.failure) hideDialog('updateProjectedMonthsDialogWidget');" />
+				<p:spacer width="5" />
+				<p:commandButton id="cancel" value="Cancel"
+					widgetVar="cancelBtnWidgetVar"
+					onclick="hideDialog('updateProjectedMonthsDialogWidget');" />
+			</h:form>
+		</p:dialog>
+
+		<div id="VIN_LOV_DIV">
+			<ui:include src="../lov/VIN.xhtml" />
+		</div>
+
+		<div id="CUSTOMER_LOV_DIV">
+			<ui:include src="../lov/customers.xhtml" />
+		</div>
+
+		<div id="inputFieldChecks">
+			<ui:include src="../alert/inputFieldChecks.xhtml" />
+		</div>
+
+		<p:confirmDialog id="vinMinimumCharactersDialog"
+			message="#{msgs.vin_minimum_characters}" header="Alert"
+			widgetVar="vinMinimumCharactersVar" appendTo="@(body)">
+			<p:focus context="vinMinimumCharactersDialog" />
+
+			<h:form prependId="false">
+				<p:hotkey immediate="true" bind="esc"
+					handler="hideDialog('vinMinimumCharactersVar'); focusSourceElement()" />
+				<p:commandButton id="cancelVINAlert" value="Ok"
+					onclick="hideDialog('vinMinimumCharactersVar'); focusSourceElement()"
+					type="button" />
+			</h:form>
+		</p:confirmDialog>
+
+		<p:confirmDialog id="numberOnlyDialog"
+			message="Unit Number must be a number" header="Alert"
+			widgetVar="numberOnlyVar" appendTo="@(body)">
+			<p:focus context="numberOnlyDialog" />
+
+			<h:form prependId="false">
+				<p:hotkey immediate="true" bind="esc"
+					handler="hideDialog('numberOnlyVar'); focusSourceElement()" />
+				<p:commandButton id="cancelNumberOnlyAlert" value="Ok"
+					onclick="hideDialog('numberOnlyVar'); focusSourceElement()"
+					type="button" />
+			</h:form>
+		</p:confirmDialog>
+
+
+
+
+		<script type="text/javascript"> 
+					
+		function saveScrollPosition() {
+        	document.getElementById('hiddenScrollPosition').value = $('#quotationDataTable .ui-datatable-scrollable-body').scrollTop(); 
+        }
+		
+        function setScrollPosition() {
+        	$('#quotationDataTable .ui-datatable-scrollable-body').scrollTop(document.getElementById('hiddenScrollPosition').value); 
+        }
+        
+        $(window).load(function(){
+   		 setScrollPosition();
+	  	});
+		
+		function setDefaultSearchRowSelection() {	 		
+			setScrollDivAtTop();
+	    }
+		
+		/**
+		* Handles the search button's client side validation before the ajax search happens. A minimum alphanumric character 
+		* check is performed. The search process either continues or not based on
+		* on the check's boolean result.
+		*/
+		function validateSearch(event){	
+			var UNIT = $('#unitNo');	
+			var VIN = $('#vin');
+			var PROJ_MONTHS = $('#projectedMonthsId');
+			var CLIENT = $('#client');
+			var searchCriteria;
+			searchCriteria = $('#unitNo').val() + $('#vin').val() + $('#client').val() + $('#projectedMonthsId').val();
+			if(!hasMinAlphaNumericCharacters(event.srcElement, searchCriteria) 
+					|| !hasInputFieldNumberOnly(UNIT, UNIT.val())
+					|| !hasMinVINCharacters(VIN, VIN.val())
+					|| !hasInputFieldNumberOnly(PROJ_MONTHS, PROJ_MONTHS.val())
+					) {		
+				return false;
+			} else {
+				return true;
+			}		
+		}
+		
+		/**
+		* VIN search criteria is required to have at a minimum 6 characters
+		*
+		* @param o (Required) UiElement that contains that may or may 
+		*          not contain the value to check. This object will 
+		*          also receive focus when the alert dialog closes.
+		* @param str The string to check
+		*/		
+		function hasMinVINCharacters(o, str) {
+			var displayAlert = false;
+			
+			if(str.length &gt; 0){
+				if(str.length &gt; 5){
+					displayAlert = false;
+				} else {
+					displayAlert = true;
+				}
+			}
+
+			if(displayAlert){
+                sourceElement = o;
+                showDialog('vinMinimumCharactersVar');	
+                setFocus('cancelVINAlert');
+                return false
+			}
+
+			return true;
+		}	
+
+		function hasInputFieldNumberOnly(o, str) {
+			var displayAlert = false;
+			str = $.trim(str);
+			
+			if(str.length &gt; 0){
+				if(str.match(/^\d+$/)){
+					displayAlert = false;
+				} else {
+					displayAlert = true;
+				}
+			}
+		
+			if(displayAlert){
+                sourceElement = o;
+                showDialog('numberOnlyVar');	
+               setFocus('cancelNumberOnlyAlert');
+                return false
+			}
+
+			return true;
+		}		
+		
+		/**
+		* Detects the Enter key and programatically clicks
+		* the search button. The search button event handler
+		* will perform the min. alphanumeric check.
+		*/
+		function doKeypressSearch(event){
+			if (event.keyCode == 13) {	
+			   $('#search').click();
+			   return false;
+			}
+			return true;	
+		}
+			
+		
+	    /**
+	    * The LOV calls this function to pass back the selected
+	    * values to the view's controls.
+	    */
+		function setSelection( lovName, nameArray, valueArray)
+		{	
+			if(lovName == 'customerLOV'){
+				for(var i=0; i  &lt; nameArray.length ; i++){
+					if(nameArray[i] == 'CUSTOMER_NAME'){
+						document.getElementById('client').value = valueArray[i];
+					}
+				}
+				setFocus('client');
+			}
+				
+		}
+	    
+        function resetUIState() {
+        	PF('quotationDataTableWidget').unselectAllRows();
+         	}
+	    
+		</script>
+
+	</ui:define>
+
+
+</ui:composition>

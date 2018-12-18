@@ -1,0 +1,2654 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component" 
+	template="../../templates/ui.xhtml">
+
+	<ui:define name="content">
+	<style type="text/css">
+   	 .button_spacer {margin-top:4px;margin-bottom:4px}
+      
+   	</style>
+		<h:form id="maintenancePOBreadCrumbForm" prependId="false">
+			<p:breadCrumb model="#{maintenancePOBean.breadCrumbTrail}"
+				ajax="false" immediate="true" />
+		</h:form>
+		
+		<p:growl id="growl" for="warnings" severity="warn" escape="false" redisplay="true" showDetail="true" sticky="true" /> 
+		
+				
+		<!-- Message display -->
+		<p:scrollPanel style="height:50px;" mode="native">
+			<p:messages id="messages" severity="info,error,fatal" showSummary="true" showDetail="true" 
+				autoUpdate="true" />
+		</p:scrollPanel>
+		
+	
+		<comp:emailClientDelivery id="alertEmail" email="#{maintenancePOBean.alertEmail}" titleText="Email Editor - Exceeded MAFS Authorization Limit" />
+        <comp:logBook id="logBook" entity="#{maintenancePOBean.maintenanceRequest}" logBookTypes="#{maintenancePOBean.logBookTypes}" showRelatedUnitLogEntry="true" />			
+		
+		<h:form id="displayAlertProcessing" prependId="false">
+			<h:inputHidden id="alertEmailContactId"
+                value="#{maintenancePOBean.selectedContactId}"/>
+            
+            <p:commandButton id="alertEmailContactBtn" style="display:none"
+                actionListener="#{maintenancePOBean.populateAlertEmail}" oncomplete="refreshEmailContact();"  />
+                
+            <p:commandButton id="refreshEmailContactBtn" style="display:none"
+                actionListener="#{emailClientDeliveryBean.setEmail(maintenancePOBean.alertEmail)}" update=":alertEmail" oncomplete="showEmailPopup();"  />
+		</h:form>
+		
+		
+        <h:form id="hiddenInputForm" prependId="false">
+            <h:inputHidden id="clickIndex" name="clickIndex"
+			    value="#{maintenancePOBean.selectedTaskIndex}" />
+					
+			<h:inputHidden id="taskCount" name="taskCount"
+                value="#{maintenancePOBean.getTaskCount()}" />	
+                
+			<h:inputHidden id="replacementUnitNoHidden" 
+                value="#{maintenancePOBean.maintenanceRequest.replacementUnitNo}" />	
+                
+			<h:inputHidden id="replacementUnitDateHidden" 
+                value="#{maintenancePOBean.maintenanceRequest.replacementUnitDate}">
+                 <f:convertDateTime pattern="MM/dd/yyyy" />
+             </h:inputHidden>	
+                
+			<h:inputHidden id="replacementUnitDateTypeHidden" 
+                value="#{maintenancePOBean.maintenanceRequest.replacementUnitDateType}" />	                                
+            
+            <h:inputHidden id="validationSuccess"
+                value="#{maintenancePOBean.validationSuccess}" />	
+            
+            <h:inputHidden id="leasePlanServiceProvider"
+                value="#{maintenancePOBean.leasePlanServiceProvider}" />
+                                
+            <h:inputHidden id="showHistoricalCategoryIconIndicator" 
+            	value="#{maintenancePOBean.showHistoricalCategoryIconIndicator}" /> 
+            	
+            <h:inputHidden id="showChangeGLDistDialogHidden" 
+            	value="#{maintenancePOBean.showChangeGLDistDialog}" />
+            	
+            <h:inputHidden id="showChangeGLDistConfirmDialogHidden" 
+            	value="#{maintenancePOBean.showChangeGLDistConfirmDialog}" />           	          	      	           	
+
+			<h:inputHidden id="vehicleNotOnContract" 
+				value="#{maintenancePOBean.vehicleNotOnContract}"/>				
+            	           	                
+        </h:form>
+        
+        <h:form id="hiddenMaintenanceProfileLinkForm" prependId="false">
+			<p:commandLink id="maintenanceProfileLink" style="display:none"
+						   update=":maintenanceProfileForm"
+						   action="#{maintenanceProfileBean.initDialog(maintenancePOBean.maintenanceRequest.fleetMaster.fmsId)}"
+						   process="@this"
+						   oncomplete="PF('maintenanceProfileDialogWidget').show()" >
+			</p:commandLink>         
+        </h:form>
+        
+        <h:form id="hiddenDriverLinkForm" prependId="false">
+            <h:inputHidden id="driverLinkDrvId"
+                value="#{maintenancePOBean.driverId}"/>
+            
+            <p:commandLink id="driverLink" style="display:none" ajax="false" immediate="true"
+                action="#{maintenancePOBean.editViewDriver(param['driverLinkDrvId'])}"/>
+            
+        </h:form>		
+
+		<h:form id="maintenancePOForm" prependId="false" onkeydown="body_onkeydown(event,'','');">
+		<p:panel id="maintenancePOPanelId">
+			<p:accordionPanel id="maintenancePOPanel" multiple="true"
+				activeIndex="0,1,2">
+				<p:tab id="vehicleInformationTab" title="Vehicle Information">
+					<p:panel id="vehicleDisplayPanel">
+						<comp:vehicleDisplay id="vehicleDisplayId" vehInfo="#{maintenancePOBean.vehicleInfo}" actualStartDate = "#{maintenancePOBean.maintenanceRequest.actualStartDate}" parentBean="#{maintenancePOBean}"/>
+					</p:panel>
+				</p:tab>
+
+				<p:tab id="serviceProviderTab" title="Service Provider Information">
+					<p:panel id="serviceProviderInputPanel" style="border-style:none;">
+					<p:focus context="serviceProviderInputPanel"/>
+					<p:panelGrid id="serviceProviderPanel" style="min-width:980px;max-width:100%;width:auto;">
+						<p:row>
+							<p:column style="width: 15%;">
+								
+								<p:commandLink id="serviceProviderDetailLink"
+									styleClass="ui-icon ui-icon-triangle-1-e"
+									style="float:left; color: green; "
+									onclick="return onServiceProviderDetailClick()" />
+								<p:outputLabel for="serviceProvider"
+									onclick="return onServiceProviderDetailClick()"
+									styleClass="ui-label" style="cursor:pointer;white-space: nowrap"
+									value="Service Provider:" />
+									<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>
+								
+							</p:column>
+							<p:column style="width: 60%;">
+								<h:panelGroup>
+									<f:validateBean  disabled="true">
+									<p:inputText id="serviceProvider" tabindex="10" validator="#{maintenancePOBean.validateServiceProvider}"
+										onchange="clearLabels(['serviceProviderName','serviceProviderId']);"
+										disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.maintenanceRequest.goodwillIndicator}"
+										value="#{maintenancePOBean.maintenanceRequest.serviceProvider.serviceProviderNumber}" onkeydown="setTargetKeyCode(event);">	
+										
+										<p:ajax event="change" onstart="return proceedAjax();" process="@this"
+										listener="#{maintenancePOBean.decodeProviderByNameOrCode(param['maintenancePOPanel:serviceProvider'],param['maintenancePOPanel:serviceTypeCodeOfPO_input'])}"
+										oncomplete="openAddressInput();setFocusOnLOV('serviceProvider' , 'serviceProviderLOV');"
+										update=":maintenancePOForm:maintenancePOPanel:serviceProviderDetailPanel, :hiddenInputForm serviceProvider serviceProviderName payeeNo hyphenId payeeName serviceProviderId maintenancePOPanel:tasks" />
+										
+									</p:inputText>
+									</f:validateBean>
+									
+									
+									
+									<p:commandButton id="serviceProviderLOV" icon="icon-lov"
+										tabindex="20"
+										title="lov"
+	                                    oncomplete="showServiceProviderLov();" immediate="true"
+	                                    actionListener="#{serviceProviderLovBean.fetchLOVDataByServiceProviderName}"
+	                                    process="@this,serviceProvider,serviceTypeCodeOfPO" dynamic="true" async="true"
+	                                    update=":serviceProviderLovToolbarForm:searchToolbar :serviceProviderLovForm:serviceProviderDataTableId  :serviceProviderLovForm:serviceProviderSelectPanel"										
+										disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.maintenanceRequest.goodwillIndicator}">
+										<f:param name="SERVICEPROVIDER_LOV_INPUT" value="maintenancePOPanel:serviceProvider" />
+										<f:param name="SERVICETYPECODE_LOV_INPUT" value="maintenancePOPanel:serviceTypeCodeOfPO_input" />
+									</p:commandButton>
+									 
+									<p:spacer width="10px" height="1px;"/>
+									<h:outputLabel id="serviceProviderName" value="#{maintenancePOBean.maintenanceRequest.serviceProvider.serviceProviderName}" />
+									<p:spacer width="10px" height="1px;"/>
+									
+									<p:outputLabel for="serviceTypeCodeOfPO" value=" Service Type:"  styleClass="ui-label" />
+									<p:spacer width="10px" height="1px;"/>								
+									<p:selectOneMenu id="serviceTypeCodeOfPO"  widgetVar="serviceTypeCodeOfPOWidget"
+									value="#{maintenancePOBean.serviceTypeCode}" tabindex="21"
+									disabled="#{!maintenancePOBean.hasPermission() or 
+									maintenancePOBean.isReadMode() or 
+									maintenancePOBean.maintenanceRequest.goodwillIndicator}">
+										<f:selectItem itemValue="" itemLabel="ALL"></f:selectItem>
+										<f:selectItems
+											value="#{maintenancePOBean.serviceTypeCodeList}"
+											var="serviceTypeCode" itemLabel="#{serviceTypeCode.suppServiceTypeCode}"
+											itemValue="#{serviceTypeCode.suppServiceTypeCode}" />
+									</p:selectOneMenu>									
+								</h:panelGroup>
+							</p:column>
+
+							<p:column>
+								<h:outputLabel for="payeeNo" styleClass="ui-label" value="Payee: " />
+							</p:column>
+							
+							<p:column style="width: 20%;">
+								<h:outputLabel id="payeeNo"
+									value="#{maintenancePOBean.maintenanceRequest.serviceProvider.payeeAccount.externalAccountPK.accountCode}" />
+								<h:outputText id="hyphenId" value="#{not empty maintenancePOBean.maintenanceRequest.serviceProvider.payeeAccount.accountName ? '-' : ''}" escape="false" />
+								<h:outputLabel id="payeeName"
+									value="#{maintenancePOBean.maintenanceRequest.serviceProvider.payeeAccount.accountName}" />
+									
+								<h:inputHidden id="serviceProviderId" value="#{maintenancePOBean.selectedProviderId}" />
+								
+								<p:commandButton id="serviceProviderSelect" style="display:none;"
+									immediate="true"
+									actionListener="#{maintenancePOBean.updateServiceProviderInfo(param['maintenancePOPanel:serviceProviderId'])}" 
+									oncomplete="openAddressInput();setFocus('serviceProvider'); refreshDiscounts(); restoreServiceProviderDetailPanel();"
+									update="maintenancePOPanel  :hiddenInputForm" >
+								</p:commandButton>								
+							</p:column>
+							
+						</p:row>
+						<p:row>
+							<p:column colspan="4">
+								<p:panel id="serviceProviderDetailPanel" toggleable="true"
+									collapsed="false" visible="false"
+									widgetVar="serviceProviderDetailPanelVar"
+									style="border-color: green">
+									<p:panelGrid cellpadding="5">
+									   <p:row>
+									       <p:column rowspan="2">
+												<p:panelGrid columns="2" rendered="#{!maintenancePOBean.leasePlanServiceProvider}">
+													<p:column>
+														<h:outputLabel for="address" styleClass="ui-label"
+															value="Address:" />
+													</p:column>
+													<p:column>
+														<h:outputLabel id="address" escape="false"
+															value="#{maintenancePOBean.getFormatedServiceProviderAddress()}" />
+														<br />
+														<h:outputLabel id="phoneNumber"
+															value="#{maintenancePOBean.maintenanceRequest.serviceProvider.telephoneNo}" />
+													</p:column>
+												</p:panelGrid>
+		                                        <p:panelGrid columns="2" rendered="#{maintenancePOBean.leasePlanServiceProvider}">
+		                                            <p:column>
+		                                                <h:outputLabel for="leasePlanSerProvContactInfo" styleClass="ui-label" value="Contact Info:"/>
+		                                            </p:column>
+		                                            <p:column>
+		                                                <p:inputTextarea id="leasePlanSerProvContactInfo" 
+		                                                         escape="false" 
+		                                                         value="#{maintenancePOBean.maintenanceRequest.serviceProviderContactInfo}" rows="4" cols="80" 
+		                                                         disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.maintenanceRequest.goodwillIndicator}" 
+		                                                         tabindex="25" 
+		                                                         maxlength="800" 
+		                                                         autoResize="false" />
+		                                            </p:column>
+		                                        </p:panelGrid>
+		                                    </p:column>		                                 
+											<p:column>
+											    <p:outputLabel value="Service Provider Type:" styleClass="ui-label"/>
+											</p:column>
+											<p:column>
+                                                <p:outputLabel id="serviceProviderDiscountInfo" escape="false"
+                                                        value="#{maintenancePOBean.serviceProviderDiscountInfo}"/>											    
+											</p:column>
+											<p:column rendered="#{maintenancePOBean.maintenanceRequest.serviceProvider.networkVendor == 'N'}">
+											    <p:outputLabel value="Waive Out of Network Surcharge:" styleClass="ui-label"/>
+											</p:column>
+											<p:column rendered="#{maintenancePOBean.maintenanceRequest.serviceProvider.networkVendor == 'N'}">
+												<p:selectOneRadio id="waiveOutOfNetworkRadio" widgetVar="waiveOutOfNetworkRadioWidget" tabindex="-1"
+													value="#{maintenancePOBean.waiveOutOfNetworkSurcharge}"
+													disabled="#{!maintenancePOBean.hasPermission('maintenancePO_waiveOutOfNetworkSurcharge') or maintenancePOBean.isReadMode()}" >
+													<p:ajax process="@this" update="tasks" listener="#{maintenancePOBean.manageMarkUpLines}"/>
+													<f:selectItem itemLabel="Yes" itemValue="true" />
+													<f:selectItem itemLabel="No" itemValue="false" />							
+												</p:selectOneRadio>	
+											</p:column>
+										</p:row>
+										<p:row>
+										    <p:column rendered="#{maintenancePOBean.leasePlanServiceProvider}">
+											    <p:outputLabel value="Lease Plan Mark Up:" styleClass="ui-label"/>											        										    
+										    </p:column>
+										    <p:column rendered="#{maintenancePOBean.leasePlanServiceProvider}">											        										    
+									            <p:selectOneRadio id="networkMarkUpIndicatorRadio" tabindex="-1"
+									                    widgetVar="networkMarkUpIndicatorRadioWidget" onchange="validateMarkup();"
+									                    value="#{maintenancePOBean.maintenanceRequest.serviceProviderMarkupInd}"
+										                disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.maintenanceRequest.goodwillIndicator}">										            
+										            <f:selectItem itemLabel="Yes" itemValue="Y" />
+										            <f:selectItem itemLabel="No" itemValue="N" />										
+									            </p:selectOneRadio>
+									            <p:commandButton id="selectLeasePlanAjax" style="display:none" actionListener="${maintenancePOBean.manageMarkUpLines()}" update="tasks"/> 	
+										    </p:column>										    
+										</p:row>							
+									</p:panelGrid>
+								</p:panel>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<h:outputLabel for="contactName" styleClass="ui-label"
+									value="Contact Name: " />
+							</p:column>
+							<p:column>
+								<p:inputText id="contactName" tabindex="30"
+									disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.maintenanceRequest.goodwillIndicator}"
+									value="#{maintenancePOBean.maintenanceRequest.serviceProviderContactName}" maxlength="30"/>
+							</p:column>
+							<p:column>
+								<h:outputLabel for="invoiceNo" styleClass="ui-label"
+									value="Work Order No: " />
+							</p:column>
+							<p:column>
+								<p:inputText id="invoiceNo" tabindex="40"
+									disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.maintenanceRequest.goodwillIndicator}"
+									value="#{maintenancePOBean.maintenanceRequest.payeeInvoiceNumber}" maxlength="100"/>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+					</p:panel>
+				</p:tab>
+					
+				<p:tab id="purchaseOrderTab" title="Purchase Order">
+					<p:panel id="purchaseOrderInputPanel" style="border-style:none;">
+					<p:panelGrid id="purchaseOrderPanel" style="min-width:900px;max-width:100%;width:auto;">
+						<p:row>
+							<p:column>
+								<p:commandLink id="poNumberLink"  rendered="#{maintenancePOBean.isPoToggleable()}" styleClass="ui-icon ui-icon-triangle-1-s" style="float:left; color: green; "
+									onclick="return onPoNumberClick()" />				
+								<h:outputLabel for="poNumber" styleClass="ui-label" onclick="return onPoNumberClick();" style="cursor:pointer;" value="PO No: " />
+							</p:column>						
+							<p:column>
+								<h:outputLabel id="poNumber" onclick="return onPoNumberClick()"
+									value="#{maintenancePOBean.maintenanceRequest.jobNo}" />
+								<p:spacer width="10"/>	
+								<p:commandLink id="creditLnk" style="text-decoration:none; cursor:pointer;vertical-align:top"
+									update=":maintenanceInvoiceCreditForm"
+							        action="#{maintenanceInvoiceCreditBean.initDialog(maintenancePOBean.maintenanceRequest.mrqId)}"
+							        process="@this"
+							        rendered="#{maintenancePOBean.hasPermission() and maintenancePOBean.showCreditLink}"
+							        title="Credit exists for this PO"
+							        oncomplete="PF('creditDialogWidget').show()">						   
+							            <p:graphicImage style="border-style: none;" value="/images/creditIcon.png" />						            							            
+							    </p:commandLink>
+							</p:column>
+							<p:column>
+								<p:outputLabel for="poStatus" styleClass="ui-label"
+									value="PO Status:" />
+									<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>
+							</p:column>
+							<p:column>
+								<p:selectOneMenu id="poStatus" tabindex="-1" widgetVar="poStatusWidget"
+									disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.maintenanceRequest.goodwillIndicator}"
+									value="#{maintenancePOBean.maintenanceRequest.maintReqStatus}">
+									<f:selectItems
+										value="#{maintenancePOBean.maintenanceRequestStatuses}"
+										var="poStatus" itemLabel="#{poStatus.description}"
+										itemValue="#{poStatus.code}" />
+								</p:selectOneMenu>
+							</p:column>
+							<p:column>
+								<p:outputLabel for="poType" styleClass="ui-label"
+									value="PO Type:" />
+									<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>
+							</p:column>
+							<p:column>
+								<p:selectOneMenu id="poType" tabindex="-1"
+									disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.maintenanceRequest.goodwillIndicator}"
+									value="#{maintenancePOBean.maintenanceRequest.maintReqType}">
+									<f:selectItems
+										value="#{maintenancePOBean.maintenanceRequestTypes}"
+										var="poType" itemLabel="#{poType.code}"
+										itemValue="#{poType.code}" />
+									<p:ajax process="@this" listener="#{maintenancePOBean.resetDefaultRechangeFlag}" event="change" />	
+								</p:selectOneMenu>
+							</p:column>
+							<p:column>
+								<p:outputLabel for="currentOdometerReading"
+								 styleClass="ui-label" value="Odo:" />
+								 <h:outputText style="color:red;" value="*"  styleClass="ui-label"/>
+							</p:column>
+							<p:column colspan="2">
+								<f:validateBean disabled="true">
+								<p:inputText id="currentOdometerReading" size="5" maxlength="7" tabindex="70" onkeypress="return numericInput(event)"
+									disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.maintenanceRequest.goodwillIndicator}"
+									value="#{maintenancePOBean.maintenanceRequest.currentOdo}"
+									style="text-align:right" onchange="validateOdo();"/>
+								</f:validateBean>
+								<p:spacer width="5px"></p:spacer>	
+								<h:outputLabel value="#{maintenancePOBean.odometer.uomCode}" />
+								<p:spacer width="5px"></p:spacer>
+								<h:outputLabel id="currentOdometerReadingDate"
+									value="#{maintenancePOBean.maintenanceRequest.actualStartDate}">
+									<f:convertDateTime pattern="MM/dd/yyyy" />
+								</h:outputLabel>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column colspan="8">
+								<p:panel id="invoiceNos" toggleable="true" collapsed="false"
+									visible="false" widgetVar="invoiceNosPanel"
+									style="border-color:green">
+									<p:panelGrid cellpadding="5">
+										<p:row>
+											<p:column>
+												<h:outputLabel for="payeeInvoiceNo" styleClass="ui-label" value="Payee Inv: " />
+											</p:column>
+											<p:column>
+												<h:outputLabel id="payeeInvoiceNo"
+													value="#{maintenancePOBean.payeeInvoiceNo}" />
+											</p:column>
+											<p:column>
+												<h:outputLabel for="mafsInvoiceNo" styleClass="ui-label"
+													value="MAFS Inv: " />
+											</p:column>
+											<p:column>
+												<h:outputLabel id="mafsInvoiceNo"
+													value="#{maintenancePOBean.mafsInvoiceNo}" />
+											</p:column>
+										</p:row>
+									</p:panelGrid>
+								</p:panel>
+							</p:column>
+						</p:row>													
+						<p:row>
+							<p:column>
+								<p:outputLabel for="actualStartDate" styleClass="ui-label"
+									value="Actual Start Date/Time:" />
+									<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>
+							</p:column>
+							<p:column>
+								<f:validateBean  disabled="true">
+									<p:calendar id="actualStartDate" widgetVar="actualStartDateWidget"
+									    size="20" 
+									    tabindex="80" 
+										value="#{maintenancePOBean.maintenanceRequest.actualStartDate}"
+										pattern="MM/dd/yyyy hh:mm a"
+										disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.maintenanceRequest.goodwillIndicator}"
+										readonly="false"
+										onkeypress="return dateInput(this, event);"
+										onfocus="selectText(this.id);"
+										onchange="revertNullDate(this); formatCalendarDateTime('actualStartDateWidget', this.value); addDayToEndDate(); ">
+										<p:ajax event="change" 
+										        async="true"
+										        process="@this"
+										        update=":maintenancePOForm:maintenancePOPanel:vehicleDisplayId" 
+										        listener="#{vehicleDisplayBean.refreshExtWarrantyInfo(maintenancePOBean.maintenanceRequest.actualStartDate)}" 
+										        onstart="refreshDiscounts();" />									
+									</p:calendar>
+								</f:validateBean>
+							</p:column>
+							<p:column>
+								<p:outputLabel for="plannedEndDate" styleClass="ui-label"
+									value="End Date/Time:" />
+									<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>
+							</p:column>
+							<p:column>
+								<f:validateBean  disabled="true">
+									<p:calendar id="plannedEndDate" widgetVar="plannedEndDateWidget"
+									    size="20"
+									    tabindex="90"
+									    onfocus="selectText(this.id);" 
+										value="#{maintenancePOBean.maintenanceRequest.plannedEndDate}"
+										pattern="MM/dd/yyyy hh:mm a"
+										onkeypress="return dateInput(this, event);"														
+										onchange="revertNullDate(this); formatCalendarDateTime('plannedEndDateWidget', this.value);"					
+										disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.maintenanceRequest.goodwillIndicator}" 
+										readonly="false">
+									</p:calendar>
+								</f:validateBean>
+							</p:column>
+							<p:column>
+								<p:outputLabel styleClass="ui-label"
+									value="Sched PO No:" />
+							</p:column>
+							<p:column>
+								<h:panelGroup id="schedAuthCodeGroup">							
+									<p:inputText id="schedAuthCode" disabled="true" value="#{maintenancePOBean.maintenanceRequest.couponBookReference}"  >
+																			
+									</p:inputText>
+									<p:spacer width="10"/>
+									<p:commandLink id="editPoAuthNoLink" title="Edit PO/Auth No. association"
+										disabled="#{!maintenancePOBean.hasPermissionOnAuthCode}"										
+										oncomplete="showVehMaintSchedule(xhr, status, args)" update=":vehicleMaintenanceSchedule"
+										action="#{viewVehicleMaintenanceScheduleBean.fetchScheduleMaintList}" 
+										ajax="true" 
+										rendered="#{maintenancePOBean.hasPermissionOnAuthCode and maintenancePOBean.maintenanceRequest.couponBookReference == null and maintenancePOBean.mafsInvoiceNo == ''}">
+								 		<f:param name="UNIT_NUMBER"  value="#{maintenancePOBean.vehicleInfo.unitNo}"/>
+								 		<f:param name="READ_ONLY"  value="false"/>
+								 		<p:graphicImage value="/images/action_edit.png" style="border-style: none"/>
+						            </p:commandLink>
+									<p:commandLink id="deletePoAuthNoLink" title="Remove PO/Auth No. association"
+										disabled="#{!maintenancePOBean.hasPermissionOnAuthCode}"
+										rendered="#{maintenancePOBean.maintenanceRequest.couponBookReference != null and maintenancePOBean.mafsInvoiceNo == ''}"
+										oncomplete="showDialog('confirmPoAuthNoWidgetVar');">
+									    <p:graphicImage value="/images/action_delete.png" style="border-style: none"/>
+									</p:commandLink>
+								</h:panelGroup>
+							</p:column>
+							<p:column>
+								<h:outputLabel for="recentOdometerReading" styleClass="ui-label" value="Recent Odo:" />
+							</p:column>
+							<p:column colspan="2">
+								<p:commandLink id="odometerReadingsLink"
+									onclick="PF('odoReadingsDialogWidget').show()" style="cursor:pointer;"
+									immediate="true">
+									<h:outputLabel id="recentOdometerReading"
+										value="#{maintenancePOBean.maintenanceRequest.fleetMaster.latestOdometerReading.odoReading}"
+										title="Click to view 5 most recent Odometer Readings" />
+									<h:outputLabel id="spacer1"
+										value="  "
+										title="Click to view 5 most recent Odometer Readings" />							
+									<h:outputLabel value="#{maintenancePOBean.odometer.uomCode}"
+										title="Click to view 5 most recent Odometer Readings" />
+									<h:outputLabel id="spacer2"
+										value="  "
+										title="Click to view 5 most recent Odometer Readings" />									
+									<h:outputLabel id="recentOdometerReadingDate"
+										value="#{maintenancePOBean.maintenanceRequest.fleetMaster.latestOdometerReading.odoReadingDate}"
+										title="Click to view 5 most recent Odometer Readings" >
+										<f:convertDateTime pattern="MM/dd/yyyy" />
+									</h:outputLabel>
+									<h:outputLabel id="spacer3"
+										value="  "
+										title="Click to view 5 most recent Odometer Readings" />
+									<h:outputLabel id="recentOdometerReadingType"
+										value="#{maintenancePOBean.maintenanceRequest.fleetMaster.latestOdometerReading.odoReadingType}" 
+										title="Click to view 5 most recent Odometer Readings" />
+								</p:commandLink>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel for="clientPo" styleClass="ui-label"
+									value="Client PO No:" />
+							</p:column>
+							<p:column>
+								<p:inputText id="clientPo" size="12" tabindex="-1"
+									disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.maintenanceRequest.goodwillIndicator}"
+									value="#{maintenancePOBean.maintenanceRequest.clientPoNo}" 
+									maxlength="25"/>
+							</p:column>						
+							<p:column>
+								<p:outputLabel for="approvalInfo" styleClass="ui-label"
+									value="Approval Info:" />
+							</p:column>
+							<p:column>
+								<p:inputText id="approvalInfo" size="25" tabindex="-1"
+									disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.maintenanceRequest.goodwillIndicator}"
+									value="#{maintenancePOBean.maintenanceRequest.authReference}" 
+									onchange="setStatusAfterApproval();" maxlength="80"/>
+							</p:column>
+							
+							<p:column>
+                                <h:outputLabel for="serviceReason" styleClass="ui-label"
+                                    disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode()}"
+                                    value="Driver's Concerns:" />
+                            </p:column>
+                            
+							<p:column>
+                                <p:inputText id="serviceReason" size="30" tabindex="125"
+                                    disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.maintenanceRequest.goodwillIndicator}"
+                                    value="#{maintenancePOBean.maintenanceRequest.reasonForService}" maxlength="40"/>
+                            </p:column>
+							
+							<p:column>
+                                <h:outputLabel for="authorizer" styleClass="ui-label"
+                                    rendered="#{!maintenancePOBean.isAddMode()}"
+                                    value="Last Updated by:" />
+                            </p:column>
+                            <p:column colspan="2">
+                                <h:outputLabel id="authorizer"
+                                    rendered="#{!maintenancePOBean.isAddMode()}"
+                                    value="#{maintenancePOBean.maintenanceRequest.lastChangedBy}"/>
+                                <h:outputLabel value="#{maintenancePOBean.getMaintenanceRequest().getLastChangedDate()}">
+                                    <f:convertDateTime pattern="MM/dd/yyyy hh:mm a" />
+                                </h:outputLabel>
+                            </p:column>
+						</p:row>
+					</p:panelGrid>
+					</p:panel>
+					
+					<p:panel id="taskItemListPanel">
+							
+						<p:commandButton id="addTaskHiddenBtn" style="display:none"
+							update=":taskDialog"
+							actionListener="#{maintenancePOBean.addItemTask('true')}"
+							process="@this,poType"
+							oncomplete="handlePopupOpenRequest(xhr, status, args);"/>
+
+						<p:dataTable id="tasks" var="task" widgetVar="tasksWidget"
+							value="#{maintenancePOBean.maintenanceRequest.maintenanceRequestTasks}"
+							scrollable="true" selectionMode="single"
+							rowKey="#{task.index}"
+							selection="#{maintenancePOBean.selectedTask}"
+							scrollHeight="#{maintenancePOBean.dataTable.height}"
+							resizableColumns="true"
+							rowIndexVar="taskRowIndex">
+
+							<p:ajax event="rowSelect"
+								listener="#{maintenancePOBean.onRowSelect}"
+								update=":hiddenInputForm:clickIndex"
+								oncomplete="onTaskRowSelect();" />
+								
+							<p:ajax event="rowToggle" listener="#{maintenancePOBean.onRowToggleSetCreditLine}" /> 
+							
+							<f:facet name="header"><h:outputLabel  style="vertical-align:15px" value="Job Tasks" />
+							    <p:commandLink id="addTaskLnk" style="float:right; border:thin solid gray; text-decoration:none; cursor:pointer;"
+                                    update=":taskDialog, :maintenancePOForm:maintenancePOPanel:vehicleDisplayPanel, :maintenancePOForm:maintenancePOPanel:purchaseOrderInputPanel, :maintenancePOForm:maintenancePOPanel:serviceProviderInputPanel, :maintCategoryInfoForm, :maintCategoryInfoDialog :hiddenInputForm:showHistoricalCategoryIconIndicator"
+							        actionListener="#{maintenancePOBean.addItemTask('true')}"
+							        process="@form"
+							        oncomplete="handlePopupOpenRequest(xhr, status, args);PF('blockDatatable').hide()" 
+							        tabindex="130"
+							        rendered="#{maintenancePOBean.hasPermission() and !maintenancePOBean.isReadMode()}"
+							        title="Add Job Task"
+							        onclick="PF('blockDatatable').show()">						   
+							            <p:graphicImage style="border-style: none;" value="/images/action_add.png" />
+							            <h:outputLabel  style="vertical-align:5px" value="New Line &#160;" /> 						            							            
+							    </p:commandLink>
+							    <p:spacer height="15px;"/>
+							</f:facet>
+
+							<p:column headerText="Maint Category" width="#{maintenancePOBean.dataTable.col2}">
+								
+						        #{task.maintCatCode}
+						        <p:commandLink id="historicalMaintCategoryDatatable" 
+						        	action="#{maintenancePOBean.serviceHistory(task.maintCatCode)}" 
+						        	ajax="false" 
+						        	onclick="lockScreen()"
+						        	rendered="#{maintenancePOBean.showHistoricalCategoryIcon(task.maintCatCode) == 'true'}">
+									<p:graphicImage
+										style="text-align:right;align:right;border-style:none;"
+										value="/images/custins.png" id="historicalMaintCategoryDatatableIcon"
+										title="This category exists for a historical purchase order. Click to view Service History screen" />
+								</p:commandLink>
+								<p:rowToggler rendered="#{maintenancePOBean.rowTogglerRendered(task.mrtId)}"/>
+					        </p:column>
+					        <p:column headerText="Service Code" width="#{maintenancePOBean.dataTable.col3}">
+								
+								#{maintenancePOBean.getServiceProviderCode(task.serviceProviderMaintenanceCode)}
+					        </p:column>	
+							<p:column headerText="Maint Code" width="#{maintenancePOBean.dataTable.col4}" style="white-space: normal">
+								
+								#{task.maintenanceCode.code} <br />
+						        #{task.workToBeDone} <!-- Display the MAFS code description instead of vendor code description HPS-1653 -->
+					        </p:column>
+							<p:column headerText="Recharge" width="#{maintenancePOBean.dataTable.col5}">
+								
+								#{task.rechargeFlag}
+							</p:column>
+							<p:column headerText="Disc" width="#{maintenancePOBean.dataTable.col6}">
+								
+						        #{task.discountFlag}
+					        </p:column>
+							<p:column headerText="Last Updated By" width="#{maintenancePOBean.dataTable.col7}">
+								
+                                #{task.authorizePerson} <br />
+								<h:outputLabel value="#{task.getAuthorizeDate()}">
+									<f:convertDateTime pattern="MM/dd/yyyy hh:mm a" />
+								</h:outputLabel>
+							</p:column>
+							<p:column headerText="Qty" width="#{maintenancePOBean.dataTable.col8}">
+								
+								<h:outputText value="#{task.taskQty}" style="float:right"/>
+							</p:column>
+							<p:column headerText="Unit Price" footerText="Total" width="#{maintenancePOBean.dataTable.col9}">
+								
+								<h:outputLabel id="unitPriceLabel" value="#{maintenancePOBean.isMaintCodeRechargeOnly(task.maintenanceCode.code) ? task.rechargeUnitCost : task.unitCost}" style="float:right">
+									<f:convertNumber type="currency" currencySymbol="$" />
+								</h:outputLabel>
+							</p:column>
+							<p:column headerText="Total Amount" width="#{maintenancePOBean.dataTable.col10}"
+								footerText="#{maintenancePOBean.getSubTotal()}">
+								
+								<h:outputLabel id="totalAmount" value="#{maintenancePOBean.isMaintCodeRechargeOnly(task.maintenanceCode.code) ? task.rechargeTotalCost : task.totalCost}" style="float:right">
+									<f:convertNumber type="currency" currencySymbol="$" />
+								</h:outputLabel>
+							</p:column>
+							<p:column headerText="Actual Invoice" width="#{maintenancePOBean.dataTable.col10}">
+								
+								<h:outputLabel id="actualInvoice" value="#{task.actualInvoiceAmount}" style="float:right">
+									<f:convertNumber type="currency" currencySymbol="$" />
+								</h:outputLabel>
+							</p:column>
+							<p:column headerText="" width="#{maintenancePOBean.dataTable.col11}">
+								
+								<p:commandLink id="detailLnk" onclick="onRowDetailClick(#{taskRowIndex});"
+									actionListener="#{maintenancePOBean.onDetailClick}"
+									immediate="true"
+									process="@this"									
+									oncomplete="PF('taskDialogWidget').show()"									
+									update=":taskDialog, :hiddenInputForm:clickIndex, :maintCategoryInfoForm,:maintCategoryInfoDialog"
+									rendered="#{maintenancePOBean.isReadMode() or !maintenancePOBean.hasPermission()}">
+									<p:graphicImage value="/images/action_detail.png"
+										style="border-style: none" />
+								</p:commandLink>
+								<p:commandLink id="editLnk" onclick="onRowDetailClick(#{taskRowIndex});"
+								    actionListener = "#{maintenancePOBean.editItemTask()}"
+								    process="@form"
+                                    oncomplete="handlePopupOpenRequest(xhr, status, args);"
+                                    update=":taskDialog, :hiddenInputForm:showHistoricalCategoryIconIndicator, :maintenancePOForm:maintenancePOPanelId,:maintenancePOForm:maintenancePOPanel:serviceProviderInputPanel"
+								    rendered="#{!maintenancePOBean.isReadMode() and !maintenancePOBean.isEditTaskDisabled(taskRowIndex) and maintenancePOBean.hasPermission()}"
+								    title="Edit Task">
+								    <p:graphicImage value="/images/action_edit.png"
+								    style="border-style: none"/>
+								</p:commandLink>
+								<p:spacer width="5"
+									rendered="#{!maintenancePOBean.isReadMode()}" />
+								<p:commandLink id="deleteLnk" onclick="onRowDetailClick(#{taskRowIndex});"
+								    actionListener = "#{maintenancePOBean.deleteItemTask()}" immediate="true" process="@this"
+								    update=":maintenancePOForm:maintenancePOPanel:taskItemListPanel :hiddenInputForm:clickIndex"
+								    oncomplete="onTaskRowSelect();" 
+								    rendered="#{!maintenancePOBean.isReadMode() and !maintenancePOBean.isDeleteTaskDisabled(taskRowIndex) and maintenancePOBean.hasPermission()}"
+								    title="Delete Task">
+								    <p:graphicImage value="/images/action_delete.png"
+								    style="border-style: none"/>
+								</p:commandLink>
+							</p:column>
+							<p:rowExpansion>
+								<h:panelGrid id="displayRowExp" style="min-width:980px;max-width:100%;width:auto;background-color: grey">
+									<p:dataTable id="creditRowExp" var="creditRowExp"
+										value="#{maintenancePOBean.getIndividualTaskItems()}"
+										resizableColumns="true">
+										<p:column headerText="Credit No." width="10%">
+											#{creditRowExp.creditNo}
+										</p:column>
+										<p:column headerText="Description" width="63%">
+											#{creditRowExp.creditDesc}
+										</p:column>
+										<p:column headerText="Qty" width="5%">
+											#{creditRowExp.quantity}
+										</p:column>
+										<p:column headerText="Unit Price" width="9%">
+											<h:outputLabel id="unitPriceCreditRowExp" value="#{creditRowExp.unitPrice}" style="float:right">
+												<f:convertNumber type="currency" currencySymbol="$" />
+											</h:outputLabel>
+										</p:column>
+										<p:column headerText="Credit Amount" width="9%">
+											<h:outputLabel id="totalAmountCreditRowExp" value="#{creditRowExp.totalPrice}" style="float:right">
+												<f:convertNumber type="currency" currencySymbol="$" />
+											</h:outputLabel>
+										</p:column>
+										<p:column width="4%">
+										</p:column>
+										
+									</p:dataTable>
+								</h:panelGrid>
+							</p:rowExpansion>
+							<p:columnGroup type="footer">
+								<p:row>
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col1}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col2}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col3}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col4}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col5}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col6}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col7}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col8}"/>
+											
+									<p:column footerText="PO Total:" style="text-align:right" width="#{maintenancePOBean.dataTable.col9}"/>
+										
+									<p:column style="text-align:right" width="#{maintenancePOBean.dataTable.col10}">										
+										<f:facet name="footer">
+											<h:outputText id="poSubTotal" value="#{maintenancePOBean.getSubTotal()}">
+												<f:convertNumber type="currency" currencySymbol="$" />
+											</h:outputText>
+										</f:facet>
+									</p:column>
+									
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col11}"/>										
+								</p:row>
+
+								<p:row>
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col1}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col2}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col3}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col4}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col5}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col6}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col7}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col8}"/>
+											
+									<p:column footerText="Rech Total:" style="text-align:right" width="#{maintenancePOBean.dataTable.col9}"/>
+										
+									<p:column style="text-align:right" width="#{maintenancePOBean.dataTable.col10}">										
+										<f:facet name="footer">
+											<h:outputText value="#{maintenancePOBean.getRechargeSubTotal()}">
+												<f:convertNumber type="currency" currencySymbol="$" />
+											</h:outputText>
+										</f:facet>
+									</p:column>
+									
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col11}"/>										
+								</p:row>
+								<p:row rendered="#{maintenancePOBean.maintenanceRequest.goodwillIndicator}">
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col1}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col2}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col3}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col4}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col5}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col6}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col7}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col8}"/>
+											
+									<p:column footerText="Goodwill:" style="text-align:right" width="#{maintenancePOBean.dataTable.col9}"/>
+										
+									<p:column style="text-align:right" width="#{maintenancePOBean.dataTable.col10}">										
+										<f:facet name="footer">
+											<h:outputText value="#{maintenancePOBean.goodwillTotal()}">
+                                                <f:convertNumber type="currency" currencySymbol="$" />
+											</h:outputText>
+										</f:facet>
+									</p:column>
+									
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col11}"/>										
+								</p:row>
+								<p:row rendered="#{maintenancePOBean.hasCostAvoidance()}">
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col1}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col2}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col3}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col4}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col5}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col6}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col7}"/>
+										
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col8}"/>
+											
+									<p:column footerText="Cost Avoidance: " style="text-align:right" width="#{maintenancePOBean.dataTable.col9}"/>
+										
+									<p:column style="text-align:right" width="#{maintenancePOBean.dataTable.col10}">										
+										<f:facet name="footer">
+											<h:outputText value="#{maintenancePOBean.costAvoidanceTotal()}">
+											    <f:convertNumber type="currency" currencySymbol="$" />
+											</h:outputText>
+										</f:facet>
+									</p:column>
+									
+									<p:column footerText="" width="#{maintenancePOBean.dataTable.col11}"/>										
+								</p:row>																
+							</p:columnGroup>
+						</p:dataTable>
+					</p:panel>
+				</p:tab>
+			</p:accordionPanel>
+
+			<p:panel id="controlPanel" styleClass="ui-layout" >
+				<p:commandButton
+					 style="display:none" id="setAuthCodeBtn" actionListener="#{maintenancePOBean.captureSchAuthCode}" update=":maintenancePOForm:maintenancePOPanel:schedAuthCodeGroup" />
+				
+				<p:commandButton id="save" styleClass="button_spacer"
+				    value="Save"
+				    action="#{maintenancePOBean.save}" 
+					disabled="#{!maintenancePOBean.hasPermission()}"
+					ajax="false"
+					onmousedown="toggleSaveButtonClickFlag();"
+					onclick="lockScreen();"
+					tabindex="150"/>
+					
+				<p:spacer width="10" />
+
+				<p:commandButton id="cancel" styleClass="button_spacer"
+				    value="Cancel"
+					action="#{maintenancePOBean.cancel}" 
+					ajax="false" 
+					immediate="true"
+					onclick="lockScreen();" 
+					tabindex="155"/>
+				
+				<p:spacer width="10" />
+									
+				<p:commandButton id="logNotes" 
+				    value="Notes Log"
+				    styleClass="#{maintenancePOBean.notesLogStyleClass()};button_spacer"
+				    process="@this"
+					immediate="true" 
+					disabled="#{maintenancePOBean.isLogNotesDisabled()}"
+					oncomplete="showLogBook();"
+					tabindex="160"
+					title="Logs for Activity, Job, and Fleet notes"/>					
+					
+				<p:spacer width="10" />
+				
+				<p:commandButton id="deletePO" styleClass="button_spacer"
+				    value="Delete PO"
+					disabled="#{!maintenancePOBean.hasPermission('maintenancePO_delete') or maintenancePOBean.isDeletePOButtonDisabled()}"
+					title="Delete PO" oncomplete="showDialog('confirmWidgetVar');" tabindex="165"/>
+
+				<p:spacer width="10" />
+									
+				<p:commandButton id="authorizePO" styleClass="button_spacer"
+				    value="Authorize PO"
+				    action="#{maintenancePOBean.findMaintenanceRequestEligibility('authorizePO')}"
+					onclick="updateButtonClicked('authorizePO');" 				    
+					disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isAuthorizePOButtonDisabled()}"
+					title="Authorize PO" tabindex="170"   />
+					
+				<p:spacer width="10" />
+									
+				<p:commandButton id="completePO" styleClass="button_spacer"
+				    value="Complete PO"
+				    action="#{maintenancePOBean.findMaintenanceRequestEligibility('completePO')}"
+					onclick="updateButtonClicked('completePO');" 
+					disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isCompletePOButtonDisabled()}"
+					title="Complete PO" tabindex="175"  />																							
+
+				<p:spacer width="10" />
+									
+				<p:commandButton id="cancelAuthorization" styleClass="button_spacer"
+				    value="Cancel PO Authorization"
+					oncomplete="showDialog('cancelAuthPOWidgetVar');" 				    			    
+					disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isCancelAuthorizationButtonDisabled()}"
+					title="Cancel PO Authorization" tabindex="180"/>
+					
+				<p:spacer width="10" />
+									
+				<p:commandButton id="closeJob" styleClass="button_spacer"
+				    value="Close - No PO"
+				    onstart="return confirmZeroDollarPO();"
+					action="#{maintenancePOBean.closeJob}" 	
+					update="@form"			    			    
+					disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isCloseJobButtonDisabled()}"
+					title="Cancel Job - No PO" tabindex="185"/>
+					
+				<p:spacer width="10" />
+					
+				<p:commandButton id="changeGlDistButton" styleClass="button_spacer"
+					action="#{glDistributionBean.initDialog(maintenancePOBean.purchaseOrderDoc.docId, maintenancePOBean.maintenanceRequest.fleetMaster.unitNo)}"
+				    value="GL Distribution"
+				    update=":glDistDialogForm"
+				    oncomplete="PF('glDistDialogWidget').show();" 		    			    
+					disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isGLDistributionButtonDisabled()}"
+					title="View GL Distribution" tabindex="190"/>
+					<p:spacer width="10" />	
+				<p:commandButton styleClass="button_spacer"
+				id="preVehSchBtn" value="View Schedule" oncomplete="showVehMaintSchedule(xhr, status, args)" update=":vehicleMaintenanceSchedule"
+								action="#{viewVehicleMaintenanceScheduleBean.fetchScheduleMaintList}" ajax="true"
+						 tabindex="191" >
+						 <f:param name="UNIT_NUMBER"  value="#{maintenancePOBean.vehicleInfo.unitNo}"/>
+						 <f:param name="READ_ONLY"  value="true"/>
+					</p:commandButton>
+				
+				<p:commandButton id="refreshSerProvDiscBtn" 
+				        style="display:none"
+                        update=":maintenancePOForm:maintenancePOPanel:serviceProviderDiscountInfo" 
+                        process="@this" 
+                        actionListener="#{maintenancePOBean.refreshServiceProviderDiscounts(maintenancePOBean.maintenanceRequest.actualStartDate)}"/>
+               
+                <p:commandButton id="authorizePOHidden" style="display:none"
+                ajax="false"
+				    actionListener="#{maintenancePOBean.authorizePO}" />
+                        						
+			</p:panel>
+			</p:panel>
+			<h:inputHidden id= "selectedAuthCode" value= "#{maintenancePOBean.selectedAuthCode}"/>
+			
+			<p:blockUI block="maintenancePOPanel:tasks:addTaskLnk" widgetVar="blockDatatable"/>
+		</h:form>
+
+		<h:form id="odoReadingsPanelForm" prependId="false">
+			<p:dialog id="odoReadingsDialog" header="Odometer Readings" 
+				widgetVar="odoReadingsDialogWidget" modal="true"
+				appendTo="@(body)" dynamic="true" height="210" width="420" onShow="setFocus('cancelOdoReadingsDialog')">
+				<p:hotkey immediate="true" bind="esc" handler="PF('odoReadingsDialogWidget').hide()"/>
+				<p:panel id="odoReadingsPanel">
+				    <p:dataTable var="odoReadings" value="#{maintenancePOBean.maintenanceRequest.fleetMaster.vehicleOdometerReadings}" rows="5"> 
+				        <p:column headerText="Date" style="text-align: center"> 
+							<h:outputText value="#{odoReadings.odoReadingDate}" >
+								<f:convertDateTime pattern="MM/dd/yyyy" />
+                          	</h:outputText>
+				        </p:column>				        
+				        <p:column headerText="Reading">  
+				            <h:outputText value="#{odoReadings.odoReading} #{maintenancePOBean.odometer.uomCode}" style="float:right"/> 
+				        </p:column>
+				        <p:column headerText="Type">  
+				            <h:outputText value="#{odoReadings.odoReadingType}" />  
+				        </p:column>
+				    </p:dataTable> 
+				</p:panel> 
+				<p:panel id="odoReadingsButtonPanel">
+					<p:commandButton id="cancelOdoReadingsDialog" value="Cancel" onclick="PF('odoReadingsDialogWidget').hide()"/>						
+				</p:panel>
+			</p:dialog> 
+		</h:form>
+		
+			<p:dialog id="taskDialog" header="PO Task Item" onShow="toggleCostAvoidanceDisplay();hideAndShowHistoricalCategoryIcon();hideAndShowAdditionalInfoIcon();PF('maintenanceCodeWidget').deactivate();PF('serviceCodeWidget').deactivate() "
+				widgetVar="taskDialogWidget" modal="true" appendTo="@(body)" closeOnEscape="true"
+				dynamic="true">			
+
+				<h:form id="lineItemPanelForm" prependId="false"
+					onkeydown="body_onkeydown(event,'','');">										
+
+				<p:focus for="maintenanceCode" />
+				
+				<p:scrollPanel style="height:50px;" mode="native">
+					<p:messages id="popupMessages" severity="info,error,fatal" showSummary="true" showDetail="false" autoUpdate="true" />
+				</p:scrollPanel>
+		
+				<p:panel id="lineItemPanel" style="width:auto;">
+					
+						<p:panelGrid id="lineItemPanelGrid" style="width:100%;">
+							<p:row>
+								<p:column>
+									<p:outputLabel for="maintenanceCategory" styleClass="ui-label"
+										value="Maint Category:" />
+								</p:column>
+								<p:column colspan="3">
+									<p:outputLabel id = "maintenanceCategory" value= "#{maintenancePOBean.selectedTask.maintCatCode}" styleClass="ui-label" />
+									<p:spacer width="5" />
+									<p:commandLink id="historicalMaintCategory"
+											action="#{maintenancePOBean.initHistoricalMaintCategoryList()}"
+											update="historicalMaintCategoryDialog" tabindex="-1"
+									        oncomplete="PF('historicalMaintCategoryDialogWidget').show()" rendered="#{!maintenancePOBean.isEditTaskDisabled(-1)}">
+										<p:graphicImage
+										    style="text-align:left;align:left;border-style:none;"
+											value="/images/custins.png" id="historicalMaintCategoryInfo"
+											title="This category exists for a historical purchase order. Click to view previous work in this category" />
+									</p:commandLink>
+									<p:spacer width="5" />
+									<p:commandLink id="maintCategoryAdditionalInfoLink" tabindex="-1"
+												   update=":maintCategoryInfoForm,:maintCategoryInfoDialog"
+												   action="#{maintenanceCategoryInfoBean.initDialog(maintenancePOBean.selectedTask)}"
+											       oncomplete="PF('maintCategoryInfoDialogWidget').show()"
+									               title="Click to view/add additional information">
+									<p:graphicImage
+										style="border-style:none;"
+										value="/images/plus_icon.png" id="maintCatAdditionalInfoImage"/>
+									</p:commandLink>
+									
+									<p:dialog id="historicalMaintCategoryDialog" appendTo="@(body)" header="Historical Maint Category" widgetVar="historicalMaintCategoryDialogWidget" dynamic="true" resizable="true" height="360" width="750" closeOnEscape="true" onHide="setFocus('qty_input');">
+											<p:dataTable id="historicalMaintCategoryTable" widgetVar="historicalMaintCategoryTableWidget"  
+											 	value="#{maintenancePOBean.historicalMaintCategoryList}" var="historicalMaintCategory" 
+												rowKey="#{historicalMaintCategory.code}"
+												scrollable="true"
+												scrollHeight="290" 
+												resizableColumns="true">
+						
+												<p:column width="18%"  >
+													<f:facet name="header"  >  
+						              						<h:outputText id = "historicalPONumber" value="PO Number"  style ="font-weight:bold"/>  
+						          						</f:facet>
+													<h:outputLabel id = "historicalPONumberText"  value="#{historicalMaintCategory.poNumber}" style="white-space: normal; cursor:text" />  
+												</p:column>
+												<p:column width="18%"  >
+													<f:facet name="header"  >  
+						              						<h:outputText id = "historicalMaintCode" value="Maint Code"  style ="font-weight:bold"/>  
+						          						</f:facet>
+													<h:outputLabel id = "historicalMaintCodeText"  value="#{historicalMaintCategory.maintCode}" style="white-space: normal; cursor:text" />  
+												</p:column>
+												<p:column width="45%"  >
+													<f:facet name="header"  >  
+						              						<h:outputText id = "historicalVendorCodeDesc" value="Code Description"  style ="font-weight:bold"/>  
+						          						</f:facet>
+													<h:outputLabel id = "historicalVendorCodeText"  value="#{historicalMaintCategory.vendorCodeDesc}" style="white-space: normal; cursor:text" />  
+												</p:column>
+												<p:column width="12%"  >
+													<f:facet name="header"  >  
+						              						<h:outputText id = "historicalOdo" value="Odo"  style ="font-weight:bold"/>  
+						          						</f:facet>
+													<h:outputLabel id = "historicalOdoText"  value="#{historicalMaintCategory.odo}" style="white-space: normal; cursor:text" />  
+												</p:column>
+												<p:column width="25%"  >
+													<f:facet name="header"  >  
+						              						<h:outputText id = "historicalActualStartDate" value="Actual Start"  style ="font-weight:bold"/>  
+						          						</f:facet>
+													<h:outputLabel id = "historicalActualStartDateText"  value="#{historicalMaintCategory.actualStartDate}" style="white-space: normal; cursor:text" >
+														<f:convertDateTime pattern="MM/dd/yyyy hh:mm a" />
+													</h:outputLabel>  
+												</p:column>
+												
+											</p:dataTable>
+											<p:panel id="historicalMaintCategoryButtonPanel" style="height:360;">
+												<p:commandButton id="cancelHistoricalMaintCategory" value="Cancel" onclick="PF('historicalMaintCategoryDialogWidget').hide()"/>						
+											</p:panel>
+									</p:dialog>
+								</p:column>
+							</p:row>
+							
+							<p:row>
+								<p:column>
+									<p:outputLabel id="serviceCodeLabel" for="serviceCode" styleClass="ui-label" value="Service Code: " />
+								</p:column>
+								<p:column colspan="3">
+									<f:validateBean  disabled="true">
+										<!-- I was asked to disable the autocomplete unless explicitly triggered; 
+										the only way I know how it to set the delay extrememly high -->
+										<p:autoComplete id="serviceCode" widgetVar="serviceCodeWidget" disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.isEditTaskDisabled(-1)}"
+											value="#{maintenancePOBean.selectedTask.serviceProviderMaintenanceCode}"
+											var="c" itemLabel="#{c.code}" itemValue="#{c}" converter="#{serviceCodeConverter}" 
+											queryDelay="36000000"
+											forceSelection="false"
+											onkeydown="autoCompleteServiceCodeOnKeyDown(event);"
+											onkeyup="deactivateServCode(event);"
+											minQueryLength="3" 
+											onchange="clickToDecodeServiceCode();"
+	                    					completeMethod="#{maintenancePOBean.serviceCodeAutoComplete}" scrollHeight="240">
+							                <p:column>
+							                    #{c.code} - #{c.description}
+							                </p:column>
+							                <p:ajax event="query" process="serviceCodeQuery,@this" onstart="setAutoOn();" oncomplete="setAutoOff();" />
+	                    					<p:ajax event="itemSelect" async="true" listener="#{maintenancePOBean.serviceCodeSelect}" onstart="ajaxProcessShow();reportFocusElement();" update="maintenanceCodeDesc,maintenanceCode,maintenanceCategory,serviceCodeLabel,:hiddenInputForm:showHistoricalCategoryIconIndicator,historicalMaintCategoryDialog,maintCodeSet" oncomplete="handleAutoCompleteRequest('serviceCode',xhr, status, args); hideAndShowHistoricalCategoryIcon();hideAndShowAdditionalInfoIcon();enabledBtn();" />
+	                    				</p:autoComplete>
+						            </f:validateBean>
+								</p:column>
+							</p:row>
+							
+							<p:row>
+								<p:column>
+									<p:outputLabel id= "maintenanceCodeLabel" for="maintenanceCode" styleClass="ui-label"
+										value="Maintenance Code:" />
+										<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>
+								</p:column>
+								<p:column>
+									<f:validateBean  disabled="true">
+										<!-- I was asked to disable the autocomplete unless explicitly triggered; 
+										the only way I know how it to set the delay extrememly high -->
+										<p:autoComplete id="maintenanceCode" widgetVar="maintenanceCodeWidget"
+											disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.isEditTaskDisabled(-1)}"
+											value="#{maintenancePOBean.selectedTask.maintenanceCode}"
+											var="c" itemLabel="#{c.code}" itemValue="#{c}" converter="#{maintenanceCodeConverter}"
+											queryDelay="36000000"
+											forceSelection="false"
+											onkeydown="autoCompleteMaintCodeOnKeyDown(event);"
+											onkeyup="deactivateMaintCode(event);"
+											minQueryLength="3" 
+	                    					completeMethod="#{maintenancePOBean.maintenanceCodeAutoComplete}" scrollHeight="240">
+							                <p:column> 
+							                    #{c.code} - #{c.description}
+							                </p:column>  
+	                    					<p:ajax event="query" process="maintCodeQuery,@this" onstart="setAutoOn();" oncomplete="setAutoOff();" />
+	                    					<p:ajax event="itemSelect" async="true" listener="#{maintenancePOBean.maintenanceCodeSelect}" 
+	                    						onstart="ajaxProcessShow();reportFocusElement();" 
+	                    						update="maintenanceCodeDesc,serviceCode,maintenanceCategory,maintenanceCodeLabel,:hiddenInputForm:showHistoricalCategoryIconIndicator,historicalMaintCategoryDialog,maintCodeSet,serviceCodeQuery, discountFlag" 
+	                    						oncomplete="handleAutoCompleteRequest('maintenanceCodeItemSelect',xhr, status, args);hideAndShowHistoricalCategoryIcon();hideAndShowAdditionalInfoIcon();enabledBtn();"/>
+	                    				
+	                    					<p:ajax event="change" listener="#{maintenancePOBean.populateSelectedTaskDiscountValues}" update="discountFlag" />
+	                    					<p:ajax event="blur" oncomplete="enableCloseTitleButton();"/>
+	                    				</p:autoComplete>
+  
+                    				</f:validateBean>
+								</p:column>
+								<p:column colspan="2">
+						        	<p:inputTextarea id="maintenanceCodeDesc"  autoResize="false" 
+						        	disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.isEditTaskDisabled(-1)}" 
+						        	rows="3" cols="28" value="#{maintenancePOBean.selectedTask.maintenanceCodeDesc}" onkeydown="setFocusToQtyOnTab(event)" 
+						        	maxlength="80" tabindex="-1"/> 
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel for="qty" styleClass="ui-label" value="Qty:" />
+									<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>
+								</p:column>
+								<p:column colspan="3">
+									<p:inputNumber id="qty"
+									    widgetVar="qtyWidget"		
+										style="text-align:right; width:68px"									    							    
+										disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.isEditTaskDisabled(-1)}"
+										value="#{maintenancePOBean.selectedTask.taskQty}" 										
+										decimalPlaces="2"
+										decimalSeparator="."
+										maxValue="1000"
+										onfocus="selectText(this.id);"										 
+										onchange="calculateTotalAmount(); calculateCostAvoidanceAmounts();"
+										onblur="resetKeyPressedValue();setTimeout('calculateTotalAmount()',10)" />
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel for="unitPrice" styleClass="ui-label"
+										value="Unit Price:" />
+										<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>
+								</p:column>
+								<p:column colspan="3">
+									<p:inputNumber id="unitPrice" validator="#{maintenancePOBean.validateUnitPrice}"  
+										disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.isEditTaskDisabled(-1)}"
+										value="#{maintenancePOBean.isMaintCodeRechargeOnly(maintenancePOBean.selectedTask.maintenanceCode.code) ? maintenancePOBean.selectedTask.rechargeUnitCost : maintenancePOBean.selectedTask.unitCost}" widgetVar="unitPriceWidget"
+										style="text-align:right; width:68px"
+										onchange="calculateTotalAmount(); calculateCostAvoidanceAmounts();" symbol="$ "
+										decimalSeparator="." thousandSeparator="," maxValue="100000"> 
+						            </p:inputNumber>
+								</p:column>
+							</p:row>
+							<p:row id="xyz">
+								<p:column>
+									<h:outputLabel for="totalAmt" styleClass="ui-label"
+										value="Total Amount:" />
+								</p:column>
+								<p:column id="abc" colspan="3">
+									<p:outputPanel style="text-align:right;width:72px;" layout="block">
+										<h:inputHidden id="totalAmountHdn"
+											value="#{maintenancePOBean.selectedTask.totalCost}" />
+										<h:outputText id="totalAmt" 
+											disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode()}"
+											value="#{maintenancePOBean.isMaintCodeRechargeOnly(maintenancePOBean.selectedTask.maintenanceCode.code) ? maintenancePOBean.selectedTask.rechargeTotalCost : maintenancePOBean.selectedTask.totalCost}">
+											<f:convertNumber type="currency" currencySymbol="$" />
+										</h:outputText>
+									</p:outputPanel>
+								</p:column>			
+							</p:row>
+							<p:row>
+							    <p:column>
+							        <h:outputLabel value="Cost Avoidance:" for="costAvoidanceRadio" styleClass="ui-label" style="vertical-align:-20px"/>
+								</p:column>	
+							    <p:column colspan="3">
+									<p:selectOneRadio id="costAvoidanceRadio" widgetVar="costAvoidanceRadioWidget" onchange="toggleCostAvoidanceDisplay();setFocusInCostAvoidance();"
+										value="#{maintenancePOBean.selectedTask.costAvoidanceIndicator}" tabindex="-1"
+										disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.isEditTaskDisabled(-1)}" >
+										<f:selectItem itemLabel="Yes" itemValue="true" />
+										<f:selectItem itemLabel="No" itemValue="false" />									
+									</p:selectOneRadio>	
+								</p:column>	
+							</p:row>
+							<p:row>
+							    <p:column colspan="4">																				        
+							        <p:panelGrid id="costAvoidanceDisplay"  style="border:1px solid green;display:#{maintenancePOBean.selectedTask.costAvoidanceIndicator ? 'block' : 'none'}">
+							       		
+							            <p:row>
+							                <p:column>
+							                    <p:outputLabel for="costAvoidanceReason" styleClass="ui-label" value="Cost Avoidance Reason:"/>
+							                </p:column>
+							                <p:column>
+								                <p:selectOneMenu id="costAvoidanceReason"      
+								                        widgetVar="costAvoidanceReasonWidget"
+									                    disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.isEditTaskDisabled(-1)}"
+									                    value="#{maintenancePOBean.selectedTask.costAvoidanceCode}">
+									                <f:selectItem itemLabel="--------------------" itemValue="" />
+									                <f:selectItems var="reason" 
+										                     value="#{maintenancePOBean.costAvoidanceReasons}" 
+										                     itemLabel="#{reason.code}"
+										                     itemValue="#{reason.code}"
+										                     itemDescription="#{reason.description}" />
+								                </p:selectOneMenu>							                    
+							                </p:column>		
+							                <p:column>
+							                    <p:outputLabel for="costAvoidanceAmount" styleClass="ui-label" value="Cost Avoidance Amount:"/>
+							                </p:column>
+							                <p:column>
+										        <p:inputNumber id="costAvoidanceAmount" widgetVar="costAvoidanceAmountWidget"
+										            disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.isEditTaskDisabled(-1)}"
+										            value="#{maintenancePOBean.selectedTask.costAvoidanceAmount}" 
+										            style="text-align:right; 
+										            width:68px" 
+										            symbol="$ "
+										            decimalSeparator="." 
+										            thousandSeparator=","> 
+										        </p:inputNumber>
+							                </p:column>								                					                
+							            </p:row>
+							            <p:row rendered="#{maintenancePOBean.isGoodwillDisplay()}">
+							                <p:column colspan="4">
+							                    <p:panelGrid>
+							                        <p:row>
+							                            <p:column>
+							                                <p:outputLabel for="goodwillReason" styleClass="ui-label" value="Goodwill Reason:"/>
+							                            </p:column>
+							                            <p:column>
+							                                <p:inputText id="goodwillReason" tabindex="260" disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.isEditTaskDisabled(-1)}" value="#{maintenancePOBean.selectedTask.goodwillReason}" />							                            
+							                            </p:column>
+							                            <p:column>
+							                                <p:outputLabel for="goodwillAmount" styleClass="ui-label" value="Goodwill Amount:"/>
+							                            </p:column>
+							                            <p:column>
+							                                <p:inputNumber id="goodwillAmount" widgetVar="goodwillAmountWidget"
+							                                    tabindex="265" 
+							                                    disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.isEditTaskDisabled(-1)}"
+							                                    value="#{maintenancePOBean.selectedTask.goodwillCost}" 
+							                                    style="text-align:right; 
+							                                    width:68px" 
+							                                    symbol="$ "
+							                                    decimalSeparator="." 
+							                                    thousandSeparator=","> 
+							                                </p:inputNumber>
+							                            </p:column>
+							                            <p:column >
+							                                <p:outputLabel for="goodwillPercent" styleClass="ui-label" value="Goodwill Percent:"/>
+							                            </p:column>
+							                            <p:column>
+										                    <p:inputNumber id="goodwillPercent" widgetVar="goodwillPercentWidget"
+										                            tabindex="270" 
+										                            disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.isEditTaskDisabled(-1)}"
+										                            value="#{maintenancePOBean.selectedTask.goodwillPercent}" 
+										                            onchange="calculateCostAvoidanceAmounts();" 
+										                            symbol="%" 
+										                            symbolPosition="right"
+										                            decimalPlaces="0"
+										                            thousandSeparator=""
+										                            maxValue="100"
+										                            style="text-align:right;width:40px"> 
+										                    </p:inputNumber>							                                         					                                
+							                            </p:column>							                            							                            							                            							                            							                            
+							                        </p:row>
+							                    </p:panelGrid>	
+							                </p:column>
+							            </p:row>							                							            
+							        </p:panelGrid>
+							    </p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<h:outputLabel for="discountFlag" styleClass="ui-label" style="vertical-align:-20px"
+										value="Discount:" />
+								</p:column>
+								<p:column colspan="3">
+									<p:selectOneRadio id="discountFlag" tabindex="-1"
+										value="#{maintenancePOBean.selectedTask.discountFlag}"
+										disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or 
+										 maintenancePOBean.selectedTaskDiscountLocked or maintenancePOBean.isEditTaskDisabled(-1)}">
+										<f:selectItem itemLabel="Yes" itemValue="Y" />
+										<f:selectItem itemLabel="No" itemValue="N" />
+									</p:selectOneRadio>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<h:outputLabel for="rechargeFlag" styleClass="ui-label" style="vertical-align:-20px"
+										value="Recharge:" />
+								</p:column>
+								<p:column>
+									<p:selectOneRadio id="rechargeFlag" tabindex="-1"
+										value="#{maintenancePOBean.selectedTask.rechargeFlag}"
+										disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.isEditTaskDisabled(-1)}">
+										<f:selectItem itemLabel="Yes" itemValue="Y" />
+										<f:selectItem itemLabel="No" itemValue="N" />
+										<p:ajax  actionListener="#{maintenancePOBean.evalualteRechargeFlagSelect}" process="rechargeFlag" update="rechargeCode"/>
+									</p:selectOneRadio>
+								</p:column>
+								<p:column>
+									<p:outputLabel for="rechargeCode" styleClass="ui-label" style="vertical-align: 8px"
+										value="Recharge Reason: " />
+								</p:column>
+								<p:column>										
+									<p:selectOneMenu id="rechargeCode" style= "width:120px" tabindex="-1"
+										disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.isEditTaskDisabled(-1)}"
+										value="#{maintenancePOBean.selectedTask.rechargeCode}">
+										<f:selectItem itemLabel="---------------" itemValue="" />
+										<f:selectItems
+											value="#{maintenancePOBean.maintenanceRechargeCodes}"
+											var="rechCode"
+											itemLabel="#{rechCode.code}"
+											itemValue="#{rechCode.code}" />
+									</p:selectOneMenu>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column >
+									<h:outputLabel for="authorizePerson" styleClass="ui-label"
+										value="Last Updated by: " />
+								</p:column>
+								<p:column>
+									<h:outputLabel id="authorizePerson"
+										value="#{maintenancePOBean.selectedTask.authorizePerson}" />
+									<h:outputLabel value="#{maintenancePOBean.selectedTask.getAuthorizeDate()}">
+									   <f:convertDateTime pattern="MM/dd/yyyy HH:mm a" />
+                                    </h:outputLabel>
+								</p:column>
+								<p:column>
+									<h:outputLabel for="repairReasonCode" styleClass="ui-label" style="vertical-align: 8px"
+										value="Maint Reason Code: " />
+								</p:column>
+								<p:column>										
+									<p:selectOneMenu id="repairReasonCode" style= "width:120px" tabindex="-1"
+										disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.isEditTaskDisabled(-1)}"
+										value="#{maintenancePOBean.selectedTask.maintenanceRepairReasonCode}">
+										<f:selectItem itemLabel="------------------" itemValue="" />
+										<f:selectItems
+											value="#{maintenancePOBean.maintenanceRepairReasons}"
+											var="reparirReason"
+											itemLabel="#{reparirReason.code}"
+											itemValue="#{reparirReason.code}" />
+									</p:selectOneMenu>
+								</p:column>								
+							</p:row>
+							
+							<p:row>
+								<p:column colspan="4" style="float:right;" >
+									<h:outputLabel styleClass="ui-label"
+										value="Line #{maintenancePOBean.selectedTask.index} of #{maintenancePOBean.getTaskCount()}" />
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+					
+				</p:panel>
+
+				<p:panel id="controlPanel_Dialog">
+
+					<p:commandButton id="add" 
+					    value="New Line" widgetVar="addWidgetVar"
+					    process="@form"
+						action="#{maintenancePOBean.addItemTask('false')}" 
+						onstart="startResetAction();"
+						onsuccess="setFocus('maintenanceCode_input');setTimeout('setCurrentElementFocus(\'maintenanceCode_input\')',30);"
+						oncomplete="toggleCostAvoidanceDisplay();hideAndShowHistoricalCategoryIcon();hideAndShowAdditionalInfoIcon();resetClientVars();"
+						immediate="false" 
+						update=":maintenancePOForm:maintenancePOPanel:purchaseOrderPanel lineItemPanel controlPanel_Dialog :hiddenInputForm:clickIndex :hiddenInputForm:taskCount :hiddenInputForm:showHistoricalCategoryIconIndicator historicalMaintCategoryDialog"
+						disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode()}"
+						title="New Line" />
+
+                    <p:spacer width="5" />
+
+					<p:commandButton id="delete" 
+					    value="Delete Line" widgetVar="deleteWidgetVar"
+						actionListener="#{maintenancePOBean.deleteItemTaskFromPopup()}" 
+						process="@form"
+						update="lineItemPanel controlPanel_Dialog :hiddenInputForm:clickIndex :hiddenInputForm:taskCount :hiddenInputForm:showHistoricalCategoryIconIndicator historicalMaintCategoryDialog "
+						oncomplete="onTaskRowDelete();hideAndShowHistoricalCategoryIcon();hideAndShowAdditionalInfoIcon();resetClientVars();"
+						immediate="false"			
+						disabled="#{!maintenancePOBean.hasPermission('maintenancePO_delete') or maintenancePOBean.isReadMode() or maintenancePOBean.isEditTaskDisabled(-1)}"
+						title="Delete Line" />
+                   
+                    <p:spacer width="5" />
+
+					<p:commandButton id="done" 
+					    value="Done" widgetVar="doneWidgetVar"
+					    immediate="false" onstart="disabledBtn();" 
+						actionListener="#{maintenancePOBean.done()}"
+						process="@form"
+						update="lineItemPanel controlPanel_Dialog :hiddenInputForm:clickIndex "						
+						oncomplete="hideAndShowHistoricalCategoryIcon(); hideAndShowAdditionalInfoIcon(); if (args.failure) {handlePopupDoneRequestFailure()} else {handlePopupDoneRequest(), $('#link').click()};"  
+						title="Finished Entering Lines" />
+						
+					<p:commandLink style="display:none" id="link"
+					  update=":maintenancePOForm"/>						
+
+					<h:panelGroup style="float:right">
+						<p:commandButton id="previous" widgetVar="previousWidgetVar"
+						    value="Previous"
+							actionListener="#{maintenancePOBean.previous()}"
+							disabled="#{!maintenancePOBean.hasPrevious()}" 
+							process="@form"
+							update="lineItemPanel controlPanel_Dialog :maintenancePOForm:maintenancePOPanel:purchaseOrderPanel :hiddenInputForm:clickIndex :hiddenInputForm:showHistoricalCategoryIconIndicator historicalMaintCategoryDialog :maintCategoryInfoForm :maintCategoryInfoDialog"
+							oncomplete="onTaskRowSelect(); toggleCostAvoidanceDisplay(); hideAndShowHistoricalCategoryIcon();hideAndShowAdditionalInfoIcon();setFocus('maintenanceCode_input');setTimeout('setCurrentElementFocus(\'maintenanceCode_input\')',30);resetClientVars();" 
+							immediate="false"
+							title="Previous Line" />
+
+						<p:spacer width="10" />
+
+						<p:commandButton id="next" 
+						    value="Next" widgetVar="nextWidgetVar"
+							actionListener="#{maintenancePOBean.next()}"
+							disabled="#{!maintenancePOBean.hasNext()}" 
+							process="@form"
+							update="lineItemPanel controlPanel_Dialog :maintenancePOForm:maintenancePOPanel:purchaseOrderPanel :hiddenInputForm:clickIndex :hiddenInputForm:showHistoricalCategoryIconIndicator historicalMaintCategoryDialog :maintCategoryInfoForm :maintCategoryInfoDialog"
+							oncomplete="onTaskRowSelect(); toggleCostAvoidanceDisplay(); hideAndShowHistoricalCategoryIcon();hideAndShowAdditionalInfoIcon();setFocus('maintenanceCode_input');setTimeout('setCurrentElementFocus(\'maintenanceCode_input\')',30);resetClientVars();"  
+							immediate="false"
+							title="Next Line" />
+
+						<p:spacer width="10" />
+						
+						<p:commandButton id="cancelPopup" style="display:none"
+							actionListener="#{maintenancePOBean.cancelItemTaskPopup}" 
+							process="@form"
+							update=":maintenancePOForm:maintenancePOPanel:tasks :maintenancePOForm :hiddenInputForm:clickIndex :hiddenInputForm:showHistoricalCategoryIconIndicator "
+							oncomplete="onTaskRowSelect();"
+							immediate="false"/>
+
+						<h:inputHidden id="serviceCodeQuery" value="#{maintenancePOBean.serviceCodeQuery}" />
+						<p:commandLink style="display:none" id="updateServiceCodeQuery" update="serviceCodeQuery"/>
+						<p:commandButton id="refreshServiceCode" style="display:none" async="false"
+							actionListener="#{maintenancePOBean.decodeServiceCode}" onstart="disabledBtn();ajaxProcessShow();reportFocusElement();" 
+							process="@form,serviceCodeQuery,maintCodeSet" oncomplete="handleAutoCompleteRequest('serviceCode',xhr, status, args);hideAndShowHistoricalCategoryIcon();hideAndShowAdditionalInfoIcon();onServCodeSelect();enabledBtn();"
+							update="maintenanceCodeDesc,maintenanceCode,maintenanceCategory,serviceCodeLabel,:hiddenInputForm:showHistoricalCategoryIconIndicator,historicalMaintCategoryDialog,maintCodeSet"
+							immediate="false"/>
+							
+						<h:inputHidden id="maintCodeQuery" value="#{maintenancePOBean.maintCodeQuery}" />
+						<p:commandLink style="display:none" id="updateMaintCodeQuery" update="maintCodeQuery"/>
+						<p:commandButton id="refreshMaintenanceCode" style="display:none" async="false"
+							actionListener="#{maintenancePOBean.decodeMaintenanceCode}" onstart="disabledBtn();ajaxProcessShow();reportFocusElement();"
+							process="@form,maintCodeQuery,maintCodeSet" oncomplete="handleAutoCompleteRequest('maintenanceCode',xhr, status, args);hideAndShowHistoricalCategoryIcon();hideAndShowAdditionalInfoIcon();onMaintCodeSelect();enabledBtn();"
+							update="maintenanceCodeDesc,serviceCode,maintenanceCategory,maintenanceCodeLabel,:hiddenInputForm:showHistoricalCategoryIconIndicator,historicalMaintCategoryDialog,maintCodeSet,serviceCodeQuery"
+							immediate="false"/>
+						
+						<p:remoteCommand name="performMaintCodeSearch" async="true" process="maintCodeQuery,maintCodeSet" update="maintCodeSet" oncomplete="triggerMaintCodeSearch();"   />
+						<p:remoteCommand name="performServiceCodeSearch" async="true" process="serviceCodeQuery,maintCodeSet" update="maintCodeSet" oncomplete="triggerServiceCodeSearch();"   />
+						
+						<!-- TODO: add a new remoteCommand -->
+						
+						
+							
+						<h:inputHidden id="maintCodeSet" value="#{maintenancePOBean.maintCodeSet}" />
+						<p:commandLink style="display:none" id="updateMaintCodeSet" update="maintCodeSet"/>	
+						
+						<h:inputHidden id="isNextDisabled" value="#{maintenancePOBean.nextDisabled}" />
+						<h:inputHidden id="isPrevDisabled" value="#{maintenancePOBean.prevDisabled}" />
+						
+					</h:panelGroup>
+
+				</p:panel>
+				</h:form>
+				
+				<p:ajax event="close" onstart="onCancelTaskItemPopup();" />	
+				<div id="loadingProgress" style="display: none;">
+					<p:graphicImage value="/images/ajaxloading.gif" />
+					Loading...
+				</div>				
+			</p:dialog>			
+
+			<p:dialog id="confirmDialogId" modal="true" header="Confirm Delete" onShow="setFocus('yesDel')" severity="alert" widgetVar="confirmWidgetVar" resizable="false" width="295" height="100" closeOnEscape="true" appendTo="@(body)">    
+		        <h:outputText value="&#160;"/><br/> 
+           		<h:outputFormat  value="#{msgs.confim_delete}" style="font-weight:bold;">
+           			<f:param value="PO"/>
+           		</h:outputFormat>	           		
+		         <h:form id ="deleteConfirmDialogForm" prependId = "false">	
+	           		<h:outputText value="&#160;"/><br/><br/>	           		
+	           		<h:panelGroup> 
+	   					<p:commandButton id = "yesDel" style="width:6em;" value="Yes" ajax="false" onclick="hideDialog('confirmWidgetVar')" action="#{maintenancePOBean.deletePO}" />  
+		       			<p:spacer width="6"/>
+		       			<p:commandButton style="width:6em;" value="No" onclick="hideDialog('confirmWidgetVar')"/>  
+		       		</h:panelGroup>
+	        	</h:form>
+		    </p:dialog>
+
+			<p:dialog id="glDistConfirm" modal="true" appendTo="@(body)" header="Change GL Distribution Confirmation" onShow="setTimeout('setFocus(\'noButton\')', 300)" widgetVar="glDistConfirmWidgetVar" resizable="false" width="350" height="100" closeOnEscape="true">
+		        <h:outputText value="&#160;"/><br/> 
+           		<h:outputFormat  value="#{msgs.change_gl_distribution_confirmation}" style="font-weight:bold;">
+           			<f:param value="PO"/>
+           		</h:outputFormat>	           		
+		         <h:form id ="glDistConfirmDialogForm" prependId = "false">
+		         	<p:focus for="noButton" />	
+	           		<h:outputText value="&#160;"/><br/><br/>	           		
+	           		<h:panelGroup> 
+	   					<p:commandButton value="Yes" style="width:6em;"
+				        				 action="#{glDistributionBean.initDialog(maintenancePOBean.purchaseOrderDoc.docId, maintenancePOBean.maintenanceRequest.fleetMaster.unitNo)}" 
+				        				 update=":glDistDialogForm,:hiddenInputForm"
+				        				 onclick="PF('glDistConfirmWidgetVar').hide();PF('glDistDialogWidget').show();setShowGlDistDialogToFalse();"/>				    
+		                <p:spacer width="6"/>
+		                <p:commandButton id="noButton" value="No" style="width:6em;" onclick="PF('glDistConfirmWidgetVar').hide();setShowGlDistDialogToFalse();"/>  
+		       		</h:panelGroup>
+	        	</h:form>
+		    </p:dialog>
+		    
+			<p:dialog id="completeConfirmDialogId" modal="true" appendTo="@(body)" header="Complete PO Confirmation" onShow="setFocus('yesComplete')" widgetVar="completePOWidgetVar" resizable="false" width="295" height="100" closeOnEscape="true">
+		        <h:outputText value="&#160;"/><br/> 
+           		<h:outputFormat  value="#{msgs.complete_po_confirmation}" style="font-weight:bold;"/>
+		         <h:form id ="completeConfirmDialogForm" prependId = "false">	
+	           		<h:outputText value="&#160;"/><br/><br/>	           		
+	           		<h:panelGroup> 
+	   					<p:commandButton style="width:6em;" id = "yesComplete" value="Yes" action="#{maintenancePOBean.completePO}" ajax="false" process="@(form)" onclick="PF('completePOWidgetVar').hide()" />  
+		       			<p:spacer width="6"/>
+		       			<p:commandButton style="width:6em;" value="No" onclick="PF('completePOWidgetVar').hide()"/>  
+		       		</h:panelGroup>
+	        	</h:form>
+		    </p:dialog>		    
+			
+			<p:dialog id="odoReadingAlertDialogId" modal="true" header="Odo Reading Alert" onShow="setFocus('okOdoReadingBtn')" widgetVar="odoLessReadingErrMeasageWidgetVar" resizable="false" width="520" height="100" closeOnEscape="true" appendTo="@(body)">
+		        <h:outputText value="&#160;"/><br/> 
+           		<h:outputFormat  value="Odometer reading entered is less than the most recent odometer reading" style="font-weight:bold;"/>
+		         <h:form id ="odoReadingAlertDialogForm" prependId = "false">	
+	           		<h:outputText value="&#160;"/><br/><br/>	           		
+	   				<p:commandButton style="width:6em;" id = "okOdoReadingBtn" value="Ok" onclick="correctOdoValidationErr();" />  
+	        	</h:form>
+		    </p:dialog>
+
+			<p:dialog id="vehicleNotOnContractAlertDialogId" appendTo="@(body)" modal="true" header="Vehicle Not on Contract Alert" onShow="setFocus('okVehicleNoContractBtn')" widgetVar="vehicleNotOnContractMsgWidgetVar" resizable="false" width="520" height="100" closeOnEscape="true">
+		        <h:outputText value="&#160;"/><br/> 
+           		<h:outputFormat  value="Markup not allowed. Vehicle has no contract." style="font-weight:bold;"/>
+		         <h:form id ="vehicleNotOnContractAlertDialogForm" prependId = "false">	
+	           		<h:outputText value="&#160;"/><br/><br/>	           		
+	   				<p:commandButton style="width:6em;" id = "okVehicleNoContractBtn" value="Ok" onclick="PF('vehicleNotOnContractMsgWidgetVar').hide()"/>  
+	        	</h:form>
+	        	<p:ajax event="close" listener="#{maintenancePOBean.resetLeasePlanMarkup}" update=":maintenancePOForm:maintenancePOPanel:networkMarkUpIndicatorRadio"/>
+		    </p:dialog>
+		    		    
+			<p:dialog id="cancelAuthConfirmDialogId" appendTo="@(body)" modal="true" header="Cancel PO Authoriztion Confirmation" onShow="setFocus('yesCancelAuth')" widgetVar="cancelAuthPOWidgetVar" resizable="false" width="450" height="125" closeOnEscape="true">
+		        <h:outputText value="&#160;"/><br/> 
+           		<h:outputFormat  value="#{msgs.cancel_auth_po_confirmation}" style="font-weight:bold;"/>
+		         <h:form id ="cancelAuthConfirmDialogForm" prependId = "false">	
+	           		<h:outputText value="&#160;"/><br/><br/>	           		
+	           		<h:panelGroup> 
+	   					<p:commandButton style="width:6em;" id = "yesCancelAuth" value="Yes" action="#{maintenancePOBean.cancelJobAuthorization}" ajax="false" process="@(form)" onclick="PF('cancelAuthPOWidgetVar').hide()" />  
+		       			<p:spacer width="6"/>
+		       			<p:commandButton style="width:6em;" value="No" onclick="PF('cancelAuthPOWidgetVar').hide()"/> 
+		       		</h:panelGroup>
+	        	</h:form>
+		    </p:dialog>
+
+			<p:dialog id="closeNoPoConfirmDialogId" modal="true" appendTo="@(body)" header="Close - No PO Confirmation" onShow="setFocus('yesCloseNoPO')" widgetVar="closeNoPOWidgetVar" resizable="false" width="500" height="100" closeOnEscape="true">
+		        <h:outputText value="&#160;"/><br/> 
+           		<h:outputFormat  value="#{msgs.close_no_po_zero_dollar_confirmation}" style="font-weight:bold;"/>
+		         <h:form id ="closeNoPoConfirmDialogForm" prependId = "false">	
+	           		<h:outputText value="&#160;"/><br/><br/>	           		
+	           		<h:panelGroup> 
+	   					<p:commandButton style="width:6em;" id = "yesCloseNoPO" value="Yes" action="#{maintenancePOBean.closeJob}" ajax="false" process="@(form)" onclick="PF('closeNoPOWidgetVar').hide()" />  
+		       			<p:spacer width="6"/>
+		       			<p:commandButton style="width:6em;" value="No" onclick="PF('closeNoPOWidgetVar').hide()"/> 
+		       		</h:panelGroup>
+	        	</h:form>
+		    </p:dialog>
+		    
+			<p:dialog id="confirmDeletePoAuthNoId" appendTo="@(body)" modal="true" header="Confirm Delete PO/Auth No. Association" onShow="setFocus('yesDel')" severity="alert" widgetVar="confirmPoAuthNoWidgetVar" resizable="false" width="295" height="100" closeOnEscape="true">    
+		        <h:outputText value="&#160;"/><br/> 
+           		<h:outputFormat  value="#{msgs.confim_delete}" style="font-weight:bold;">
+           			<f:param value="PO/Auth No. association"/>
+           		</h:outputFormat>	           		
+		         <h:form id ="deleteConfirmDeleteAuthNoForm" prependId = "false">	
+	           		<h:outputText value="&#160;"/><br/><br/>	           		
+	           		<h:panelGroup> 
+	   					<p:commandButton id = "yesDelAuthNo" style="width:6em;" value="Yes" action="#{maintenancePOBean.deleteAuthNo}" ajax="true" update=":maintenancePOForm:maintenancePOPanel:schedAuthCodeGroup" onclick="hideDialog(confirmPoAuthNoWidgetVar)" />  
+		       			<p:spacer width="6"/>
+		       			<p:commandButton style="width:6em;" value="No" onclick="hideDialog(confirmPoAuthNoWidgetVar)"/>  
+		       		</h:panelGroup>
+	        	</h:form>
+		    </p:dialog>		
+		    
+		    <p:dialog id="eligibleMaintenancePO" appendTo="@(body)" modal="true" header="Maintenance Schedule Authorization Code missing" onShow="setFocus('yesAuthReq')" widgetVar="eligibleMaintenancePOWidgetVar" resizable="false" width="395" height="100" closeOnEscape="true">    
+		        <h:outputText value="&#160;"/><br/> 
+           		<h:outputFormat  value="#{msgs.maint_schedule_auth_code_req}" style="font-weight:bold;" />
+		         <h:form id ="eligibleMaintenancePOForm" >	
+	           		<h:outputText value="&#160;"/><br/><br/>	           		
+	           		<h:panelGroup> 
+	   					<p:commandButton id = "yesAuthReq" style="width:6em;" value="Yes" onclick="hideDialog('eligibleMaintenancePOWidgetVar');" type="button"  />  
+		       			<p:spacer width="6"/>
+		       			<p:commandButton style="width:6em;" value="No"  onclick="authOrCompletePO(); hideDialog('eligibleMaintenancePOWidgetVar'); lockScreen();" type="button" />  
+		       		</h:panelGroup>
+	        	</h:form>
+		    </p:dialog>	    
+			
+		<div id="SERVICEPROVIDER_LOV_DIV">
+            <ui:include src="../lov/serviceProviders.xhtml" />
+        </div>
+        
+		<div id="maintenanceProfileInclude">
+			<ui:include src="../../resources/view/component/maintenanceProfile.xhtml" />
+		</div>  
+		
+		<div id="maintenanceInvoiceCreditInclude">
+			<ui:include src="../../resources/view/component/maintenanceInvoiceCredit.xhtml" />
+		</div> 
+		
+		<div id="maintenanceCategoryInfoInclude">
+			<ui:include src="../../resources/view/component/maintenanceCategoryInfo.xhtml" />
+		</div>
+		
+		<div id="glDistributionInclude">
+			<ui:include src="../../resources/view/component/glDistribution.xhtml" />
+		</div>
+		
+		<!-- TODO: this new page is included using the same pattern as an LOV -->
+		<div id="VEH_MAINT_SCH">
+			<ui:include src="../lov/vehicleMaintenanceSchedule.xhtml" />
+		</div>
+    
+    	<style type="text/css">              
+			.ui-widget.ui-selectmanycheckbox td, .ui-widget.ui-selectoneradio td {
+				padding-right:15px;
+			}	
+					
+		</style>
+		<script type="text/javascript">
+			var PO_STATUS_COMPLETE = 'C';
+		    var isserviceProviderDetailPanelCollapsed = true;
+			var isSaveButtonClicked = false;
+			var isPoNumberCollapsed = true;
+			
+			var isDoneButtonClicked = false;
+			
+			// has the code been set (server side look happened)
+			var isMaintCodeSet = false;
+			// is decoding?
+			var isDecode = false;
+			// is tabbing?
+			var isTab = false;
+			// is auto complete fired?
+			var isAuto = false;
+			// has the input been changed (has change fired)
+			var isChange = false;
+			// client side value for the maint code query
+			var maintCodeQuery = '';
+			// client side value for the service code query
+			var serviceCodeQuery = '';
+			// when we move from record to record we need to reset. initially we are not set (reset = true)
+			var isReset = true;
+			// try to keep track of the last element that had focus before the ajax calls so we can set it if we "blur"
+			var lastElemInFocus = '';
+			// Track the button click for Authorize PO or Complete PO
+			var AuthOrCompleteClicked ='';
+			
+			/**
+			* Initializes the page after the body loads.
+			*/
+			function init(){
+				if($('[id$=validationSuccess]').val() == 'false'){
+//					setInitialFocusServiceProvider();	
+				}				
+				initCompletePO();
+				openAddressInput();
+				onPoNumberClick();
+				AuthOrCompleteClicked ='';
+			}
+			
+			/**
+			* Initializes controls for 'C'ompleted POs
+			*/
+			function initCompletePO(){
+				var poStatus = PF('poStatusWidget').getSelectedValue();
+				var rplUnitNo = $('[id$=replacementUnitNoHidden]').val();
+				var rplDate = $('[id$=replacementUnitDateHidden]').val();
+				var rplDateType = $('[id$=replacementUnitDateTypeHidden]').val();
+				var showChangeGlDistDialog = $('[id$=showChangeGLDistDialogHidden]').val();
+				var showChangeGlDistConfirmDialog = $('[id$=showChangeGLDistConfirmDialogHidden]').val();
+				
+				if(poStatus == PO_STATUS_COMPLETE){
+					if(rplUnitNo){
+						$('[id$=replacementUnit]').text(rplUnitNo);
+					} else {
+						$('[id$=replacementUnit]').text('');						
+					}
+					if(rplDate){
+						$('[id$=replacementDateLabel]').text('Replacement ' + rplDateType + ' Date:' );
+						$('[id$=replacementDate]').text(rplDate);
+					}  else {
+						$('[id$=replacementDateLabel]').text('Replacement Date:' );	
+						$('[id$=replacementDate]').text('');
+					}
+					if(showChangeGlDistConfirmDialog == 'true'){
+						if(showChangeGlDistDialog == 'true'){
+							$('[id$=changeGlDistButton]').click();
+						}else{
+							showDialog('glDistConfirmWidgetVar');
+						}
+					}
+				}				
+			}
+			
+			function onServiceProviderDetailClick() {
+
+				if (!isserviceProviderDetailPanelCollapsed) {
+					$('[id$=serviceProviderDetailPanel]').hide();
+					$('[id$=serviceProviderDetailLink]').attr("class",
+							"ui-commandlink ui-icon ui-icon-triangle-1-e");
+					isserviceProviderDetailPanelCollapsed = true;
+				} else {
+					$('[id$=serviceProviderDetailPanel]').show();
+					$('[id$=serviceProviderDetailLink]').attr("class",
+							"ui-commandlink ui-icon ui-icon-triangle-1-s");
+					isserviceProviderDetailPanelCollapsed = false;
+				}
+				return false;
+			}
+
+			/**
+			* Handles the tasks row selection event. 
+			*/
+			function onTaskRowSelect() { 
+				var index = $('[id$=clickIndex]').val();				
+				$('[id$=taskRadio' + index + ']').attr('checked', true).focus();
+			}
+
+			/**
+			* Handles the tasks row deletion. 
+			*/			
+			function onTaskRowDelete() {
+			    
+			    if ($('[id$=clickIndex]').val() == 0 &amp;&amp; $('[id$=taskCount]').val() == 0){
+			     PF('taskDialogWidget').hide();
+			    }else{
+			    	onTaskRowSelect();
+			    	setFocus('maintenanceCode_input');
+			    	setTimeout('setCurrentElementFocus(\'maintenanceCode_input\')',30);
+			    }
+			}
+			
+			
+			/**
+			* Handles the click event on the detail image by unselecting all rows, 
+			* then selecting the image's respective row.
+			*/
+			function onRowDetailClick(idx){
+				PF('tasksWidget').unselectAllRows(); 	
+				PF('tasksWidget').selectRow(idx);
+			}
+			
+		    /**
+		    * The LOV calls this function to pass back the selected
+		    * values to the view's controls.
+		    */
+			function setSelection( lovName, nameArray, valueArray)
+			{	
+					if(lovName == 'serviceProviderLOV'){
+	                    for(var i=0; i  &lt; nameArray.length ; i++){
+	                        if(nameArray[i] == 'SERVICE_PROVIDER_NAME'){
+	                            $('[id$=serviceProviderName]').html(valueArray[i]);
+	                            
+	                        }
+	                        if(nameArray[i] == 'SERVICE_PROVIDER_NUMBER'){
+	                            $('[id$=serviceProvider]').val(valueArray[i]);
+	                            
+	                        }
+	                        if(nameArray[i] == 'SERVICE_PROVIDER_ID'){
+	                            $('[id$=serviceProviderId]').val(valueArray[i]);
+
+	                            
+	     	                    
+	                        }
+	                        if(nameArray[i] == 'SERVICE_TYPE_CODE'){
+	                            $('[id$=serviceTypeCodeOfPO_input]').val(valueArray[i]);
+	                           
+	                        } 
+	                    }
+	                  
+	                    $('[id$=serviceProviderSelect]').click();
+	                }else if(lovName == 'vehicleScheduleLOV'){
+	                	for(var i=0; i  &lt; nameArray.length ; i++){
+	                        if(nameArray[i] == 'AUTHORIZATION_NUMBER'){
+	                            $('[id$=selectedAuthCode]').val(valueArray[i]);
+	                             $('[id$=schedAuthCode]').val(valueArray[i]);
+	                            
+	                              $('[id$=setAuthCodeBtn]').click();
+	                           
+	                           
+	                        }
+	                    }
+	                }
+					
+			}
+		    function procedeToDecodeSvcProvider(){
+		    
+		    	if(trim($('[id$=serviceProvider]').val()).length == 0){
+		    		return false;
+		    	}
+		    	else if(trim($('[id$=serviceProvider]').val())== ""){
+		    		
+		    		return false;	
+		    	}
+		    	else{
+		    		proceedAjax();
+		    	}
+		    }
+			    
+			/**
+			 * Handles the event where the user clicks on the '+' icon
+			 */
+			function onAddTask(){
+			    $('[id$=addTaskHiddenBtn]').click();
+			}
+		    
+		    /**
+			* Clicks the add task image link when the user hits the 'Enter' key.
+			*/
+			function onAddTaskLnkKeyPress(evt){
+			    if(evt.keyCode == 13) { //Enter keycode
+			   	    $('[id$=addTaskLnk]').click();
+			   	}
+			}			    
+		    
+		    function calculateTotalAmount(){			
+		    	var qty = PF('qtyWidget').getValue();
+		    	
+		    	if( PF('unitPriceWidget') &amp;&amp; PF('qtyWidget') ){
+		    		var unitPrice = PF('unitPriceWidget').getValue();
+		    		if(unitPrice.length &gt; 0){
+			    		var indexofDollar  = unitPrice.indexOf('$');			    		
+			    		if(indexofDollar &gt; -1){
+			    			unitPrice = unitPrice.substring(indexofDollar + 1);
+			    		}
+			    		
+			    		unitPrice = unitPrice.replace(/\,/g, '');
+			    
+			    		if(!isNaN(unitPrice) &amp;&amp; unitPrice &gt;= 0){
+			    			var unitPriceVal = Number(unitPrice);
+			    			if(!isNaN(qty)){
+			    				var qtyVal = Number(qty);			    				
+			    				var totalAmount = toFixed(qtyVal * unitPriceVal, 2).toFixed(2);		    							    				
+			    				
+			    				$('[id$=totalAmountHdn]').val(totalAmount);
+			    				$('[id$=totalAmt]').html('$' + totalAmount);
+			    			}
+			    		}
+			    	}else{
+			    		var totalAmount = parseFloat(0).toFixed(2); //Used this to set precision of 2 decimal places
+			    		PF('unitPriceWidget').setValue(0);
+			    		$('[id$=totalAmountHdn]').val(0);
+	    				$('[id$=totalAmt]').html('$'+totalAmount);
+			    	}
+		    	}
+		    	
+		    }
+		    
+			function handlePopupDoneRequest(){
+				isDoneButtonClicked = true;
+				PF('taskDialogWidget').hide();
+				$(".ui-dialog-titlebar-close").show();
+			}
+			
+			function handlePopupDoneRequestFailure(){
+				$(".ui-dialog-titlebar-close").show();
+			}			
+			
+			function handlePopupOpenRequest(xhr, status, args) { 
+                if(!args.failure) {
+                	isserviceProviderDetailPanelCollapsed = true;
+                	isDoneButtonClicked = false;
+                	PF('taskDialogWidget').show();                    
+                }
+            }
+			
+			function setInitialFocusServiceProvider(){
+				var serviceProviderComponent = document.getElementById('maintenancePOPanel:serviceProvider').disabled;
+				if(serviceProviderComponent != true){
+					setFocus("serviceProvider");
+				}
+			}
+						
+			function focusOnServiceCode(){
+				 $('[id$=serviceCode]').focus();
+			}
+			
+			/**
+			 * Handles the popup close event where the user clicks on 'X' icon in popup
+			 */ 
+			function onCancelTaskItemPopup(){
+				if(isDoneButtonClicked){ // if the dialog was closed because of the done do nothing
+					isDoneButtonClicked = false;
+					//TODO: revisit
+					//setFocusOnDone();
+				}else{ // if the dialog was closed for any other reason then run thru the close action logic
+					$('[id$=cancelPopup]').click();
+				}
+			}
+			
+			
+			
+			
+			
+			/**
+			 * This will refresh the service code list when maintenance code is removed
+			 */ 
+			function clickToDecodeServiceCode(){
+				isChange = true;
+				
+				if((!isMaintCodeSet) || (serviceCodeQuery.length == 0)){
+					// make sure the backing bean has the query captured
+					isDecode = true;
+					if(serviceCodeQuery.length == 0){
+						enabledBtn();
+					}
+					$('#maintCodeQuery').val(serviceCodeQuery);
+					$('#maintCodeSet').val(isMaintCodeSet);
+					
+					// perform a decode with a limited "delay" incase a auto-complete just got fired off (let it do something first)
+			   		setTimeout(
+				   		     function(){
+				   		    	if(!isAuto){
+					   		    	if($('#serviceCode_input').is(":focus")){
+										if(isTab){ // we started decode on tab so do nothing
+						   		    		isTab = false;
+										} // else do nothing
+					   		    	}
+					   		    	else{ // otherwise click to decode (immediately) // focus is not on the button (we didn't click there) 
+						   		    		isDecode = true;
+						   		    		$('[id$=refreshServiceCode]').click();					   		    			
+					   		    	}	
+				   		    	}
+				   		    	isAuto=false;
+				   		     }, 100);					
+				}
+				
+			}
+			
+						
+			/**
+			 * This will decode maintenace code when not found
+			 */ 
+			function clickToDecodeMaintenanceCode(){
+				isChange = true;
+				
+				if((!isMaintCodeSet) || (maintCodeQuery.length == 0)){
+					// make sure the backing bean has the query captured
+					isDecode = true;
+					
+					$('#maintCodeQuery').val(maintCodeQuery);
+					$('#maintCodeSet').val(isMaintCodeSet);
+					
+					// perform a decode with a limited "delay" incase a auto-complete just got fired off (let it do something first)
+			   		setTimeout(
+				   		     function(){
+				   		    	if(!isAuto){
+					   		    	if($('#maintenanceCode_input').is(":focus")){
+										if(isTab){ // we started decode on tab so do nothing
+						   		    		isTab = false;
+										} // else do nothing
+					   		    	}
+					   		    	else{ // otherwise click to decode (immediately) // focus is not on the button (we didn't click there) 
+						   		    		isDecode = true;
+						   		    		$('[id$=refreshMaintenanceCode]').click();					   		    			
+					   		    	}	
+				   		    	}
+				   		    	isAuto=false;
+				   		     }, 100);					
+				}
+			}
+			
+			//<![CDATA[
+			
+		    function autoCompleteServiceCodeOnKeyDown(event){
+		        var keyCode = event.keyCode;
+				if(keyCode == 13) { // enter key
+					// if he have not already triggered an auto (like via button)
+					if(!isAuto || !isDecode){
+						isAuto = true;
+						// undate the hidden fields
+						$('#serviceCodeQuery').val(serviceCodeQuery);
+						
+						performServiceCodeSearch();
+						
+						isDecode = false;
+					}
+				}else if(isCharacterTyped(event)){
+					disabledBtn();
+				}
+				if(keyCode == 9 && (!event.shiftKey)){ // tab but not shift
+					PF('serviceCodeWidget').deactivate();
+					isDecode = true;
+					isTab = true;
+				}
+		    }	           
+			           
+			function autoCompleteMaintCodeOnKeyDown(event){
+				var keyCode = event.keyCode;
+				if(keyCode == 13) { // enter key
+					// if we have not already triggered an auto (like via button)
+					if(!isAuto || !isDecode){
+						isAuto = true;
+						// undate the hidden fields
+						$('#maintCodeSet').val(false);
+						$('#maintCodeQuery').val(maintCodeQuery);
+						performMaintCodeSearch();
+						if(isChange){
+							$('#maintenanceCodeDesc').val('');
+							$('[id$=maintenanceCategory]').html('');
+							$('#showHistoricalCategoryIconIndicator').val(false);
+							hideAndShowHistoricalCategoryIcon();
+							hideAndShowAdditionalInfoIcon();
+						}
+						isDecode = false;
+					}
+				}else if(isCharacterTyped(event)){
+					disabledBtn();
+				}
+				if(keyCode == 9 && (!event.shiftKey)){ // tab but not shift
+					PF('maintenanceCodeWidget').deactivate();
+					isDecode = true;
+					isTab = true;
+					if(isChange){
+						clickToDecodeMaintenanceCode();
+					}
+				}
+			}           
+								
+
+			
+			
+			
+			function triggerMaintCodeSearch(){
+				// activate the auto-complete (search) and perform a search
+				maintCodeQuery = $('#maintCodeQuery').val();
+				PF('maintenanceCodeWidget').activate();
+				PF('maintenanceCodeWidget').search(maintCodeQuery);
+				isAuto = false;
+			}
+			
+			function triggerServiceCodeSearch(){
+				// activate the auto-complete (search) and perform a search
+				serviceCodeQuery = $('#serviceCodeQuery').val();
+				PF('serviceCodeWidget').activate();
+				PF('serviceCodeWidget').search(serviceCodeQuery);
+				isAuto = false;
+			}
+			
+			function setAutoOn(){
+				isAuto = true;
+			}
+			
+			function setAutoOff(){
+				isAuto = false;
+			}
+			
+			//]]>
+			
+			
+			//<![CDATA[
+			
+			function deactivateMaintCode(event){
+				var keyCode = event.keyCode;
+				maintCodeQuery = $('#maintenanceCode_input').val();
+				// skip past doing anything with keyup on TAB or ENTER
+				// this is simple and "crude" but I just want to suppress some problem keys
+				if(keyCode != 9 && keyCode != 13 && keyCode != 16 && keyCode != 17 && keyCode != 20 ){
+					isReset = false;
+					isMaintCodeSet = false;
+					isAuto = false;
+					isChange = true;
+					isDecode = false;
+					
+					if(maintCodeQuery.length > 0 && maintCodeQuery.length < 2){
+						$('#maintCodeSet').val(false);
+						$('#maintCodeQuery').val(maintCodeQuery);
+					} else if(maintCodeQuery .length > 2){
+						$('#maintCodeSet').val(false);
+						$('#maintCodeQuery').val(maintCodeQuery);
+						if(!isDecode){
+							// I was asked to deactivate the autocomplete
+							// unless the user explicitly triggers it.
+							PF('maintenanceCodeWidget').deactivate();
+							isDecode = false;
+							isReset = false;
+							isMaintCodeSet = false;
+						}
+					} 
+					else {  // our length is 0 (empty) so let's set the backing bean to do nothing
+						$('#maintCodeSet').val(false);
+						$('#maintCodeQuery').val(maintCodeQuery);
+						PF('maintenanceCodeWidget').deactivate();
+					}								
+				}
+			}
+			
+			//]]>
+			
+			
+			//<![CDATA[
+						
+			function deactivateServCode(event){
+				var keyCode = event.keyCode;
+				serviceCodeQuery = $('#serviceCode_input').val();
+				$('#serviceCodeQuery').val(serviceCodeQuery);
+				if(serviceCodeQuery.length == 0){
+					enabledBtn();
+				}
+				// skip past doing anything with keyup on TAB or ENTER
+				// this is simple and "crude" but I just want to suppress some problem keys
+				if(keyCode != 9 && keyCode != 13 && keyCode != 16 && keyCode != 17 && keyCode != 20 ){
+					isReset = false;
+					isMaintCodeSet = false;
+					isAuto = false;
+					isChange = true;
+					isDecode = false;
+					
+					if(serviceCodeQuery.length > 0 && serviceCodeQuery.length <= 2){
+						$('#maintCodeSet').val(false);
+					} else if(serviceCodeQuery .length > 2){
+						$('#maintCodeSet').val(false);
+						// TODO: set a timer to activate and search
+						if(!isDecode){
+							// I was asked to deactivate the autocomplete
+							// unless the user explicitly triggers it.
+							PF('serviceCodeWidget').deactivate();
+							isDecode = false;
+							isReset = false;
+							isMaintCodeSet = false;
+						}
+					} 
+					else {  // our length is 0 (empty) so let's set the backing bean to do nothing
+						$('#maintCodeSet').val(false);
+						$('#serviceCode').val(maintCodeQuery);
+						// TODO: deactivate timer
+						PF('serviceCodeWidget').deactivate();
+					}	
+				}
+			}
+
+			//]]>
+			
+			// on complete of the "itemSelect" event make sure we turn decoding back off and suppress the change
+			function onMaintCodeSelect(){
+				isDecode = false;
+				isChange = false;
+			}
+			
+			// on complete of the "itemSelect" event make sure we turn decoding back off and suppress the change
+			function onServCodeSelect(){
+				isDecode = false;
+				isChange = false;
+			}
+			
+			function reportFocusElement(){
+				lastElemInFocus = document.activeElement.id;
+			}
+			
+			//<![CDATA[
+						
+			function handleAutoCompleteRequest(inputObject,xhr, status, args) { 
+				if(!args.failure) {	
+					if(inputObject == 'serviceCode'){
+						if(!isReset){
+							isMaintCodeSet = ('true' == $('#maintCodeSet').val());
+							serviceCodeQuery = $('#serviceCode_input').val();
+							isAuto = false; // for itemSelect selection
+			       			setTimeout('setCurrentElementFocus(\'maintenanceCode_input\')',50);
+			       			setFocus('maintenanceCode_input');
+			       			setTimeout('PF(\'serviceCodeWidget\').close()',1000);
+						}
+					}
+		
+					else if(inputObject == 'maintenanceCode'){
+						if(!isReset){
+							isMaintCodeSet = ('true' == $('#maintCodeSet').val());
+				       		maintCodeQuery = $('#maintenanceCode_input').val();
+							isAuto = false; // for itemSelect selection
+							if(lastElemInFocus == 'unitPrice_input'){
+								$('#unitPrice').focus();
+								$('#unitPrice_input').focus();
+								setTimeout('setCurrentElementFocus(\'unitPrice_input\')',50);
+							}else if(lastElemInFocus == 'qty_input'){
+								setTimeout('setCurrentElementFocus(\'qty_input\')',50);
+							}else{
+								if(typeof lastElemInFocus !== 'undefined' && lastElemInFocus){
+									setCurrentElementFocus(lastElemInFocus);
+									setTimeout('setCurrentElementFocus(lastElemInFocus)',50);									
+								}
+							}
+
+				       		setTimeout('PF(\'maintenanceCodeWidget\').close()',1000);
+						}
+					}
+					
+					else if(inputObject == 'maintenanceCodeItemSelect'){
+						if(!isReset){
+							isMaintCodeSet = ('true' == $('#maintCodeSet').val());
+				       		maintCodeQuery = $('#maintenanceCode_input').val();
+							isAuto = false; // for itemSelect selection
+							setTimeout('setCurrentElementFocus(\'qty_input\')',50);
+				       		setTimeout('PF(\'maintenanceCodeWidget\').close()',1000);
+						}
+					}
+					
+					else if(inputObject == 'qty'){
+			       		setTimeout('setCurrentElementFocus(\'unitPrice_input\')',50);
+					}
+				}else{
+					if(inputObject == 'serviceCode'){
+						if(!isReset){
+							isMaintCodeSet = ('true' == $('#maintCodeSet').val());
+							isAuto = false; // for itemSelect selection
+							setTimeout('setFocus(\'serviceCode_input\')',50);
+				       		setFocus('serviceCode_input');
+				       		setTimeout('PF(\'serviceCodeWidget\').close()',1000);
+						}
+					}
+		
+					else if(inputObject == 'maintenanceCode'){
+						if(!isReset){
+							isMaintCodeSet = ('true' == $('#maintCodeSet').val());
+			       			isAuto = false; // for itemSelect selection
+							setTimeout('setFocus(\'maintenanceCode_input\')',50);
+			       			setFocus('maintenanceCode_input');
+			       			setTimeout('PF(\'maintenanceCodeWidget\').close()',1000);
+						}
+					}
+					else if(inputObject == 'qty'){
+			       		setTimeout('setFocus(\'qty_input\')',50);
+			       		setFocus('qty_input');
+					}
+				}
+	   		}
+	   		
+	   		//]]>
+			
+			function resetClientVars(){
+				isDecode = false;
+				// is tabbing?
+				isTab = false;
+				// is auto complete fired?
+				isAuto = false;
+				// is change
+				isChange = false;
+				
+				// client side value for the maint code query
+				maintCodeQuery = '';
+				// client side value for the service code query
+				serviceCodeQuery = '';
+				
+				// when we move from record to record then the overall dialog needs to be reset
+				isReset = true;
+			}
+			
+			function startResetAction(){
+				isReset = true;
+			}
+			
+			function resetAfterNewLine(xhr, status, args){
+				resetClientVars();
+				
+				if(!args.failure) {
+					// clear any codes (client and server side)
+					// by setting the maint code value and doing a decode on an empty maint code.
+					$('#maintenanceCode_input').val('');
+					setTimeout(
+				   		     function(){
+								$('[id$=refreshMaintenanceCode]').click();
+				   			},100);				
+				}else{
+					// they performed an operation using the new line that failed (they went nowhere)
+					isReset = false;
+				}
+				
+
+			}
+
+			function setFocusOnDone(){
+				if(canSetFocus('save')){
+					setFocus('save');	
+				}else if(canSetFocus('cancel')){
+					setFocus('cancel');
+				}
+			}
+			
+			function toggleSaveButtonClickFlag(){
+				
+				if(isSaveButtonClicked)
+					isSaveButtonClicked = false;
+				else
+					isSaveButtonClicked = true;		
+			}
+			
+			var currentStartDate;
+			/**
+			* Add Day to End Date: This function gets the actual start date, adds one day to the date, 
+			* then sets the planned end date
+			*/
+			function addDayToEndDate(){
+				var date = PF('actualStartDateWidget').getDate();			
+				if (!isNaN(date)) {					
+                    if(date -  $('[id$=actualStartDate_input]').prop('defaultValue') != 0){		               	
+						PF('plannedEndDateWidget').setDate(new Date(date.getFullYear(), date.getMonth(), date.getDate()+1, date.getHours(), date.getMinutes()));
+	                }
+				} 				
+
+			}
+			
+
+			/**
+			* Reverts date to its initial value when the new value is Nan.
+			*/
+			function revertNullDate(oCalendar){			
+				var date = new Date(oCalendar.value);
+				if (isNaN(date)) {
+					oCalendar.value = oCalendar.defaultValue;					
+				}
+			}
+			
+			function openAddressInput(){
+				if($('[id$=leasePlanServiceProvider]').val() == 'true'){
+					$('[id$=serviceProviderDetailPanel]').show();
+					$('[id$=serviceProviderDetailLink]').attr("class", "ui-commandlink ui-icon ui-icon-triangle-1-s");
+					isserviceProviderDetailPanelCollapsed = false;
+				}
+			}
+				
+		  var keyPressed = false;
+		  
+		  
+		  function resetKeyPressedValue(){
+			 keyPressed = false;
+		  }
+		 
+		  function setFocusToQty(){
+			  var field = document.getElementById('qty_input');	
+				var end = field.value.length;
+			  if( field.createTextRange ) {
+			      var selRange = field.createTextRange();
+			      selRange.collapse(true);
+			      selRange.moveStart('character', 0);
+			      selRange.moveEnd('character', end);
+			      selRange.select();
+			      field.focus();
+			      
+			  }
+		  }
+		  function setFocusToQtyOnTab(event){
+			  var keyCode = event.keyCode;
+			  if(keyCode == 9 &amp;&amp; !event.shiftKey  ){
+				  setTimeout('setFocus(\'qty_input\')',5);
+			  }
+			  
+		  }
+		  		  
+		  function hideAndShowHistoricalCategoryIcon(){
+			  var showIconIndicator = document.getElementById('showHistoricalCategoryIconIndicator').value;
+			  	if(showIconIndicator == 'false') {
+					$('[id$=historicalMaintCategory]').css('display', 'none');
+			  	}else {
+			  		$('[id$=historicalMaintCategory]').css('display', 'inline');
+				}
+		  }
+
+		  function hideAndShowAdditionalInfoIcon(){
+				var arr = ['GLASS','BRKS_BRGS','PASS_TIRES','SNOW_TIRES','TIRE_SVCS','TRUCK_TIRE'];
+				var element = $('[id$=maintenanceCategory]').html();
+				
+				if ($.inArray( element, arr ) != -1 ) {
+				 		$('[id$=maintCategoryAdditionalInfoLink]').css('display', 'inline');
+			 	}else {			  	
+			 		$('[id$=maintCategoryAdditionalInfoLink]').css('display', 'none');
+			 	}					
+		  }	
+  
+		  function setFocusInCostAvoidance(){
+			  var isDisplay = $('[name$=costAvoidanceRadio]:first').prop('checked');
+			  if(isDisplay){
+				  PF('costAvoidanceReasonWidget').focusInput.focus();
+			  }
+		  }
+		/**
+		  * Hides or show the Cost Avoidance display based on 
+		  * the the boolean state of the Cost Avoidance radio buttons. 
+		  * Also resizes the task dialog to acommodate the display.
+		  */
+		  function toggleCostAvoidanceDisplay(){
+		      var isDisplay = $('[name$=costAvoidanceRadio]:first').prop('checked');
+			  var expandedDialogHeight = 645;
+			  var collapsedDialogHeight = 565;
+			  if(isDisplay){	
+				  resizeDialog('taskDialogWidget', null, expandedDialogHeight - getDialogHeight('taskDialogWidget')); 
+				  $('[id$=costAvoidanceDisplay]').show();
+				  //Depending on the PO, goodwill fields may be hidden
+				  if(typeof PF('goodwillAmountWidget') != 'undefined'){
+					  if(!PF('goodwillPercentWidget').getValue() &gt; 0){					  
+					      PF('goodwillPercentWidget').setValue(100);						  
+					  } 				  
+				  }
+				
+				  
+				  
+			  }else{ 			
+				  resizeDialog('taskDialogWidget', null, collapsedDialogHeight - getDialogHeight('taskDialogWidget'));				  
+				  $('[id$=costAvoidanceDisplay]').hide();
+			  }
+
+		  }
+		
+		/**
+		* When the task's 'Total Amount' changes via 'QTY' or 'Unit Price' changes, 
+		* the 'Cost Avoidance Amount' and 'Goodwill Amount' values will be updated 
+		* to reflect the change. The update will only occur when the PO is a 
+		* goodwill PO and when 'Cost Avoidance' indicator is active.
+		*/
+		function calculateCostAvoidanceAmounts(){
+			var isDisplay = $('[name$=costAvoidanceRadio]:first').prop('checked');
+		
+			if((isDisplay == true || isDisplay == 'true') &amp;&amp; (typeof PF('goodwillAmountWidget') != 'undefined')){				
+				lineTotal = parseFloat($('[id$=totalAmt]').text().replace(/[^\d\.]/g,''));
+				PF('costAvoidanceAmountWidget').setValue(lineTotal * (parseFloat(PF('goodwillPercentWidget').getValue() / 100)));
+				PF('goodwillAmountWidget').setValue(lineTotal * (parseFloat(PF('goodwillPercentWidget').getValue() / 100)));												
+			}
+		}
+		
+		function setFocusOnSuccess(args, id){
+			if(!args.failure) {	
+	        	setFocus(id);
+			}
+		}
+				
+		function resumeTabbing(){
+			$(document).unbind('keydown');
+		}
+		
+		function showExceededAuthLimitEmail(id){
+			// determine which link was clicked
+			// trigger a server side re-processing of the email to set the To and Cc emails correctly on the email object
+			$('[id$=alertEmailContactId]').val(id);
+			$('[id$=alertEmailContactBtn]').click();
+			// when this is complete then call showEmailPospup to show the email updated email in the editors
+		}
+		
+		function refreshEmailContact(){
+			$('[id$=refreshEmailContactBtn]').click();
+		}
+		
+		function refreshDiscounts() {
+			$('[id$=refreshSerProvDiscBtn]').click();
+		}
+		
+		function restoreServiceProviderDetailPanel() {
+            if (isserviceProviderDetailPanelCollapsed) {
+                isserviceProviderDetailPanelCollapsed = false;
+            } else {
+                isserviceProviderDetailPanelCollapsed = true;
+            }
+            $('[id$=serviceProviderDetailLink]').click();
+        }
+		
+		function setStatusAfterApproval(){
+			// If approval info has been entered and current status is WCA, change status to booked-in
+			if($('[id$=approvalInfo]').val() != ''){
+				if($('[id$=poStatus_input]').val() == 'WCA'){
+					PF('poStatusWidget').selectValue('B');
+				}
+			}
+		}
+		
+		function validateOdo(){
+			var currentOdoReadingStr = parseInt($('[id$=currentOdometerReading]').val().replace(/[^\d\.]/g,''));
+			if(!isNaN(currentOdoReadingStr)){
+				if(parseInt(currentOdoReadingStr) > 0){
+					var mostRecentOdoReading = parseInt($('[id$=recentOdometerReading]').text().replace(/[^\d\.]/g,''));
+					var currentOdoReading = parseInt($('[id$=currentOdometerReading]').val().replace(/[^\d\.]/g,'').replace(/^0+/, ''));
+					if( currentOdoReading &lt; mostRecentOdoReading){
+						PF('odoLessReadingErrMeasageWidgetVar').show();
+						return false;
+					}
+				}
+			}
+		}
+		
+		function correctOdoValidationErr(){
+			PF('odoLessReadingErrMeasageWidgetVar').hide();
+			$('[id$=currentOdometerReading]').focus();
+		}
+		function onPoNumberClick() {
+			var poStatus = PF('poStatusWidget').getSelectedValue();
+			if(poStatus == PO_STATUS_COMPLETE){
+				if (!isPoNumberCollapsed) {
+					$('[id$=invoiceNos]').hide();
+					$('[id$=poNumberLink]').attr("class", "ui-commandlink ui-icon ui-icon-triangle-1-e");
+					isPoNumberCollapsed = true;
+				} else {
+					$('[id$=invoiceNos]').show();
+					$('[id$=poNumberLink]').attr("class", "ui-commandlink ui-icon ui-icon-triangle-1-s");
+					isPoNumberCollapsed = false;
+				}
+			}
+			return false;
+		}
+		
+		/**
+		* Displays confirmation dialog when the PO total is 0
+		*/
+		function confirmZeroDollarPO(){		
+			var isNotZeroDollar = true;
+			var poSubTotal = $('[id$=poSubTotal]').text().replace(/[^\d\.]/g,'');
+
+			if(poSubTotal == 0){
+				isNotZeroDollar = false;
+				showDialog('closeNoPOWidgetVar');
+			}
+		
+			return isNotZeroDollar;
+		}
+		function setCurrentElementFocus(inputObject){
+			if(document.activeElement.id.length > 0){
+				$("*:focus").focus();
+				$("*:focus").focus();
+			}else{
+				 if(inputObject){
+				 	setFocus(inputObject);
+				 	setFocus(inputObject);				 
+				 }
+			}
+		
+		}
+		
+		function enableCloseTitleButton(){
+			$(".ui-dialog-titlebar-close").show();
+		}
+		
+		function setShowGlDistDialogToFalse(){
+			$('[id$=showChangeGLDistDialogHidden]').val('false');
+			$('[id$=showChangeGLDistConfirmDialogHidden]').val('false');
+		}
+			
+		function enabledBtn(){
+			document.getElementById('add').disabled = false;
+			document.getElementById('delete').disabled = false;
+			document.getElementById('done').disabled = false;
+			if(document.getElementById('isNextDisabled').value == 'false'){
+				document.getElementById('next').disabled = false;	
+			}
+			if(document.getElementById('isPrevDisabled').value == 'false'){
+				document.getElementById('previous').disabled = false;	
+			}
+			$(".ui-dialog-titlebar-close").show();
+			$('[id$=taskDialog]').unbind("keydown");
+			ajaxProcessHide();
+		}
+		function disabledBtn(){
+			document.getElementById('add').disabled = true;
+			document.getElementById('delete').disabled = true;
+			document.getElementById('done').disabled = true;
+			document.getElementById('next').disabled = true;
+			document.getElementById('previous').disabled = true;
+			$(".ui-dialog-titlebar-close").hide();
+			$('[id$=taskDialog]').on("keydown",function(e){
+			    var charCode = e.charCode || e.keyCode || e.which;
+			    if (charCode == 27){
+			        return false;
+			    }
+			});
+		}		
+	  	//  <![CDATA[
+		function isCharacterTyped(event){
+			var keyCode = event.keyCode;
+			if( ((keyCode >= 48 && keyCode <= 57) || (keyCode >= 65 && keyCode <= 90) || (keyCode >= 96 && keyCode <= 110) || (keyCode >= 186 && keyCode <= 191) || (keyCode >= 219 && keyCode <= 222) || keyCode == 46 || keyCode == 32 || keyCode == 8 ) && ( (event.shiftKey) || (!event.shiftKey))){
+				return true;
+			}else{
+				return false;
+			}
+		}
+		// ]]>
+				
+		function ajaxProcessShow(){
+			var popUp = document.getElementById('loadingProgress');
+			popUp.style.display = "block";		
+			popUp.style.position = "absolute";
+			popUp.style.left = "83%";	
+			popUp.style.top = "2%";	
+		}
+				
+		function ajaxProcessHide(){
+			document.getElementById('loadingProgress').style.display = "none";
+		}
+
+		//<![CDATA[
+		
+		
+		function validateMarkup(){
+			if($('[id$=vehicleNotOnContract]').val() == 'true'){	
+				if(document.getElementById('maintenancePOPanel:networkMarkUpIndicatorRadio:0').checked){
+					showDialog('vehicleNotOnContractMsgWidgetVar');
+				}
+			}else{
+				$('[id$=selectLeasePlanAjax]').click();
+			}
+		}
+		
+		// ]]>
+		function updateButtonClicked(id){
+			AuthOrCompleteClicked = id;
+		}
+		
+		 function authOrCompletePO(){
+			 if(AuthOrCompleteClicked == 'authorizePO'){
+				 authorizeHiddenButtonClicked();
+			 }else if(AuthOrCompleteClicked == 'completePO'){
+				 showDialog('completePOWidgetVar');
+			 } 
+		 }
+		 
+		 function authorizeHiddenButtonClicked(){
+			 $('[id$=authorizePOHidden]').click();
+		 }
+		
+     	$(window).load(function(){
+     		init();
+		});			
+		
+		</script>
+	</ui:define>
+
+</ui:composition>

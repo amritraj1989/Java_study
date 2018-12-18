@@ -1,0 +1,260 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+		<p:dialog id="creditDialog" header="Credit" 
+				  widgetVar="creditDialogWidget" 
+				  modal="true"
+				  appendTo="@(body)" 
+				  resizable="true"
+				  height="auto" width="1100">
+				  <p:hotkey immediate="true" bind="esc" handler="PF('creditDialogWidget').hide();"/>
+			<h:form id="maintenanceInvoiceCreditForm" prependId="false">
+				<p:focus for="creditList" rendered="#{maintenanceInvoiceCreditBean.selectedCredit != null}" />
+				<p:panelGrid id="creditPanel" style="min-width:980px;max-width:100%;width:auto;">
+					<p:row>
+						<p:column>
+							<p:outputLabel for="creditList" styleClass="ui-label"
+								value="Credit No:" />
+						</p:column>
+						<p:column>
+							<p:selectOneMenu id="creditList" tabindex="1000" 
+											 widgetVar="creditListWidget"
+											 value="#{maintenanceInvoiceCreditBean.selectedCredit}"
+											 converter="DocConverter">
+								<p:ajax process="@this" event="change" update="maintenanceInvoiceCreditForm" />
+								<f:selectItems
+									value="#{maintenanceInvoiceCreditBean.creditList}"
+								    var="credit" 
+									itemLabel="#{credit.docNo}"
+									itemValue="#{credit}"/>
+							</p:selectOneMenu>
+						</p:column>
+						<p:column>
+							<h:outputLabel for="creditDate" styleClass="ui-label"
+								value="Credit Date:" />
+						</p:column>
+						<p:column>
+							<h:outputLabel id="creditDate"
+								value="#{maintenanceInvoiceCreditBean.selectedCredit.docDate}" >
+								<f:convertDateTime pattern="MM/dd/yyyy" />
+							</h:outputLabel>
+						</p:column>
+						<p:column>
+							<h:outputLabel for="creditDesc" styleClass="ui-label"
+								value="Credit Desc:" />
+						</p:column>						
+						<p:column>
+							<h:outputLabel id="creditDesc"
+								value="#{maintenanceInvoiceCreditBean.selectedCredit.docDescription}" 
+								style="white-space: normal" />
+						</p:column>
+					</p:row>
+				</p:panelGrid>
+				<p:panel>
+					<p:dataTable id="credit" var="credit" widgetVar="creditWidget"
+						value="#{maintenanceInvoiceCreditBean.creditListWithoutTaxByDocNo()}"
+						scrollHeight="#{maintenanceInvoiceCreditBean.dataTable.height}"
+						resizableColumns="true"
+						rowIndexVar="creditRowIndex">
+						<p:column headerText="Maint Category" width="18%">
+							#{credit.maintCategory}
+						</p:column>
+						<p:column headerText="Service Code" width="12%">
+							#{credit.serviceCode}
+				        </p:column>	
+						<p:column headerText="Maint Code" width="25%">
+							#{credit.maintCode} <br />
+					        #{credit.maintCodeDesc}
+						</p:column>
+						<p:column headerText="Recharge" width="8%">
+							#{credit.rechargeInd}
+						</p:column>
+						<p:column headerText="Disc" width="4%">
+							#{credit.discountInd}
+						</p:column>
+						<p:column headerText="Qty" width="4%">
+							#{credit.quantity}
+						</p:column>
+						<p:column headerText="Unit Price" width="19%">
+							<h:outputLabel id="unitPriceCredit" value="#{credit.unitPrice}" style="float:right">
+								<f:convertNumber type="currency" currencySymbol="$" />
+							</h:outputLabel>
+						</p:column>
+						<p:column headerText="Total Amount" width="10%">
+							<h:outputLabel id="totalAmountCredit" value="#{credit.totalPrice}" style="float:right">
+								<f:convertNumber type="currency" currencySymbol="$" />
+							</h:outputLabel>
+						</p:column>
+						<p:columnGroup type="footer">
+							<p:row>
+								<p:column footerText="Service Provider Credit(s)" style="font-weight:bold" colspan="2" width="18%"/>
+									
+								<p:column footerText="Client Recharge Credit(s)" colspan="2" style="font-weight:bold" width="26%"/>
+									
+								<p:column footerText="" style="text-align:right" width="4%"/>
+									
+								<p:column footerText="" width="4%"/>
+									
+								<p:column footerText="Selected Credit Total:" style="text-align:right" width="14%"/>
+																	
+								<p:column style="text-align:right" width="10%">										
+									<f:facet name="footer">
+										<h:outputText value="#{maintenanceInvoiceCreditBean.calculateCreditListTotalWoTaxByDocNo()}">
+											<f:convertNumber type="currency" currencySymbol="$" />
+										</h:outputText>
+									</f:facet>
+								</p:column>
+									
+							</p:row> 
+							<p:row>
+								<p:column footerText="Credit(s) Total:" style="text-align:right" width="18%"/>
+									
+								<p:column style="text-align:right" width="12%">
+									<f:facet name="footer">
+										<h:outputText value="#{maintenanceInvoiceCreditBean.allCreditsTotalNoTax}">
+											<f:convertNumber type="currency" currencySymbol="$" />
+										</h:outputText>
+									</f:facet>
+								</p:column>
+									
+								<p:column footerText="Recharge Credit Lines Total:" style="text-align:right" width="26%"/>
+									
+								<p:column style="text-align:right" width="8%">
+									<f:facet name="footer">
+										<h:outputText value="#{maintenanceInvoiceCreditBean.creditRechargeLinesTotal}">
+											<f:convertNumber type="currency" currencySymbol="$" />
+										</h:outputText>
+									</f:facet>
+								</p:column>
+									
+								<p:column footerText="" width="8%"/>
+									
+								<p:column footerText="" width="4%"/>
+									
+								<p:column footerText="" width="14%"/>
+																	
+								<p:column footerText="" width="10%"/>
+									
+							</p:row>
+							<p:row>
+								<p:column footerText="Credit(s) Tax Total:" style="text-align:right" width="18%"/>
+									
+								<p:column style="text-align:right" width="12%">
+									<f:facet name="footer">
+										<h:outputText value="#{maintenanceInvoiceCreditBean.creditTaxTotal}">
+											<f:convertNumber type="currency" currencySymbol="$" />
+										</h:outputText>
+									</f:facet>
+								</p:column>
+									
+								<p:column footerText="Recharge Tax Total:" style="text-align:right" width="26%"/>
+									
+								<p:column style="text-align:right" width="8%">
+									<f:facet name="footer">
+										<h:outputText value="#{maintenanceInvoiceCreditBean.rechargeTaxTotal}">
+											<f:convertNumber type="currency" currencySymbol="$" />
+										</h:outputText>
+									</f:facet>
+								</p:column>
+									
+								<p:column footerText="" width="8%"/>
+									
+								<p:column footerText="" width="4%"/>
+									
+								<p:column footerText="" width="14%"/>
+									
+								<p:column footerText="" width="10%" />
+									
+							</p:row>
+							<p:row>
+								<p:column footerText="Srv Prov Credit(s) Total:" style="text-align:right" width="18%"/>
+									
+								<p:column style="text-align:right" width="12%">
+									<f:facet name="footer">
+										<h:outputText value="#{maintenanceInvoiceCreditBean.allCreditsTotalWithTax}">
+											<f:convertNumber type="currency" currencySymbol="$" />
+										</h:outputText>
+									</f:facet>
+								</p:column>
+									
+								<p:column footerText="Recharge Mark Up:" style="text-align:right" width="26%"/>
+									
+								<p:column footerText="$10.00" style="text-align:right" width="8%">
+									<f:facet name="footer">
+										<h:outputText value="#{maintenanceInvoiceCreditBean.markupTotalWithoutTax}">
+											<f:convertNumber type="currency" currencySymbol="$" />
+										</h:outputText>
+									</f:facet>
+								</p:column>
+									
+								<p:column footerText="" width="8%"/>
+									
+								<p:column footerText="" width="4%"/>
+									
+								<p:column footerText="" width="14%"/>
+									
+								<p:column footerText="" width="10%" />
+									
+							</p:row>
+							<p:row>
+								<p:column footerText="" style="text-align:right" width="18%"/>
+									
+								<p:column footerText="" style="text-align:right" width="12%"/>
+									
+								<p:column footerText="Recharge Mark Up Tax:" style="text-align:right" width="26%"/>
+									
+								<p:column footerText="$10.00" style="text-align:right" width="8%">
+									<f:facet name="footer">
+										<h:outputText value="#{maintenanceInvoiceCreditBean.markupTaxTotal}">
+											<f:convertNumber type="currency" currencySymbol="$" />
+										</h:outputText>
+									</f:facet>
+								</p:column>
+									
+								<p:column footerText="" width="8%"/>
+									
+								<p:column footerText="" width="4%"/>
+										
+								<p:column footerText="" width="14%"/>
+									
+								<p:column footerText="" width="10%"/>																		
+							</p:row>
+							<p:row>
+								<p:column footerText="" style="text-align:right" width="18%"/>
+									
+								<p:column style="text-align:right" width="12%"/>
+									
+								<p:column footerText="Recharge Credit(s) Total:" style="text-align:right" width="26%"/>
+									
+								<p:column footerText="" style="text-align:right" width="8%">
+									<f:facet name="footer">
+										<h:outputText value="#{maintenanceInvoiceCreditBean.creditRechargeTotal}">
+											<f:convertNumber type="currency" currencySymbol="$" />
+										</h:outputText>
+									</f:facet>
+								</p:column>
+									
+								<p:column footerText="" width="8%"/>
+									
+								<p:column footerText="" width="4%"/>
+										
+								<p:column footerText="" width="14%"/>
+									
+								<p:column footerText="" width="10%"/>								
+							</p:row>
+						</p:columnGroup>
+					</p:dataTable>
+				</p:panel> 
+				<p:panel id="cancelPanel">
+					<p:commandButton id="cancelCreditDialog" 
+									 tabindex="1001"
+					                 value="Cancel" 
+					                 onclick="PF('creditDialogWidget').hide();"/>
+                 </p:panel>
+			</h:form>
+		</p:dialog>
+
+</ui:composition>					

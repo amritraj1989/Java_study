@@ -1,0 +1,191 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	template="../../templates/ui.xhtml">
+	<ui:define name="content" >
+		
+		<h:form id="amendmentHistoryBreadCrumbForm" prependId="false">
+			<h:inputHidden id = "invalidAccessPath"  name = "invalidAccessPath" value = "#{amendmentHistoryBean.invalidAccessPath}"/>
+			<p:breadCrumb style ="min-width:1200px;max-width:100%;width:auto" model="#{amendmentHistoryBean.breadCrumbTrail}" ajax="false" immediate="true" styleClass="ui-layout"/>
+		</h:form>
+			<!-- Error message display -->
+		<p:scrollPanel style="min-width:1200px;max-width:100%;width:auto;height:50px;" mode="native" styleClass="ui-layout">
+				<p:messages id="messages" showSummary="false" showDetail="true"	autoUpdate="true" />
+		</p:scrollPanel>
+		<h:form id="amendmentHistoryForm" prependId="false" rendered="#{!amendmentHistoryBean.invalidAccessPath}" >
+			<p:panel id="amendmentHistoryInformationPanel" style ="min-width:1200px;max-width:100%;width:auto">
+					<h:panelGrid columns="6" cellspacing="10">
+							<h:outputLabel value="Client:"  styleClass="ui-label"/> 
+							<h:panelGroup>
+								<h:outputText value="#{amendmentHistoryBean.accountCode}"/>
+								<p:spacer width="20" height="1"/>
+								<h:outputText value="#{amendmentHistoryBean.accountName}"/>
+							</h:panelGroup>
+							<h:outputLabel value="Contract Start:"  styleClass="ui-label"/>
+							<h:outputText value="#{amendmentHistoryBean.contractStart}"> 
+							<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+           					</h:outputText>
+							<h:outputLabel value="Cost Treatment:"  styleClass="ui-label"/> 
+							<h:outputText value="#{amendmentHistoryBean.costTreatment}"/>
+							
+							
+							<h:outputLabel value="Quote:"  styleClass="ui-label"/> 
+							<h:panelGroup>
+								<h:outputText value="#{amendmentHistoryBean.quote}"/>
+								<p:spacer width="20" height="1"/>
+								<h:outputText value="#{amendmentHistoryBean.productDesc}"/>
+							</h:panelGroup>
+							<h:outputLabel value="Contract End:"  styleClass="ui-label"/>
+							<h:outputText value="#{amendmentHistoryBean.contractEnd}">
+							<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+           					</h:outputText>
+							<h:outputLabel value="Interest Treatment:" style="white-space:nowrap;"  styleClass="ui-label"/> 
+							<h:outputText value="#{amendmentHistoryBean.interestTreatment}"/>
+							
+							<h:outputLabel value="Unit:"  styleClass="ui-label"/> 
+							<h:panelGroup>
+								<h:outputText value="#{amendmentHistoryBean.unitNo != null ? amendmentHistoryBean.unitNo : amendmentHistoryBean.accountCode != null ? 'N/A' : null}"/>
+								<p:spacer width="20" height="1"/>
+								<h:outputText value="#{amendmentHistoryBean.unitDescription}"/>
+							</h:panelGroup>
+							<h:outputLabel value="Terms:"  styleClass="ui-label"/> 
+							<h:panelGroup>
+								<h:outputText value="#{amendmentHistoryBean.terms}">
+									<f:convertNumber type="number" pattern="#,##0" />
+								</h:outputText><h:outputText value=" months"/>
+								<h:outputText value=" / "/>
+								<h:outputText value="#{amendmentHistoryBean.distance}">
+									<f:convertNumber type="number" pattern="#,##0" />
+								</h:outputText><h:outputText value=" miles"/>
+							</h:panelGroup>
+							<h:outputLabel value="Float/Non-Float:" styleClass="ui-label"/>
+							<h:outputText value="#{amendmentHistoryBean.floatDescription}"/>
+							
+							<h:outputText value=" "/>
+							<h:outputText value=" "/>
+							<h:outputText value=" "/>
+							<h:outputText value=" "/>
+							<h:outputLabel value="Interest Index:" styleClass="ui-label"/>
+							<h:outputText value="#{amendmentHistoryBean.interestIndex}"/>
+							
+							
+					</h:panelGrid>
+			</p:panel>
+			<p:panel id="amendHistoryDatatableTablePanel" style="min-width:1200px;max-width:100%;width:auto;" >
+				<p:dataTable value="#{amendmentHistoryBean.amendmentHistoryList}" 
+					var = "quote" style ="width:auto;" id="amendHistoryDatatableTable"  >
+					 <p:column>  
+           				<f:facet name="header">                  
+           						Quote             
+           				</f:facet> 
+           				<h:panelGrid columns="2" styleClass="ui-noBorder" >
+           					<h:outputLabel value="Quote:" /> 
+           					<p:commandLink action="#{amendmentHistoryBean.viewQuoteOverview}"    immediate="true" ajax="false" onclick="lockScreen()">
+           						<f:param name= "selectedQmdId" value= "#{quote.qmdId}"/>
+           						<h:outputText value="#{quote.quote}"/>
+           					</p:commandLink>
+           					<h:outputLabel value="Effective Date:" /> 
+           					<h:outputText value="#{quote.effectiveDate}">
+           						<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+           					</h:outputText>
+           					
+           					<h:outputLabel value="Effective Period:" rendered="#{quote.informalAmendmentText != null ? false:true}" /> 
+           					<h:outputText value="#{quote.effectivePeriod}" rendered="#{quote.informalAmendmentText != null ? false:true}" />
+           					
+           					<h:outputLabel value="#{quote.informalAmendmentText}" rendered="#{quote.informalAmendmentText != null ? true:false}" /> 
+           					<h:outputText value=""  rendered="#{quote.informalAmendmentText != null ? true:false}" />
+           					
+           					<h:outputLabel value="Created By:" /> 
+           					<h:outputText value="#{quote.createdBy}"/>
+           				</h:panelGrid>
+           			</p:column>
+           			<p:column>  
+           				<f:facet name="header">                  
+           					Aftermarket Equipment 
+           				</f:facet> 
+           					 <p:dataGrid  value="#{quote.afterMarketEquipments}" columns="1" styleClass="ui-noBorder"  
+							var = "afElement" style ="width:auto;" id="afDatatableTable"  emptyMessage=""> 
+								
+           							<h:panelGroup>
+           								<h:outputText value="#{afElement.amendmentTypeInd}"/>
+           								<p:spacer width="20" height="1"/>
+           								<h:outputText value="#{afElement.elementDesc}"/>
+           							</h:panelGroup>
+           							<p:spacer width="20" height="1"/>
+           							<h:panelGroup>
+           								<h:outputText value="#{afElement.rental}">
+           								<f:converter converterId="malDollarValueConverter" />
+           								</h:outputText><h:outputText value="/Mo"/>
+           								<p:spacer width="20" height="1"/>
+		           						<h:outputText value="#{afElement.totalRental}" rendered="#{afElement.rechargeText != null ? false:true}">
+		           						<f:converter converterId="malDollarValueConverter" />
+           								</h:outputText><h:outputText value="/Tot" rendered="#{afElement.rechargeText != null ? false:true}"/>
+           								<h:outputText value="(#{afElement.rechargeText})" rendered="#{afElement.rechargeText != null ? true:false}"/>
+		           					</h:panelGroup>
+           						  
+							</p:dataGrid >   
+           					     
+           				
+           			</p:column>
+           			<p:column>  
+           				<f:facet name="header">                  
+           						Service Elements             
+           				</f:facet>
+           				 <p:dataGrid  value="#{quote.serviceElements}"  emptyMessage="" columns="1" styleClass="ui-noBorder"
+							var = "srvElement" style ="width:auto" id="srvDatatableTable" > 
+								
+           							<h:panelGroup>
+           								<h:outputText value="#{srvElement.amendmentTypeInd}"/>
+           								<p:spacer width="20" height="1"/>
+           								<h:outputText value="#{srvElement.elementDesc}"/>
+           								
+           							</h:panelGroup>
+           							<p:spacer width="20" height="1"/>
+           							<h:panelGroup>
+           								<h:outputText value="#{srvElement.rental!= null ? srvElement.rental:0}">
+           									<f:converter converterId="malDollarValueConverter" />
+           								</h:outputText><h:outputText value="/Mo"/>
+           								<p:spacer width="20" height="1"/>
+		           						<h:outputText value="#{srvElement.totalRental != null ? srvElement.totalRental:0}">
+		           							<f:converter converterId="malDollarValueConverter" />
+		           						</h:outputText><h:outputText value="/Tot"/>
+		           					</h:panelGroup>
+		           					
+           							<h:panelGroup rendered="#{srvElement.financeParameters != null  ? true:false}">
+           									<p:dataGrid  value="#{srvElement.financeParameters}"  
+           									emptyMessage="" columns="1" styleClass="ui-noBorder"
+											var = "finElement" style ="width:auto" id="finParamDatatableTable" >
+												<h:outputText value="#{finElement.quotationModelFinances.description}"/>
+												<p:spacer width="10" height="1"/>
+												<h:outputText value="("/>
+												<h:outputText value="#{finElement.value}">
+													<f:convertNumber type="number" pattern="#,##0.00000" />
+												</h:outputText>
+												<h:outputText value=")"/>
+											</p:dataGrid>
+           							</h:panelGroup>
+           						  
+							</p:dataGrid >  
+           			</p:column>
+				</p:dataTable>	
+			</p:panel>
+			<h:panelGrid>
+					<f:facet name="footer">
+						<p:focus/>
+						<p:commandButton id="cancel"  value="Cancel"
+							action="#{amendmentHistoryBean.cancel}" ajax="false"
+							onclick="lockScreen();" immediate="true" />
+					</f:facet>
+				</h:panelGrid>
+		</h:form>
+		
+		<script type="text/javascript">
+	     	$(window).load(function(){
+	     		if(document.getElementById('invalidAccessPath').value == 'true')return false;
+			});			
+		</script>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,37 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Fleet Maintenance / FM-6 Maintenance Request PO Header display for Maintenance PO Entry</title>
+    <body>
+    	<h1>Fleet Maintenance / Maintenance Request PO Header display for Maintenance PO Entry</h1>
+    	<h2>Acceptance Tests (Automated)</h2>
+
+		    <ul concordion:execute="#result = testCreatePurchaseOrder(#purchaseOrderNumber)">
+		    <li>Input Purchase Number <b><span concordion:set="#purchaseOrderNumber">J00298724</span></b>, click on Create Purchase Order:</li>
+		    <ul type = "square">
+		    <li><span concordion:assertNotEquals="#result.maintReqStatus"></span>The PO status should return not null</li>
+		    <li><span concordion:assertNotEquals="#result.getFleetMaster().getLatestOdometerReading().getOdoReading()"></span>Most recent odometer field should return not null</li>
+		    <li><span concordion:assertNotEquals="#result.getFleetMaster().getLatestOdometerReading().getOdoReadingDate()"></span>Most recent odometer reading date field should return not null</li>
+		    <li><span concordion:assertNotEquals="#result.getUnitofMeasureCode()"></span>Unit of measure field should return not null</li></ul></ul>
+		    
+		    <ul concordion:execute="#result = testViewPurchaseOrder(#purchaseOrderNumber)">
+            <li>Input Purchase Number <b><span concordion:set="#purchaseOrderNumber">J00307701</span></b>, click on View Purchase Order:</li>
+            <ul type = "square">
+            <li><span concordion:assertNotEquals="#result.getMaintReqStatus"></span>The PO status should return not null</li>
+            <li><span concordion:assertNotEquals="#result.getMaintReqType"></span>The Maintenance Request Type code should return not null</li>
+            <li><span concordion:assertNotEquals="#result.getFleetMaster().getLatestOdometerReading().getOdoReading()"></span>Most recent odometer field should return not null</li>
+            <li><span concordion:assertNotEquals="#result.getFleetMaster().getLatestOdometerReading().getOdoReadingDate()"></span>Most recent odometer reading date field should return not null</li>
+            <li><span concordion:assertNotEquals="#result.getUnitofMeasureCode()"></span>Unit of measure field should return not null</li>
+            <li><span concordion:assertNotEquals="#result.getActualStartDate()"></span>Actual start date should return not null</li>
+            <li><span concordion:assertNotEquals="#result.getPlannedEndDate()"></span>Planned End/Complete Date should return not null</li>
+            <li><span concordion:assertNotEquals="#result.getActualEndDate()"></span>Complete Date should return not null</li></ul></ul>
+
+            
+    	<h2>Manual Tests</h2>
+    	    <ul type = "circle"><b>
+    	       <li>TODO: Verify the data in the Vehicle Information section of Create Maintenance Purchase Order screen based on the vehicle status.</li>
+    	    </b></ul>
+
+    	<h2>Untested (Out of Scope)</h2>
+    		<ul><li>TODO:</li></ul>
+    </body>
+</html>

@@ -1,0 +1,338 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.mikealbert.service</groupId>
+  <artifactId>mafs-core-services</artifactId>
+  <version>2.n.n.n.J8-SNAPSHOT</version>
+  
+   <properties>
+     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> 
+     <mafs.core.data.version>2.n.n.n.J8-SNAPSHOT</mafs.core.data.version>
+     <mafs.core.testing.version>2.n.n.n.J8-SNAPSHOT</mafs.core.testing.version>
+     <vehcfg-client.version>1.0.0.1</vehcfg-client.version>                 
+ 	</properties>
+   
+  <dependencies>
+    
+   <dependency>
+	    <groupId>com.fasterxml.jackson.jaxrs</groupId>
+	    <artifactId>jackson-jaxrs-json-provider</artifactId>
+	    <version>2.9.4</version>
+	</dependency>
+	
+	<dependency>
+        <groupId>com.sun.xml.bind</groupId>
+        <artifactId>jaxb-impl</artifactId>
+        <version>2.3.0</version>
+    </dependency>
+	
+	<dependency>
+	    <groupId>com.sun.xml.bind</groupId>
+	    <artifactId>jaxb-core</artifactId>
+	    <version>2.3.0</version>
+	</dependency>
+	
+  	<!-- Spring WS -->
+	<dependency>
+   	 <groupId>org.springframework.ws</groupId>
+     <artifactId>spring-ws-core</artifactId>
+    	<version>3.0.1.RELEASE</version>
+    	<exclusions>
+    		<exclusion>
+    			<artifactId>stax-api</artifactId>
+    			<groupId>javax.xml.stream</groupId>
+    		</exclusion>
+    	</exclusions>
+	</dependency>
+ 	<dependency>
+		<groupId>com.mikealbert.data</groupId>
+		<artifactId>mafs-core-data</artifactId>
+		<version>${mafs.core.data.version}</version>
+	</dependency>
+	
+	<dependency>
+    	<groupId>javax.mail</groupId>
+    	<artifactId>mail</artifactId>
+    	<version>1.4.7</version>
+    </dependency>
+   
+	<dependency>
+		<groupId>com.mikealbert.service.tal</groupId>
+		<artifactId>tal-websvc-schema</artifactId>
+		<version>1.0</version>
+	</dependency>
+	
+    <dependency>
+        <groupId>com.mikealbert.ws.vehcfg.client</groupId>
+        <artifactId>vehcfg-client</artifactId>
+        <version>${vehcfg-client.version}</version>
+    </dependency>		
+	
+     <dependency>
+  		<groupId>org.apache.velocity</groupId>
+  		<artifactId>velocity</artifactId>
+  		<version>1.7</version>  		
+  	</dependency>
+     <dependency>
+  		<groupId>org.apache.velocity</groupId>
+  		<artifactId>velocity-tools</artifactId>
+  		<version>2.0</version>
+  		<exclusions>
+	        <exclusion>
+	            <groupId>antlr</groupId>
+	            <artifactId>antlr</artifactId>
+	        </exclusion>
+	        <exclusion>
+	            <groupId>dom4j</groupId>
+	            <artifactId>dom4j</artifactId>
+	        </exclusion>
+	        <exclusion>
+	            <groupId>org.apache.struts</groupId>
+	            <artifactId>struts-core</artifactId>
+	        </exclusion>
+	        <exclusion>
+	            <groupId>org.apache.struts</groupId>
+	            <artifactId>struts-taglib</artifactId>
+	        </exclusion>
+	        <exclusion>
+	            <groupId>org.apache.struts</groupId>
+	            <artifactId>struts-tiles</artifactId>
+	        </exclusion>
+	    </exclusions>
+  	</dependency>
+  	
+  	<dependency>
+		<groupId>com.googlecode.cqengine</groupId>     
+		<artifactId>cqengine</artifactId>     
+		<version>1.3.2</version> 
+	</dependency>
+
+	<!-- JasperReports -->
+	<dependency>
+		<groupId>net.sf.jasperreports</groupId>
+		<artifactId>jasperreports</artifactId>
+		<version>6.6.0</version>
+<!-- 		<exclusions>
+			<exclusion>
+				<artifactId>xml-apis</artifactId>
+				<groupId>xml-apis</groupId>
+			</exclusion>
+			<exclusion>
+				<artifactId>stax</artifactId>
+				<groupId>stax</groupId>
+			</exclusion>
+			<exclusion>
+				<groupId>javax.xml.stream</groupId>
+				<artifactId>stax-api</artifactId>
+			</exclusion>
+		</exclusions>
+--> 	</dependency>
+	<dependency>
+		<groupId>net.sf.jasperreports</groupId>
+		<artifactId>jasperreports-fonts</artifactId>
+		<version>6.0.0</version>
+	</dependency>	
+	
+	  <dependency>
+			<groupId>com.mikealbert.reporting.extras</groupId>
+			<artifactId>JasperReportsFonts</artifactId>
+			<version>1.0.0</version>
+		</dependency> 	
+
+	<dependency>
+	    <groupId>com.chrome.services</groupId>
+	    <artifactId>wsdlStubs7a</artifactId>
+	    <version>1.0</version>
+	</dependency>
+		
+<!-- 	<dependency> -->
+<!--   		<groupId>dumbster</groupId> -->
+<!--   		<artifactId>dumbster</artifactId> -->
+<!--   		<version>1.6</version> -->
+<!--   		<type>jar</type> -->
+<!--   		<scope>test</scope> -->
+<!--   		<optional>false</optional> -->
+<!--   	</dependency> -->
+	
+	<dependency>
+      <groupId>com.mikealbert.data</groupId>
+      <artifactId>mafs-core-data</artifactId>
+      <version>${mafs.core.data.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+	<dependency>
+		<groupId>com.mikealbert.testing</groupId>
+		<artifactId>mafs-core-testing</artifactId>
+		<version>${mafs.core.testing.version}</version>
+		<scope>test</scope>
+	</dependency>	
+  </dependencies>
+  <build>
+    <plugins>
+       <plugin>
+           <groupId>org.apache.maven.plugins</groupId>
+           <artifactId>maven-compiler-plugin</artifactId>
+           <version>3.7.0</version>
+           <configuration>
+               <source>1.8</source>
+               <target>1.8</target>
+           </configuration>
+       </plugin>
+       <plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-source-plugin</artifactId>
+			<version>3.0.1</version>
+			<executions>
+				<execution>
+					<id>attach-sources</id>
+					<goals>
+						<goal>jar</goal>
+					</goals>
+				</execution>
+			</executions>
+		</plugin>
+		
+		<plugin>
+			<groupId>org.codehaus.mojo</groupId>
+			<artifactId>jasperreports-maven-plugin</artifactId>
+			<version>1.0-beta-2</version>
+			<configuration>
+            	<outputDirectory>${project.build.outputDirectory}/reports</outputDirectory>
+          	</configuration>
+		  <executions>
+		  	<execution>
+		  		<id>compile-reports</id>
+		  		<phase>compile</phase>
+		  		<goals>
+		  			<goal>compile-reports</goal>
+		  		</goals>
+		  	</execution>
+		  </executions>
+          <dependencies>
+            <dependency>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jasperreports-maven-plugin</artifactId>
+                <version>1.0-beta-2</version>
+                <exclusions>
+                  <exclusion>
+                    <groupId>jasperreports</groupId>
+                    <artifactId>jasperreports</artifactId>
+                  </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>net.sf.jasperreports</groupId>
+                <artifactId>jasperreports</artifactId>
+                <version>6.6.0</version>
+                <exclusions>
+                  <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                  </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-all</artifactId>
+                <version>1.8.6</version>
+            </dependency>
+          </dependencies>
+		</plugin>
+		
+    </plugins>
+    <resources>
+   		<resource>
+     		<directory>src/main/resources</directory>
+     		<filtering>true</filtering>
+   		</resource>
+   		<resource>
+   			<targetPath>reports/images</targetPath>
+     		<directory>src/main/jasperreports/images</directory>
+     		<filtering>true</filtering>
+   		</resource>   		
+ 	</resources>
+ 	 <pluginManagement>
+    	<plugins>
+    		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+    		<plugin>
+    			<groupId>org.eclipse.m2e</groupId>
+    			<artifactId>lifecycle-mapping</artifactId>
+    			<version>1.0.0</version>
+    			<configuration>
+    				<lifecycleMappingMetadata>
+    					<pluginExecutions>
+    						<pluginExecution>
+    							<pluginExecutionFilter>
+    								<groupId>org.codehaus.mojo</groupId>
+    								<artifactId>
+    									jasperreports-maven-plugin
+    								</artifactId>
+    								<versionRange>
+    									[1.0-beta-2,)
+    								</versionRange>
+    								<goals>
+    									<goal>compile-reports</goal>
+    								</goals>
+    							</pluginExecutionFilter>
+    							<action>
+    								<ignore></ignore>
+    							</action>
+    						</pluginExecution>
+    					</pluginExecutions>
+    				</lifecycleMappingMetadata>
+    			</configuration>
+    		</plugin>
+    	</plugins>
+    </pluginManagement> 		
+ 	
+  </build>
+  <reporting>
+  	<plugins>
+		<plugin>
+           <groupId>org.apache.maven.plugins</groupId>
+           <artifactId>maven-javadoc-plugin</artifactId>
+           <version>3.0.0</version>
+              <configuration>
+                    <outputDirectory>${project.build.directory}/apidocs</outputDirectory>
+                    <overview>overview.html</overview>
+                    <javadocDirectory>Source/Javadoc</javadocDirectory>
+                    <excludedocfilessubdir>CVS</excludedocfilessubdir>
+                    <docfilessubdirs>true</docfilessubdirs>
+                    <source>1.8</source>
+                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <id>html</id>
+                        <configuration>
+                            <doctitle>API for ${project.name} ${project.version}</doctitle>
+                            <windowtitle>API for ${project.name} ${project.version}</windowtitle>
+                        </configuration>
+                        <reports>
+                            <report>javadoc</report>
+                        </reports>
+                    </reportSet>
+                    <reportSet>
+                        <id>test-html</id>
+                        <configuration>
+                            <testDoctitle>Testware API for ${project.name} ${project.version}</testDoctitle>
+                            <testWindowtitle>Testware API for ${project.name} ${project.version}</testWindowtitle>
+                        </configuration>
+                        <reports>
+                            <report>test-javadoc</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+        </plugin>
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>findbugs-maven-plugin</artifactId>
+            <version>3.0.5</version>
+            <configuration>
+                <findbugsXmlOutput>true</findbugsXmlOutput>
+                <findbugsXmlWithMessages>true</findbugsXmlWithMessages>
+                <xmlOutput>true</xmlOutput>
+            </configuration>
+        </plugin>         
+  	</plugins>
+  </reporting>
+</project>

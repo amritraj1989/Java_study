@@ -1,0 +1,21 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Fleet Maintenance / Client Lov</title>
+    <body>
+    	<h1>Fleet Maintenance / Client Lov</h1>
+    	<h2>Acceptance Tests (Automated)</h2>
+
+    		<ul concordion:execute="#result = testFindCustomerContacts(#searchParam)"><li>When searching the lov for a Client - <b><span concordion:set="#searchParam">00005945</span></b><span concordion:assertTrue="#result"> the lov search results show at least one Client.</span></li></ul>
+		    <ul concordion:execute="#result = testFindCustomerContacts(#searchParam)"><li>When searching the lov for a Client - <b><span concordion:set="#searchParam">0005945</span></b><span concordion:assertFalse="#result"> the search results show no records found.</span></li></ul>
+		    <ul concordion:execute="#result = testFindCustomerContacts(#searchParam)"><li>When searching the lov for a Client - <b><span concordion:set="#searchParam">0000594</span></b><span concordion:assertTrue="#result"> the lov search results show at least one Client.</span></li></ul>
+		    <ul concordion:execute="#result = testFindCustomerContacts(#searchParam)"><li>When searching the lov for a Client - <b><span concordion:set="#searchParam">Medtronic, Inc.</span></b><span concordion:assertTrue="#result"> the lov search results show at least one Client.</span></li></ul>
+		    <ul concordion:execute="#result = testFindCustomerContacts(#searchParam)"><li>When searching the lov for a Client - <b><span concordion:set="#searchParam">Medtronic</span></b><span concordion:assertTrue="#result"> the lov search results show at least one Client.</span></li></ul>
+		    <ul concordion:execute="#result = testFindCustomerContacts(#searchParam)"><li>When searching the lov for a Client - <b><span concordion:set="#searchParam">edtronic</span></b><span concordion:assertFalse="#result"> the search results show no records found.</span></li></ul>
+		        		
+    	<h2>Manual Tests</h2>
+    		<ul><li>TODO: After entering information in search criteria field: test clicking Enter in search field, test clicking Search, test clicking the LOV.</li></ul>
+    		
+    	<h2>Untested (Out of Scope)</h2>
+    		<ul><li>TODO:</li></ul>
+    </body>
+</html>

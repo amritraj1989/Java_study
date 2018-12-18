@@ -1,0 +1,213 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	template="../../templates/ui.xhtml">
+	
+	<ui:define name="content">
+			<h:form id="breadCrumbForm" prependId="false">
+				<p:breadCrumb model="#{tasksBean.breadCrumbTrail}"  
+				 style="min-width:900px;max-width:100%;width:auto" 
+				ajax="false" immediate="true" styleClass="ui-layout"/>
+			</h:form>
+		
+			<!-- Error message display -->
+			<p:scrollPanel style="height:50px;max-width:100%;width:auto;" 
+				mode="native" styleClass="ui-layout">
+				<p:messages id="messages" showSummary="false" showDetail="true"	autoUpdate="true" />
+			</p:scrollPanel>			
+			
+			<h:form id="mainForm" prependId="false">
+			
+	    		<p:panel id="resultsPanel" >
+	    		
+		    		<f:facet name="header" >
+	    				<h:outputText value="Task List"/>
+		    		</f:facet>
+	    			 
+	    			 <h:inputHidden id="hiddenScrollPosition" value="#{tasksBean.scrollPosition}" />	
+	    			 
+	                <p:dataTable  id="resultsTable" var="result" 
+	                	widgetVar="resultVar"
+	                	value="#{tasksBean.rowList}" 
+	                	scrollable="true"  
+	                	scrollHeight="#{tasksBean.dataTable.height}"
+						paginator= "true"
+						rows="500"
+						paginatorPosition="bottom" 
+						rowIndexVar="selectedRowIndex"
+						selection="#{tasksBean.selectedTask}" 
+						sortBy="#{result.maintenanceCategory.code}"
+						sortOrder="ascending"
+						rowKey="#{result}" 
+						selectionMode="single">
+
+					
+	                   	<p:column width="#{tasksBean.dataTable.col4}" sortBy="#{result.maintenanceCategory.code}">
+	                    	<f:facet name="header">
+								<h:outputText value="Category" style ="font-weight:bold"/>
+								<p:spacer width="4" />
+								<p:commandLink  oncomplete="PF('filterDialogVar').show()" actionListener="#{tasksBean.processDialogRequest}" 
+	                    				  update=":filterDialog,:filterForm:filterPanel" >
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: middle" 
+													value="/images/filtered-red.png"
+													rendered="#{tasksBean.categoryFilter != 'ALL'}"
+													title="Filtered" />
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: middle" 
+													value="/images/non-filtered.png"
+													rendered="#{tasksBean.categoryFilter == 'ALL'}"
+													title="Unfiltered" />
+								</p:commandLink>
+							</f:facet>
+	                    	<h:outputText value="#{result.maintenanceCategory.code}" />
+	                   	</p:column> 
+	                
+	                
+	                   	<p:column width="#{tasksBean.dataTable.col1}" sortBy="#{result.serviceCode}">
+	                    	<f:facet name="header">
+								<h:outputText value="Name" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputText value="#{result.serviceCode}" />
+	                   	</p:column> 
+
+	                   	<p:column style="word-wrap: break-word" width="#{tasksBean.dataTable.col2}" sortBy="#{result.taskDescription}">
+	                    	<f:facet name="header">
+								<h:outputText value="Description" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputText value="#{result.taskDescription}" />
+	                   	</p:column> 
+
+	                   	<p:column width="#{tasksBean.dataTable.col3}" sortBy="#{result.cost}">
+	                    	<f:facet name="header">
+								<h:outputText value="Cost" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputText value="#{result.cost}" styleClass="alignmentRight">
+	                    		<f:converter converterId="malDollarValueConverter" />
+	                    	</h:outputText>
+	                   	</p:column> 
+
+
+	                   	<p:column width="#{tasksBean.dataTable.col5}" style="text-align:center" sortBy="#{result.activeFlag}">
+	                    	<f:facet name="header">
+								<h:outputText value="Active" style ="font-weight:bold"/>
+								<p:spacer width="4" />
+								
+								<p:commandLink oncomplete="PF('filterDialogVar').show()" actionListener="#{tasksBean.processDialogRequest}" 
+	                    				  update=":filterDialog,:filterForm:filterPanel" >
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: middle" 
+													value="/images/filtered-red.png"
+													rendered="#{tasksBean.activeFilter != 'ALL'}"
+													title="Filtered" />
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: middle" 
+													value="/images/non-filtered.png"
+													rendered="#{tasksBean.activeFilter == 'ALL'}"
+													title="Unfiltered" />
+								</p:commandLink>
+								
+								
+								
+
+							</f:facet>
+	                    	<h:outputText value="#{result.activeFlag == 'Y' ? 'Yes' : 'No'}" />
+	                   	</p:column> 
+	                    
+						<f:facet name="footer" >
+							<h:outputText value="Total Records: #{tasksBean.totalRecords}" />
+						</f:facet>
+	                </p:dataTable>
+	    			
+
+              	</p:panel>
+
+	    		<p:panel id="buttonsPanel">
+					<h:panelGrid id="buttons">
+						<f:facet name="footer">
+							<p:commandButton disabled="#{!tasksBean.hasEditPermission}" id="addButton" tabindex="30" value="Add"
+								action="#{tasksBean.add}" ajax="false"
+								onclick="lockScreen();" />
+   							<p:spacer width="10" />
+   							<p:commandButton id="editButton" tabindex="40" value="View/Edit" disabled="#{ tasksBean.totalRecords == 0}"
+								action="#{tasksBean.edit}" ajax="false"
+								onclick="lockScreen();saveScrollPosition();" />
+							<p:spacer width="10" />
+							<p:commandButton id="deleteButton" tabindex="40" value="Delete"
+								disabled="#{!tasksBean.hasEditPermission}" onclick="showDialog('confirmVar');" />
+							<p:spacer width="10" />
+							<p:commandButton id="cancel" value="Cancel" action="#{tasksBean.cancel}" ajax="false" onclick="lockScreen();" immediate="true" />
+						</f:facet>
+					</h:panelGrid>
+              	</p:panel>
+
+			</h:form>
+
+
+			<p:dialog id="filterDialog" header="Filters"  widgetVar="filterDialogVar"   
+					   modal="true" resizable="false" appendTo="@(body)" style="min-width: 425px; max-width: 425px;"> 
+			  	
+			  	<h:form id="filterForm" prependId="false">   					  
+				<p:hotkey immediate="true" bind="esc" handler="PF('filterDialogVar').hide();"/>	
+					<p:panel id="filterPanel">
+						
+					
+						<p:panelGrid columns="2">
+							<h:outputText value="Category:" />
+							<h:selectOneMenu id="categoryFilter" value="#{tasksBean.categoryFilter}">
+					            <f:selectItems value="#{tasksBean.availableCategories}" />
+					        </h:selectOneMenu>
+							
+							<h:outputText value="Active:" />
+							<h:selectOneMenu id="activeFilter" value="#{tasksBean.activeFilter}">
+					            <f:selectItems value="#{tasksBean.availableActiveFlags}" />
+					        </h:selectOneMenu>
+						</p:panelGrid>
+						<hr />
+						<p:commandButton value="Apply filters" ajax="true" update=":mainForm:resultsTable, :mainForm:buttonsPanel" process="@form" 
+							  		oncomplete="PF('filterDialogVar').hide();" actionListener="#{tasksBean.filterRowList}"/>
+						<p:spacer width="10"/>
+						<p:commandButton value="Clear filters" ajax="true" update=":mainForm:resultsTable, :mainForm:buttonsPanel, filterForm" process="@form" 
+					  		oncomplete="PF('filterDialogVar').hide();" actionListener="#{tasksBean.removeAllFilters}"/>
+						<p:spacer width="10"/>
+						
+						<p:commandButton value="Cancel" onclick="PF('filterDialogVar').hide();"/>
+                                                
+
+
+
+
+					</p:panel>	    	
+				</h:form>		
+		  	</p:dialog>
+
+		  	<p:confirmDialog id="confirmDialogId" message="Are you sure?" header="Confirm Delete" appendTo="@(body)"
+				widgetVar="confirmVar" resizable="false" width="200" height="60" update=":mainForm:buttonsPanel">    
+				
+	           <h:form prependId="false">
+       				<p:commandButton  value="Yes" ajax="false" process="@this"	onclick="hideDialog('confirmVar');lockScreen();" 
+       					actionListener="#{tasksBean.delete}"/>			  
+        			<p:spacer width="10" />
+        			<p:commandButton  value="No"  onclick="PF('confirmVar').hide();" type="button"/>
+        			
+        		</h:form>
+        </p:confirmDialog>
+		  	
+		  	
+
+
+			<script>
+			
+			function saveScrollPosition() {
+            	document.getElementById('hiddenScrollPosition').value = $('#resultsTable .ui-datatable-scrollable-body').scrollTop();
+            }
+            function setScrollPosition() {
+            	$('#resultsTable .ui-datatable-scrollable-body').scrollTop(document.getElementById('hiddenScrollPosition').value);
+            }
+            $(window).load(function(){
+       		 setScrollPosition();
+		  	});
+			</script>
+			
+			
+	</ui:define>
+</ui:composition>

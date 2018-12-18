@@ -1,0 +1,336 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component" 
+	xmlns:pe="http://primefaces.org/ui/extensions"   
+    template="../../templates/ui.xhtml" >
+
+    <ui:define name="content"> 
+		<h:form id="clientLevelFeesBreadCrumbForm" prependId="false">
+    	<p:breadCrumb model="#{gradeGroupServiceElementDetailsBean.breadCrumbTrail}" ajax="false" immediate="true" />
+    </h:form>
+    <!-- Message display -->
+		<p:scrollPanel style="height:50px;" mode="native">
+			<p:messages id="messages" severity="info,error,fatal" showSummary="false" showDetail="true" autoUpdate="true" />
+		</p:scrollPanel>
+
+		<!-- Per SS-557, may be implemented at a later date -->
+		<comp:billingOptionDialog id="billingOption" radioOptionsValue="#{gradeGroupServiceElementDetailsBean.selectedBillingOption}" saveBillingOptionAction="#{gradeGroupServiceElementDetailsBean.changeGradeGroupServiceElement}" />
+   		  
+   		<h:form id="gradeGroupDetailsForm" prependId="false"> 
+			<p:panel id="gradeGroupPanelTop" header="Grade Group Service Element Details for Client: #{gradeGroupServiceElementDetailsBean.clientAccount.externalAccountPK.accountCode} - #{gradeGroupServiceElementDetailsBean.clientAccount.accountName}"> 
+				<p:toolbar id="searchToolbar">  
+			        <p:toolbarGroup style="vertical-align:top;text-align:left">  
+			          <p:spacer width="10"/>
+					  <h:outputText for="gradeGroupFilter" value="Grade Group: " />
+			          <p:spacer width="10"/>  
+					  <p:selectOneMenu id="gradeGroupFilter" style="vertical-align:top;" tabindex="10" value="#{gradeGroupServiceElementDetailsBean.selectedGradeGroupCode}"> 
+				          <p:ajax update=":gradeGroupDetailsForm"/>
+				          <f:selectItem itemLabel="All" itemValue="ALL" />				        				 
+					      <f:selectItems value="#{gradeGroupServiceElementDetailsBean.gradeGroupServiceElementList}" var="gradeGroupList"
+								        itemLabel="#{gradeGroupList.gradeGroupCode} - #{gradeGroupList.gradeDescription}"
+										itemValue="#{gradeGroupList.gradeGroupCode}"/> 
+			          </p:selectOneMenu>  
+			        </p:toolbarGroup>  
+		      	</p:toolbar>
+				<p:panel>	
+					<p:dataTable id= "gradeGroupsTbl" value="#{gradeGroupServiceElementDetailsBean.gradeGroupServiceElementList}" var="gradeGroups" rowStyleClass="ui-datatable-none">
+						<p:column rendered="#{gradeGroupServiceElementDetailsBean.selectedGradeGroupCode eq 'ALL' ? true : gradeGroups.gradeGroupCode eq gradeGroupServiceElementDetailsBean.selectedGradeGroupCode}">
+							<p:panel id="gradeGroupPanel" header="#{gradeGroups.gradeGroupCode} - #{gradeGroups.gradeDescription}" style="border-style:none">
+							    <p:dataTable id="gradeGroupElementsTbl" value="#{gradeGroups.serviceElementList}" var="grdGrpElements" emptyMessage="No Grade Group overrides exist">
+							      	<p:column style="width:52%">
+						                <f:facet name= "header">Service Element</f:facet > 
+						                <h:outputText value="#{grdGrpElements.clientContractServiceElement.leaseElement.elementName} - #{grdGrpElements.clientContractServiceElement.leaseElement.description}" style="#{grdGrpElements.removedFlag == 'Y' ? 'text-decoration:line-through;':'text-decoration:none;'}"/>
+				           			</p:column>
+						            <p:column style="width:10%">
+							            <f:facet name= "header">Default Value</f:facet > 
+							            <h:outputText value="#{gradeGroupServiceElementDetailsBean.getDefaultValues(grdGrpElements.clientContractServiceElement.leaseElement.lelId, grdGrpElements.clientServiceElementId, grdGrpElements.product.productCode)}" style="float:right;"/>
+						            </p:column>
+						            <p:column style="width:10%">
+							            <f:facet name= "header">Client Value</f:facet > 
+							            <h:outputText value="#{gradeGroupServiceElementDetailsBean.clientValueTotal}" style="float:right;"/>
+						            </p:column>
+						            <p:column style="width:10%">
+							            <f:facet name="header">Grade Group Value</f:facet> 
+							            <h:panelGroup  style="float:right">
+								            <h:outputText value="#{gradeGroupServiceElementDetailsBean.gradeGroupValueTotal}" />
+						            		<p:spacer width="10"/>                       
+						            		<p:commandLink id="editLnk" title="Edit" oncomplete="PF('gradeGroupServEleFeesDialogWidget').show();" update=":gradeGroupServEleFeesDialog"
+						                  				actionListener="#{gradeGroupServiceElementDetailsBean.populateElementValues(grdGrpElements.clientContractServiceElement.leaseElement.lelId, grdGrpElements.clientServiceElementId, grdGrpElements.product.productCode)}"
+						                  				rendered="#{gradeGroupServiceElementDetailsBean.hasPermission() and grdGrpElements.removedFlag == 'N'}">
+						                  			<p:graphicImage value="/images/action_edit.png" style="border-style: none"/>
+						            		</p:commandLink>
+						            		<p:commandLink id="detailLnk" title="View" oncomplete="PF('gradeGroupServEleFeesDialogWidget').show();" update=":gradeGroupServEleFeesDialog"
+						                  				actionListener="#{gradeGroupServiceElementDetailsBean.populateElementValues(grdGrpElements.clientContractServiceElement.leaseElement.lelId, grdGrpElements.clientServiceElementId, grdGrpElements.product.productCode)}"
+						                 				rendered="#{!gradeGroupServiceElementDetailsBean.hasPermission() and grdGrpElements.removedFlag == 'N'}" >
+						            				<p:graphicImage value="/images/action_detail.png" style="border-style: none"/>	
+			            					</p:commandLink>
+		            					</h:panelGroup>						            
+						            </p:column>
+						            <!-- hide column as per business -->
+						            <p:column style="display: none">
+							            <f:facet name="header">Billing Option</f:facet> 
+							            <p:commandLink id="billingOptionCommandLink"
+							                        update=":billingOption:billingOptionDialogForm"
+							                        action="#{gradeGroupServiceElementDetailsBean.initDialog(grdGrpElements.billingOption,grdGrpElements.clientServiceElementId)}"
+							                        process="@this"
+							                        oncomplete="showBillingOptions();"
+							                        disabled="#{!gradeGroupServiceElementDetailsBean.hasPermission() or grdGrpElements.removedFlag == 'Y'}" 
+							                        title="Click to change Billing Option">  
+						                    <h:outputText value="#{grdGrpElements.billingOption == 'MONTHLY' ? 'Monthly' : 'Per Occurrence'}" />
+							            </p:commandLink>                                    
+						            </p:column>
+					            	<p:column style="width:18%">                
+					            		<p:spacer width="10"/>                       
+					            		<p:commandLink id="deleteLnk" title="Grade Group Exclusion" action="#{gradeGroupServiceElementDetailsBean.removeServiceElement(grdGrpElements.clientServiceElementId)}" 
+					             					rendered="#{gradeGroupServiceElementDetailsBean.hasPermission() and grdGrpElements.removedFlag == 'N' and gradeGroupServiceElementDetailsBean.isElementAssginedToClient(grdGrpElements.clientContractServiceElement)}"
+					             					update="gradeGroupElementsTbl" ajax="false" style="float:left">
+					            				<h:outputText value="GG Exclusion" />
+					            		</p:commandLink>
+										<p:spacer width="5"/>
+										<p:commandLink id="prdRemoveLnk" title="Product Exclusion"
+													rendered="#{gradeGroupServiceElementDetailsBean.hasPermission() and grdGrpElements.removedFlag == 'N'}" style="float:right"
+													action="#{gradeGroupServiceElementDetailsBean.initProductOverrideDialog(grdGrpElements.clientServiceElementId)}"
+		             								oncomplete="PF('productLevelDialogWidget').show();"
+		             								update=":productLevelDialogForm"> 
+						                		<h:outputText value="Product Exclusion" />
+						                </p:commandLink>
+					              	</p:column>
+								</p:dataTable>
+							<p:panel style="height:15px;" rendered="#{!empty gradeGroups.productServiceElementList}"></p:panel>
+								<p:dataTable id= "productExclusions" value="#{gradeGroups.productServiceElementList}" var="ggProductOverridesList" rendered="#{!empty gradeGroups.productServiceElementList}"> 
+					                <p:column style="width:20%">
+					                    <f:facet name= "header"><p:outputPanel style="float: left">Product Type Overrides</p:outputPanel></f:facet > 
+					                    <h:outputText value="#{ggProductOverridesList.product.productName}" style="#{ggProductOverridesList.removedFlag == 'Y' ? 'text-decoration:line-through;':'text-decoration:none;'}"/>
+					                </p:column>	                
+					                <p:column style="width:32%">
+					                    <f:facet name= "header">Service Element</f:facet > 
+					                    <h:outputText value="#{ggProductOverridesList.clientContractServiceElement.leaseElement.elementName} - #{ggProductOverridesList.clientContractServiceElement.leaseElement.description}"/>
+					                </p:column>
+					                <p:column style="width:10%">
+					                    <f:facet name= "header">Default Value</f:facet > 
+					                    <h:outputText value="#{gradeGroupServiceElementDetailsBean.getDefaultValues(ggProductOverridesList.clientContractServiceElement.leaseElement.lelId, ggProductOverridesList.clientServiceElementId, ggProductOverridesList.product.productCode)}" style="float:right;"/>
+					                </p:column>
+					                <p:column style="width:10%">
+					                    <f:facet name= "header">Client Value</f:facet > 
+					                    <h:outputText value="#{gradeGroupServiceElementDetailsBean.clientValueTotal}" style="float:right;"/>
+					                </p:column>	                
+						          	<p:column style="width:10%">
+							        	<f:facet name="header">Grade Group Value</f:facet> 
+										<h:outputText value="#{gradeGroupServiceElementDetailsBean.gradeGroupValueTotal}" style="float:right;"/>
+						          	</p:column> 
+									<p:column style="width:10%">
+							        	<f:facet name="header">Product Value</f:facet> 
+		        				          	<h:panelGroup  style="float:right">
+												<h:outputText value="#{gradeGroupServiceElementDetailsBean.productValueTotal}"/>
+									            <p:spacer width="10"/>                       
+						            		<p:commandLink id="editLnk2" title="Edit" oncomplete="PF('gradeGroupServEleFeesDialogWidget').show();" update=":gradeGroupServEleFeesDialog"
+						                  				actionListener="#{gradeGroupServiceElementDetailsBean.populateElementValues(ggProductOverridesList.clientContractServiceElement.leaseElement.lelId, ggProductOverridesList.clientServiceElementId, ggProductOverridesList.product.productCode)}"
+						                  				rendered="#{gradeGroupServiceElementDetailsBean.hasPermission() and ggProductOverridesList.removedFlag == 'N'}">
+						                  			<p:graphicImage value="/images/action_edit.png" style="border-style: none"/>
+						            		</p:commandLink>
+						            		<p:commandLink id="detailLnk2" title="View" oncomplete="PF('gradeGroupServEleFeesDialogWidget').show();" update=":gradeGroupServEleFeesDialog"
+						                  				actionListener="#{gradeGroupServiceElementDetailsBean.populateElementValues(ggProductOverridesList.clientContractServiceElement.leaseElement.lelId, ggProductOverridesList.clientServiceElementId, ggProductOverridesList.product.productCode)}"
+						                 				rendered="#{!gradeGroupServiceElementDetailsBean.hasPermission() and ggProductOverridesList.removedFlag == 'N'}">
+						            				<p:graphicImage value="/images/action_detail.png" style="border-style: none"/>	
+			            					</p:commandLink>						            		
+							            	</h:panelGroup>										
+						          	</p:column>
+									<p:column style="width:8%">		          	
+							            <p:commandLink id="deletePrdExclLink" title="Remove Product Exclusion"
+											    actionListener = "#{gradeGroupServiceElementDetailsBean.deleteProductExclusion(ggProductOverridesList.clientServiceElementId)}" 
+											    immediate="true" process="@this"
+											    update=":gradeGroupDetailsForm"
+											    rendered="#{gradeGroupServiceElementDetailsBean.hasPermission() and ggProductOverridesList.removedFlag == 'Y'}">
+							            	<p:graphicImage value="/images/action_delete.png" style="border-style: none"/>
+							            </p:commandLink>
+									</p:column>			            		          	               
+				            	</p:dataTable> 
+	    					</p:panel>
+		  				</p:column>
+					</p:dataTable>			
+				</p:panel>
+			</p:panel>		  		
+	  		
+	   		<p:panel id="commandPanel" style="min-width:980px;max-width:100%;width:auto;">
+				<p:commandButton id="cancelPage" value="Done" action="#{gradeGroupServiceElementDetailsBean.done}" ajax="false" immediate="true" tabindex="30"/>					
+			    <p:spacer width="10" />
+				<p:commandButton id= "viewEditGradeGroupServiceElements" value="Service Elements" tabindex="40" actionListener="#{gradeGroupServiceElementDetailsBean.viewEditGradeGroupServiceElements}" ajax="false"/>
+				<p:spacer width="10" />	
+			    <p:commandButton id="gradeGroupServEleHistoryDialogButton" value="Service Element History" tabindex="50"
+				    		actionListener="#{gradeGroupServiceElementDetailsBean.populateHistory}"
+				    		update=":gradeGroupServEleHistoryDialogForm" process="@this" oncomplete="PF('gradeGroupServEleHistoryDialogWidget').show();"/>	
+			</p:panel>
+   		</h:form>
+  		
+      	<p:dialog id= "gradeGroupServEleFeesDialog" header="Grade Group Service Element Finance Parameters" widgetVar="gradeGroupServEleFeesDialogWidget"
+          			modal="true" appendTo="@(body)" dynamic="true" closeOnEscape="true" onShow="readOnlyFocus();">
+      		<h:form id="gradeGroupServEleFeesDialogForm" prependId = "false">
+          		<h:inputHidden id="hiddenGradeGroupTotal" value="#{gradeGroupServiceElementDetailsBean.gradeGroupValueTotal}"/>
+   			    <h:inputHidden id="hiddenProductTotal" value="#{gradeGroupServiceElementDetailsBean.productValueTotal}"/>			  
+ 	        	<p:remoteCommand name="adjustTotal" actionListener="#{gradeGroupServiceElementDetailsBean.adjustTotal()}"
+	           					oncomplete="updateTotal();" update="hiddenGradeGroupTotal hiddenProductTotal"/>
+          		<p:dataTable id= "gradeGroupServEleFees" value="#{gradeGroupServiceElementDetailsBean.serviceElementParameterList}" var="elementValues">
+		            <p:column>
+			            <f:facet name= "header">Description</f:facet > 
+			            <h:outputText value="#{elementValues.parameterKey} - #{elementValues.parameterDescription}"/>
+		            </p:column>
+		            <p:column>
+			            <f:facet name= "header">Default Value</f:facet > 
+			            <h:outputText value= "#{elementValues.defaultValue}" style="float:right;"/>
+		            </p:column>
+		            <p:column>
+			            <f:facet name= "header">Client Value</f:facet >
+			            <h:outputText value= "#{elementValues.clientValue}" style="float:right;"/>
+		            </p:column>
+		            <p:column rendered="#{gradeGroupServiceElementDetailsBean.productOverride}">
+			            <f:facet name= "header">Grade Group Value</f:facet >
+			            <h:outputText value= "#{elementValues.gradeGroupValue}" style="float:right;"/>
+		            </p:column>		            
+		            <p:column rendered="#{!gradeGroupServiceElementDetailsBean.productOverride}">
+			            <f:facet name= "header">Grade Group Value</f:facet > 
+			            <p:inputNumber value="#{elementValues.gradeGroupValue}" disabled="#{!gradeGroupServiceElementDetailsBean.hasPermission()}" onchange="adjustTotal();"
+			               				styleClass="ui-text-align-right-dev" style="text-align:right" tabindex="100" decimalPlaces="5" maxlength="16" minValue="-10000" onfocus="selectText(this.id);">
+			            </p:inputNumber>
+		            </p:column> 
+		            <p:column rendered="#{gradeGroupServiceElementDetailsBean.productOverride}">
+			            <f:facet name= "header">Product Value</f:facet > 
+			            <p:inputNumber value="#{elementValues.productValue}" disabled="#{!gradeGroupServiceElementDetailsBean.hasPermission()}" onchange="adjustTotal();"
+			               			   styleClass="ui-text-align-right-dev" style="text-align:right" tabindex="100" decimalPlaces="5" maxlength="16" minValue="-10000" onfocus="selectText(this.id);">
+			            </p:inputNumber>
+		            </p:column> 		            
+		            <p:column>
+			            <f:facet name= "header">Last Updated</f:facet > 
+			            <h:outputText value= "#{elementValues.lastUpdated}"/>
+		            </p:column> 
+            		<p:columnGroup type="footer">
+              			<p:row>
+                			<p:column footerText="Total:" style="text-align:right"/>
+                  			<p:column style="text-align:right">                    
+                    			<f:facet name="footer">
+                      				<h:outputText id="defaultTotal" value="#{gradeGroupServiceElementDetailsBean.serviceElementParameterList.size() > 0 ? gradeGroupServiceElementDetailsBean.defaultValueTotal : ''}"/>
+                    			</f:facet>
+                  			</p:column>
+                  			<p:column style="text-align:right">
+                    			<f:facet name="footer">
+                    				<h:outputText id="clientTotal" value="#{gradeGroupServiceElementDetailsBean.serviceElementParameterList.size() > 0 ? gradeGroupServiceElementDetailsBean.clientValueTotal : ''}"/>
+                    			</f:facet>
+                  			</p:column>
+                  			<p:column style="text-align:right">
+                    			<f:facet name="footer">
+                    				<h:outputText id="gradeGroupTotal" value="#{gradeGroupServiceElementDetailsBean.serviceElementParameterList.size() > 0 ? gradeGroupServiceElementDetailsBean.gradeGroupValueTotal : ''}"/>
+                    			</f:facet>
+                  			</p:column>  
+                            <p:column style="text-align:right" rendered="#{gradeGroupServiceElementDetailsBean.productOverride}">
+		                      <f:facet name="footer">
+		                        <h:outputText id="productTotal" value="#{gradeGroupServiceElementDetailsBean.serviceElementParameterList.size() > 0 ? gradeGroupServiceElementDetailsBean.productValueTotal : ''}"/>
+		                      </f:facet>
+		                    </p:column> 
+                  			<p:column footerText=""/>
+              			</p:row>
+            		</p:columnGroup>                                                                                     
+          		</p:dataTable>
+        		<p:panel id="gradeGroupServEleFeesButtonPanel">
+				    <p:commandButton id="saveGradeGroupServEleFees" value="Save" tabindex="110" oncomplete="handleServEleDialogSave(xhr, status, args);"
+				      				action="#{gradeGroupServiceElementDetailsBean.save}" update=":gradeGroupDetailsForm"
+				      				disabled="#{!gradeGroupServiceElementDetailsBean.hasPermission() or gradeGroupServiceElementDetailsBean.serviceElementParameterList.size() eq 0}"/>
+				    <p:spacer width="10" />		         
+	        		<p:commandButton id="canceleGradeGroupServEleFeesDialog" value="Cancel" onclick="PF('gradeGroupServEleFeesDialogWidget').hide();" tabindex="120"/>
+	        	</p:panel>
+        	</h:form> 		        
+	    </p:dialog>
+
+      	<p:dialog id= "gradeGroupEleHistoryDialog" header="Grade Group Service Element History" widgetVar="gradeGroupServEleHistoryDialogWidget"
+        			modal="true" appendTo="@(body)" dynamic="true" resizable="true" height="325" width="900" closeOnEscape="true" onShow="setFocus('closeGradeGroupServEleHistoryDialog')">
+        	<h:form id="gradeGroupServEleHistoryDialogForm" prependId = "false">  
+          		<p:panel>
+            		<p:outputLabel value="Account: " styleClass="ui-label"/>
+            		<p:outputLabel value="#{gradeGroupServiceElementDetailsBean.clientAccount.externalAccountPK.accountCode} - #{gradeGroupServiceElementDetailsBean.clientAccount.accountName}"/> 
+          		</p:panel>            
+            	<p:dataTable id= "gradeGroupServHistory" value="#{gradeGroupServiceElementDetailsBean.gradeGroupServiceElementHistoryList}" var="serviceElementHistorylist"
+            			 	scrollable="true" scrollHeight="200">
+                  	<p:column width="55%">
+                      	<f:facet name= "header">Element</f:facet > 
+                      	<h:outputText value="#{serviceElementHistorylist.clientContractServiceElement.leaseElement.elementName} - #{serviceElementHistorylist.clientContractServiceElement.leaseElement.description}" />
+                  	</p:column>
+                  	<p:column width="12%">
+                    	<f:facet name= "header">Grade Group</f:facet > 
+                      	<h:outputText value="#{serviceElementHistorylist.externalAccountGradeGroup.driverGradeGroup.driverGradeGroup}" />
+                  	</p:column>                   
+                 	<p:column width="10%">
+                      	<f:facet name= "header">
+                        	<h:outputLabel value="Start Date"/>
+                      	</f:facet >
+                      	<h:outputLabel value="#{serviceElementHistorylist.startDate}">
+                      		<f:convertDateTime pattern="MM/dd/yyyy"/>
+                    	</h:outputLabel>                      
+                  	</p:column>
+                  	<p:column width="10%">
+                      	<f:facet name= "header">
+                        	<h:outputLabel value="End Date"/>
+                      	</f:facet > 
+                      	<h:outputLabel value="#{serviceElementHistorylist.endDate}">
+                      		<f:convertDateTime pattern="MM/dd/yyyy"/>
+                    	</h:outputLabel>                      
+                  	</p:column>                 
+              	</p:dataTable>
+	            <p:panel id="gradeGroupServEleHistoryButtonPanel">
+	              	<p:commandButton id="closeGradeGroupServEleHistoryDialog" value="Close" onclick="PF('gradeGroupServEleHistoryDialogWidget').hide();"/>
+	            </p:panel>
+          	</h:form>             
+      	</p:dialog>
+      	
+	    <p:dialog id="productLevelDialog" header="Select Product Level for Removal" 
+			widgetVar="productLevelDialogWidget" modal="true"
+			appendTo="@(body)" dynamic="true" height="325" width="500" closeOnEscape="true">
+			<h:form id="productLevelDialogForm" prependId = "false">
+			<p:focus/>
+			<p:messages id="productLevelMessages" severity="info,error,fatal" showSummary="true" showDetail="false" autoUpdate="true" />
+			<p:panelGrid id="productLevelDialogPanel">
+                <p:row>
+                	<p:column style="vertical-align:top;">
+						<p:outputLabel for="radioOptions" styleClass="ui-label" value="Product Level: " />
+						<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>
+					</p:column>
+					<p:column style="vertical-align:top;">
+				        <h:selectOneRadio id="radioOptions" value="#{gradeGroupServiceElementDetailsBean.selectedProduct}" layout="pageDirection" tabindex="200">  
+								<f:selectItems
+									value="#{gradeGroupServiceElementDetailsBean.activeClientProductList}"
+									var="prodList" itemLabel="#{prodList.productCode} - #{prodList.productName}"
+									itemValue="#{prodList.productCode}" />			            
+				        </h:selectOneRadio>
+					</p:column>	
+                </p:row>	
+			</p:panelGrid>
+			<p:panel id="productLevelDialogButtonPanel">
+				<p:commandButton id="saveProductLevelDialog" value="Save" tabindex="210" action="#{gradeGroupServiceElementDetailsBean.removeProductServiceElement()}" update=":gradeGroupDetailsForm" process="@form" disabled="" oncomplete="PF('productLevelDialogWidget').hide()"/>
+				<p:spacer width="10" />
+				<p:commandButton id="cancelProductLevelDialog" value="Cancel" tabindex="220" onclick="PF('productLevelDialogWidget').hide();"/>
+			</p:panel>
+			</h:form>
+		</p:dialog>      	
+	    		
+		<script type="text/javascript">
+		
+		function handleServEleDialogSave(xhr, status, args) {
+			if(!args.failure) {
+				PF('gradeGroupServEleFeesDialogWidget').hide();
+			}
+		}
+
+	    function updateTotal () {
+	        $('[id$=gradeGroupTotal]').html($('[id$=hiddenGradeGroupTotal]').val()); 
+	        $('[id$=productTotal]').html($('[id$=hiddenProductTotal]').val());
+	    }
+    
+	    function readOnlyFocus() {
+			if ($('[id$=saveGradeGroupServEleFees]').disabled = true) {
+				setFocus('canceleGradeGroupServEleFeesDialog');
+			}
+		}
+		
+		</script> 
+	</ui:define>
+</ui:composition>    

@@ -1,0 +1,191 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	template="../../templates/ui.xhtml">
+	
+	<ui:define name="content">
+			<h:form id="breadCrumbForm" prependId="false">
+				<p:breadCrumb model="#{maintainSupplierDiscountsBean.breadCrumbTrail}"  
+				 style="min-width:900px;max-width:100%;width:auto" 
+				ajax="false" immediate="true" styleClass="ui-layout"/>
+			</h:form>
+		
+			<!-- Error message display -->
+			<p:scrollPanel style="height:50px;max-width:100%;width:auto;" 
+				mode="native" styleClass="ui-layout">
+				<p:messages id="messages" showSummary="false" showDetail="true"	autoUpdate="true" />
+			</p:scrollPanel>			
+			
+			<h:form id="mainForm" prependId="false">
+
+	    		<p:panel id="resultsPanel" >
+	    			<p:focus context="resultsPanel" />
+		    		<f:facet name="header" >
+	    				<h:outputText value="MAFS Maintenance Code Discount Status"/>
+		    		</f:facet>
+
+	    			<p:toolbar id="filterToolbar" rendered="true">  
+					    <p:toolbarGroup align="left">  
+					    		<p:separator></p:separator>
+								<p:outputLabel for="providerFilter" value="Service Provider:* "  />	
+								<h:panelGroup style="white-space:nowrap;">							
+									<p:inputText id="providerFilter" name="providerFilter" title="Service Provider" tabindex="10" 
+									value="#{maintainSupplierDiscountsBean.serviceProviderName}"  onkeypress="return doKeypressFilter(event)"
+									style="vertical-align: middle;"/>
+									<p:commandButton id='serviceProviderLOV' icon="icon-lov" title="lov" tabindex="20"
+				                             oncomplete="showServiceProviderLov();" immediate="true"
+				                             actionListener="#{serviceProviderLovBean.fetchLOVDataByServiceProviderName}"
+				                             process="@all" dynamic="true" async="true"
+				                             update=":serviceProviderLovToolbarForm:searchToolbar :serviceProviderLovForm:serviceProviderDataTableId  :serviceProviderLovForm:serviceProviderSelectPanel">
+				                             <f:param name="SERVICEPROVIDER_LOV_INPUT" value="providerFilter" />
+				                             <f:param name="INCLUDEPARENTSONLY_LOV_INPUT" value="Y" />
+				                     </p:commandButton>
+				          		</h:panelGroup>
+								<p:spacer width="10" />
+								<p:outputLabel for="maintCodeFilter" value="MAFS Maint Code: "  />	
+								<h:panelGroup style="white-space:nowrap;">							
+									<p:inputText id="maintCodeFilter" name="maintCodeFilter" title= "MAFS Maint Code" tabindex="30" 
+										value="#{maintainSupplierDiscountsBean.maintCode}"  onkeypress="return doKeypressFilter(event)"
+										style="vertical-align: middle;" />
+									<p:commandButton id='maintCodeLOV' icon="icon-lov" title="lov" tabindex="40"
+				                             oncomplete="showMaintenanceCodeLov();" immediate="true"
+				                             actionListener="#{maintenanceCodeLovBean.fetchLOVDataByMaintenanceCodeDescription}"
+				                             process="@all" dynamic="true" async="true"
+				                             update=":MaintLovForm:MAINTENANCE_CODE_GRID">
+				                             <f:param name="MAINTENANCE_CODE_LOV_INPUT" value="maintCodeFilter" />
+				                     </p:commandButton>
+				          		</h:panelGroup>
+
+								<p:spacer width="10" />
+								<p:outputLabel for="categoryFilter" value="Category: "  />
+				               	<h:panelGroup style="white-space:nowrap;">			
+									<p:selectOneMenu id="categoryFilter" title="Category" tabindex="50" styleClass="selectMenu" value="#{maintainSupplierDiscountsBean.maintCategory}" onkeydown="return doKeypressFilter(event);" 
+									style="width:160px;vertical-align: middle;"   >
+										<f:selectItem itemLabel="----" itemValue="" />
+										<f:selectItems
+											value="#{maintainSupplierDiscountsBean.maintCategories}"
+								    		var="category" 
+											itemLabel="#{category.code}"
+											itemValue="#{category.code}"/>
+									</p:selectOneMenu>														
+								</h:panelGroup>
+								
+								
+								
+								<p:separator></p:separator>
+								<p:commandButton  value="Search" id="filter" title="Search" tabindex="60" process="@this, providerFilter, maintCodeFilter, categoryFilter"
+								 	update="maintCodeDataTable, buttonsPanel" actionListener="#{maintainSupplierDiscountsBean.performSearch}" oncomplete="saveDataForDirtyDetection();" /> 
+					    </p:toolbarGroup>  
+					</p:toolbar>     				
+	    			 
+	    			<p:dataTable id="maintCodeDataTable" var="maintCode" widgetVar="maintCodeDataTableWidget"
+   						rowKey="#{maintCode.mcoId}"
+	                	value="#{maintainSupplierDiscountsBean.rowList}"   
+	                	scrollable="true"  
+	                	scrollHeight="#{maintainSupplierDiscountsBean.dataTable.height}"
+	                	rows="#{maintainSupplierDiscountsBean.rowsPerPage}" 
+	                	rowIndexVar="maintCodeRowIndex"
+	                	paginator="true"
+	                	paginatorPosition="bottom">
+
+						<p:ajax event="sort" oncomplete="initializeDirtyDetection();"/>
+			            
+			            <p:column sortBy="#{maintCode.maintCode}" headerText="MAFS Maint Code" width="#{maintainSupplierDiscountsBean.dataTable.col1}"> 
+			                <h:outputText id="code" value="#{maintCode.maintCode}" />
+			            </p:column>
+			            <p:column sortBy="#{maintCode.maintCodeDescription}" headerText="MAFS Maint Code Description" width="#{maintainSupplierDiscountsBean.dataTable.col2}"> 
+			                <h:outputText id="description" value="#{maintCode.maintCodeDescription}" />
+			            </p:column>
+
+			            <p:column sortBy="#{maintCode.maintCategoryCode}" headerText="MAFS Maint Category" width="#{maintainSupplierDiscountsBean.dataTable.col3}"> 
+			                <h:outputText id="maintCatCode" value="#{maintCode.maintCategoryCode}" />
+			            </p:column>
+
+			            <p:column sortBy="#{maintCode.discount}" headerText="Discount" width="#{maintainSupplierDiscountsBean.dataTable.col4}"> 
+			            	<h:selectBooleanCheckbox styleClass="trackDirtyCheckbox" id="discountFlag" disabled="#{!maintainSupplierDiscountsBean.hasPermission()}" value="#{maintCode.discount}" />
+			            </p:column>
+
+ 						<f:facet name="footer">
+							<h:outputText value="Total Records: #{maintainSupplierDiscountsBean.totalRecords}" />
+						</f:facet>	            
+				</p:dataTable>
+	    			
+
+              	</p:panel>
+
+	    		<p:panel id="buttonsPanel">
+					<h:panelGrid id="buttons">
+						<f:facet name="footer">
+							<p:commandButton disabled="#{!maintainSupplierDiscountsBean.hasPermission() or maintainSupplierDiscountsBean.rowList.size() == 0}" id="saveButton" tabindex="80" value="Save"
+								action="#{maintainSupplierDiscountsBean.save}" ajax="false" onclick="lockScreen();" oncomplete="saveDataForDirtyDetection();"/>
+   							<p:spacer width="10" />
+							<p:commandButton id="cancelButton" tabindex="90" value="Cancel"
+								action="#{maintainSupplierDiscountsBean.cancel}" ajax="false"
+								onclick="lockScreen();" immediate="true" />
+						</f:facet>
+					</h:panelGrid>
+              	</p:panel>
+
+			</h:form>
+
+	   		<div id="SERVICEPROVIDER_LOV_DIV">
+	            <ui:include src="../lov/serviceProviders.xhtml" />
+	        </div>
+
+	        <div id="MAINTENANCE_LOV_DIV">
+	            <ui:include src="../lov/maintenanceCode.xhtml" />
+	        </div>
+
+
+			<script>
+			
+            $(window).load(function(){
+            	initializeDirtyDetection();
+            });
+
+
+            function initializeDirtyDetection() {
+				registerIgnoreButton("saveButton");
+				saveDataForDirtyDetection();
+			}
+
+            
+		    function setSelection( lovName, nameArray, valueArray){	
+				if(lovName == 'maintenanceCodeLOV') {
+				    for(var i=0; i  &lt; nameArray.length ; i++) {	
+					    if(nameArray[i] == "MAINTENANCE_CODE") {	
+					   		document.getElementById('maintCodeFilter').value =  valueArray[i];	
+						}
+					}			    
+				}else if(lovName == 'serviceProviderLOV'){
+	                for(var i=0; i  &lt; nameArray.length ; i++){
+	                    if(nameArray[i] == 'SERVICE_PROVIDER_NAME'){
+	                        document.getElementById('providerFilter').value = valueArray[i];
+	                    }
+	                }
+	                setFocus('providerFilter');
+	            } 	 					 				
+			}
+
+			/**
+			* Detects the Enter key and programatically clicks
+			* the filter button. The search button event handler
+			* will perform the min. alphanumeric check.
+			*/
+			function doKeypressFilter(event){
+				if (event.keyCode == 13) {
+					source = event.srcElement.id;
+				   $('#filter').click();
+				   return false;
+				}
+				return true;	
+			}
+
+
+			</script>
+			
+	</ui:define>
+</ui:composition>

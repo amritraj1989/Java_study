@@ -1,0 +1,196 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+		<p:dialog id="glDistDialog" header="GL Distribution" 
+				widgetVar="glDistDialogWidget" modal="true"
+				appendTo="@(body)" dynamic="true" height="340" width="1250" closeOnEscape="true" scrollable="true">
+				<h:form id = "glDistDialogForm" prependId="false">
+				
+				<p:messages id="glDistMessages" severity="info,error,fatal" showSummary="false" showDetail="true" autoUpdate="true" />
+				
+				<p:panel id="glInfoPanel">
+					<h:outputLabel for="glDistUnitNo" value="Unit No:" styleClass="ui-label"/>
+					<h:outputLabel id="glDistUnitNo" value="#{glDistributionBean.unitNo}"/>
+				</p:panel>
+				<p:focus for="glCodeDataTable"/>
+				<p:panel id="glDistPanel">
+				    <p:dataTable var="glDist" 
+				    			 id = "glCodeDataTable" 
+				    			 value="#{glDistributionBean.glDistList}" 
+				    			 rowIndexVar="glCodeRowIndex" 
+				    			 scrollable="true" 
+				    			 scrollHeight="180"> 
+				        <p:column headerText="Internal Company" width="18%"> 
+				        	<p:selectOneMenu id="corpId" value="#{glDist.corpId}" style="text-align: left" disabled="#{!glDistributionBean.hasPermission()}">
+								<f:selectItems
+									value="#{glDistributionBean.corporateEntityList}"
+									var="glDistCId" itemLabel="#{glDistCId.displayName}"
+									itemValue="#{glDistCId.corpId}" />
+							</p:selectOneMenu>
+				        </p:column>
+				        <p:column headerText="GL Code" width="20%"> 
+				        	<h:panelGroup layout="block" styleClass="left">
+					        	<p:inputText id = "glCode" value="#{glDist.glCode}" disabled="#{!glDistributionBean.hasPermission()}">
+					        	
+						        	<p:ajax event="change" process="@form" update="@form"
+											listener="#{glDistributionBean.decodeGlCode(glDist.glCode,glDist.corpId,glCodeRowIndex)}"
+											oncomplete="setFocusAfterDecode(#{glCodeRowIndex},'glCode')"/>
+								
+								</p:inputText>
+								
+								<h:inputHidden id="glCodeDescHidden" value="#{glDist.glCodeDescription}"/>
+								
+					        	<p:commandButton id="glCodeLOV" icon="icon-lov"
+										title="lov"
+	                                    oncomplete="showGlCodeLov();" immediate="true"
+	                                    actionListener="#{glCodeLovBean.fetchLOVData}"
+	                                    process="@this,glCode" dynamic="true" async="true"
+	                                    update=":glCodeLovForm:glCodeDataTableId  :glCodeLovForm:glCodeSelectPanel"
+	                                    disabled="#{!glDistributionBean.hasPermission()}">										
+										<f:param name="GL_CODE_LOV_CODE_INPUT" value="glCodeDataTable:#{glCodeRowIndex}:glCode" />
+										<f:param name="GL_CODE_LOV_CORPID_INPUT" value="glCodeDataTable:#{glCodeRowIndex}:corpId_input" />
+										<f:param name="rowIndex" value="#{glCodeRowIndex}" />
+										
+									</p:commandButton>
+				        	</h:panelGroup>
+				        </p:column>	
+				        <p:column headerText="GL Code Description" width="20%"> 
+				        	<h:outputText id = "glCodeDesc" value="#{glDist.glCodeDescription}" style="text-align: left"/>
+				        </p:column>
+				        <p:column headerText="Category" width="20%"> 
+				        	
+				        	<p:inputText id = "glCategory" value="#{glDist.cdbCode4}" 
+				        	disabled="#{!glDistributionBean.hasPermission()}">
+					        	
+				        	<p:ajax event="change" process="@form" update="@form"
+									listener="#{glDistributionBean.decodeGlCategory(glDist.cdbCode4,glCodeRowIndex)}"
+									oncomplete="setFocusAfterDecode(#{glCodeRowIndex},'glCategory')"/>						       
+								
+							</p:inputText>
+				        	<p:commandButton id="glCategoryLOV" icon="icon-lov"
+										title="lov"
+	                                    oncomplete="showGlCategoryLov();" immediate="true"
+	                                    actionListener="#{glCategoryLovBean.fetchLOVData}"
+	                                    process="@this,glCategory" dynamic="true" async="true"
+	                                    update=":glCategoryLovForm:glCategoryDataTableId  :glCategoryLovForm:glCategorySelectPanel"
+	                                    disabled="#{!glDistributionBean.hasPermission()}">										
+										<f:param name="GL_CATEGORY_LOV_CODE_INPUT" value="glCodeDataTable:#{glCodeRowIndex}:glCategory" />
+										<f:param name="rowIndex" value="#{glCodeRowIndex}" />
+										
+									</p:commandButton>
+				        </p:column>
+				        <p:column headerText="Detail" width="25%"> 
+				        	#{glDist.description}
+				        </p:column>
+				        <p:column headerText="Amount" width="10%"> 
+				        	<h:outputText value="#{glDist.amount}" >
+				        		<f:convertNumber type="currency" currencySymbol="$" />
+				        	</h:outputText>
+				        </p:column>					        
+				    </p:dataTable> 
+				</p:panel> 
+				<p:panel id="glDistButtonPanel">
+					<p:commandButton id="saveGlDistDialog"
+									 value="Done" 
+									 oncomplete="showDialog('saveGlDistWidgetVar');"
+									 disabled="#{!glDistributionBean.hasPermission()}"/>	
+					<p:spacer width="10" />	
+					<p:commandButton id="cancelGlDistDialog" 
+									 value="Cancel" 
+									 onclick="PF('glDistDialogWidget').hide();"/>					
+				</p:panel>
+				</h:form> 
+			</p:dialog>
+			
+			<p:dialog id="saveGlDistConfirmDialogId" appendTo="@(body)" modal="true" header="Save GL Distribution Confirmation" onShow="setFocus('yesSaveGlDist')" widgetVar="saveGlDistWidgetVar" resizable="false" width="500" height="100" closeOnEscape="true">
+		        <h:outputText value="&#160;"/><br/> 
+           		<h:outputFormat  value="#{msgs.save_gl_distribution_confirmation}" style="font-weight:bold;"/>
+		         <h:form id ="saveGlDistConfirmDialogForm" prependId = "false">	
+	           		<h:outputText value="&#160;"/><br/><br/>	           		
+	           		<h:panelGroup> 
+	   					<p:commandButton style="width:6em;" id = "yesSaveGlDist" value="Yes" actionListener="#{glDistributionBean.saveDist()}" process="@(form)" oncomplete="PF('saveGlDistWidgetVar').hide();handleGlDistDoneRequest(xhr, status, args);"/>  
+		       			<p:spacer width="6"/>
+		       			<p:commandButton style="width:6em;" value="No" onclick="PF('saveGlDistWidgetVar').hide();PF('glDistDialogWidget').hide();" oncomplete="PF('glDistDialogWidget').show();"/> 
+		       		</h:panelGroup>
+	        	</h:form>
+		    </p:dialog>
+			
+			<div id="GL_CODE_LOV_DIV">
+            	<ui:include src="../../../view/lov/glCodes.xhtml" />
+        	</div>
+        	
+        	<div id="GL_CATEOGRY_LOV_DIV">
+            	<ui:include src="../../../view/lov/glCategory.xhtml" />
+        	</div>
+        	
+        	<script type="text/javascript">
+        	
+        	/**
+ 		    * The LOV calls this function to pass back the selected
+ 		    * values to the view's controls.
+ 		    */
+ 			function setSelectionGl( lovName, nameArray, valueArray){	
+ 				if(lovName =='glCodeLOV'){
+					var index = valueArray[2];
+					var glCodeID ="glCodeDataTable:"+index+":glCode";
+					var glCodeDescID = "glCodeDataTable:"+index+":glCodeDesc";
+					var glCodeDescHiddenID = "glCodeDataTable:"+index+":glCodeDescHidden";
+				
+					for(var i=0; i  &lt; nameArray.length ; i++){
+
+                        if(nameArray[i] == 'GL_CODE'){
+                           document.getElementById(glCodeID).value = valueArray[i];
+                        }
+                        if(nameArray[i] == 'GL_CODE_DESC'){
+                        	document.getElementById(glCodeDescID).innerHTML = valueArray[i];
+                        	document.getElementById(glCodeDescHiddenID).value = valueArray[i];
+                        }
+                        
+                    }
+					setFocusAfterDecode(index,"glCode");
+				}
+ 				else if(lovName== 'glCategoryLOV'){
+ 					var index = valueArray[2];
+					var glCategoryID ="glCodeDataTable:"+index+":glCategory";
+					var glCategoryDescID = "glCodeDataTable:"+index+":glCategoryDesc";
+					var glCategoryDescHiddenID = "glCodeDataTable:"+index+":glCategoryDescHidden";
+				
+					for(var i=0; i  &lt; nameArray.length ; i++){
+
+                        if(nameArray[i] == 'GL_CATEGORY'){
+                           document.getElementById(glCategoryID).value = valueArray[i];
+                        }
+                        if(nameArray[i] == 'GL_CATEGORY_DESC'){
+                        	//document.getElementById(glCategoryDescID).innerHTML = valueArray[i];
+                        	//document.getElementById(glCategoryDescHiddenID).value = valueArray[i];
+                        }
+                        
+                    }
+					setFocusAfterDecode(index,"glCategory");
+
+ 				}
+ 			}
+        	
+ 			function handleGlDistDoneRequest(xhr, status, args) {
+ 				PF('glDistDialogWidget').hide();
+		        if(args.failure) { 
+		        	PF('glDistDialogWidget').show();		        	
+		        }
+			}
+ 			
+ 			function setFocusAfterDecode(idx,eleName){
+ 				//var glCodeID ="glCodeDataTable:"+idx+":glCode";
+				//var glCodeLOVID = "glCodeDataTable:"+idx+":glCodeLOV";
+				var codeID= "glCodeDataTable:"+idx+":"+eleName;
+				var codeLOVID = "glCodeDataTable:"+idx+":"+eleName+"LOV";
+
+ 				document.getElementById(codeID).focus();
+ 				document.getElementById(codeLOVID).focus();
+ 			}
+ 			
+        	</script>
+
+</ui:composition>					

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- ======= Property Configurers ======= -->
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	  <property name="location" value="classpath:email.properties" />
+	  <property name="placeholderPrefix" value="$email{" />
+	</bean>	
+	
+	<!-- ======= Mail Sender Beans ======= -->	
+	<bean id="javaMailSenderSimple" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="$email{email.host}" />
+	</bean>
+	
+	<bean id="emailServiceImpl" class="com.mikealbert.service.util.email.EmailServiceSpringImpl">
+		<property name="mailSender" ref="javaMailSenderSimple" />
+	</bean>
+</beans>

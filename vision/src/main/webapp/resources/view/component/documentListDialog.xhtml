@@ -1,0 +1,153 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+	    xmlns:h="http://java.sun.com/jsf/html"
+	    xmlns:f="http://java.sun.com/jsf/core"
+	    xmlns:p="http://primefaces.org/ui"
+	    xmlns:composite="http://java.sun.com/jsf/composite"
+	    xmlns:comp="http://java.sun.com/jsf/composite/view/component" 
+	    xmlns:pe="http://primefaces.org/ui/extensions" >
+	
+    <composite:interface>
+		<composite:attribute name="documentVOs" required="true" type="java.util.List" />	  
+		<composite:attribute name="initialMessage" required="false" type="java.lang.String" />
+		<composite:attribute name="onClose" required="false" default="" type="java.lang.String" />
+		<composite:attribute name="unitNumber" required="true" type="java.lang.String" />	    	 	    	    	    			            
+	</composite:interface>
+	
+	<composite:implementation>
+	    <h:form id="ccDocumentListHiddenForm" prependId="false">           
+            <p:commandButton id="ccInitializeBeanHiddenBtn" 
+                    style="display:none"
+                    actionListener="#{documentListDialogBean.init()}" 
+                    oncomplete="showDialog('ccDocumentListDialogWidget');"
+                    update="#{':'.concat(cc.attrs.clientId).concat(':ccDocumentListDialog')}" />
+		</h:form>
+		        	  	
+	  	<div id="ccDocumentListDiv">
+			<p:dialog id="ccDocumentListDialog" 
+			        modal="true"  
+			        onShow="init()" 
+			        onHide="onHideListener();"
+			        header="Document List - Unit #{documentListDialogBean.unitNumber}" 
+			        widgetVar="ccDocumentListDialogWidget" 
+			        dynamic="true" 
+			        resizable="false" 
+			        height="auto" 
+			        width="475px" 
+			        closeOnEscape="true" 
+			        appendTo="@(body)">
+		        
+	    	    <!-- Message display -->
+		    <p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:100%;max-width:100%;width:auto;">
+			    <p:messages id="ccDocumentListmessages" showSummary="true" showDetail="true" autoUpdate="true" />
+		    </p:scrollPanel> 	    	    
+
+				<h:form id="ccDocumentListForm" prependId="false">   
+	                <p:remoteCommand immediate="true" name="onHideListener" actionListener="#{documentListDialogBean.onHideListener()}" />
+	                <p:remoteCommand immediate="true" name="displayInitialMessage" actionListener="#{documentListDialogBean.displayInitialMessageListener()}" />	                
+	                
+	                <p:focus for="ccDoneBtn" />
+	                
+                        <p:dataTable id="documentListDT" value="#{documentListDialogBean.documentList}" var="document">
+                            <p:column width="%">
+                                <h:outputText value="*" rendered="#{document.required}" /><h:outputText value="#{document.label}" />
+                            </p:column>
+                            <p:column width="%">
+                                <p:commandLink id="ccViewConfirmDocumentLnk" title="Displays PDF" value="View" rendered="#{not document.emailable}" actionListener="#{documentListDialogBean.viewDocumentListener(document)}" update="@form"/>
+                                <p:commandLink id="ccEmailConfirmDocumentLnk" title="Email" value="Email" rendered="#{document.emailable and not document.emailed}" 
+                                        actionListener="#{documentListDialogBean.email(document)}" onclick="this.disabled=true" oncomplete="this.disabled=false" update="@form" />
+                                <h:outputText value="Emailed" rendered="#{document.emailable and document.emailed}" />                         
+                            </p:column> 
+                            <p:column width="5px">
+                                <p:graphicImage id="ccCheckMarkImg" style="border-style: none;" value="/images/checkmark.png" rendered="#{document.viewed}" />                        
+                            </p:column>                                                                       
+                        </p:dataTable>                                                     
+                    
+				    <p:panel id="ccDocumentListDialogButtonPnl">
+					    <p:commandButton id="ccDoneBtn" value="Done" onclick="ccDoneBtnHandler();"  />				    
+				    </p:panel>		                
+	                	                	                               	                        		                		         		
+				</h:form>
+				
+		        <h:form id="ccShowPDFHiddenForm" prependId="false" target="_blank">		    
+		            <p:commandButton id="ccViewDocumentBtn" value="Show" actionListener="#{documentListDialogBean.view}" ajax="false" style="display:none"/>
+		        </h:form>											        
+			</p:dialog>
+			
+			<p:dialog id="ccUnviewedDocumentAlertDialogId" 
+			        modal="true" 
+			        header="Unviewed Documents Alert" 
+			        severity="alert" 
+			        widgetVar="ccUnviewedDocumentAlertWidgetVar" 
+			        resizable="false" 
+			        onHide="showDialog('ccDocumentListDialogWidget')"
+			        width="400" 
+			        height="auto" 
+			        closeOnEscape="true" 
+			        appendTo="@(body)"
+			        onShow="initUnviewedDocumentAlertDialog()">  
+		         <h:form id ="ccUnviewedDocumentAlertDialogForm" prependId = "false">
+		         	<p:focus context="ccDoNotContinueBtn" />		          
+		        <h:outputText value="&#160;"/><br/> 
+           		<h:outputFormat  value="#{documentListDialogBean.unviewedDocumentAlertMessage}" style="font-weight:bold;" />
+		        <br/><br/>
+		                   		           		
+           		<ui:repeat value="#{documentListDialogBean.documentList}" var="document">
+           		       <h:panelGroup rendered="#{not document.viewed and document.required}">
+           		           <h:outputText value="&#009;&#8226;&#160;" /> <h:outputText value="#{document.label}" /> <br />
+           		       </h:panelGroup>          		
+           		</ui:repeat>
+           				         
+	           		<h:outputText value="&#160;"/><br/><br/>	           		
+	           		<h:panelGroup> 
+						<p:commandButton id="ccDoNotContinueBtn" style="width:6em;" value="Ok" onclick="hideDialog('ccUnviewedDocumentAlertWidgetVar');"/> 
+		       		</h:panelGroup>
+	        	</h:form>
+		    </p:dialog>  			
+	  	</div>	
+	  	 	  	  	   
+		
+	  	<script type="text/javascript">
+	  	
+	  	    /**
+	  	    * Clicks a hidden button to intialize the bean, then
+	  	    * shows the dialog.
+	  	    */
+			function showCCDocumentListDialog(){	
+				$('[id$=ccInitializeBeanHiddenBtn]').click();
+			}			
+					  	    
+			/**
+			* Handels the cancel button click event.
+			*/
+		 	function ccDoneBtnHandler(){
+		 		hideDialog('ccDocumentListDialogWidget');
+		    }
+					 	
+			/**
+			* Place initialization logic here
+			*/
+		 	function init() {								
+				this.setDirtyData(false);
+				displayInitialMessage();
+				setFocus('ccDoneBtn');
+				setFocus('ccDoneBtn');				
+		 	}
+			
+			/**
+			*
+			*/
+			function initUnviewedDocumentAlertDialog() {
+				setFocus('ccDoNotContinueBtn');
+				setFocus('ccDoNotContinueBtn');					
+			}
+			/*
+			*
+			*/
+ 			function showDocument(){
+			    $('[id$=ccViewDocumentBtn]').click();
+			} 			
+		</script>
+	  	
+	</composite:implementation>
+</html>

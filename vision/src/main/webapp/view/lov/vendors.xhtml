@@ -1,0 +1,137 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	
+		<p:dialog header="Select Vendor" widgetVar="vendorLOV"
+			id="VENDOR_GRID" dynamic="true" resizable="false" width="800"
+			height="355" modal="true" appendTo="@(body)"
+			onShow="setFirstPageVendorDataTableWidget();setFocus('vendorSelectButton')">
+
+		<h:form id="vendLovForm" name="vendLovForm" prependId="false"
+		onkeydown="body_onkeydown(event,'vendorSelectButton','vendorLOV');">
+			<p:hotkey immediate="true" bind="esc" handler="PF('vendorLOV').hide();"/>
+
+			<p:dataTable widgetVar="vendDataTableWidget" var="vendor"
+				scrollable="true" scrollHeight="270" resizableColumns="true"
+				value="#{vendorLovBean.vendors}" rows="#{vendorLovBean.rowsPerPage}"
+				paginator="true" paginatorPosition="bottom" lazy="true"
+				selection="#{vendorLovBean.selectedVendor}" selectionMode="single"
+				>
+
+				<p:ajax event="page" onstart="clearDataTableSelection('vendDataTableWidget');" oncomplete="setScrollDivAtTop();" />
+				<p:ajax event="rowDblselect" listener="#{vendorLovBean.onRowSelect}"
+					update=":vendLovForm:lovVendorCode,:vendLovForm:lovVendorName"
+					oncomplete="hideVendorLov();setVendorValues();" />
+				<p:ajax event="rowSelect" listener="#{vendorLovBean.onRowSelect}"
+					update=":vendLovForm:lovVendorCode,:vendLovForm:lovVendorName" />
+				<h:messages />
+				
+				<p:column width="200">
+					<f:facet name="header">
+						<h:outputText value="Vendor Name" style="font-weight:bold" />
+					</f:facet>
+					<h:outputText value="#{vendor.vendorName}"></h:outputText>
+				</p:column>
+				<p:column width="100">
+					<f:facet name="header">
+						<h:outputText value="Vendor Code" style="font-weight:bold" />
+					</f:facet>
+					<h:outputText value="#{vendor.vendorCode}"></h:outputText>
+				</p:column>
+				<p:column width="200">
+					<f:facet name="header">
+						<h:outputText value="Address" style="font-weight:bold" />
+					</f:facet>
+					<h:outputText value="#{vendor.addressLine1}"></h:outputText>
+					<h:outputText
+						value="#{not empty vendor.addressLine2 ? '&lt;br /&gt;' : ''}"
+						escape="false" />
+					<h:outputText value="#{vendor.addressLine2}"></h:outputText>
+					<h:outputText
+						value="#{not empty vendor.addressLine3 ? '&lt;br /&gt;' : ''}"
+						escape="false" />
+					<h:outputText value="#{vendor.addressLine3}"></h:outputText>
+					<h:outputText
+						value="#{not empty vendor.addressLine4 ? '&lt;br /&gt;' : ''}"
+						escape="false" />
+					<h:outputText value="#{vendor.addressLine4}"></h:outputText>
+					<br />
+					<h:outputText value="#{vendor.townCity}"></h:outputText>
+					<h:outputText
+						value="#{not empty vendor.region ? ', ' : ''}"
+						escape="false" />
+					<h:outputText
+						value="#{vendor.region}
+                                                    #{vendor.postCode}"></h:outputText>
+				</p:column>				
+				
+				<p:column width="100">
+					<f:facet name="header">
+						<h:outputText value="Vendor Phone" style="font-weight:bold" />
+					</f:facet>
+					<h:outputText value="#{vendor.phoneNumber}"></h:outputText>
+				</p:column>
+				
+				
+			</p:dataTable>
+			<div style="text-align: center;">
+
+				<h:outputText style="font-weight:bold;" 
+										value="Record Count: #{vendorLovBean.vendors.rowCount}">
+									</h:outputText>
+				<p:commandButton style="float:right;" value="Select"
+					id="vendorSelectButton" name="vendorSelectButton"
+					update=":vendLovForm:lovVendorCode,:vendLovForm:lovVendorName"
+					oncomplete="hideVendorLov();setVendorValues();"
+				>
+				</p:commandButton>
+
+			</div>
+			
+		<h:inputHidden id="targetInputName" value="vendorLOV" />
+		<h:inputHidden id="lovVendorCode" value="#{vendorLovBean.vendorCode}" />
+		<h:inputHidden id="lovVendorName" value="#{vendorLovBean.vendorName}" />
+			
+			</h:form>
+		</p:dialog>
+
+		
+	
+	<script type="text/javascript">
+		
+		function setVendorValues(){
+			var lovNameArray = new Array();
+			var lovValueArray = new Array()
+			lovNameArray[0]='VENDOR_CODE';
+			lovValueArray[0]=document.getElementById('lovVendorCode').value;
+			
+			lovNameArray[1]='VENDOR_NAME';
+			lovValueArray[1]=document.getElementById('lovVendorName').value;
+			<!-- This method need to implement in parent page to populate LOV seletion-->
+			setSelection(document.getElementById('targetInputName').value,lovNameArray,lovValueArray);
+		}
+		
+		function showVendorLov(){
+			showDialog('vendorLOV');
+		}	
+		
+		function hideVendorLov(){
+			hideDialog('vendorLOV');
+		}
+		
+		function setScrollDivAtTop(){
+			jQuery("div").scrollTop(0);
+			jQuery("div").scrollLeft(0);	
+		} 
+		
+		function setFirstPageVendorDataTableWidget(){
+			setDataTableToFirstPage('vendDataTableWidget');
+			// also select the first row, but only if we have data
+			setDataTableToFirstRow('vendDataTableWidget');
+		}
+		
+		</script>
+</ui:composition>

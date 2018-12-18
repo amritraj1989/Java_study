@@ -1,0 +1,13 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" template="../templates/ui.xhtml">
+
+	<f:metadata>
+	    <f:viewParam name="module" value="#{handlerBean.module}" /> 
+    	<!-- You would normally also convert/validate it here. --> 
+    	<f:event type="postValidate" listener="#{handlerBean.determineNewPage}"  /> 
+	</f:metadata> 
+
+</ui:composition>

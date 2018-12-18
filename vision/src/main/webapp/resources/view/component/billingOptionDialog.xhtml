@@ -1,0 +1,57 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	>
+	
+	  <!-- INTERFACE -->
+	  <composite:interface>
+	    <composite:attribute  name="radioOptionsValue" required="true" />    
+	    <composite:attribute name="saveBillingOptionAction" required="true"
+    		method-signature="java.lang.String action()" />     
+	  </composite:interface>
+	
+	  <!-- IMPLEMENTATION -->          
+	  <composite:implementation>
+	  	<div id="billingOptionDialog">
+   		<p:dialog id="billingOptionDialogId" header="Select Billing Option" 
+			widgetVar="billingOptionDialogWidget" modal="true"
+			appendTo="@(body)" dynamic="true" height="160" width="300" closeOnEscape="true">
+			<h:form id="billingOptionDialogForm" prependId = "false">
+			<p:focus/>
+			<p:messages id="billingOptionMessages" severity="info,error,fatal" showSummary="true" showDetail="false" autoUpdate="true" />
+			<p:panelGrid id="billingOptionDialogPanel">
+                <p:row>
+                	<p:column style="vertical-align:top;">
+						<p:outputLabel for="radioOptions" styleClass="ui-label" value="Billing Option: " />
+						<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>
+					</p:column>
+					<p:column style="vertical-align:top;">
+				        <h:selectOneRadio id="radioOptions" value="#{cc.attrs.radioOptionsValue}" layout="pageDirection" tabindex="200">  
+				            <f:selectItem itemLabel="Monthly" itemValue="MONTHLY" />
+				            <f:selectItem itemLabel="Per Occurrence" itemValue="PEROCCURRENCE" />  
+				        </h:selectOneRadio>
+					</p:column>	
+                </p:row>	
+			</p:panelGrid>
+			<p:panel id="billingOptionDialogButtonPanel">
+				<p:commandButton id="saveBillingOptionDialog" value="Save" tabindex="210" action="#{cc.attrs.saveBillingOptionAction}" process="@form" disabled="" oncomplete="PF('billingOptionDialogWidget').hide()"/>
+				<p:spacer width="10" />
+				<p:commandButton id="cancelBillingOptionDialog" value="Cancel" tabindex="220" onclick="PF('billingOptionDialogWidget').hide();"/>
+			</p:panel>
+			</h:form>
+		</p:dialog>
+	  	</div>
+		
+	  	<script type="text/javascript">
+	  	
+			function showBillingOptions(){
+				showDialog('billingOptionDialogWidget');
+			}
+			
+		</script>
+	  	
+	  </composite:implementation>
+</html>

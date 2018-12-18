@@ -1,0 +1,416 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+xmlns:f="http://java.sun.com/jsf/core" 
+xmlns:h="http://java.sun.com/jsf/html" 
+xmlns:p="http://primefaces.org/ui" 
+xmlns:ui="http://java.sun.com/jsf/facelets" 
+xmlns:pe="http://primefaces.org/ui/extensions"
+xmlns:comp="http://java.sun.com/jsf/composite/view/component"
+template="../../templates/ui.xhtml">
+
+	<ui:define name="content">
+			<h:form id="orderProgressSearchBreadCrumbForm" prependId="false">
+				<p:breadCrumb model="#{orderProgressSearchBean.breadCrumbTrail}" ajax="false" immediate="true" style="min-width:980px;max-width:100%;width:auto;" />
+			</h:form>
+			<!-- Message display -->
+			<p:scrollPanel id="messagePanel" mode="native" styleClass="ui-layout" style="height:50px;min-width:980px;max-width:100%;width:auto;">
+				<p:messages id="messages" showSummary="false" showDetail="true" autoUpdate="true" />
+			</p:scrollPanel>
+
+			<h:form id="orderProgressSearchForm" prependId="false">
+				<p:remoteCommand name="filterBasedOnMfgCode" update="year,make" actionListener="#{orderProgressSearchBean.changeMfgCode}" oncomplete="setFocusPF('year');" />
+				<p:panel id="searchPanel" header="Search Criteria" style="min-width:980px;max-width:100%;width:auto;">
+					<p:focus context="searchPanel" />
+					<h:panelGrid columns="10" cellspacing="5">
+						<h:outputLabel for="mfgCode" value="Mfg. Code " styleClass="ui-label" />
+					    <h:panelGroup style="white-space:nowrap;">								
+                               <p:inputText id="mfgCode" title="Mfg. Code" value="#{orderProgressSearchBean.searchCriteria.mfgCode}" onchange="handleMfgCodeChange(this.id);" onkeypress="return doKeypressSearch(event)" style="width:100px" /> 
+					    </h:panelGroup>
+						
+						<h:outputLabel for="year" value="Year " styleClass="ui-label" />
+						<h:panelGroup style="white-space:nowrap;">
+							<p:selectOneMenu id="year" widgetVar="yearWidget" value="#{orderProgressSearchBean.searchCriteria.year}" style="width:60px" >
+								<f:selectItem itemLabel=" " />
+								<f:selectItems value="#{orderProgressSearchBean.years}" var="year" itemLabel="#{year}" itemValue="#{year}" />
+								<p:ajax process="@parent" listener="#{orderProgressSearchBean.changeYear}" update="make" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+
+						<h:outputLabel for="make" value="Make " styleClass="ui-label" />
+						<h:panelGroup style="white-space:nowrap;">
+							<p:selectOneMenu id="make" value="#{orderProgressSearchBean.searchCriteria.make}" style="width:135px" >
+								<f:selectItem itemLabel=" " />
+								<f:selectItems var="make" value="#{orderProgressSearchBean.makes}" itemLabel="#{make}" itemValue="#{make}" />
+								<p:ajax process="@parent" update="model" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+
+						<h:outputLabel for="model" value="Model " styleClass="ui-label" />
+						<h:panelGroup style="white-space:nowrap;">
+							<p:inputText id="model" title="Model" value="#{orderProgressSearchBean.searchCriteria.model}" onkeypress="return doKeypressSearch(event)" />
+							<p:commandButton id='modelLOV' icon="icon-lov" title="lov" oncomplete="showModelLOV();" immediate="true" actionListener="#{modelLOVBean.fetchLOVDataByModelDescription}" process="@parent" dynamic="true" async="true" onstart="return hasMinAlphaNumericCharacters($('#model'));"
+								update=":modelLovForm:MODEL_GRID">
+								<f:param name="MODEL_LOV_INPUT_MFG_CODE" value="mfgCode" />
+								<f:param name="MODEL_LOV_INPUT_YEAR" value="year_input" />
+								<f:param name="MODEL_LOV_INPUT_MAKE" value="make_input" />
+								<f:param name="MODEL_LOV_INPUT_MODEL" value="model" />
+							</p:commandButton>
+							<h:inputHidden id="hiddenModelCode" value="#{orderProgressSearchBean.searchCriteria.modelCode}" />
+						</h:panelGroup>
+						
+						<h:outputLabel for="trim" value="Trim " styleClass="ui-label" />
+						<h:panelGroup style="white-space:nowrap;">
+							<p:inputText id="trim" title="Trim" value="#{orderProgressSearchBean.searchCriteria.trim}" onkeypress="return doKeypressSearch(event)" style="width:200px;" />
+						</h:panelGroup>
+						
+						<h:outputLabel for="orderType" value="Order Type " styleClass="ui-label" />
+						<h:panelGroup style="white-space:nowrap;">
+							<p:selectOneMenu id="orderType" widgetVar="orderTypeWidget" value="#{orderProgressSearchBean.searchCriteria.orderType}" style="width:85px;" >
+								<f:selectItem itemLabel="Factory" itemValue="F"/>
+								<f:selectItem itemLabel="Locate" itemValue="L"/>
+							</p:selectOneMenu>
+						</h:panelGroup>
+						
+						<h:outputLabel for="unitNo" value="Unit No " styleClass="ui-label" />
+						<h:panelGroup style="white-space:nowrap;">
+							<p:inputText id="unitNo" title="Unit No" value="#{orderProgressSearchBean.searchCriteria.unitNo}" onkeypress="return doKeypressSearch(event)" style="width:75px;" />
+						</h:panelGroup>
+						
+						<h:outputLabel for="equipmentInput" value="Factory Equipment " styleClass="ui-label"/>
+						<h:panelGroup style="white-space:nowrap;">
+							<p:inputText id="equipmentInput" title="Factory Equipment" value="#{orderProgressSearchBean.searchCriteria.factoryEquipment}" onkeypress="return doKeypressSearch(event)" style="width:150px;" />
+						</h:panelGroup>
+
+						<h:outputLabel for="availableClientsAC" value="Client " styleClass="ui-label" />
+						<p:autoComplete id="availableClientsAC" title="Client" 
+					            widgetVar="availableClientsACWidgetVar"
+						        value="#{orderProgressSearchBean.searchCriteria.client}"
+						        var="client"
+						        completeMethod="#{orderProgressSearchBean.autoCompleteClientListener}"
+						        itemLabel="#{client.accountName.concat(' - ').concat(client.externalAccountPK.accountCode)}"
+						        itemValue="#{client.externalAccountPK.accountCode}"
+						        forceSelection="false" 
+						        size="40" 
+						        maxlength="100" 
+						        autocomplete="off" 
+						        scrollHeight="100">
+							<p:ajax event="query" process="@this" />									        		
+					    </p:autoComplete>
+								    
+						<h:outputLabel value="" />
+						<p:commandButton id="search" widgetVar="searchButtonWidgetVar" title="Search" value="Search" onstart="return validateSearch(event);" style="float:right" onmouseover="handleSearch = true;" onmouseout="handleSearch = false;"
+							actionListener="#{orderProgressSearchBean.performSearch}" oncomplete="PF('searchButtonWidgetVar').enable();resetUIState();" update="resultsPanel,commandPanel, :messages" />
+					</h:panelGrid>
+				</p:panel>
+
+				<p:panel id="resultsPanel" header="Order Progress" style="min-width:980px;max-width:100%;width:auto;">
+					<p:dataTable id="searchResultDataTable" widgetVar="searchResultDataTableWidget" lazy="true" 
+						var="element" value="#{orderProgressSearchBean.lazyOrderProgressSearchResults}" 
+						rowIndexVar="elementRowIndex"
+						scrollable="true" scrollHeight="#{orderProgressSearchBean.dataTable.height}"
+						selection="#{orderProgressSearchBean.selectedResultVOs}" 
+						emptyMessage="#{orderProgressSearchBean.dataTableMessage}" 
+						rows="50" resizableColumns="true"
+						paginator="true" paginatorPosition="bottom">
+
+						<p:ajax event="toggleSelect" onstart="updateBtnState(); return false;"/>
+						<p:ajax event="rowSelectCheckbox" onstart="updateBtnState(); return false;"/>
+						<p:ajax event="rowUnselectCheckbox" onstart="updateBtnState(); return false;"/>
+						<p:ajax event="rowSelect" onstart="updateBtnState(); return false;"/>
+						<p:ajax event="rowUnselect" onstart="updateBtnState(); return false;"/>
+						
+						<p:ajax event="sort" update=":orderProgressSearchForm:updateETABtn" listener="#{orderProgressSearchBean.onSortOperation}" oncomplete="resetUIState();"/>
+						<p:ajax event="page" update=":orderProgressSearchForm:updateETABtn" listener="#{orderProgressSearchBean.onPageChange}" oncomplete="resetUIState();" />
+
+						<p:column selectionMode="multiple" style="text-align:center;padding:0px" width="#{orderProgressSearchBean.dataTable.col1}" />
+
+						<p:column headerText="Unit No" sortBy="#{element.unitNo}" width="#{orderProgressSearchBean.dataTable.col2}">				
+						    <h:outputText id="unitNo" value="#{element.unitNo}" />
+						</p:column>
+						
+						<p:column headerText="Client" sortBy="#{element.accountName}" width="#{orderProgressSearchBean.dataTable.col3}">				
+						    <h:outputText id="clientName" value="#{element.accountName}" />
+						</p:column>
+						
+						<p:column headerText="CSS" sortBy="#{element.css}" width="#{orderProgressSearchBean.dataTable.col4}">				
+						    <h:outputText id="cssCode" value="#{element.css}" />
+						</p:column>
+
+						<p:column headerText="Year" sortBy="#{element.year}" width="#{orderProgressSearchBean.dataTable.col5}">
+							<h:outputText value="#{element.year}"/>
+						</p:column>
+
+						<p:column headerText="Make" sortBy="#{element.make}" width="#{orderProgressSearchBean.dataTable.col6}">
+							<h:outputText value="#{element.make}" escape="false" />
+						</p:column>
+
+						<p:column headerText="Model" sortBy="#{element.model}" width="#{orderProgressSearchBean.dataTable.col7}">
+							<h:outputText value="#{element.model}" escape="false" />
+						</p:column>
+
+						<p:column headerText="Trim" sortBy="#{element.trim}" width="#{orderProgressSearchBean.dataTable.col8}">
+							<h:outputText value="#{element.trim}" escape="false"/>
+						</p:column>
+
+						<p:column headerText="Factory Equipment" width="#{orderProgressSearchBean.equipmentSearch eq 'true' ? orderProgressSearchBean.dataTable.col9 : orderProgressSearchBean.dataTable.col10}">
+							<h:panelGrid columns="#{orderProgressSearchBean.equipmentSearch eq 'true' ? '2' : '1'}" columnClasses="column1,column2">
+									<p:commandLink id="equipmentInfoLink" 
+                              			actionListener="#{orderProgressSearchBean.populateSelectedUnitEquipments(element)}"		
+                              			oncomplete="PF('equipmentInfoWidget').show();selectCurrentRow('searchResultDataTableWidget',#{elementRowIndex});"					                              
+		                                update=":equipmentInfoDialog" 
+		                                title="View Equipment" immediate="true">
+										<p:graphicImage value="/images/custins.png" style="border-style:none" />	
+									</p:commandLink>
+									<h:panelGroup rendered="#{orderProgressSearchBean.equipmentSearch}">
+										<ui:repeat value="#{element.factoryEquipments}" var="factEqpt">
+											<h:outputText value="#{factEqpt}"/>	
+										  	<p></p>									
+										</ui:repeat>
+									</h:panelGroup>
+							</h:panelGrid>
+						</p:column>	
+						
+						<p:column headerText="ETA" sortBy="#{element.currentETADate}" width="#{orderProgressSearchBean.dataTable.col10}">								
+						    <h:outputText id="clientETADateLbl" value="#{element.currentETADate}">
+						     <f:convertDateTime type="date" pattern="MM/dd/yyyy" /> 
+							</h:outputText>
+						</p:column>
+
+						<f:facet name="footer">
+							Record Count: <h:outputText value="#{orderProgressSearchBean.lazyOrderProgressSearchResults.rowCount}" />
+						</f:facet>
+					</p:dataTable>
+
+					<h:inputHidden id="rowCount" name="rowCount" value="#{orderProgressSearchBean.lazyOrderProgressSearchResults.rowCount}" />
+
+				</p:panel>
+
+				<p:panel id="commandPanel" style="min-width:980px;max-width:100%;width:auto;">
+					<p:commandButton id="updateETABtn" widgetVar="updateETABtnVar" value="Update ETA" actionListener="#{orderProgressSearchBean.updateETAListener}" oncomplete="PF('updateETADialogWidget').show();"/>
+					<p:spacer width="5"/>
+					<p:commandButton id="done" value="Cancel" action="#{orderProgressSearchBean.cancel}" ajax="false" immediate="true" onclick="lockScreen();" />
+				</p:panel>
+
+			</h:form>
+			
+			<p:dialog id="equipmentInfoDialog" widgetVar="equipmentInfoWidget" modal="true"
+                header="Factory Equipment" resizable="false" appendTo="@(body)" style="min-width:450px; max-width:800px;"
+                closeOnEscape="true" onShow="setFocus('equipmentInfoDialogDoneBtn');">
+	            <h:form id="equipmentForm" prependId="false">
+					<p:panel id="equipmentPanel" style="max-height:300px;overflow:auto;" rendered="#{not orderProgressSearchBean.noEquipment}">
+						<h:panelGroup rendered="#{empty orderProgressSearchBean.selectedUnitStandardEquipments ? 'false' : 'true'}">						     
+						    <h:outputText styleClass="ui-label" value="Standard " rendered="#{orderProgressSearchBean.stockOrder == false}"/>
+						    <h:outputText styleClass="ui-label" value="Standard-Offered " rendered="#{orderProgressSearchBean.stockOrder == true}"/>
+						    <br/>
+						    <ui:repeat value="#{orderProgressSearchBean.selectedUnitStandardEquipments}" var="stdEquipment">	
+							     <h:outputText value="#{stdEquipment}" /><br/>						     
+						    </ui:repeat>
+					    </h:panelGroup>
+					    <br/>
+					    <h:panelGroup rendered="#{empty orderProgressSearchBean.selectedUnitFactoryOptionalEquipments ? 'false' : 'true'}">
+						    <h:outputText styleClass="ui-label" value="Optional "/><br/>
+						    <h:outputText value="#{orderProgressSearchBean.selectedUnitFactoryOptionalEquipments}" style="white-space:pre;"/>
+					    </h:panelGroup>
+	                </p:panel>
+		    	  	<p:panel id="noEquipmentPanel" style="max-height:250px;overflow:auto;" rendered="#{orderProgressSearchBean.noEquipment}">
+		    	  		<h:outputText styleClass="ui-label" value="NO EQUIPMENT" /><br/>
+		    	  	</p:panel>
+		    	  	<br/>
+				 	<p:commandButton id="equipmentInfoDialogDoneBtn" value="Done" onclick="PF('equipmentInfoWidget').hide();" />               
+	            </h:form>
+	        </p:dialog>
+			
+			<p:dialog id="updateETADialog" widgetVar="updateETADialogWidget" header="Update ETA" dynamic="true" modal="true"  
+				resizable="false" appendTo="@(body)" style="min-width: 500px; max-width: 600px;" closeOnEscape="true" >
+	            <h:form id="updateETADialogForm" prependId="false">
+	            	<p:focus context="updateETADialogForm"/>
+			      	<p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:100%;max-width:100%;width:auto;">
+	                  <p:messages id="updateETAMessages" severity="info,error" showSummary="true" showDetail="false" autoUpdate="true" />
+	              	</p:scrollPanel>
+					<p:panel id="updateETADialogPanel">
+					    <h:panelGrid columns="2" cellpadding="5" style="white-space:nowrap;">					                    	    
+			    				<p:outputLabel for="daysAdjusted" value="Days:*" styleClass="ui-label" style="white-space:nowrap;"/>
+		                        <p:inputNumber id="daysAdjusted" style="text-align:right; width:50px"									    							    
+					                    value="#{orderProgressSearchBean.daysAdjusted}"	
+					                    thousandSeparator=""					
+					                    decimalPlaces="0"				
+					                    minValue="-999"
+					                    maxValue="999"
+					                    autocomplete="off"
+					                    styleClass="ui-text-align-right-dev" />				                      	
+			                    <p:outputLabel for="noteTextArea" value="Notes:*" styleClass="ui-label" style="white-space:nowrap;"/>
+								<h:panelGroup>
+                                      <p:inputTextarea id="noteTextArea" rows="4" cols="70" 
+                                          value="#{orderProgressSearchBean.adjustmentNote}" counter="counter" 
+                                          maxlength="200" style="white-space: normal;"
+                                          counterTemplate="{0} characters remaining" autoResize="false" />
+                                      <br/>
+                                      <h:outputText id="counter" />	
+                                </h:panelGroup>
+	                	</h:panelGrid>
+	                </p:panel>
+		    	  	<br/><br/>
+					<p:commandButton id="updateETASaveBtn" value="Save" actionListener="#{orderProgressSearchBean.updateETAandNotes}" process="@form" update="@form" oncomplete="handleUpdateETASaveBtnClickRequest(xhr, status, args);"/>  
+					<p:spacer width="5"/>
+					<p:commandButton id="cancel" value="Cancel" onclick="PF('updateETADialogWidget').hide();"/>	   
+	            </h:form>
+	        </p:dialog> 
+			
+			<div id="MODEL_LOV_DIV">
+				<ui:include src="../lov/model.xhtml" />
+			</div>
+
+			<div id="inputFieldChecks">
+				<ui:include src="../alert/inputFieldChecks.xhtml" />
+			</div>
+
+		<style type="text/css">
+			.column1 {
+			    width: 5%;
+			    text-align: center;
+			    padding:0px !important;
+			    border: none !important;
+			}
+			
+			.column2 {
+			    width: 95%;
+			    text-align: left;
+			    border: none !important;
+			}
+			
+			.textWrap {
+				white-space: normal;
+			}
+			
+			.ui-datatable thead th {
+				white-space: normal;
+				text-align: center;
+			}
+			
+			
+		</style>
+
+		<script type="text/javascript"> 
+		
+		var source;
+		var handleSearch = false;
+		var UI_ID_MFG_CODE = 'mfgCode';
+		
+		function moveScrollbarToTop(){					
+			setScrollDivAtTop();	
+		}
+		
+		/**
+		* Handles the search button's client side validation before the ajax search happens. A minimum alphanumric character 
+		* check is performed. The search process either continues or not based on
+		* on the check's boolean result.
+		*/
+		function validateSearch(event){			
+			var searchCriteria = "";
+			
+			searchCriteria += $('#mfgCode').val()
+			searchCriteria += $('#year_input').val();
+			searchCriteria += $('#make_input').val();
+			searchCriteria += $('#model').val();
+			searchCriteria += $('#trim').val();	
+			searchCriteria += $('#orderType_input').val();
+			searchCriteria += $('#unitNo').val();
+			searchCriteria += $('#equipmentInput').val();
+			
+			if(!hasMinAlphaNumericCharacters(event.srcElement, searchCriteria)) {		
+				return false;
+			} else {
+				return true;
+			}
+
+		}
+		
+				
+		/**
+		* Detects the Enter key and programatically clicks
+		* the search button. The search button event handler
+		* will perform the min. alphanumeric check.
+		*/
+		function doKeypressSearch(event){
+			if (event.keyCode == 13) {
+				source = event.srcElement.id;
+			   $('#search').click();
+			   focus();
+			   return false;
+			}
+			return true;	
+		}
+		
+	    /**
+	    * The LOV calls this function to pass back the selected
+	    * values to the view's controls.
+	    */
+		function setSelection( lovName, nameArray, valueArray){	
+			if(lovName == 'modelLOV'){
+				for(var i=0; i  &lt; nameArray.length ; i++){
+					if(nameArray[i] == 'MODEL_DESCRIPTION'){
+						document.getElementById('model').value = valueArray[i];
+					}
+					if(nameArray[i] == 'MODEL_CODE'){
+						document.getElementById('hiddenModelCode').value = valueArray[i];						
+					}
+				}
+				setFocus('model');
+			}				
+		}
+	    
+		var hasPermissionUpdateETA = #{orderProgressSearchBean.hasPermission('manageETA')};
+		function updateBtnState() {
+			if(hasPermissionUpdateETA) {
+				if(PF('searchResultDataTableWidget').selection.length >= 1){
+	 				PF('updateETABtnVar').enable();
+	   			}else {
+	   				PF('updateETABtnVar').disable();
+	   			}
+			} else {
+				PF('updateETABtnVar').disable();
+			}
+			
+			PF('searchResultDataTableWidget').updateHeaderCheckbox();
+		}
+	    
+		function resetUIState() {
+			PF('searchResultDataTableWidget').unselectAllRows();
+        	setScrollDivAtTop();
+        	updateBtnState();
+        }
+		 
+	    function selectCurrentRow(table,index){
+	    	if(index > (Number(50) -1)){//here 50 is rows being display in per page in dt
+        		index = index % 50;	
+        	}
+            PF(table).unselectAllRows();
+          	PF(table).selectRow(index ,false);
+        }
+	    
+	    function handleMfgCodeChange(id){
+	    	switch(id) {
+	    	    case UI_ID_MFG_CODE:
+	    	    	filterBasedOnMfgCode();
+	    	    	break;
+	    	    default:
+	    	    	alert('unrecognized code' );
+	    	}
+	    	
+	    	if(handleSearch){
+	    		$('[id$=search]').click();
+	    		handleSearch = false;
+	    	} 
+	    }
+	    
+	    function handleUpdateETASaveBtnClickRequest(xhr, status, args) { 
+            if(!args.failure) {    
+            	PF('updateETADialogWidget').hide();
+            }
+		}
+	    
+     	$(window).load(function(){
+     		updateBtnState();
+		});		    
+		</script>
+	</ui:define>
+</ui:composition>

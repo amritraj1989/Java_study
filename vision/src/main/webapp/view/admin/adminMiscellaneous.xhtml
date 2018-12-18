@@ -1,0 +1,70 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" template="../../templates/ui.xhtml">
+
+	<ui:define name="content">
+			<h:form id="adminMiscellaneousBreadCrumbForm"
+				prependId="false">
+				<p:breadCrumb
+					model="#{adminMiscellaneousBean.breadCrumbTrail}"
+					ajax="false" immediate="true" styleClass="ui-layout"/>
+			</h:form>
+						
+			<!-- Message display -->
+			<p:scrollPanel style="height:50px;" mode="native">
+				<p:messages id="messages" showSummary="false" showDetail="true"
+					autoUpdate="true" />
+			</p:scrollPanel>
+
+			<h:form id="adminMiscellaneousForm" prependId="false">
+
+				<!-- Miscellaneous Panel -->
+				<p:panel id="miscellaneousPanel"
+					header="Miscellaneous Administration" styleClass="ui-layout"
+					toggleable="true"  toggleSpeed="200">
+
+				</p:panel>
+				
+				<p:panel id="mainPanel" header="Operations" styleClass="ui-layout" toggleable="true"  toggleSpeed="200">
+					<p:commandButton id="clearCache" tabindex="1" value="Refresh Cache"
+						action="#{adminMiscellaneousBean.refreshCache}" ajax="false"
+						onclick="lockScreen();" immediate="true" />
+				
+				</p:panel>
+
+				<!-- Log level management Panel -->
+				
+				<p:panel id="logPanel" header="Log Level Management" toggleable="true"  toggleSpeed="200" widgetVar="panel">
+				  <p:panelGrid columns="3">   
+					<p:column>						
+						<h:outputLabel value="Log Levels : " styleClass="ui-label" />
+					</p:column>	 
+					
+					<p:selectOneMenu id="logId" tabindex="2" styleClass="ui-select-dropdown" value="#{adminMiscellaneousBean.selectedLevel}">
+						<f:selectItem	itemLabel="Trace"	itemValue="TRACE"/>						
+						<f:selectItem	itemLabel="Debug"	itemValue="DEBUG"/>
+						<f:selectItem	itemLabel="Information"	itemValue="INFO"/>
+						<f:selectItem	itemLabel="Warning"	itemValue="WARN"/>
+						<f:selectItem	itemLabel="Error"	itemValue="ERROR"/>
+						<f:selectItem	itemLabel="Fatal"	itemValue="FATAL"/>
+						<f:selectItem	itemLabel="Off"	itemValue="OFF"/>
+					</p:selectOneMenu>
+					
+					<p:commandButton id="updateLog" tabindex="2" value="Update Log Level"
+						action="#{adminMiscellaneousBean.updateLogLevel}" ajax="false"
+						onclick="lockScreen();"/>
+				 </p:panelGrid>		
+				</p:panel>
+				
+				<p:panel id="controlPanel" styleClass="ui-layout">
+					<p:commandButton id="cancel" tabindex="1" value="Cancel"
+						action="#{adminMiscellaneousBean.cancel}" ajax="false"
+						onclick="lockScreen();" immediate="true" />
+				</p:panel>
+			</h:form>
+
+	</ui:define>
+
+</ui:composition>

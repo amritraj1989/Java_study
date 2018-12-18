@@ -1,0 +1,40 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+    <p:confirmDialog id="dirtyDetectDialog"
+		message="There are unsaved changes on the page.  Cannot proceed until the changes are saved." header="Alert"
+		widgetVar="dirtyDetectWidgetVar"
+		appendTo="@(body)">
+		<p:focus context="dirtyDetectDialog" />
+
+		<h:form prependId="false">
+			<p:hotkey immediate="true" bind="esc"
+				handler="PF('dirtyDetectWidgetVar').hide();" />
+			<p:commandButton id="cancelDirtyDetectAlert" value="Ok"
+				onclick="PF('dirtyDetectWidgetVar').hide();" />
+		</h:form>
+	</p:confirmDialog> 
+	 
+
+    <script type="text/javascript"> 	
+		/**
+		* Checks for dirty data on the page and displays a dialog if found.
+		*/
+		function hasDirtyData(){
+			
+			if(dirtyCheck()){
+				showDialog('dirtyDetectWidgetVar');	
+    	        setFocus('cancelDirtyDetectAlert');
+    	        return false;				
+			}
+			
+	    	return true;
+		}		
+
+				
+	</script>	
+	
+</ui:composition>

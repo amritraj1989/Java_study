@@ -1,0 +1,137 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Fleet Maintenance / Delete PO</title>
+    <body>
+    	<h1>Fleet Maintenance / Delete PO</h1>
+    	<h2>Acceptance Tests (Automated)</h2>    
+    
+        <ul concordion:execute="testAutorizationToDelete()">
+           	<li>Under Work Class Permissions, Work Class for Willow remove Delete PO Permission:</li>
+			<ul>           	
+	           	<li>Search Vehicles screen, Input unit number 00942128, click on Search, click Create Purchase Order</li>
+				<li>Create PO (service Provider = CSC32, add Maintenance Code = 500-102, Unit Price = $20)</li>
+				<li>Status = Booked In</li>
+				<li>Delete PO <span concordion:assertTrue="authorized">grayed out</span></li>
+			</ul>            
+		</ul>
+       
+        <ul concordion:execute="testDeletePO(#unitNo)">
+           	<li>Under Work Class Permissions, Work Class for Willow Add Delete PO Permission:</li>
+			<ul>           	
+	           	<li>Search Vehicles screen, Input unit number <span concordion:set="#unitNo">00942128</span>, click on Search, click Create Purchase Order</li>
+				<li>Create PO (service Provider = CSC32, add Maintenance Code = 500-102, Unit Price = $20)</li>
+				<li>Status = Booked In</li>
+				<li>Click Delete PO</li>
+				<li>Receive Message - Do you want to Delete PO?</li>
+				<li>Click Yes Delete</li>
+				<li>On Service History screen receive message - Delete PO process completed successfully.</li>
+				<li>Confirm PO is <span concordion:assertTrue="maintRequestsDeleted">deleted from Service History Screen</span></li>
+				<li>Confirm PO is <span concordion:assertTrue="maintRequestsDeleted">deleted from Maintenance Requests Table</span></li>
+				<li>Confirm PO is <span concordion:assertTrue="maintRequestTasksDeleted">deleted from Maintenance Request Tasks Table</span></li>
+			</ul>            
+		</ul>
+		
+        <ul concordion:execute="testUpdateStatusAndDeletePO(#unitNo, #status)">
+           	<li>Under Work Class Permissions, Work Class for Willow Add Delete PO Permission:</li>
+			<ul>           	
+	           	<li>Search Vehicles screen, Input unit number <span concordion:set="#unitNo">00942128</span>, click on Search, click Create Purchase Order</li>
+				<li>Create PO (service Provider = CSC32, add Maintenance Code = 500-102, Unit Price = $20)</li>
+				<li>Status = Booked In</li>
+				<li>Change PO Status = Preauthorized <style hidden="true"><span concordion:set="#status">P</span></style></li>
+				<li>Click Delete PO</li>
+				<li>Receive Message - Do you want to Delete PO?</li>
+				<li>Click Yes Delete</li>
+				<li>On Service History screen receive message - Delete PO process completed successfully.</li>
+				<li>Confirm PO is <span concordion:assertTrue="maintRequestsDeleted">deleted from Service History Screen</span></li>
+				<li>Confirm PO is <span concordion:assertTrue="maintRequestsDeleted">deleted from Maintenance Requests Table</span></li>
+				<li>Confirm PO is <span concordion:assertTrue="maintRequestTasksDeleted">deleted from Maintenance Request Tasks Table</span></li>
+			</ul>            
+		</ul>		
+
+        <ul concordion:execute="testUpdateStatusAndDeletePO(#unitNo, #status)">
+           	<li>Under Work Class Permissions, Work Class for Willow Add Delete PO Permission:</li>
+			<ul>
+	           	<li>Search Vehicles screen, Input unit number <span concordion:set="#unitNo">00942128</span>, click on Search, click Create Purchase Order</li>
+				<li>Create PO (service Provider = CSC32, add Maintenance Code = 500-102, Unit Price = $20)</li>
+				<li>Status = Booked In</li>
+				<li>Change PO Status = Scheduled <style hidden="true"><span concordion:set="#status">S</span></style></li>
+				<li>Click Delete PO</li>
+				<li>Receive Message - Do you want to Delete PO?</li>
+				<li>Click Yes Delete</li>
+				<li>On Service History screen receive message - Delete PO process completed successfully.</li>
+				<li>Confirm PO is <span concordion:assertTrue="maintRequestsDeleted">deleted from Service History Screen</span></li>
+				<li>Confirm PO is <span concordion:assertTrue="maintRequestsDeleted">deleted from Maintenance Requests Table</span></li>
+				<li>Confirm PO is <span concordion:assertTrue="maintRequestTasksDeleted">deleted from Maintenance Request Tasks Table</span></li>
+			</ul>            
+		</ul>
+
+        <ul concordion:execute="testUpdateStatusAndDeletePO(#unitNo, #status)">
+           	<li>Under Work Class Permissions, Work Class for Willow Add Delete PO Permission:</li>
+			<ul>
+	           	<li>Search Vehicles screen, Input unit number <span concordion:set="#unitNo">00942128</span>, click on Search, click Create Purchase Order</li>
+				<li>Create PO (service Provider = CSC32, add Maintenance Code = 500-102, Unit Price = $20)</li>
+				<li>Status = Booked In</li>
+				<li>Change PO Status = Waiting for Client&apos;s Approval <style hidden="true"><span concordion:set="#status">WCA</span></style></li>
+				<li>Click Delete PO</li>
+				<li>Receive Message - Do you want to Delete PO?</li>
+				<li>Click Yes Delete</li>
+				<li>On Service History screen receive message - Delete PO process completed successfully.</li>
+				<li>Confirm PO is <span concordion:assertTrue="maintRequestsDeleted">deleted from Service History Screen</span></li>
+				<li>Confirm PO is <span concordion:assertTrue="maintRequestsDeleted">deleted from Maintenance Requests Table</span></li>
+				<li>Confirm PO is <span concordion:assertTrue="maintRequestTasksDeleted">deleted from Maintenance Request Tasks Table</span></li>
+			</ul>            
+		</ul>
+
+        <ul concordion:execute="testUpdateStatusAndDeletePO(#unitNo, #status)">
+           	<li>Under Work Class Permissions, Work Class for Willow Add Delete PO Permission:</li>
+			<ul>
+	           	<li>Search Vehicles screen, Input unit number <span concordion:set="#unitNo">00942128</span>, click on Search, click Create Purchase Order</li>
+				<li>Create PO (service Provider = CSC32, add Maintenance Code = 500-102, Unit Price = $20)</li>
+				<li>Status = Booked In</li>
+				<li>Change PO Status = In Progress<style hidden="true"><span concordion:set="#status">I</span></style></li>
+				<li>Click Delete PO</li>
+				<li>Receive Message - Do you want to Delete PO?</li>
+				<li>Click Yes Delete</li>
+				<li>On Service History screen receive message - Delete PO process completed successfully.</li>
+				<li>Confirm PO is <span concordion:assertTrue="maintRequestsDeleted">deleted from Service History Screen</span></li>
+				<li>Confirm PO is <span concordion:assertTrue="maintRequestsDeleted">deleted from Maintenance Requests Table</span></li>
+				<li>Confirm PO is <span concordion:assertTrue="maintRequestTasksDeleted">deleted from Maintenance Request Tasks Table</span></li>
+			</ul>            
+		</ul>
+
+        <ul concordion:execute="testUpdateStatusAndDeletePO(#unitNo, #status)">
+           	<li>Under Work Class Permissions, Work Class for Willow Add Delete PO Permission:</li>
+			<ul>
+	           	<li>Search Vehicles screen, Input unit number <span concordion:set="#unitNo">00942128</span>, click on Search, click Create Purchase Order</li>
+				<li>Create PO (service Provider = CSC32, add Maintenance Code = 500-102, Unit Price = $20)</li>
+				<li>Status = Booked In</li>
+				<li>Change PO Status = In Progress<style hidden="true"><span concordion:set="#status">I</span></style></li>
+				<li>Click Delete PO</li>
+				<li>Receive Message - Do you want to Delete PO?</li>
+				<li>Click Yes Delete</li>
+				<li>On Service History screen receive message - Delete PO process completed successfully.</li>
+				<li>Confirm PO is <span concordion:assertTrue="maintRequestsDeleted">deleted from Service History Screen</span></li>
+				<li>Confirm PO is <span concordion:assertTrue="maintRequestsDeleted">deleted from Maintenance Requests Table</span></li>
+				<li>Confirm PO is <span concordion:assertTrue="maintRequestTasksDeleted">deleted from Maintenance Request Tasks Table</span></li>
+			</ul>            
+		</ul>
+
+        <ul concordion:execute="testUpdateStatusAndDeletePO(#unitNo, #status)">
+           	<li>Under Work Class Permissions, Work Class for Willow Add Delete PO Permission:</li>
+			<ul>
+	           	<li>Search Vehicles screen, Input unit number <span concordion:set="#unitNo">00942128</span>, click on Search, click Create Purchase Order</li>
+				<li>Create PO (service Provider = CSC32, add Maintenance Code = 500-102, Unit Price = $20)</li>
+				<li>Status = Booked In</li>
+				<li>Change PO Status = Waiting for Invoice<style hidden="true"><span concordion:set="#status">WI</span></style></li>
+				<li>Click Delete PO</li>
+				<li>Receive Message - Do you want to Delete PO?</li>
+				<li>Click Yes Delete</li>
+				<li>On Service History screen receive message - Delete PO process completed successfully.</li>
+				<li>Confirm PO is <span concordion:assertTrue="maintRequestsDeleted">deleted from Service History Screen</span></li>
+				<li>Confirm PO is <span concordion:assertTrue="maintRequestsDeleted">deleted from Maintenance Requests Table</span></li>
+				<li>Confirm PO is <span concordion:assertTrue="maintRequestTasksDeleted">deleted from Maintenance Request Tasks Table</span></li>
+			</ul>            
+		</ul>
+								
+	</body>
+</html>            

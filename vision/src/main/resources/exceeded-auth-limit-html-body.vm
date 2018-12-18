@@ -1,0 +1,111 @@
+<html>
+<body style="font-family: arial,sans-serif">
+#set ($vehicle = ${maintenanceRequest.fleetMaster})
+#set ($tasks = ${maintenanceRequest.maintenanceRequestTasks})
+<span style="font-family: arial,sans-serif">The following vehicle is in for service and we need immediate approval before the following maintenance work can be started:</span><br/>
+<br/>
+
+<table style="width: 80%; font-family: arial,sans-serif" cellspacing="0">
+<tr>
+	<td style="width: 150px">Reason for Service:</td><td></td><td>$!maintenanceRequest.reasonForService</td>
+</tr>
+</table>
+<br/>
+<table style="width: 80%; font-family: arial,sans-serif" cellspacing="0">
+<tr>
+	<td style="width: 150px">Cost Center #:</td><td></td><td>$!{costCenterCode}</td>
+</tr>
+<tr>
+	<td style="width: 150px">Driver Name:</td><td></td><td>$!driverForename $!driverSurname</td>
+</tr>
+</table>
+<br/>
+<table style="width: 80%; font-family: arial,sans-serif" cellspacing="0">
+<tr>
+	<td style="width: 150px">Unit #:</td><td></td><td>$vehicle.unitNo</td>
+</tr>
+<tr>
+	<td style="width: 150px">Fleet Ref #:</td><td></td><td>#if("$!vehicle.fleetReferenceNumber" != "")$vehicle.fleetReferenceNumber #end</td>
+</tr>
+<tr>
+	<td style="width: 150px">Model Desc:</td><td></td><td>$!vehicle.model.modelDescription</td>
+</tr>
+<tr>
+	<td style="width: 150px">VIN:</td><td></td><td>#if("$!vehicle.vin" != "")$vehicle.vin #end</td>
+</tr>
+<tr>
+	<td style="width: 150px">Last Service:</td><td></td><td>#if("$!latestProcessedMaintReqStartDate" != "")$!latestProcessedMaintReqStartDate; $number.format('###,###', $latestProcessedMaintRequestOdo) ${latestProcessedMaintRequestUMO} #end</td>
+</tr>
+</table>
+<br/>
+<table style="width: 80%; font-family: arial,sans-serif" cellspacing="0">
+<tr>
+	<td style="width: 150px">PO #:</td><td></td><td>$maintenanceRequest.jobNo</td>
+</tr>
+<tr>
+	<td style="width: 150px">Mileage:</td><td></td><td>$number.format('###,###', $maintenanceRequest.currentOdo) ${UOM}</td>
+</tr>
+<tr>
+	<td style="width: 150px">Service Provider:</td><td></td><td>$maintenanceRequest.serviceProvider.serviceProviderName</td>
+</tr>
+<tr>
+	<td style="width: 150px"></td><td></td><td>$serviceProviderAddress</td>
+</tr>
+</table>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<table style="width: 60%; font-family: arial,sans-serif" cellspacing="0">
+<tr><th style="border-bottom-style: solid; border-width: 1px; border-color: black;text-align: right;">Qty</th><th style="border-bottom-style: solid; border-width: 1px; border-color: black;text-align: right;"></th><th style="border-bottom-style: solid; border-width: 1px; border-color: black;text-align: left;">Description</th><th style="border-bottom-style: solid; border-width: 1px; border-color: black;text-align: right;">Unit Price</th><th style="border-bottom-style: solid; border-width: 1px; border-color: black;text-align: right;">Total Amount</th></tr>
+
+#foreach( $task in $tasks )
+
+	#if($task.rechargeFlag == "Y")
+	<tr>
+	<td style="text-align: right;">$task.rechargeQty</td>
+	<td style="text-align: right;"></td>
+	<td style="text-align: left;">$task.maintenanceCodeDesc</td>
+	<td style="text-align: right;">$number.currency($task.rechargeUnitCost)</td>
+	<td style="text-align: right;">$number.currency($task.rechargeTotalCost)</td>
+	</tr>
+	#end
+
+#end
+<tr>
+		<td colspan= "5"></td>
+</tr>
+<tr>
+		<td colspan= "5"></td>
+</tr>
+
+</table>
+<br/><br/><span style="font-family: arial,sans-serif">Total Amount:	$number.currency($rechargeTotal) (Does not include sales tax)</span>
+#if($costAvoidanceTotal > 0)
+<br/><br/><span style="font-family: arial,sans-serif">Negotiated Savings:</span>
+<br/>
+<table style="font-family: arial,sans-serif">
+	
+	#foreach( $task in $tasks )
+		#if($task.costAvoidanceCode)
+			<tr>
+				<td>$task.costAvoidanceCode &nbsp; $task.costAvoidanceDescription</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+				<td>$number.currency($task.costAvoidanceAmount)</td>
+			</tr>
+		#end
+	#end
+</table>
+#end
+<br/>
+<br/>
+<br/>
+<br/>
+
+
+</body>
+</html>

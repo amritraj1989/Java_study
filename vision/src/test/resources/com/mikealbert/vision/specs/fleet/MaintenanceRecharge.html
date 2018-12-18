@@ -1,0 +1,74 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Fleet Maintenance / FM-154 - FM-156 Maintenance Recharge Flag and Reason</title>
+    <body>
+    	<h1>Fleet Maintenance / FM-154 - FM-156 Maintenance Recharge Flag and Reason</h1>
+    	<h2>Acceptance Tests (Automated)</h2>
+    	<!-- fm-154 -->
+			<ul concordion:execute="#result = testActualEndDatePriorToMaintStartDate(#unitNo)">
+ 				<li>When creating the PO for the unit number <b><span concordion:set="#unitNo">00216600</span></b> 
+ 				if Maintenance Start date is after the Actual Contract End Date, then the Recharge Indicator should be <span concordion:assertEquals="#result">N</span>
+ 				</li>
+ 			</ul>	
+ 			<ul concordion:execute="#result = testMaintProgramEqualsMaintMgmt(#unitNo)">
+ 				<li>When creating the PO for the unit number <b><span concordion:set="#unitNo">00222931</span></b> 
+ 				if maintenance program is Maint Mgmt, then the Recharge Indicator should be <span concordion:assertEquals="#result">Y</span>
+ 				</li>
+ 			</ul>
+ 			<ul concordion:execute="#result = testMaintProgramEqualsFullMaint(#unitNo)">
+ 				<li>When creating the PO for the unit number <b><span concordion:set="#unitNo">00940991</span></b> 
+ 				if maintenance program is Full Maint/Budgeted Maint, then the Recharge Indicator should be <span concordion:assertEquals="#result">N</span>
+ 				</li>
+ 			</ul> 	
+		    <ul concordion:execute="#result = testNoMaintProgram(#unitNo)">
+ 				<li>When creating the PO for the unit number <b><span concordion:set="#unitNo">00224733</span></b> 
+ 				if no maintenance program exists, then the Recharge Indicator should be <span concordion:assertEquals="#result">Y</span>
+ 				</li>
+ 			</ul>
+		    <ul concordion:execute="#result = testMaintReqTypeRiskMgt(#unitNo)">
+ 				<li>When creating the PO for the unit number <b><span concordion:set="#unitNo">00224733</span></b> 
+ 				if maintenance request type is Risk Mgmt, then the Recharge Indicator should be <span concordion:assertEquals="#result">Y</span>
+ 				</li>
+ 			</ul> 			
+
+ 			<!--fm-156--> 
+ 			<ul concordion:execute="#result = testMaintMgtAndMaint(#unitNo)">
+ 				<li>When creating the PO for the unit number <b><span concordion:set="#unitNo">00947322</span></b> 
+ 				if Maintenance Program is Maint Mgmt and the Maintenance Request Type is Maint and the Recharge Indicator is checked, then the Recharge Reason should be <span concordion:assertEquals="#result">MAINT_MGT</span>
+ 				</li>
+ 			</ul>
+	   		<ul concordion:execute="#result = testBothMaintMgtAndRiskMgtAndMaint(#unitNo)">
+ 				<li>When creating the PO for the unit number <b><span concordion:set="#unitNo">00942121</span></b> 
+ 				if Maintenance Program is both Maint Mgmt and Risk Mgt and the Maintenance Request Type is Maint and the Recharge Indicator is checked, then the Recharge Reason should be <span concordion:assertEquals="#result">MAINT_MGT</span>
+ 				</li>
+ 			</ul> 
+	   		<ul concordion:execute="#result = testBothMaintMgtAndRiskMgtAndRiskMgt(#unitNo)">
+ 				<li>When creating the PO for the unit number <b><span concordion:set="#unitNo">00942121</span></b> 
+ 				if Maintenance Program is both Maint Mgmt and Risk Mgt and the Maintenance Request Type is Risk Mgt and the Recharge Indicator is checked, then the Recharge Reason should be <span concordion:assertEquals="#result">RISK_MGMT</span>
+ 				</li>
+ 			</ul>  		
+ 			<ul concordion:execute="#result = testBothFullBgtAndRiskMgtAndMaint(#unitNo)">
+ 				<li>When creating the PO for the unit number <b><span concordion:set="#unitNo">00966666</span></b> 
+ 				if Maintenance Program is both Full/Budgeted and Risk Mgt and the Maintenance Request Type is Maint and the Recharge Indicator is not checked, then the Recharge Reason should be <span concordion:assertEquals="#result">Blank</span>
+ 				</li>
+ 			</ul> 
+ 			<ul concordion:execute="#result = testBothFullBgtAndRiskMgtAndRiskMgmt(#unitNo)">
+ 				<li>When creating the PO for the unit number <b><span concordion:set="#unitNo">00966666</span></b> 
+ 				if Maintenance Program is both Full/Budgeted and Risk Mgt and the Maintenance Request Type is Risk Mgmt and the Recharge Indicator is checked, then the Recharge Reason should be <span concordion:assertEquals="#result">RISK_MGMT</span>
+ 				</li>
+ 			</ul>  			
+		    <ul concordion:execute="#result = testNoMaintPrograms(#unitNo)">
+ 				<li>When creating the PO for the unit number <b><span concordion:set="#unitNo">00224733</span></b> 
+ 				if no Maintenance Program exists and the Recharge Indicator is checked, then the Recharge Reason should be <span concordion:assertEquals="#result">NON_COVER</span>
+ 				</li>
+ 			</ul> 			
+     	<h2>Manual Tests</h2>
+    	    <ul type = "circle"><b>
+    	       <li>TODO: After entering information in search criteria field: test clicking Enter in search field, test clicking Search, test clicking the LOV</li>
+    	       <li>TODO: If maintenance request Actual Start Date is prior to In Service Date of original contract line for a Formal Extension (because in service date is null on a Formal Extension), then Recharge indicator is not checked.</li>
+    	    </b></ul>
+
+    	<h2>Untested (Out of Scope)</h2>
+    		<ul><li>TODO:</li></ul>
+    </body>
+</html>

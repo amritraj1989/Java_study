@@ -1,0 +1,408 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	template="../../templates/ui.xhtml">
+	
+	<ui:define name="content">
+			<h:form id="breadCrumbForm" prependId="false">
+				<p:breadCrumb model="#{serviceElementsBean.breadCrumbTrail}"  
+				 style="min-width:900px;max-width:100%;width:auto" 
+				ajax="false" immediate="true" styleClass="ui-layout"/>
+			</h:form>
+			<!-- Error message display -->
+			<p:scrollPanel style="height:50px;max-width:100%;width:auto;" 
+				mode="native" styleClass="ui-layout">
+				<p:messages id="messages" showSummary="false" showDetail="true"	autoUpdate="true" />
+			</p:scrollPanel>			
+			
+			<h:form id="serviceElementForm" prependId="false">
+				
+			  <p:scrollPanel style="width:auto;height:#{serviceElementsBean.dataTable.height}px"  mode="native" >
+				
+	    		<p:panel id="serviceElementDatatableTablePanel" rendered="#{serviceElementsBean.hideHistory }" >
+
+					<p:focus />
+
+					<h:panelGrid columns="3" cellspacing="10">
+						<h:panelGroup>
+							<h:outputLabel value="Quote:" style="font-weight:bold"/>
+							<h:outputLabel value="#{serviceElementsBean.outputQuote}" />
+						</h:panelGroup>
+						
+						<h:panelGroup>
+							<h:outputText value="Effective Date:" style ="font-weight:bold"/>
+	                    	<h:outputLabel value="#{serviceElementsBean.effectiveDate}">
+	                    		<f:convertDateTime pattern="MM/dd/yyyy" />
+	                    	</h:outputLabel>
+	                   </h:panelGroup>
+	                    
+					</h:panelGrid>
+
+	                <p:dataTable  id="serviceElementTable" var="element"
+	                	value="#{serviceElementsBean.rowList}" 
+	                	emptyMessage=""  
+	                	scrollable="false"  
+	                	scrollHeight="250"
+	                
+						rowIndexVar="elementRowIndex"
+						rowKey="#{serviceElementsBean.selectedElement.description}"
+						selection="#{serviceElementsBean.selectedElement}">
+	                    
+	                    <p:column width="40%">
+	                    	<f:facet name="header">
+								<h:outputText value="Service Element" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputLabel value="#{element.description}" />
+	              			<p:spacer width="3" height="1"/>
+							<p:commandLink id="servElementParamLink" rendered="#{element.inRateTreatment and serviceElementsBean.showFinanceParameterDialog}" actionListener="#{serviceElementsBean.getSelectedServiceElement(element)}"
+	                              			title="View Details" immediate="true" oncomplete="showDialog('currentFinParamWidget');" update="currentFinParamDialogId">
+								<p:graphicImage value="/images/custins.png" style="border-style: none" />	
+							</p:commandLink>
+	                   	</p:column> 
+	                   
+	                    <p:column width="10%">  
+	                    	<f:facet name="header">
+								<h:outputText value="Monthly" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputLabel value="#{element.monthlyCost}" styleClass="alignmentRight">
+		                    	<f:converter converterId="malDollarValueConverter" />
+							</h:outputLabel>
+	                   	</p:column> 
+	                    <p:column width="10%">  
+	                    	<f:facet name="header">
+								<h:outputText value="Total" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputLabel value="#{element.totalCost}" styleClass="alignmentRight">
+	                    		<f:converter converterId="malDollarValueConverter" /> 
+	                  		</h:outputLabel>
+	                   	</p:column> 
+	                    <p:column width="25%">
+	                    	<f:facet name="header">
+								<h:outputText value="Finance Parameters" style ="font-weight:bold"/>
+							</f:facet>
+							<p:dataList value="#{element.currentFinanceParameters}" var="cfp" type="none" styleClass="ui-noBorder" emptyMessage=" " >  
+								<h:outputText value="#{cfp.quotationModelFinances.description} (#{cfp.quotationModelFinances.nValue})" 
+									rendered="#{cfp.quotationModelFinances.nValue != null ? 'true': 'false'}"/>
+								<h:outputText value=" &lt;br /&gt; "  rendered="#{cfp.quotationModelFinances.nValue != null ? 'true': 'false'}"  
+									escape="false" />
+							</p:dataList>  
+	                    </p:column> 
+	                    
+	                    
+	                    
+	                    <p:column width="5%">
+	                    	<p:commandLink id="showfp" rendered="#{element.editable}" tabindex="10" 
+	                    				  oncomplete="PF('fpDialogVar').show();clickFirstRow();" actionListener="#{serviceElementsBean.onRowSelect}" 
+	                    				  update=":fpDialog,:fpForm:fpPanel , :serviceElementForm:selectedRowIndex" onclick="setSelectedElementRow('#{elementRowIndex}')" >
+								<p:graphicImage style="text-align:right;align:right;border-style:none;" 
+												value="/images/action_edit.png" id="permissionSetDesc"
+												title="Add/Edit Finance Parameters" />
+							</p:commandLink>
+
+
+	                  
+	                    </p:column> 
+	                </p:dataTable>
+	              </p:panel>
+	              <p:panel id="headerPanel" rendered="#{!serviceElementsBean.hideHistory and fn:length(serviceElementsBean.amendmentHistoryList) gt 0}"  
+	              style="max-width:100%;width:auto;" >
+
+		    		<h:panelGrid columns="3">
+			    		<h:panelGrid columns="5">
+			    			<p:outputLabel value="Client:" styleClass="ui-label"/>
+							<p:spacer width="10" height="1"/>
+		    				<h:outputText value="#{serviceElementsBean.accountCode}" /> 
+	            			<p:spacer width="10" height="1"/>
+	            			<h:outputText value="#{serviceElementsBean.accountName}" />
+			    			<p:outputLabel value="Unit:" styleClass="ui-label"/>
+							<p:spacer width="10" height="1"/>
+		    				<h:outputText value="#{serviceElementsBean.unitNo != null ? serviceElementsBean.unitNo : serviceElementsBean.quoteType != null ? 'N/A     ' : null}" /> 
+	            			<p:spacer width="10" height="1"/>
+	            			<h:outputText value="#{serviceElementsBean.modelDescription}" />
+	            			<p:outputLabel value="Quote Type:" styleClass="ui-label"/>
+	            			<p:spacer width="10" height="1"/>
+	            			<h:outputText value="#{serviceElementsBean.quoteType}" />
+	            		</h:panelGrid>
+						<p:spacer width="200" height="1"/>
+			    		<h:panelGrid columns="5">
+			    			<p:outputLabel value="Ordering Dealer:" styleClass="ui-label"/>
+							<p:spacer width="10" height="1"/>
+		    				<h:outputText value="#{serviceElementsBean.orderingDealerCode != null ? serviceElementsBean.orderingDealerCode : 'N/A'}" /> 
+	            			<p:spacer width="10" height="1"/>
+	            			<h:outputText value="#{serviceElementsBean.orderingDealerName}" />
+			    			<p:outputLabel value="Delivering Dealer:" styleClass="ui-label"/>
+							<p:spacer width="10" height="1"/>
+		    				<h:outputText value="#{serviceElementsBean.deliveringDealerCode != null ? serviceElementsBean.deliveringDealerCode : 'N/A'}" /> 
+	            			<p:spacer width="10" height="1"/>
+	            			<h:outputText value="#{serviceElementsBean.deliveringDealerName}" />
+							<p:spacer width="1" height="10"/>
+	            		</h:panelGrid>
+            		</h:panelGrid>
+            	</p:panel>
+            	
+	              <p:panel id= "amedmentHistoryPanel" >
+	              	<div id="" style="overflow-y: height:350px;">
+	              	<ui:repeat   value= "#{serviceElementsBean.amendmentHistoryList}"   
+	              		rendered="#{!serviceElementsBean.hideHistory and fn:length(serviceElementsBean.amendmentHistoryList) gt 0}"    	var = "mainQuote"  >
+	              		<p></p>
+	              			<p:dataTable id= "amendTable2" value= "#{mainQuote.serviceElements}" var = "srvElement" emptyMessage="No service element changes">
+	              				<f:facet name="header">
+	              			 		<h:panelGrid styleClass="panelGrid-compact">
+	     	              			 	<h:panelGrid columns="1" styleClass="panelGrid-compact alignmentLeft">
+	     	              			 	<h:panelGroup>
+	     	              			 	<h:outputText value= "#{mainQuote.getAmendmentTypeDescription() }"  />
+              							<p:spacer width="30" height="1"/>
+										<h:panelGroup rendered="#{mainQuote.amendmentSource eq 'I' ? false:true}">
+	           										<p:outputLabel value="Quote: " />
+	           										<h:outputText value="#{mainQuote.quote}" />
+           								</h:panelGroup>										
+              							<p:spacer width="30" height="1"/>
+			              				<h:panelGroup>
+	           										<p:outputLabel value="Effective Date: " />
+	           										<h:outputText value="#{mainQuote.effectiveDate}">
+					              						<f:convertDateTime type="date" pattern="MM/dd/yyyy" />           										
+	           										</h:outputText>
+           								</h:panelGroup>
+			              				<p:spacer width="30" height="1"/>
+			              				<h:panelGroup>
+						              				<h:outputLabel value="Effective Period: " 
+						              					rendered="#{mainQuote.amendmentSource eq 'O'  or mainQuote.amendmentSource eq 'F'  or mainQuote.amendmentSource eq 'I'? false:true}" /> 
+					           						<h:outputText value="#{mainQuote.effectivePeriod}" 
+					           							rendered="#{mainQuote.amendmentSource eq 'O'  or mainQuote.amendmentSource eq 'F' or mainQuote.amendmentSource eq 'I' ? false:true}"  />
+           								</h:panelGroup>
+	     	              			 	</h:panelGroup>
+              			 					
+		           						
+									</h:panelGrid>		           						             			         
+	              			 		</h:panelGrid>
+        						</f:facet>
+        						<p:column width="40%"> 
+           								<f:facet name="header">                  
+           									<p:outputLabel styleClass="ui-label">Element</p:outputLabel>
+	              						</f:facet>
+           								
+										<h:outputText value="&#8211;" styleClass="amendment-ind" rendered="#{srvElement.amendmentTypeInd eq '-'}"/>
+										<h:outputText value="+" styleClass="amendment-ind" rendered="#{srvElement.amendmentTypeInd eq '+'}"/>
+																				
+           								<p:spacer width="10" height="1"/>
+           								<h:outputText value="#{srvElement.elementDesc}"/>
+           								<h:panelGroup rendered="#{mainQuote.noChangeInfo != null}" >
+            								<h:outputText value="#{mainQuote.noChangeInfo}"  />
+            							</h:panelGroup>
+            							  
+           						</p:column>
+        						
+           						<p:column width="10%">  
+           								<f:facet name="header">                  
+           									Monthly            
+           								</f:facet>
+           								<h:outputText   value="#{srvElement.rental!= null ? srvElement.rental:0}"  rendered="#{srvElement.rental!= null }" styleClass="alignmentRight">
+           									<f:converter converterId="malDollarValueConverter" />
+           								</h:outputText>
+           						</p:column>
+           						<p:column width="10%">  
+           								<f:facet name="header">                  
+           									Total            
+           								</f:facet>
+           								<h:outputText  value="#{srvElement.totalRental != null ? srvElement.totalRental:0}" rendered="#{srvElement.totalRental!= null }" styleClass="alignmentRight">
+		           							<f:converter converterId="malDollarValueConverter" />
+		           						</h:outputText>
+           						</p:column>
+           						<p:column width="35%">  
+           								<f:facet name="header">                  
+           									Finance Parameters            
+           								</f:facet>
+           								<p:dataList  value="#{srvElement.financeParameters}"  emptyMessage=" "
+           									styleClass="ui-noBorder" type="none" 
+											var = "finElement" style ="width:auto" id="finParamDatatableTable" >
+												<h:outputText value="#{finElement.quotationModelFinances.description}"/>
+												<p:spacer width="5" height="1"/>
+												<h:outputText value="(" rendered="#{finElement.value != null}"/>
+												<h:outputText value="#{finElement.value}">
+													<f:convertNumber type="number" pattern="#,##0.00" />
+												</h:outputText>
+												<h:outputText value=")" rendered="#{finElement.value != null}" />
+												<h:outputText value=" &lt;br /&gt; "  
+													rendered="#{finElement.quotationModelFinances.description != null ? 'true': 'false'}"  
+													escape="false" />
+												
+										</p:dataList>
+           						</p:column>
+	              			</p:dataTable>
+	              		
+	              	</ui:repeat>
+	              	</div>
+	              </p:panel>
+
+				</p:scrollPanel>
+
+	              <h:panelGrid id="buttons">
+					<f:facet name="footer">
+						<p:commandButton id="save" tabindex="30" value="Save"
+							action="#{serviceElementsBean.save}" ajax="false"
+							onclick="lockScreen();" immediate="true" disabled="#{serviceElementsBean.disabledSave}"/>
+						<p:spacer width="10" />
+						<p:commandButton id="cancel" tabindex="36" value="Cancel"
+							action="#{serviceElementsBean.cancel}" ajax="false"
+							onclick="lockScreen();" immediate="true" />
+
+					</f:facet>
+				</h:panelGrid>
+	              
+				<h:inputHidden id="selectedRowIndex" value="#{serviceElementsBean.selectedRowIndex}" />	              
+
+
+
+
+			</h:form>
+			
+			
+			
+			<p:dialog id="fpDialog" header="#{serviceElementsBean.selectedElement.description}" widgetVar="fpDialogVar"   
+					   modal="true" resizable="false" appendTo="@(body)" style="min-width: 660px; max-width: 660px;"> 
+			  
+			  <h:form id="fpForm" prependId="false">   					  
+
+				<p:panel id="fpPanel">
+					<p:messages id="dialogErrorMsgID" showDetail="false" autoUpdate="true" showSummary="true" globalOnly="false"/>	
+					<p:focus  context="fpPanel"/>
+					<p:dataTable id="fpDataTable" var="fp" value="#{serviceElementsBean.dialogList}" 
+						 widgetVar="fpTable" 
+						rowIndexVar="fpRowIndex"    
+						rendered="#{serviceElementsBean.selectedElement.editableFinanceParameters != null ? 'true': 'false'}">  
+  
+						<p:column width="170" style="white-space: normal;">  
+						   	<f:facet name="header">
+								<h:outputText value="Name" style ="font-weight:bold"/>
+							</f:facet>
+				        	<h:outputLabel value="#{fp.financeParameter.description}" rendered="#{fp != null ? 'true': 'false'}"/>
+				        </p:column>  
+						<p:column width="30"> 
+						   	<f:facet name="header">
+								<h:outputText value="Default" style ="font-weight:bold"/>
+							</f:facet>
+				        	<h:outputLabel value="#{fp.defaultValue}" rendered="#{fp != null ? 'true': 'false'}" styleClass="alignmentRight"/>
+				        </p:column>  
+						<p:column width="50"> 
+						   	<f:facet name="header">
+								<h:outputText value="Your Limits" style ="font-weight:bold"/>
+							</f:facet>
+				        	<h:outputLabel value="#{fp.workClassAuthority.lowerLimit} to #{fp.workClassAuthority.upperLimit}" 
+				        		rendered="#{fp != null ? 'true': 'false'}" />
+				        </p:column>  
+						<p:column style="width:85px">  
+						   	<f:facet name="header">
+								<h:outputText value="Value" style ="font-weight:bold"/>
+							</f:facet>
+          					<p:inputNumber  styleClass="rowArray" id="fpInput" 
+	   					 				value="#{fp.value}" size="17"
+                						decimalPlaces="5"  thousandSeparator="," 
+                						maxValue="9999999999.99999"
+                						minValue="-9999999999.99999" 
+                                     	emptyValue="empty"/>
+           				</p:column>  
+
+					</p:dataTable>
+ 				<br />
+ 				
+ 				
+ 				
+				<p:commandButton  id="fpdialogUpdateButton" value="Update" oncomplete="handlePopupDoneRequest(xhr, status, args);" 
+								process="@form"
+								ajax="true" 
+								update=":serviceElementForm:serviceElementDatatableTablePanel,  :serviceElementForm:buttons"
+								actionListener="#{serviceElementsBean.processUpdateDialog}"  />
+				<p:spacer width="10" />
+				<p:commandButton id="fpdialogCancelButton" value="Cancel" oncomplete="PF('fpDialogVar').hide();"  
+								process="@none"
+								immediate="true"
+								actionListener="#{serviceElementsBean.processCancelDialog}"  />
+				
+				</p:panel>	    	
+			</h:form>		
+		  </p:dialog>  				
+		
+			
+			<p:dialog id="currentFinParamDialogId" widgetVar="currentFinParamWidget" closeOnEscape="true" modal="true" onShow="setFocus('currentFinParamDialogDoneBtn');"
+		    			header="#{serviceElementsBean.selectedElement.description}" resizable="false" appendTo="@(body)"
+		    			width="60%" height="50%">
+		    	<h:form id="currentFinParamFormId" prependId="false">
+		    		<p:panel id="currentFinParamPanel">
+		    			<p:dataTable id="currentFinParamTblId" widgetVar="currentFinParamTblWidget" var="cfp"
+		    						value="#{serviceElementsBean.inRateElementParameters}" rowStyleClass="#{not empty cfp.value? '' : 'ui-helper-hidden'}"
+		    						scrollable="true" scrollHeight="150">
+		    				<p:column headerText="Element Finance Parameter" width="30%">
+		    					<p:outputLabel value="#{cfp.quotationModelFinances.description}"/>
+		    				</p:column>
+		    				<p:column headerText="Monthly Amount" width="15%">
+								<h:outputLabel value="#{cfp.monthlyValue}" styleClass="alignmentRight">
+			    					<f:converter converterId="malDollarValueConverter" />
+								</h:outputLabel>
+		    				</p:column>
+		    				<p:column headerText="Total Amount (Excluding Interest)" width="27%">
+		    					<h:outputLabel value="#{cfp.totalValueExcludingInterest}" styleClass="alignmentRight">
+			    					<f:converter converterId="malDollarValueConverter" />
+								</h:outputLabel>
+		    				</p:column>
+		    				<p:column headerText="Total Unpaid (Excluding Interest)" width="28%">
+		    					<h:outputLabel value="#{cfp.totalUnpaidAmount}" styleClass="alignmentRight">
+			    					<f:converter converterId="malDollarValueConverter" />
+								</h:outputLabel>
+		    				</p:column>
+		    			</p:dataTable>
+		    		</p:panel>
+					<br/>
+				 	<p:commandButton id="currentFinParamDialogDoneBtn" value="Done" onclick="hideDialog('currentFinParamWidget')" />
+		    	</h:form>
+		    </p:dialog>
+			
+			
+			
+			<script>	
+			
+			function initializeDirtyDetection() {
+				registerIgnoreButton("save");
+			}
+			
+				function setSelectedElementRow(index){
+					document.getElementById('selectedRowIndex').value = index;
+				}
+				
+				function handlePopupDoneRequest(xhr, status, args) { 
+                    if(!args.failure) { 
+                    	setDirtyData(true);
+                        PF('fpDialogVar').hide();                                
+                    }
+				}
+				
+				function clickFirstRow() {
+					var dataRows = $('.rowArray');
+					if(dataRows[0]) 
+						
+						dataRows[0].click();
+				}
+
+				function formatAmount(i){
+					var dataRows = $('.rowArray');    
+					if(dataRows[i]) {
+						z = dataRows[i].id;
+						var value = document.getElementById(z).value;
+						if((value)) {
+							formatAmountValue(z, "Value", false);						
+						} else {
+							document.getElementById(z).value = '0.00';
+						}
+
+					}
+				}
+		     	$(window).load(function(){
+		     		initializeDirtyDetection();
+				});					
+			</script>
+
+	</ui:define>
+</ui:composition>

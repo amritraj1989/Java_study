@@ -1,0 +1,255 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+	    xmlns:h="http://java.sun.com/jsf/html"
+	    xmlns:f="http://java.sun.com/jsf/core"
+	    xmlns:p="http://primefaces.org/ui"
+	    xmlns:composite="http://java.sun.com/jsf/composite"
+	    xmlns:comp="http://java.sun.com/jsf/composite/view/component" 
+	    xmlns:pe="http://primefaces.org/ui/extensions" >
+	
+    <composite:interface>
+		<composite:attribute name="quotationModel" required="true" type="com.mikealbert.data.entity.QuotationModel" />
+		<composite:attribute name="mainPODocId" required="false" type="java.lang.Long" />
+		<composite:attribute name="upfitPOStatuses" required="true" type="java.util.List" />
+		<composite:attribute name="enableBailment" required="true" default="false" type="java.lang.Boolean" />
+		<composite:attribute name="readOnly" required="true" default="true" type="java.lang.Boolean" />		
+		<composite:attribute name="enableStartEndDates" required="true" default="false" type="java.lang.Boolean" />							  			
+		<composite:attribute name="windowTitle" required="false" default="Upfit Progress" type="java.lang.String" />
+		<composite:attribute name="onClose" required="false" default="" type="java.lang.String" />			    	 	    	    	    			            
+	</composite:interface>
+	
+	<composite:implementation>
+	    <h:form id="ccUpfitProgressHiddenForm" prependId="false">           
+            <p:commandButton id="ccUpfitProgressInitializeBeanHiddenBtn" 
+                    style="display:none"
+                    actionListener="#{upfitProgressBean.init()}" 
+                    oncomplete="showDialog('ccUpfitProgressWidget');"
+                    update="#{':'.concat(cc.clientId).concat(':ccUpfitProgressDialog')}" />
+		</h:form>
+		        	  	
+	  	<div id="#{cc.clientId}">
+			<p:dialog id="ccUpfitProgressDialog" 
+			        modal="true" 
+			        onShow="ufpInit()" 
+			        onHide="onHideListener();"
+			        header="#{upfitProgressBean.windowTitle}" 
+			        widgetVar="ccUpfitProgressWidget" 			      
+			        resizable="false" 
+			        dynamic="true"
+			        width="960" height="350" 
+			        closeOnEscape="true" 
+			        appendTo="@(body)">
+		        
+	    	    <!-- Message display -->
+			    <p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:100%;max-width:100%;width:auto;">
+				    <p:messages id="upfitProgresssDialogMessages" severity="info,error,fatal" showSummary="true" showDetail="false" autoUpdate="true" />
+			    </p:scrollPanel>  			    		   		        		    	    	        
+            		        
+				<h:form id="ccUpfitProgressForm" prependId="false">
+			   
+	                <p:remoteCommand immediate="true" name="onHideListener" actionListener="#{upfitProgressBean.onHideListener()}" update="@form" oncomplete="#{cc.attrs.onClose}" />	                
+                    
+                    <p:panel rendered="#{upfitProgressBean.enableBailment or not empty upfitProgressBean.bailmentUpfitterProgress}">
+                        <p:outputLabel for="ccBailmentVendorMnu" value="Bailment Vendor:*" styleClass="ui-label" />                        
+						<p:selectOneMenu id="ccBailmentVendorMnu" value="#{upfitProgressBean.bailmentUpfitterProgress}" converter="#{upfitterProgressConverter}" rendered="#{upfitProgressBean.enableBailment}">
+						    <f:selectItem itemValue="#{null}" itemLabel="" />								
+							<f:selectItems value="#{upfitProgressBean.upfitterProgressList}" var="upfitProgress" itemLabel="#{upfitProgress.upfitter.accountName}" itemValue="#{upfitProgress}" itemDescription="Test Description"/>
+							
+							<p:ajax listener="#{upfitProgressBean.bailmentUpfitterListener}" process="@this" update="ccBailmentVendorMnu" />								
+						</p:selectOneMenu>                    
+					    <h:outputText value="#{upfitProgressBean.bailmentUpfitterProgress.upfitter.accountName}" rendered="#{not upfitProgressBean.enableBailment and not empty upfitProgressBean.bailmentUpfitterProgress}" />						
+                    </p:panel>
+                    
+					<p:panel style="width:100%"> 						
+					    <p:dataTable id="ccUpfitProgressDT" 
+					            value="#{upfitProgressBean.upfitterProgressList}" 
+					            var="upfitProgress" 
+					            rowIndexVar="rowIndex"
+					            scrollable="true"
+		                        scrollHeight="150">
+		                        
+					        <p:column headerText="Sequence" width="1" style="text-align:center">
+					            <h:outputText value="#{upfitProgress.sequenceNo}" rendered="#{not upfitProgressBean.isChild(rowIndex)}" />
+					            
+					            <p:spacer width="5" />
+								<p:spacer width="12" rendered="#{rowIndex == upfitProgressBean.upfitterProgressList.size()-1 and upfitProgressBean.upfitterProgressList.size() == 0}"/>
+								<p:commandLink id="ccSequenceDown" tabindex="31" rendered="#{upfitProgressBean.canGoDown(rowIndex)}"
+								        process="@this"
+								        update="ccUpfitProgressDT"
+		                   		 		actionListener="#{upfitProgressBean.reSequenceRow(rowIndex, upfitProgressBean.DOWN)}">
+								    
+								    <p:graphicImage value="/images/arrow_down.png" title="Move Down" style="text-align:right;align:right;border-style:none;"  height="12" width="12"  />
+								</p:commandLink>
+								
+								<p:spacer width="5" rendered="#{rowIndex != 0  and upfitProgressBean.upfitterProgressList.size() == 0}" />
+								<p:spacer width="17" rendered="#{rowIndex == 0  and upfitProgressBean.upfitterProgressList.size() == 0}"/>
+		                    	<p:commandLink id="ccSequenceUp" tabindex="32" rendered="#{upfitProgressBean.canGoUp(rowIndex)}"
+		                    	        process="@this"
+								        update="ccUpfitProgressDT"		                    	                          			
+		                   		 		actionListener="#{upfitProgressBean.reSequenceRow(rowIndex, upfitProgressBean.UP)}">
+		                   		  		 
+									<p:graphicImage style="text-align:right;align:right;border-style:none;" 
+										value="/images/arrow_up.png" title="Move Up" height="12" width="12" />
+								</p:commandLink>								
+
+					        </p:column>
+					        
+					        <p:column headerText="Vendor" width="50">
+					            <h:outputText value="#{upfitProgress.upfitter.accountName}" />
+					        </p:column>	
+					        				     
+					        <p:column headerText="Linked to" width="70">	
+							    <h:outputLabel value="#{upfitProgress.parentUpfitterProgress.upfitter.accountName}" rendered="#{(not empty upfitProgress.parentUpfitterProgress and not empty upfitProgress.parentUpfitterProgress.persistedEndDate) or upfitProgressBean.readOnly}" />				        
+						        <p:selectOneMenu value="#{upfitProgress.parentUpfitterProgress}" 
+						                converter="#{upfitterProgressConverter}" 
+						                style="width:200px;"
+						                rendered="#{(empty upfitProgress.parentUpfitterProgress or empty upfitProgress.parentUpfitterProgress.persistedEndDate) and not upfitProgressBean.readOnly}">
+						            <f:selectItem itemValue="#{null}" itemLabel="" />								
+							        <f:selectItems value="#{upfitProgressBean.linkedToList(upfitProgress)}" var="upfitProgressMenuItem" itemLabel="#{upfitProgressMenuItem.upfitter.accountName}" itemValue="#{upfitProgressMenuItem}" itemDescription="Test Description"/>
+							        			
+							        <p:ajax listener="#{upfitProgressBean.linkedToListener(rowIndex)}" process="@form" update="ccUpfitProgressDT" />						        							        
+						        </p:selectOneMenu>    					        			        
+					        </p:column>
+					        
+					        <p:column headerText="Start Date" style="text-align:center;" width="60">
+					            <p:outputLabel value="---" rendered="#{upfitProgressBean.isChild(rowIndex)}" />
+								<p:calendar id="ccStartDate" widgetVar="ccStartDateWidget"
+					                    rendered="#{not upfitProgressBean.isChild(rowIndex)}"
+						                size="10"  
+							            value="#{upfitProgress.startDate}" 
+							            pattern="MM/dd/yyyy"
+							            disabled="#{not upfitProgressBean.enableStartDate(rowIndex)}"
+										readonly="false"
+										showOn="button" 
+										onkeypress="return dateInput(this, event);"
+										onfocus="selectText(this.id);" 
+										onchange="formatDate(this);">
+										
+								    <p:ajax event="change" 
+									        async="true"
+										    process="@form"
+										    update="ccUpfitProgressDT"  />
+										    
+                                    <p:ajax event="dateSelect" 
+                                            async="true"
+										    process="@form"
+										    update="ccUpfitProgressDT" />												    																											
+							    </p:calendar>							            							           
+							    						           						        
+					        </p:column>		
+					        		        					        		        
+					        <p:column headerText="End Date" style="text-align:center;" width="60">
+					            <p:outputLabel value="---" rendered="#{upfitProgressBean.isChild(rowIndex)}" />					        
+					            <p:calendar id="ccEndDate"
+					                    rendered="#{not upfitProgressBean.isChild(rowIndex)}" 
+						                size="10"
+							            value="#{upfitProgress.endDate}"
+							            pattern="MM/dd/yyyy" 
+							            style="width:20px"
+							            readonly="false" 
+							            showOn="button"
+							            disabled="#{not upfitProgressBean.enableEndDate(rowIndex)}"
+							            onchange="formatDate(this);" >
+								    
+								    <p:ajax event="change" 
+									        async="true"
+										    process="@form"
+										    update="ccUpfitProgressDT"  />
+										    
+                                    <p:ajax event="dateSelect" 
+                                            async="true"
+										    process="@form"
+										    update="ccUpfitProgressDT" />
+										    		    									
+							    </p:calendar>   					        
+					        </p:column>	
+					       				        					        				           
+					    </p:dataTable>	               
+	                </p:panel>
+	                
+	                <p:panel>
+	                    <p:commandButton id="ccUpfitProgressSaveBtn" widgetVar="ccUpfitProgressSaveBtnVar" value="Save" actionListener="#{upfitProgressBean.save}"
+	                    	     onstart="ufpDisableButtons();" oncomplete="ufpEnableButtons(); setRefreshRequired(); handleUpfitProgressSaveBtnRequest(xhr, status, args);" process="@form" update="@form" disabled="#{upfitProgressBean.readOnly}"/>
+	                    <p:spacer width="5" />
+	                    <p:commandButton id="ccUpfitProgressCancelBtn" widgetVar="ccUpfitProgressCancelBtnVar" value="Cancel" actionListener="#{upfitProgressBean.clearEverything()}" 
+	                             onstart="ufpDisableButtons();" oncomplete="ufpEnableButtons(); setRefreshRequired(); ufpCancelBtnHandler();" update="@form" />		
+	                    <h:inputHidden id="hiddenRefresh" value="#{upfitProgressBean.refreshNeeded}" />		                                                 	                
+	                </p:panel>	                
+	                                    	                                    	                        		                		         		
+				</h:form>							        
+			</p:dialog>
+	  	</div>	  	   
+		
+	  	<script type="text/javascript">
+	  	
+	  	    /**
+	  	    * Clicks a hidden button to intialize the bean, then
+	  	    * shows the dialog.
+	  	    */
+			function showUpfitProgress(){	
+				$('[id$=ccUpfitProgressInitializeBeanHiddenBtn]').click();
+			}			
+				
+	  	    /**
+	  	    * Post save activities.
+	  	    */
+	  	    function ufpPostSaveBtnHandler(){
+				$('[id$=ccUpfitProgressCancelBtn]').click();	  	    	
+	  	    }
+	  	    
+			/**
+			* Handels the cancel button click event.
+			*/
+		 	function ufpCancelBtnHandler(){
+		 		hideDialog('ccUpfitProgressWidget');				
+			}
+					 	
+			/**
+			* Place initialization logic here
+			*/
+		 	function ufpInit() {
+				//$('[id^=ccUpfitProgressDT]').val('02/05/05');				
+				//this.setDirtyData(false)
+				//setTimeout(function(){setFocusPF('ccRequestClientContactForm:ccRequestClientContactReasonTxt'); }, 100);
+		 		
+		 		var readOnly = #{cc.attrs.readOnly};
+		 		if(readOnly == true){
+			 		setFocusPF('ccUpfitProgressCancelBtn');
+			 		setFocus('ccUpfitProgressCancelBtn');
+		 		}				
+		 	}
+			
+			/**
+			* Ported from manufactuererQueue view
+			*/
+            function handleUpfitProgressSaveBtnRequest(xhr, status, args){
+            	if(!args.failure) {    
+            		hideDialog('ccUpfitProgressWidget');
+            		//ajaxStatusHide();
+                }
+            }
+			
+			/**
+			* Enables buttons 
+			*/
+			function ufpEnableButtons() {
+				PF('ccUpfitProgressSaveBtnVar').enable(); 
+				PF('ccUpfitProgressCancelBtnVar').enable();
+			}
+		 	
+			/**
+			* Disables buttons 
+			*/
+			function ufpDisableButtons() {
+				PF('ccUpfitProgressSaveBtnVar').disable(); 
+				PF('ccUpfitProgressCancelBtnVar').disable();
+			}			
+			
+			function setRefreshRequired(){
+				var refNeeded = document.getElementById('ccUpfitProgress:hiddenRefresh').value;
+				setRefreshNeeded(refNeeded);
+			}
+		</script>
+	  	
+	</composite:implementation>
+</html>

@@ -1,0 +1,87 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	template="../../templates/ui.xhtml">
+
+	<ui:define name="content">
+			<h:form id="breadCrumbForm" prependId="false">
+				<p:breadCrumb model="#{taskAddEditBean.breadCrumbTrail}"
+					style="min-width:1000px;max-width:100%;width:auto" ajax="false"
+					immediate="true" styleClass="ui-layout" />
+			</h:form>
+			<!-- Error message display -->
+			<p:scrollPanel style="height:50px;max-width:100%;width:auto;"
+				mode="native" styleClass="ui-layout">
+				<p:messages id="messages" showSummary="false" showDetail="true"
+					autoUpdate="true" />
+			</p:scrollPanel>
+
+			<h:form id="mainForm" prependId="false">
+				<p:panel id="pagePanel" header="Task" >
+					<p:focus context="pagePanel" />
+					<h:panelGrid columns="2" cellspacing="10">
+						
+						<p:outputLabel styleClass="ui-label" value = "Category:*" for="category"/>
+						 
+						<p:selectOneMenu disabled="#{!taskAddEditBean.hasEditPermission}" id="category" value="#{taskAddEditBean.selectedCategory}" styleClass = "trackDirtySelect" tabindex="4" >
+					    	<f:selectItems value="#{taskAddEditBean.availableCategories}" />
+					    </p:selectOneMenu>
+
+						<p:outputLabel styleClass="ui-label" value = "Name:*" for="name"/>
+						<p:inputText readonly="#{!taskAddEditBean.hasEditPermission}" value="#{taskAddEditBean.task.serviceCode}" tabindex="6" maxlength="25"
+							id="name" size="25" styleClass="trackDirtyValue"/>
+						<p:outputLabel styleClass="ui-label" value = "Description:*" for="description" /> 
+						<p:inputText  readonly="#{!taskAddEditBean.hasEditPermission}"  value="#{taskAddEditBean.task.taskDescription}" tabindex="8" maxlength="80" 
+							id="description" size="80" styleClass="trackDirtyValue"/>
+						<h:panelGroup>
+							<p:outputLabel styleClass="ui-label" value = "Cost:*" for="cost"/>
+						</h:panelGroup> 
+						<p:inputNumber  readonly="#{!taskAddEditBean.hasEditPermission}" id="cost" style="text-align:right"  sy-mbol="$" tabindex="10"
+									value="#{taskAddEditBean.task.cost}" size="10" thousandSeparator=","
+									maxlength="10" decimalPlaces="2" maxValue="99999.99"
+									minValue="0" emptyValue="empty" 
+									styleClass="trackDirtyChildValues ui-text-align-right-dev" /> 
+
+						<p:outputLabel styleClass="ui-label" value = "Schedules:" for="scheduleCount"/>
+						<h:outputText id="scheduleCount" value="#{taskAddEditBean.scheduleCount}"/>
+ 						<p:outputLabel styleClass="ui-label" value = "Active: " for="active"/>
+						<h:selectBooleanCheckbox  disabled="#{!taskAddEditBean.hasEditPermission}" id="active" value="#{taskAddEditBean.activeFlag}" tabindex="16"
+									title="Active Flag" styleClass = "trackDirtyCheckbox" />
+					</h:panelGrid>
+				</p:panel>
+
+	    		<p:panel id="buttonsPanel">
+					<h:panelGrid id="buttons">
+						<f:facet name="footer">
+							<p:commandButton disabled="#{!taskAddEditBean.hasEditPermission}" id="saveButton" tabindex="30" value="Save"
+								action="#{taskAddEditBean.save}" ajax="false"
+								onclick="lockScreen();" />
+   							<p:spacer width="10" />
+							<p:commandButton id="cancelButton" tabindex="70" value="Cancel"
+								action="#{taskAddEditBean.cancel}" ajax="false"
+								onclick="lockScreen();" immediate="true" />
+						</f:facet>
+					</h:panelGrid>
+              	</p:panel>
+
+			</h:form>
+			
+        
+		<script type="text/javascript">
+		
+		function initializeDirtyDetection() {
+			registerIgnoreButton("saveButton");
+			saveDataForDirtyDetection();
+		}
+		
+     	$(window).load(function(){
+     		initializeDirtyDetection();
+		});			
+		
+		</script>
+
+	</ui:define>
+</ui:composition>

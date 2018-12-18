@@ -1,0 +1,477 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"   
+    template="../../templates/ui.xhtml" >
+	
+    <ui:define name="content">
+    	    <h:form id="maintainQuoteDealerAccessoryBreadCrumbForm" prependId="false">
+   			    <p:breadCrumb model="#{maintainQuoteDealerAccessoryBean.breadCrumbTrail}" ajax="false" immediate="true" style="min-width:980px;max-width:100%;width:auto;"/>
+   		    </h:form>
+   		        
+		     <!-- Message display -->
+		    <p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:980px;max-width:100%;width:auto;">
+			    <p:messages id="messages" severity="info,fatal,error" showSummary="false" showDetail="true" autoUpdate="true" />
+		    </p:scrollPanel>
+
+			<h:form id="maintainQuoteDlrAccssryForm" prependId="false">
+				<h:inputHidden id="dirtyData" value="#{maintainQuoteDealerAccessoryBean.dirtyData}"/>
+				
+				<p:panel id="quoteOverviewInformationPanel" style ="min-width:1200px;max-width:100%;width:auto">
+					<h:panelGrid columns="8" cellspacing="10">
+						<h:outputLabel value="Client:" styleClass="ui-label"/> 
+						<h:outputText value="#{maintainQuoteDealerAccessoryBean.quoteOverviewVO.accountCode}"/>
+						<h:outputText value="#{maintainQuoteDealerAccessoryBean.quoteOverviewVO.accountName}"/>
+						<h:outputLabel value="Quote Profile:" style="white-space:nowrap;" styleClass="ui-label"/>
+						<h:outputText value="#{maintainQuoteDealerAccessoryBean.quoteOverviewVO.quoteProfileDesc}"/>
+						<h:outputLabel value="Unit:" styleClass="ui-label"/>
+						<h:outputText value="#{maintainQuoteDealerAccessoryBean.quoteOverviewVO.unitNo != null ? maintainQuoteDealerAccessoryBean.quoteOverviewVO.unitNo : 'N/A'}" /> 
+						<h:outputText value="#{maintainQuoteDealerAccessoryBean.quoteOverviewVO.unitDesc}"/>
+
+						<h:outputLabel value="Quote:" styleClass="ui-label"/> 
+						<h:outputText value="#{maintainQuoteDealerAccessoryBean.quoteOverviewVO.quote}"/>
+						<h:outputText value="#{maintainQuoteDealerAccessoryBean.quoteOverviewVO.productName}"/>
+						<h:outputLabel value="Mileage Program:" style="white-space:nowrap;" styleClass="ui-label"/> 
+						<h:outputText  value="#{maintainQuoteDealerAccessoryBean.quoteOverviewVO.mileageProgramDesc}"/>						
+						<h:outputLabel value="Replacement for:"  styleClass="ui-label"/> 
+						<h:outputText value="#{maintainQuoteDealerAccessoryBean.quoteOverviewVO.unitNoReplacement}"/>	
+						<h:outputText value=""/>					
+					</h:panelGrid>
+				</p:panel>
+				
+				<p:panel id="maintainQuoteDlrAccssryDataTablePanel" header="">
+	            	<p:dataTable id="maintainQuoteDlrAccssryTable" var="selectedQuoteDealerAccessory" widgetVar="maintainQuoteDlrAccssryTableWidget"	            	  
+				        value="#{maintainQuoteDealerAccessoryBean.quoteDealerAccessories}" 
+						rowIndexVar="elementRowIndex" sortMode="multiple"
+						scrollHeight="#{maintainQuoteDealerAccessoryBean.dataTable.height}"
+						rowKey="#{selectedQuoteDealerAccessory.qdaId}"
+						rows="15"						
+						paginator="true" paginatorPosition="bottom">						
+						
+						
+					 	<f:facet name="header">
+		                    <h:outputLabel  style="vertical-align:15px" value="Quotation Dealer Accessories" />
+						   	<p:commandLink id="addQuoteDlrAccsryLnk" 
+						            style="float:right; border:thin solid gray; text-decoration:none; cursor:pointer;"
+						            oncomplete="PF('addQuoteDealerAccessoryDialogWidget').show();"
+						            actionListener="#{maintainQuoteDealerAccessoryBean.addQuoteDealerAccsryListener}"
+						            update=":addQuoteDealerAccessoryDialog"
+						            rendered="#{maintainQuoteDealerAccessoryBean.addEditAllowed}"
+						            title="Add Quotation Dealer Accessory">						   
+						        <p:graphicImage style="border-style: none;" value="/images/action_add.png" />
+						        <h:outputLabel  style="vertical-align:5px" value="Add &#160;"  /> 						            							            
+							</p:commandLink>
+						    <p:spacer height="15px;"/>			                    
+		                </f:facet> 
+						
+		                <p:column headerText="Description" sortBy="#{selectedQuoteDealerAccessory.dealerAccessory.dealerAccessoryCode.description}" width="#{maintainQuoteDealerAccessoryBean.dataTable.col1}">
+                            <p:outputLabel value="#{selectedQuoteDealerAccessory.dealerAccessory.dealerAccessoryCode.description}"/>
+		                </p:column>	
+		                
+		                <p:column headerText="Category" width="#{maintainQuoteDealerAccessoryBean.dataTable.col10}">
+                               <p:outputLabel value="#{empty selectedQuoteDealerAccessory.dealerAccessory.dealerAccessoryCode.optionAccessoryCategory.mafsDescription ? selectedQuoteDealerAccessory.dealerAccessory.dealerAccessoryCode.optionAccessoryCategory.description : selectedQuoteDealerAccessory.dealerAccessory.dealerAccessoryCode.optionAccessoryCategory.mafsDescription}"/>
+		                </p:column>	
+		                
+		                <p:column headerText="Vendor" sortBy="#{selectedQuoteDealerAccessory.vendorAccount.accountName}" width="#{maintainQuoteDealerAccessoryBean.dataTable.col2}">
+                            <p:outputLabel value="#{selectedQuoteDealerAccessory.vendorAccount.accountName}"/>                          
+		                </p:column>				                		                
+		                
+		                <p:column headerText="Vendor Quote No" width="#{maintainQuoteDealerAccessoryBean.dataTable.col3}">
+                            <p:outputLabel value="#{selectedQuoteDealerAccessory.externalReferenceNo}"/>                          
+		                </p:column>
+		                
+		                <p:column headerText="Price" width="#{maintainQuoteDealerAccessoryBean.dataTable.col4}">
+                            <h:outputLabel style="float:right" value="#{selectedQuoteDealerAccessory.basicPrice}">
+								<f:convertNumber type="currency" pattern="$###,###,##0.00"/>                              
+                            </h:outputLabel>
+		                </p:column>	
+		                
+		                <p:column headerText="Recharge" width="#{maintainQuoteDealerAccessoryBean.dataTable.col5}">
+                            <h:outputLabel style="float:right" value="#{selectedQuoteDealerAccessory.rechargeAmount}">
+								<f:convertNumber type="currency" pattern="$###,###,##0.00"/>                               
+                            </h:outputLabel>
+		                </p:column>
+		                
+		                <p:column headerText="Total Price" width="#{maintainQuoteDealerAccessoryBean.dataTable.col6}">
+                            <h:outputLabel style="float:right" value="#{selectedQuoteDealerAccessory.totalPrice}">
+								<f:convertNumber type="currency" pattern="$###,###,##0.00"/>                               
+                            </h:outputLabel>
+		                </p:column>
+		                
+		                <p:column headerText="FOC" width="#{maintainQuoteDealerAccessoryBean.dataTable.col7}">
+                            <p:outputLabel style="text-align:center" value="#{selectedQuoteDealerAccessory.freeOfChargeYn}" />                                                               
+		                </p:column>
+						
+						<p:column headerText="Lead Time" width="#{maintainQuoteDealerAccessoryBean.dataTable.col8}">
+                            <p:outputLabel style="float:right" value="#{maintainQuoteDealerAccessoryBean.getAccessoryLeadTime(selectedQuoteDealerAccessory)}" />                                                               
+		                </p:column>
+								                
+		                 <p:column width="#{maintainQuoteDealerAccessoryBean.dataTable.col9}">
+							<p:commandLink id="quoteDealerAccessoryEditLink"
+									actionListener="#{maintainQuoteDealerAccessoryBean.editQuoteDealerAccsryListener(selectedQuoteDealerAccessory)}"
+									oncomplete="PF('addQuoteDealerAccessoryDialogWidget').show();"
+									update=":addQuoteDealerAccessoryDialog"	
+									rendered="#{maintainQuoteDealerAccessoryBean.addEditAllowed}"	 
+                                    title="Edit Quotation Dealer Accessory">
+                                <p:graphicImage value="/images/action_edit.png" style="border-style: none"/>                                
+                            </p:commandLink>
+                             <p:spacer width="10" />
+                            <p:commandLink id="quoteDealerAccessoryDeleteLink" 
+                            		actionListener="#{maintainQuoteDealerAccessoryBean.deleteQuoteDealerAccsryListener(selectedQuoteDealerAccessory)}"
+                            		title="Delete Quotation Dealer Accessory"
+                            		rendered="#{maintainQuoteDealerAccessoryBean.addEditAllowed}"
+                            		update=":maintainQuoteDlrAccssryForm:maintainQuoteDlrAccssryTable">   
+                                <p:graphicImage value="/images/action_delete.png" style="border-style: none"/>                                
+                            </p:commandLink>  
+						</p:column>
+						
+						<p:columnGroup type="footer">
+		                  <p:row>
+		                    <p:column colspan="8" footerText="Total Lead Time:" style="text-align:right;font-weight:bold"/>
+		                    <p:column style="text-align:right;font-weight:bold">                    
+		                      <f:facet name="footer">
+		                        <h:outputText id="leadTimeTotal" value="#{maintainQuoteDealerAccessoryBean.getTotalLeadTime()}"/>
+		                      </f:facet>
+		                    </p:column>
+		                    <p:column/>
+		                  </p:row>
+		                </p:columnGroup>
+		                
+						<f:facet name="footer" >
+							Record Count: <h:outputText value="#{maintainQuoteDealerAccessoryBean.quoteDealerAccessories.size()}" />
+						</f:facet>
+					</p:dataTable>  
+				</p:panel>
+				<p:panel>
+				    <p:commandButton id="accByQuote" value="Add by Vendor Quote" title="Add Accessories by Vendor Quote No"  actionListener="#{maintainQuoteDealerAccessoryBean.addDealerAccessoriesByQuoteListener}" disabled="#{!maintainQuoteDealerAccessoryBean.addEditAllowed}"
+						            update=":dealerAccessoryByQuoteDialog" oncomplete="PF('dealerAccessoryByQuoteDialogWidget').show();" />
+	            </p:panel>
+			</h:form>
+		    
+		    <p:dialog id="addQuoteDealerAccessoryDialog" 
+		    	header="#{maintainQuoteDealerAccessoryBean.addMode ? 'Add Dealer Accessory' :'Edit Dealer Accessory'}" 
+		    	widgetVar="addQuoteDealerAccessoryDialogWidget" 
+		    	modal="true" appendTo="@(body)" closeOnEscape="true"
+				dynamic="true" height="auto" resizable="false"
+				onHide="addQuoteDealerAccessoryDialogHideHandler();">			
+				
+				 <p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;width:auto;min-width:575px">
+				    <p:messages id="addDealerAccessoryDialogMessages" severity="info,error,fatal" showSummary="true" showDetail="false" autoUpdate="true" />
+			    </p:scrollPanel>
+			    
+				<h:form id="quoteDealerAccessoryForm" prependId="false" >
+					<p:panel id="quoteDealerAccessoryPanel">
+						<p:focus context="quoteDealerAccessoryPanel" rendered="#{maintainQuoteDealerAccessoryBean.focusAllowed}"></p:focus>
+						<h:panelGrid id="quoteDealerAccessoryPanelGrid" columns="2" cellpadding="5" style="white-space:nowrap;">
+								<p:column>
+									<p:outputLabel id="dealerAccessoryLabel" for="dealerAccessoryCode" rendered="#{maintainQuoteDealerAccessoryBean.addMode}" styleClass="ui-label" value="Description:*" />
+								</p:column>
+								<p:column>
+									<p:autoComplete id="dealerAccessoryCode" rendered="#{maintainQuoteDealerAccessoryBean.addMode}" tabindex="1"
+								        value="#{maintainQuoteDealerAccessoryBean.selectedDealerAccessory}"
+								        var="dealerAccessory"
+								        completeMethod="#{maintainQuoteDealerAccessoryBean.autoCompleteDealerAccessories}"
+								        itemLabel="#{dealerAccessory.dealerAccessoryCode.newAccessoryCode.concat(' - ').concat(dealerAccessory.dealerAccessoryCode.description).concat(' - ').concat(empty dealerAccessory.dealerAccessoryCode.optionAccessoryCategory.mafsDescription ? dealerAccessory.dealerAccessoryCode.optionAccessoryCategory.description : dealerAccessory.dealerAccessoryCode.optionAccessoryCategory.mafsDescription)}"
+								        itemValue="#{dealerAccessory}"
+								        converter="#{dealerAccessoryConverter}" 
+								        forceSelection="true"
+								        size="95" 
+								        maxlength="95" 
+								        scrollHeight="80" >
+								        <p:ajax event="query" onstart="clearSelectedVendorAndQuoteFields();" />
+								        <p:ajax event="itemSelect" listener="#{maintainQuoteDealerAccessoryBean.autoCompleteDealerAccessorySelectListener}"
+								                update="upfitter quoteNumber price recharge totalPrice dealerAccessoryCode" onsuccess="setDirtyData(true);"/>							                                                              
+								    </p:autoComplete> 
+							    
+								</p:column>
+								
+								<p:column>
+									<p:outputLabel id="savedDealerAccessoryLabel" rendered="#{not maintainQuoteDealerAccessoryBean.addMode}" styleClass="ui-label" value="Description:" />
+								</p:column>
+								
+								<p:column>
+									<p:outputLabel id="selectedDealerAccessoryDescription" rendered="#{not maintainQuoteDealerAccessoryBean.addMode}" 
+										value="#{maintainQuoteDealerAccessoryBean.selectedQuotationDealerAccessory.dealerAccessory.dealerAccessoryCode.description}" />
+								</p:column>
+							
+								<p:column>
+									<p:outputLabel id="vendorLabel" for="upfitter" styleClass="ui-label" style="cursor:pointer;white-space: nowrap" value="Vendor:" />
+								</p:column>	
+								<p:column>
+									<p:selectOneMenu id="upfitter" style= "width:350px" tabindex="2" value="#{maintainQuoteDealerAccessoryBean.selectedUpfitter}" var="upfitterPriceAddress" 
+										converter="#{upfitterPriceAddressVOConverter}" onchange="setDirtyData(true);">
+										<f:selectItems value="#{maintainQuoteDealerAccessoryBean.availableUpfitters}" 
+											var="availableUpfitter"
+											itemLabel="#{empty availableUpfitter ? '' : availableUpfitter.payeeAccountName}"
+											itemValue="#{empty availableUpfitter ? null : availableUpfitter}" />
+										<p:column>
+							                <h:outputText value="#{empty upfitterPriceAddress ? '&#160;' : (upfitterPriceAddress.payeeAccountCode == -1 ? '&#160;' : upfitterPriceAddress.payeeAccountName.concat('-').concat(upfitterPriceAddress.payeeAccountCode))}" />
+							            </p:column>
+										<p:column>
+							                <h:outputText value="#{empty upfitterPriceAddress ? '' : upfitterPriceAddress.defaultFormattedAddresss}" />
+							            </p:column>
+							            <p:ajax update="quoteNumber price recharge totalPrice" listener="#{maintainQuoteDealerAccessoryBean.vendorChangeListener}"/>	
+									</p:selectOneMenu>
+									
+								</p:column>
+							
+								<p:column>
+									<p:outputLabel id="quoteNumberLabel" for="quoteNumber" styleClass="ui-label" value="Vendor Quote No: " />
+								</p:column>
+								<p:column>
+									<p:selectOneMenu id="quoteNumber" style= "width:175px" tabindex="3" value="#{maintainQuoteDealerAccessoryBean.selectedQuoteUpfitter}" converter="#{upfitterPriceAddressVOConverter}" onchange="setDirtyData(true);">
+										<f:selectItem itemLabel=""  itemValue=""/>
+										<f:selectItems  value="#{maintainQuoteDealerAccessoryBean.availableQuoteUpfitters}"
+											var="availableUpfitter"
+											itemLabel="#{availableUpfitter.quoteNumber}"
+											itemValue="#{availableUpfitter}" />
+										<p:ajax update="price recharge totalPrice" listener="#{maintainQuoteDealerAccessoryBean.vendorQuoteChangeListener}"/>	
+									</p:selectOneMenu>
+								</p:column>
+								<p:column>
+									<p:outputLabel for="price" styleClass="ui-label" value="Price:" />
+								</p:column>
+								<p:column>
+									<p:inputNumber id="price"
+										tabindex="4"
+		                        		symbol="$" symbolPosition="p" 
+					                    style="text-align:right; width:100px"									    							    
+					                    value="#{maintainQuoteDealerAccessoryBean.selectedQuoteDealerAccesoryVO.basePrice}" 										
+					                    decimalPlaces="2"
+					                    decimalSeparator="."
+					                    minValue="-999999999.99" 										
+					                    maxValue="999999999.99"
+					                    onchange="setDirtyData(true);">
+					                    <p:ajax update="totalPrice" listener="#{maintainQuoteDealerAccessoryBean.populateTotalPriceFOC}"/>
+					               	</p:inputNumber> 
+								</p:column>
+								<p:column>
+									<p:outputLabel id="rechargeLabel" for="recharge" styleClass="ui-label" value="Recharge:" />
+								</p:column>
+								<p:column>
+									<p:inputNumber id="recharge"
+										tabindex="5"
+		                        		symbol="$" symbolPosition="p" 
+					                    style="text-align:right; width:100px"									    							    
+					                    value="#{maintainQuoteDealerAccessoryBean.selectedQuoteDealerAccesoryVO.rechargeAmount}" 										
+					                    decimalPlaces="2"
+					                    decimalSeparator="." 
+					                    minValue="0"
+					                    maxValue="999999999.99"
+					                    onchange="setDirtyData(true);">
+					                    <p:ajax update="recharge totalPrice" listener="#{maintainQuoteDealerAccessoryBean.populateTotalPriceFOC}"/>
+					               	</p:inputNumber> 
+								</p:column>
+								<p:column>
+									<p:outputLabel for="totalPrice" styleClass="ui-label" value="Total Price:" />
+								</p:column>
+								<p:column>
+									<p:inputNumber id="totalPrice" disabled="true"
+		                        		symbol="$" symbolPosition="p" 
+					                    style="text-align:right; width:100px"									    							    
+					                    value="#{maintainQuoteDealerAccessoryBean.selectedQuoteDealerAccesoryVO.totalPrice}" 										
+					                    decimalPlaces="2"
+					                    decimalSeparator="." 
+					                    minValue="-999999999.99"										
+					                    maxValue="999999999.99"
+					                    onchange="setDirtyData(true);">
+					                    <p:ajax listener="#{maintainQuoteDealerAccessoryBean.populateTotalPriceFOC}"/>
+					               	</p:inputNumber> 
+								</p:column>
+						</h:panelGrid>
+					</p:panel>
+					
+					<p:panel>
+						<p:commandButton id="saveBtn" 
+							tabindex="6"
+						    value="Save" 
+						    widgetVar="saveWidgetVar"
+						    actionListener="#{maintainQuoteDealerAccessoryBean.saveDealerAccessory(false)}"
+						    update="@form, :maintainQuoteDlrAccssryForm:maintainQuoteDlrAccssryTable"
+					        process="@form"
+							onstart="PF('saveWidgetVar').disable()"
+					        oncomplete="PF('saveWidgetVar').enable()"
+					        onsuccess="setDirtyData(false);"/>
+	
+	                    <p:spacer width="5" />
+						
+						<p:commandButton id="saveStayBtn" 
+							tabindex="7"
+						    value="Save and Stay" 
+						    widgetVar="saveStayWidgetVar"
+						    actionListener="#{maintainQuoteDealerAccessoryBean.saveDealerAccessory(true)}"
+						    update="@form, :maintainQuoteDlrAccssryForm:maintainQuoteDlrAccssryTable"
+					        process="@form"
+					        onstart="PF('saveStayWidgetVar').disable()"
+					        oncomplete="PF('saveStayWidgetVar').enable()"
+					        onsuccess="setDirtyData(false);"
+					        rendered="#{maintainQuoteDealerAccessoryBean.addMode}" />
+	                    <p:spacer width="5" rendered="#{maintainQuoteDealerAccessoryBean.addMode}" />
+	                    
+						<p:commandButton id="cancelBtn" 
+						    value="Cancel" tabindex= "8" widgetVar="doneWidgetVar"
+							title="Finished Entering Accessory Details" 
+							update=":maintainQuoteDlrAccssryForm:maintainQuoteDlrAccssryTable"
+							onclick="cancelDealerAccessoryBtnHandler();"/>
+					</p:panel>
+				</h:form>
+			</p:dialog>
+            
+            <p:dialog id="dealerAccessoryByQuoteDialog" 
+		    	header="Add Accessories by Vendor Quote" 
+		    	widgetVar="dealerAccessoryByQuoteDialogWidget" 
+		    	modal="true" appendTo="@(body)" closeOnEscape="true"
+				dynamic="true" height="auto" width="700" resizable="false">			
+				
+				<p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;width:auto;min-width:575px">
+				    <p:messages id="dealerAccessoryByQuoteDialogMessages" severity="info,error,fatal" showSummary="true" showDetail="false" autoUpdate="true" />
+			    </p:scrollPanel>
+			    
+				<h:form id="dealerAccessoryByQuoteForm" prependId="false" >
+					<p:focus context="dealerAccessoryByQuotePanelGrid" rendered="#{maintainQuoteDealerAccessoryBean.focusAllowed}"></p:focus>
+					<p:panel id="vendorQuotePanel">
+						<h:panelGrid columns="2"  id="dealerAccessoryByQuotePanelGrid" cellpadding="5" style="white-space:nowrap;">  
+							    <p:outputLabel for="trimVendors" value="Vendor:*" styleClass="ui-label" />	                                      
+								<p:selectOneMenu id="trimVendors" value="#{maintainQuoteDealerAccessoryBean.selectedVendor}" style= "width:320px" converter="#{upfitterSearchResultVOConverter}" tabindex="1" >
+									<f:selectItem itemValue="" itemLabel="" />								
+								    <f:selectItems value="#{maintainQuoteDealerAccessoryBean.availableVendors}" var="upfitter" 
+								    itemLabel="#{upfitter.payeeAccountName.concat(' - ').concat(upfitter.payeeAccountCode)}" itemValue="#{upfitter}"/>
+									<p:ajax  process="@form" listener="#{maintainQuoteDealerAccessoryBean.trimVendorChangeListener}" update="trimVendorAddressLbl trimVendorPhoneNumberLbl vendorQuoteNumbers dealerAccessoryDataTable" />
+								</p:selectOneMenu>
+								
+								<h:outputLabel for="trimVendorAddressLbl" value="Address:" styleClass="ui-label"/>
+			                    <h:outputLabel id="trimVendorAddressLbl" value="#{maintainQuoteDealerAccessoryBean.formatSelectedVendorAddress()}" />	
+			                    
+			                    <h:outputLabel for="trimVendorPhoneNumberLbl" value="Phone:" styleClass="ui-label"/>
+			                    <h:outputLabel id="trimVendorPhoneNumberLbl" value="#{not empty maintainQuoteDealerAccessoryBean.selectedVendor ? maintainQuoteDealerAccessoryBean.selectedVendor.payeePhoneNumber : ''}" />
+								
+							    <p:outputLabel for="vendorQuoteNumbers" value="Vendor Quote No:*" styleClass="ui-label" />
+							    <p:autoComplete id="vendorQuoteNumbers" value="#{maintainQuoteDealerAccessoryBean.selectedQuote}" tabindex="2" 
+								        var="upfitterQuote"
+								        completeMethod="#{maintainQuoteDealerAccessoryBean.autoCompleteVendorQuoteNumber}"
+								        itemLabel="#{upfitterQuote.quoteNumber}"
+								        itemValue="#{upfitterQuote}"
+								        converter="#{upfitterQuoteACConverter}" 
+								        forceSelection="true"
+								        size="40" 
+								        maxlength="40" 
+								        scrollHeight="80">
+								        <p:ajax event="itemSelect" listener="#{maintainQuoteDealerAccessoryBean.autoCompleteUpfitterQuoteSelectListener}" update="dealerAccessoryDataTable" />
+								</p:autoComplete>
+							</h:panelGrid>
+					</p:panel>
+					
+					<p:panel id="dealerAccessoryByQuotePanel">
+						<p:dataTable id="dealerAccessoryDataTable" 
+		                        var="dealerAccessoryPrice" 
+		                        value="#{maintainQuoteDealerAccessoryBean.availableDealerAccessories}"
+		                        scrollable="true"
+		                        scrollHeight="300">		                        			                		                       
+			                	            
+			                <f:facet name="header">
+			                    <h:outputLabel  style="vertical-align:15px" value="Dealer Accessories" />
+			                </f:facet>  
+			                
+			                <p:column headerText="Description" width="65%">
+                                <p:outputLabel value="#{dealerAccessoryPrice.dealerAccessory.dealerAccessoryCode.description}"/>
+			                </p:column>	
+			                <p:column headerText="Category" width="35%">
+                                <p:outputLabel value="#{empty dealerAccessoryPrice.dealerAccessory.dealerAccessoryCode.optionAccessoryCategory.mafsDescription ? dealerAccessoryPrice.dealerAccessory.dealerAccessoryCode.optionAccessoryCategory.description : dealerAccessoryPrice.dealerAccessory.dealerAccessoryCode.optionAccessoryCategory.mafsDescription}"/>
+			                </p:column>	
+			                <p:column headerText="Price" width="20%">
+	                            <h:outputLabel style="float:right" value="#{dealerAccessoryPrice.basePrice}">
+									<f:convertNumber type="currency" pattern="$###,###,##0.00"/>                              
+	                            </h:outputLabel>
+		                	</p:column>		                
+			                <p:column headerText="Lead Time" width="15%">
+                                <h:outputLabel style="float:right" value="#{dealerAccessoryPrice.leadTime}" />                                                               
+			                </p:column>	
+		                </p:dataTable>
+					</p:panel>
+					
+					<p:panel>
+						<p:commandButton tabindex="3" value="Save" 
+						    widgetVar="saveBtnWidgetVar"
+						    actionListener="#{maintainQuoteDealerAccessoryBean.saveDealerAccessoriesByQuote}"
+						    update="@form, :maintainQuoteDlrAccssryForm:maintainQuoteDlrAccssryTable"
+					        process="@form"
+							onstart="PF('saveBtnWidgetVar').disable()"
+					        oncomplete="PF('saveBtnWidgetVar').enable()"/>
+	                    <p:spacer width="5" />
+						<p:commandButton tabindex="4" value="Cancel" 
+							widgetVar="cancelBtnWidgetVar"
+							onclick="PF('dealerAccessoryByQuoteDialogWidget').hide();"/>
+					</p:panel>
+				</h:form>
+			</p:dialog>
+            
+            <p:dialog id="dirtyCheckDialog" modal="true" header="Save Changes" onShow="setFocus('dirtyCheckDialogOkBtn')" dynamic="true"
+			        widgetVar="dirtyCheckDialogVar" resizable="false" width="520" height="auto" closeOnEscape="true" appendTo="@(body)">
+			    <br />
+			    <h:outputFormat value="Are you sure want to navigate away from this dialog?" />
+			    <br /> <br />
+			    <h:outputFormat value="You have unsaved data and will lose it" />
+			    <br /> <br />			    
+			    <h:outputFormat value="Press OK to continue, or Cancel to stay on the current page." />			    
+			    <h:form id="dirtyCheckDialogForm" prependId="false">
+				    <br />
+				    <br />
+				    <p:commandButton id="dirtyCheckDialogOkBtn" value="Ok" onclick="dirtyCheckDialogOkBtnHandler();"/>
+				    <h:outputText value="&#160;"/>
+				    <p:commandButton id="dirtyCheckDialogCancelBtn" value="Cancel" onclick="PF('dirtyCheckDialogVar').hide();" />
+			    </h:form>
+		    </p:dialog>     
+		    
+			<style type="text/css">
+				.ui-radiobutton {
+				    margin-left: 10px;
+				}
+				
+			</style>
+			  
+            <script type="text/javascript" >
+	            function initializeDirtyDetection() {
+			    	registerIgnoreButton("saveBtn");
+			    	registerIgnoreButton("saveStayBtn");
+			    	setDirtyDataById("dirtyData");
+				}
+	            
+	            function dirtyCheckDialogOkBtnHandler(){
+			    	setDirtyData(false); 
+			    	PF('dirtyCheckDialogVar').hide(); 
+			    	PF('addQuoteDealerAccessoryDialogWidget').hide();			    	
+			    }
+	            
+	            function cancelDealerAccessoryBtnHandler(){
+					if(dirtyCheck()) {
+						PF('dirtyCheckDialogVar').show();
+						return false;
+					}
+					
+					PF('addQuoteDealerAccessoryDialogWidget').hide();
+					return true;
+			    }
+	            
+	            function addQuoteDealerAccessoryDialogHideHandler() {
+	            	if(dirtyCheck()) {
+	            		PF('addQuoteDealerAccessoryDialogWidget').show();
+						PF('dirtyCheckDialogVar').show();
+					}
+	            }
+	            
+	            function clearSelectedVendorAndQuoteFields(){
+	            	$('[id$=upfitter]').val('');
+	            	$('[id$=quoteNumber]').val('');
+	            }  
+	            
+	         	$(window).load(function(){
+	         		setFocus('accByQuote');
+				});	            
+	            
+            </script>
+	</ui:define>
+	
+</ui:composition>

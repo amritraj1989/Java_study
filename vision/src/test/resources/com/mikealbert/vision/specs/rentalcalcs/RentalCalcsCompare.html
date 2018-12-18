@@ -1,0 +1,31 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Rental Calcs Automated Compare</title>
+    <body>
+    	<h2>Rental Calcs Automated Compare</h2>
+    		<table>
+    			<tr>
+    				<th>Baseline</th>
+    				<th>First Pass</th>
+    			</tr>
+    			<tr>
+    				<td>
+    					<table>
+    						<tr>
+    							<th>QMD_ID</th>
+    							<th>Calulated Amounts</th>
+    						</tr>
+    						<tr concordion:execute="#result = testCalculateBaselineRental(#qmdId)">
+    							<td class="qmdId" concordion:set="#qmdId">253031</td>
+    							<td>Monthly Rental : <span >374.00</span><br/>
+    								IRR: <span>TODO</span><br/>
+    								Profit Amt: <span>TODO</span>
+    							</td>
+    						</tr>
+    					</table>
+    				</td>    				
+    				<td>TODO</td>
+    			</tr>
+    		</table>
+    </body>
+</html>

@@ -1,0 +1,81 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui" >	
+    <h:head>
+	    <link rel="stylesheet"
+		        href="#{request.contextPath}/resources/css/login.css" type="text/css" />
+		        
+		<script type="text/javascript">
+		    function resetLoginForm(){
+			    document.getElementById('j_username').value="";
+			    document.getElementById('j_password').value="";
+		    }		
+		    
+    	    $(document).ready(function() {   	    	
+    	    });			    
+		</script>		        
+	</h:head>	
+	<body>      
+		<div>
+			<h:graphicImage id="background" width="50%" url="/images/main-bg.jpg" />
+		</div>
+		        
+        <h:form  id="loginFormId" prependId="false" method='POST'>
+            <p:focus for="j_username" />
+		    <h:panelGroup layout="block" id="fixed">
+		    
+			   <h:panelGroup layout="block" id="HeaderPart">					
+			       <h:panelGroup layout="block" id="logo-grd" />					
+				</h:panelGroup>
+							    
+		        <h:panelGroup layout="block" id="HeadingMain">
+				    <h:outputText styleClass="TextSmallHeading" value="VISION" />
+			    </h:panelGroup>		    
+		        
+		        <h:panelGroup layout="block" id="HeadingSmall">
+				    <h:outputText value="Sign In" styleClass="SignInlogin" />
+				</h:panelGroup>		    
+			    
+			    
+                <h:panelGroup layout="block" id="LoginPart">
+				    <h:panelGroup layout="block" id="gbox-grd">
+				        <p:panel style="height:50px;background:transparent;border:none">
+					        <p:messages showDetail="true" autoUpdate="true" showSummary="true" />				        
+				        </p:panel>
+
+							<h:panelGrid columns="2">
+								<p:outputLabel for="j_username" value="Username:" styleClass="loginText" />
+								<p:inputText id="j_username" styleClass="userInput" value="#{loginBean.userName}" autocomplete="false"  />
+								<p:outputLabel for="j_password" value="Password:" styleClass="loginText" />
+								<p:password id="j_password" styleClass="userInput" value="#{loginBean.password}" autocomplete="false"   />
+								<p:outputLabel value="" />
+								<p:outputLabel value="" />
+								<p:outputLabel value="" />
+								<p:outputLabel value="" />
+								<p:outputLabel value="" />								
+								<h:panelGroup>
+									<h:commandButton type="submit" id="login" styleClass="ButtonMedium"
+										action="#{loginBean.login}" value="Login" />
+										<p:spacer width="10" />						
+								    <h:commandButton type="submit" id="reset"
+								        styleClass="ButtonMedium" immediate="true"
+									    render="j_username j_password" value="Reset" ajax="true"
+									    onclick="resetLoginForm();" />
+								</h:panelGroup>										    								
+							</h:panelGrid>
+						</h:panelGroup>
+					</h:panelGroup>
+								    
+			    <h:panelGroup layout="block" id="FooterPart"><h:outputLabel>&#169; 2016 Mike Albert Leasing. All rights reserved.</h:outputLabel></h:panelGroup>		    
+		    </h:panelGroup>        
+        </h:form> 
+                       
+    </body>
+    
+</ui:composition>
+
+
+
+

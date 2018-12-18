@@ -1,0 +1,33 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Fleet Maintenance / FM-271 Capture/display name of coordinator who last saved/authorized PO</title>
+    <body>
+    	<h1>Fleet Maintenance / FM-271 Capture/display name of coordinator who last saved/authorized PO</h1>
+    	<h2>Acceptance Tests (Automated)</h2>
+ 
+		    <ul concordion:execute="#result = testCreatePurchaseOrder(#purchaseOrderNumber)">
+		    <li>Build a maintenance PO for a unit number of 00938754 and open the newly created PO. <span concordion:set="#purchaseOrderNumber">J00334596</span>The "Last Updated By:" field is displayed with the name <span concordion:assertEquals="#result.lastChangedBy">ANDERSON_K</span> and date <span concordion:assertEquals="lastChangedDate">08-27-2013</span></li>
+            </ul>
+            
+<!--  TODO: The date test does not seem to be correct. It seems that the correct date should be now. Raj, please review.           
+            <ul concordion:execute="#result = testUpdatePO(#purchaseOrderNumber)">
+            <li>Open an existing PO <span concordion:set="#purchaseOrderNumber">J00334342</span> and update the PO header data. The "Last Updated By:" field is displayed with the name <span concordion:assertEquals="#result.lastChangedBy">SHARMA_R</span> and date <span concordion:assertEquals="lastChangedDate">06-03-2013</span> of the person who last saved the PO</li>
+            </ul>
+ -->            
+            <ul concordion:execute="#result = testUpdatePOLine(#purchaseOrderNumber)">
+            <li>Open an existing PO <span concordion:set="#purchaseOrderNumber">J00219793</span> and update the line item data. The "Last Updated By:" field is displayed with the name <span concordion:assertEquals="#result.lastChangedBy">SHARMA_R</span> and date <span concordion:assertNotNull="lastChangedDate" /> of the person who last saved the PO</li>
+            </ul>
+<!--             
+            <ul concordion:execute="#result = testUpdatePOAddLine(#purchaseOrderNumber)">
+            <li>Open an existing PO <span concordion:set="#purchaseOrderNumber">J00224851</span> and add a new  line item. The "Last Updated By:" field is displayed with the name <span concordion:assertEquals="#result.lastChangedBy">SHARMA_R</span> and date <span concordion:assertNotNullEquals="lastChangedDate" /> of the person who last saved the PO</li>
+            </ul>
+ -->            
+    	<h2>Manual Tests</h2>
+    	    <ul type = "circle"><b>
+    	       <li>TODO: Verify the name and the date/time of the last coordinator who updated the PO when creating a new PO or updating an existing PO for all the vehicle statuses and all the PO statuses.</li>
+    	    </b></ul>
+
+    	<h2>Untested (Out of Scope)</h2>
+    		<ul><li>TODO:</li></ul>
+    </body>
+</html>

@@ -1,0 +1,46 @@
+package com.mikealbert.vision.view.converter;
+
+import javax.annotation.Resource;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
+import org.springframework.stereotype.Component;
+import com.mikealbert.data.entity.DealerAccessoryCode;
+import com.mikealbert.service.ModelService;
+import com.mikealbert.util.MALUtilities;
+
+/** This converter is used to convert the DealerAccessoryCode
+ */
+@Component
+public class DealerAccessoryCodeConverter implements Converter{
+	@Resource ModelService modelService;	
+	
+	@Override
+	public Object getAsObject(FacesContext context, UIComponent component, String value) {
+		DealerAccessoryCode dealerAccessoryCode = null;		
+		
+        if (!MALUtilities.isEmptyString(value)) {           	
+        	dealerAccessoryCode = modelService.getDealerAccessoryCode(value);
+        } 
+  
+        return dealerAccessoryCode; 
+	}
+
+	@Override
+	public String getAsString(FacesContext context, UIComponent component, Object value) {
+		String retVal;
+		
+        if (MALUtilities.isEmpty(value)) {   
+            retVal = "";   
+        } else {   
+        	if(value instanceof String){
+        		retVal = (String) value;
+        	} else {
+                retVal = String.valueOf(((DealerAccessoryCode) value).getAccessoryCode());        		
+        	}   
+        }  
+        
+        return retVal;
+	}
+
+}

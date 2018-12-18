@@ -1,0 +1,33 @@
+<html>
+    <body style="font-size:smaller; font-family:arial,sans-serif">
+        <table width=75% style="font-size:smaller; font-family:arial,sans-serif" cellspacing="0">
+            <tr>
+	            <td width=20%><b>Mike Albert Unit #:</b></td><td width=1%></td><td width=*>$emailVO.unitNo</td>
+            </tr>
+            #if("$!emailVO.fleetReferenceNo" != "")             
+            <tr>
+	            <td><b>Fleet Ref #:</b></td><td></td><td>#if("$!emailVO.fleetReferenceNo" != "")$emailVO.fleetReferenceNo #end</td>
+            </tr>
+             #end
+            <tr>
+	            <td><b>Driver:</b></td><td></td><td>$emailVO.driverFirstName $emailVO.driverLastName</td>
+            </tr>
+        </table>
+        <br/>
+        <span style="font-family: arial,sans-serif"><p>Please be advised that the unit listed above is ready for the driver to take possession at $emailVO.deliveringDealerName, $emailVO.deliveringDealerSingleLineAddress. Please contact the dealer to make arrangements. The dealer&#39;s contact information is: </p></span>        
+        <span style="font-family: arial,sans-serif">
+            <p>
+                #if("$!emailVO.deliveringDealerContactName" != "") $emailVO.deliveringDealerContactName <br/> #end     
+                #if("$!emailVO.deliveringDealerContactPhoneNumber" != "") $emailVO.deliveringDealerContactPhoneNumber <br/> #end         
+                #if("$!emailVO.deliveringDealerMultiLineAddress" != "") $emailVO.deliveringDealerMultiLineAddress #end 
+            </p>
+        </span>        
+        <span style="font-family: arial,sans-serif"><p>This unit will be placed in service on the earlier to occur of (a) the day on which the driver takes possession or (b) 48 hours after this Vehicle Ready Notification was sent.</p></span>
+        <br/>
+        <br/>
+        <span style="font-family: arial,sans-serif">Thank you</span>
+        <br/>
+        <br/>
+        <img src="cid:contentId1" alt="Image not found">
+     </body>
+</html>

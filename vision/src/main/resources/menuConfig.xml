@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:cache="http://www.springframework.org/schema/cache"
+       xmlns:sec="http://www.springframework.org/schema/security"
+       xmlns:jee="http://www.springframework.org/schema/jee"         
+       xsi:schemaLocation="
+            http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    
+    <!-- Menu Configuration  -->          
+
+	<bean id="menuService" class="com.mikealbert.view.MenuService" scope="prototype"  lazy-init="true" >
+		<property name="menuGroupList"  >
+			<list>
+				 <ref bean="driverMenuGroup" />	
+				 <ref bean="adminMenuGroup" />
+				 <ref bean="rentalCalcMenuGroup" />			
+				 <ref bean="fleetMenuGroup" />	 
+				 <ref bean="trimMaintenanceMenuGroup" />
+				 <ref bean="progressQueueMenuGroup" /> 		
+				 <ref bean="vehicleConfigurationGroup" />
+				 <ref bean="quoteRequestMenuGroup" /> 					 
+				 <ref bean="debitCreditMemoGroup" /> 		
+				 <ref bean="contractManagementGroup" />
+				 	 	
+		   </list>
+		</property>
+	</bean>
+	
+	<bean id="driverMenuGroup" class="com.mikealbert.view.MenuGroup" scope="prototype">
+	 	<property name="groupName" value="Driver Mgmt" />
+	  	<property name="menuItemList" >
+			<list>
+				 <bean id="searchDriver" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Search Drivers" />
+					<constructor-arg name="URL" value="/view/drivers/driverSearch.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="true"  />	
+				 	<constructor-arg name="permissionResourceName" value="driverSearch"  />			 	
+				 </bean>
+				  <bean id="addDriver" class="com.mikealbert.view.MenuItem" scope="prototype">
+				 	<constructor-arg name="displayName" value="Add Driver" />
+				 	<constructor-arg name="URL" value="/view/drivers/driverAddEdit.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="false" />
+				 	<constructor-arg name="permissionResourceName" value="driverAddEdit"  />				 	
+				 </bean>
+				<bean id="searchWebUsers" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Search Web Users" />
+					<constructor-arg name="URL" value="/view/drivers/webUserSearch.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="false"  />	
+				 	<constructor-arg name="permissionResourceName" value="driverAddEdit"  />			 	
+				 </bean>				 
+		   </list>
+		</property>
+	</bean>
+	
+	
+	<bean id="adminMenuGroup" class="com.mikealbert.view.MenuGroup" scope="prototype">
+	 	<property name="groupName" value="Admin" />
+	  	<property name="menuItemList" >
+			<list>
+				<bean id="managePermission" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Work Class Permissions" />
+					<constructor-arg name="URL" value="/view/admin/adminWorkClassPermissions.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="false"  />	
+				 	<constructor-arg name="permissionResourceName" value="adminWorkClassPermissions"  />			 	
+				 </bean>
+				<bean id="adminMiscellaneous" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Miscellaneous Administration" />
+					<constructor-arg name="URL" value="/view/admin/adminMiscellaneous.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="false"  />	
+				 	<constructor-arg name="permissionResourceName" value="adminMiscellaneous"  />			 	
+				 </bean>				 
+		   </list>
+		</property>
+	</bean>
+	
+	<bean id="rentalCalcMenuGroup" class="com.mikealbert.view.MenuGroup" scope="prototype">
+	 	<property name="groupName" value="Rental Calculation" />
+	  	<property name="menuItemList" >
+			<list>
+				<bean id="quoteOverview" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Quote Overview" />
+					<constructor-arg name="URL" value="/view/rentalCalc/quoteOverview.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="true"  />	
+				 	<constructor-arg name="permissionResourceName" value="capitalCostOverview"  />			 	
+				 </bean>	
+				 <bean id="quoteOverview" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Unit Reconciliation" />
+					<constructor-arg name="URL" value="/view/rentalCalc/unitReconciliation.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="true"  />	
+				 	<constructor-arg name="permissionResourceName" value=""  />			 	
+				 </bean>
+				 <bean id="updateGradeGroup" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Update Grade Group" />
+					<constructor-arg name="URL" value="/view/rentalCalc/updateGradeGroup.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="true"  />	
+				 	<constructor-arg name="permissionResourceName" value=""  />			 	
+				 </bean>
+				 <bean id="updateProjectedMonths" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Update Projected Replacement Month" />
+					<constructor-arg name="URL" value="/view/rentalCalc/updateProjectedMonths.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="true"  />	
+				 	<constructor-arg name="permissionResourceName" value=""  />			 	
+				 </bean>				 
+		   </list>
+		</property>
+	</bean>
+
+	<bean id="fleetMenuGroup" class="com.mikealbert.view.MenuGroup" scope="prototype">
+	 	<property name="groupName" value="Fleet Maintenance" />
+	  	<property name="menuItemList" >
+			<list>
+				 <bean id="searchUnit" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Search Vehicles" />
+					<constructor-arg name="URL" value="/view/fleet/vehicleSearch.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="true"  />	
+				 	<constructor-arg name="permissionResourceName" value="vehicleSearch"  />			 	
+				 </bean>
+				 <bean id="progressChasing" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Progress Chasing" />
+					<constructor-arg name="URL" value="/view/fleet/progressChasing.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="true"  />	
+				 	<constructor-arg name="permissionResourceName" value="progressChasing"  />			 	
+				 </bean>			 
+				 <!-- TODO: fix permission resource name for this menu -->				 
+				 <bean id="providerMaintCodeMgmt" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Provider Maint Codes" />
+					<constructor-arg name="URL" value="/view/fleet/providerMaintCodeMgmt.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="false"  />	
+				 	<constructor-arg name="permissionResourceName" value="providerMaintCodeMgmt"  />			 	
+				 </bean>		 
+				 <bean id="taskMaintenance" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Schedule Tasks" />
+					<constructor-arg name="URL" value="/view/maintSchedules/tasks.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="true"  />	
+				 	<constructor-arg name="permissionResourceName" value=""  />			 	
+				 </bean>
+				 <bean id="scheduleMaintenance" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Master Schedules" />
+					<constructor-arg name="URL" value="/view/maintSchedules/schedules.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="true"  />	
+				 	<constructor-arg name="permissionResourceName" value=""  />			 	
+				 </bean>
+				 <bean id="scheduleMaintenance" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Schedule Rules" />
+					<constructor-arg name="URL" value="/view/maintSchedules/scheduleRules.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="true"  />	
+				 	<constructor-arg name="permissionResourceName" value=""  />			 	
+				 </bean>
+				 <bean id="scheduleQueues" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Schedule Queues" />
+					<constructor-arg name="URL" value="/view/maintSchedules/maintScheduleQueues.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="true"  />	
+				 	<constructor-arg name="permissionResourceName" value=""  />			 	
+				 </bean>
+				 <bean id="fuelMappings" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Fuel Mappings" />
+					<constructor-arg name="URL" value="/view/maintSchedules/fuelTypeMapping.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="true"  />	
+				 	<constructor-arg name="permissionResourceName" value=""  />			 	
+				 </bean>
+
+		   </list>
+		</property>
+	</bean>
+	
+	<bean id="trimMaintenanceMenuGroup" class="com.mikealbert.view.MenuGroup" scope="prototype">
+	 	<property name="groupName" value="Trim Maintenance" />
+	  	<property name="menuItemList" >
+			<list>
+				 <bean id="searchTrim" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Search Trims" />
+					<constructor-arg name="URL" value="/view/pricing/modelSearch.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="true"  />	
+				 	<constructor-arg name="permissionResourceName" value=""  />			 	
+				 </bean>
+		   </list>
+		</property>
+	</bean>	
+	
+	<bean id="progressQueueMenuGroup" class="com.mikealbert.view.MenuGroup" scope="prototype">
+	 	<property name="groupName" value="Order To Delivery" />
+	  	<property name="menuItemList" >
+			<list>
+				<bean id="orderProgressSearch" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Order Progress" />
+					<constructor-arg name="URL" value="/view/progressQueues/orderProgressSearch.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="true"  />	
+				 	<constructor-arg name="permissionResourceName" value=""  />			 	
+				</bean>	
+				<bean id="acceptanceQueue" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Acceptance Queue" />
+					<constructor-arg name="URL" value="/view/progressQueues/acceptanceQueue.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="true"  />	
+				 	<constructor-arg name="permissionResourceName" value=""  />			 	
+				</bean>
+				<bean id="clientFacingQueue" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Client Facing Queue" />
+					<constructor-arg name="URL" value="/view/progressQueues/clientFacingQueue.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="true"  />	
+				 	<constructor-arg name="permissionResourceName" value=""  />			 	
+				 </bean>
+				<bean id="unitProgressChasing" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Unit Progress Chasing" />
+					<constructor-arg name="URL" value="/view/progressQueues/unitProgressSearch.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="true"  />	
+				 	<constructor-arg name="permissionResourceName" value=""  />			 	
+				</bean>
+				 <bean  class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Vehicle Order Status" />
+					<constructor-arg name="URL" value="/view/progressQueues/vehicleOrderStatusSearch.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="true"  />	
+				 	<constructor-arg name="permissionResourceName" value=""  />			 	
+				 </bean> 					
+		   </list>
+		</property>
+	</bean>		
+	
+	<bean id="vehicleConfigurationGroup" class="com.mikealbert.view.MenuGroup" scope="prototype">
+	 	<property name="groupName" value="Vehicle Configuration" />
+	  	<property name="menuItemList" >
+			<list>
+				 <bean id="vehicleConfigurationSearch" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Search Configuration" />
+					<constructor-arg name="URL" value="/view/vehicleConfiguration/vehicleConfigurationSearch.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="true"  />	
+				 	<constructor-arg name="permissionResourceName" value=""  />			 	
+				 </bean>
+		   </list>
+		</property>
+	</bean>
+
+	<bean id="quoteRequestMenuGroup" class="com.mikealbert.view.MenuGroup" scope="prototype">
+	 	<property name="groupName" value="Quote Request" />
+	  	<property name="menuItemList" >
+			<list>
+				 <bean id="searchQuoteRequest" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Search Quote Requests" />
+					<constructor-arg name="URL" value="/view/quoteRequest/quoteRequestSearch.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="true"  />	
+				 	<constructor-arg name="permissionResourceName" value=""  />			 	
+				 </bean>
+				 <bean id="addQuoteRequest" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Add Quote Request" />
+					<constructor-arg name="URL" value="/view/quoteRequest/quoteRequestAddEdit.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="false"  />	
+				 	<constructor-arg name="permissionResourceName" value="quoteRequestAddEdit"  />			 	
+				 </bean>
+		   </list>
+		</property>
+	</bean>	
+		
+	<bean id="debitCreditMemoGroup" class="com.mikealbert.view.MenuGroup" scope="prototype">
+	 	<property name="groupName" value="Debit/Credit Memo" />
+	  	<property name="menuItemList" >
+			<list>
+				 <bean id="debitCreditMemoSearch" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Search Debit/Credit Memos" />
+					<constructor-arg name="URL" value="/view/debitCreditMemos/debitCreditMemoSearch.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="true"  />	
+				 	<constructor-arg name="permissionResourceName" value=""  />			 	
+				 </bean>
+				 <bean id="debitCreditMemoErrors" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Debit/Credit Upload Errors" />
+					<constructor-arg name="URL" value="/view/debitCreditMemos/debitCreditMemoErrors.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="true"  />	
+				 	<constructor-arg name="permissionResourceName" value=""  />			 	
+				 </bean>				 
+		   </list>
+		</property>
+	</bean>	
+	
+	<bean id="contractManagementGroup" class="com.mikealbert.view.MenuGroup" scope="prototype">
+	 	<property name="groupName" value="Contract Management" />
+	  	<property name="menuItemList" >
+			<list>
+				 <bean id="contractVehicleSearchBean" class="com.mikealbert.view.MenuItem" scope="prototype">
+					<constructor-arg name="displayName" value="Search Contract Vehicles" />
+					<constructor-arg name="URL" value="/view/contractManagement/contractVehicleSearch.xhtml" />				 
+				 	<constructor-arg name="applicableForReadOnly" value="true"  />	
+				 	<constructor-arg name="permissionResourceName" value=""  />			 	
+				 </bean>
+		   </list>
+		</property>
+	</bean>		
+			
+ </beans>

@@ -1,0 +1,249 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component" 
+	xmlns:pe="http://primefaces.org/ui/extensions"   
+    template="../../templates/ui.xhtml" >
+
+    <ui:define name="content"> 
+		<h:form id="breadCrumbForm" prependId="false">
+			<p:breadCrumb model="#{serviceElementAmendmentsBean.breadCrumbTrail}"  
+			 style="min-width:900px;max-width:100%;width:auto" 
+			ajax="false" immediate="true" styleClass="ui-layout"/>
+		</h:form>
+		
+		<p:growl id="growl" for="warnings" severity="warn" escape="false" redisplay="true" showDetail="true" sticky="true" /> 
+	
+    	<!-- Message display -->
+		<p:scrollPanel style="height:50px;" mode="native">
+			<p:messages id="messages" severity="info,error,fatal" showSummary="false" showDetail="true" autoUpdate="true" />
+		</p:scrollPanel>
+
+   		<h:form id="serviceElementAmendmentsForm" prependId="false"> 
+
+			<!-- Pick list -->
+			<p:panel id="elementsPickListPanel" styleClass="ui-layout">
+				<p:panelGrid cellpadding="5">
+					<p:row>
+						<p:column styleClass="ui-datatable-partition-dev">
+							<p:dataTable id="availableElements" var="availableElement"
+								value="#{serviceElementAmendmentsBean.availableElements}"
+								widgetVar="availableElementsWidget"
+								rowKey="#{availableElement}"								
+								selection="#{serviceElementAmendmentsBean.selectedAvailableElement}"
+								rowIndexVar="availableElementRowIndex" selectionMode="single"
+								scrollable="true"
+								scrollHeight="#{serviceElementAmendmentsBean.dataTable.height}">
+
+								<p:ajax event="rowSelect"
+									listener="#{serviceElementAmendmentsBean.onRowSelect}"
+									update=":serviceElementAmendmentsForm" />
+
+								<f:facet name="header">Available Service Elements</f:facet>
+
+								<p:column width="#{serviceElementAmendmentsBean.dataTable.col1}">
+									<h:outputText value="#{availableElement.availableOperationMarker} #{availableElement.name} - #{availableElement.description} " style="#{availableElement.availableOperation eq 'NONE' ? 'color:red' : 'color:black'}"/>
+									<h:outputText value="#{availableElement.displayOnlyMonthlyCost}" style="#{availableElement.availableOperation eq 'NONE' ? 'color:red' : 'color:black'}"><f:converter converterId="malDollarValueConverter"/></h:outputText> 
+								</p:column>
+							</p:dataTable>
+						</p:column>
+
+						<p:column style="vertical-align:top;">
+							<p:spacer width="40" />
+							<p:commandButton id="addElement" icon="ui-icon-arrowthick-1-e"
+								actionListener="#{serviceElementAmendmentsBean.addElement}"
+								update="availableElements assignedElements" title="Add"
+								process="@this, availableElements" 
+								onstart="moveRecordCheck('Add')"
+								disabled="#{ !serviceElementAmendmentsBean.editable}"/>
+							<br />
+							<br />
+							<p:commandButton id="removeElement"
+								icon="ui-icon-arrowthick-1-w"
+								actionListener="#{serviceElementAmendmentsBean.removeElement}"
+								update="availableElements assignedElements" title="Remove"
+								process="@this, availableElements" 
+								onstart="moveRecordCheck('Remove')"
+								disabled="#{ !serviceElementAmendmentsBean.editable}"/>
+							<br />
+							<br />
+						</p:column>
+
+						<p:column styleClass="ui-datatable-partition-dev">
+							<p:dataTable id="assignedElements" var="assignedElement"
+								value="#{serviceElementAmendmentsBean.assignedElements}"
+								widgetVar="assignedElementsWidget"
+								rowKey="#{assignedElement}"
+								selection="#{serviceElementAmendmentsBean.selectedAssignedElement}"
+								rowIndexVar="assignedElementRowIndex" selectionMode="single"
+								scrollable="true"
+								scrollHeight="#{serviceElementAmendmentsBean.dataTable.height}">
+
+								<p:ajax event="rowSelect"
+									listener="#{serviceElementAmendmentsBean.onRowSelect}"
+									update=":serviceElementAmendmentsForm" />
+
+								<f:facet name="header">Currently Assigned Service Elements</f:facet>
+
+								<p:column width="#{serviceElementAmendmentsBean.dataTable.col1}">
+									<h:outputText value="#{assignedElement.availableOperationMarker} #{assignedElement.name} - #{assignedElement.description} " style="#{assignedElement.availableOperation eq 'NONE' ? 'color:red' : 'color:black'}"/>
+									<h:outputText value="#{assignedElement.displayOnlyMonthlyCost}" style="#{assignedElement.availableOperation eq 'NONE' ? 'color:red' : 'color:black'}"><f:converter converterId="malDollarValueConverter"/></h:outputText> 
+								</p:column>
+							</p:dataTable>
+						</p:column>
+					</p:row>
+				</p:panelGrid>
+			</p:panel>
+
+	      	<p:panel id="commandPanel" style="min-width:980px;max-width:100%;width:auto;">
+				<p:commandButton id="savePage" value="Store" tabindex="30" 
+					oncomplete="handleFormalExtStore(#{serviceElementAmendmentsBean.isFormalExtension()})"  
+					disabled="#{ !serviceElementAmendmentsBean.editable}">
+				</p:commandButton>
+				<p:commandButton id="formalExtHiddenBtn"
+					style="display:none"
+					ajax="false"  
+					actionListener="#{serviceElementAmendmentsBean.store}">
+				</p:commandButton>
+				<p:commandButton id="notFormalExtHiddenBtn" 
+					style="display:none" 
+					actionListener="#{serviceElementAmendmentsBean.store}" 
+					process="@this" update=":odoReadingsDialog">
+					<p:resetInput target=":odoReadingsPanelForm"/>
+				</p:commandButton>
+				<p:spacer width="10" />
+				<p:commandButton id= "cancelPage" value="Cancel" tabindex="40" 				
+					action="#{serviceElementAmendmentsBean.cancel}" ajax="true"
+					oncomplete="window.close();" immediate="true" />	
+				<p:spacer width="10" />	
+			    <p:commandButton id="resetPage" value="Reset" action="#{serviceElementAmendmentsBean.reset}" update=":serviceElementAmendmentsForm:elementsPickListPanel" tabindex="50" disabled="#{ !serviceElementAmendmentsBean.editable}"/>
+			    <p:spacer width="10" />
+			    <h:outputText value="*Items in Red may not be removed as they are already on the contract and are also in the current setup for the client." style="text-align:right" />	
+			</p:panel>			
+			
+   		</h:form>
+   		
+   		<p:confirmDialog id="selectElementAlertDialog"
+			message="Select an element to add or remove" header="Alert"
+			widgetVar="selectElementAlertWidgetVar" appendTo="@(body)">
+			<p:focus context="selectElementAlertDialog" />
+
+			<h:form prependId="false">
+				<p:hotkey immediate="true" bind="esc"
+					handler="PF('selectElementAlertWidgetVar').hide(); setFocus('availableElement')" />
+				<p:commandButton id="cancelSelectElementAlertDialog" value="Ok" 
+					onclick="PF('selectElementAlertWidgetVar').hide(); setFocus('availableElement')" />
+			</h:form>
+		</p:confirmDialog>	
+		
+
+		<p:dialog id="odoReadingsDialog" header="Odometer Readings" 
+			widgetVar="odoReadingsDialogWidget" modal="true" closeOnEscape="true"
+			appendTo="@(body)" dynamic="true" height="325" width="585" onShow="setFocusAndHighlight();">
+			<h:form id="odoReadingsPanelForm" prependId="false">
+
+				<p:messages id="odometerMessages" severity="info,error,fatal" showSummary="true" showDetail="false" autoUpdate="true" />
+				<p:panel id="odoReadingsPanelEntry" header="Current">
+					<p:panelGrid id="odoReadingsPanelGrid" style="width:auto;">
+						<p:row>
+							<p:column>
+								<p:outputLabel for="currentOdometerReading"
+								 styleClass="ui-label" value="Odometer Reading:" />
+								 <h:outputText style="color:red;" value="*"  styleClass="ui-label"/>
+							</p:column>
+							<p:column>
+								<p:inputText id="currentOdometerReading" size="5" maxlength="7" tabindex="100" onkeypress="return numericInput(event)"
+									value="#{serviceElementAmendmentsBean.currentOdo}"
+									style="text-align:right"/>
+								<p:spacer width="4" />
+								<h:outputLabel value="#{serviceElementAmendmentsBean.unitofMeasureCode}" />
+								<p:spacer width="12" />
+								<h:outputLabel value="#{serviceElementAmendmentsBean.currentDate}">
+									<f:convertDateTime pattern="MM/dd/yyyy" />
+								</h:outputLabel>
+							</p:column>	
+						</p:row>
+					</p:panelGrid>	
+				</p:panel>
+				<p:panel id="odoReadingsPanel" header="Previous">				
+				    <p:dataTable var="odoReadings" value="#{serviceElementAmendmentsBean.vehicleOdometerReadings}" rows="5"> 
+				        <p:column headerText="Date" style="text-align: center"> 
+							<h:outputText value="#{odoReadings.odoReadingDate}" >
+								<f:convertDateTime pattern="MM/dd/yyyy" />
+                          	</h:outputText>
+				        </p:column>				        
+				        <p:column headerText="Reading">  
+				            <h:outputText value="#{odoReadings.odoReading} #{serviceElementAmendmentsBean.unitofMeasureCode}" style="float:right"/> 
+				        </p:column>
+				        <p:column headerText="Type">  
+				            <h:outputText value="#{odoReadings.odoReadingType}" />  
+				        </p:column>
+				    </p:dataTable> 
+				</p:panel>
+				<p:panel id="odoReadingsButtonPanel">
+					<p:commandButton id="saveOdometer" value="Save" tabindex="110" 
+						process="@form" update="@form" 
+						actionListener="#{serviceElementAmendmentsBean.save}" 
+						oncomplete="handleOdometerDialogSave(xhr, status, args);" 
+						immediate="false"/>
+					<p:spacer width="8" />					
+					<p:commandButton id="cancelOdoReadingsDialog" value="Cancel" tabindex="120" ajax="false"
+						actionListener="#{serviceElementAmendmentsBean.closeOdoReadingsDialog}" />
+ 					<h:outputText value="  *Required to amend this contract with maintenance service elements" />												
+				</p:panel>
+			</h:form>
+		</p:dialog>		
+
+			<style type="text/css">	
+				.ui-datatable-partition-dev .ui-datatable TBODY TD{
+					border-top-style: solid !important;
+					border-bottom-style: solid !important;
+					border-right-style: solid !important;
+					border-left-style: solid !important;				
+				}
+			</style> 
+			<script type="text/javascript"> 
+			    /**
+			    * Prior to moving record from one pick list to another, this function
+			    * will check for a selected record to move. If one does not exist, an
+			    * alert is displayed to inform the user that they must select a driver
+			    * in order to move a row.
+			    */
+			    function moveRecordCheck(mode){	    
+			    	var display = false;
+			    	if((mode == 'Add' &amp;&amp; PF('availableElementsWidget').getSelectedRowsCount() &lt; 1)
+			    	        || (mode == 'Remove' &amp;&amp; PF('assignedElementsWidget').getSelectedRowsCount() &lt; 1)) {
+			          	    display = true;
+			        }
+			    	
+			        if(display){
+			        	showDialog('selectElementAlertWidgetVar');	
+			        	setFocus('cancelSelectElementAlertDialog');
+			        }
+			    }
+
+				function handleOdometerDialogSave(xhr, status, args) {
+					if(!args.failure) {
+						PF('odoReadingsDialogWidget').hide();
+					}
+				}	
+				
+				function setFocusAndHighlight() {
+					$(document).ready(function() {
+					    $("input:text").focus(function() { $(this).select(); } );
+					});
+				}
+				
+				function handleFormalExtStore(isFormalExt){
+					if(isFormalExt){
+						$('[id$=formalExtHiddenBtn]').click();
+					} else {
+						$('[id$=notFormalExtHiddenBtn]').click();
+					}
+				}
+			    
+			</script> 
+	</ui:define>
+</ui:composition>   			

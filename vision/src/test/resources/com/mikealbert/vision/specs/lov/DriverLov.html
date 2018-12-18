@@ -1,0 +1,21 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Fleet Maintenance / Fleet Maintenance Driver LOV</title>
+    <body>
+    	<h1>Fleet Maintenance / Fleet Maintenance Driver LOV</h1>
+    	<h2>Acceptance Tests (Automated)</h2>
+    		<ul concordion:execute="#result = testSearchActiveDrvByLastName(#drvLastName)"><li> When searching the lov for an active driver's last name of <b><span concordion:set="#drvLastName">burden</span></b><span concordion:assertTrue="#result"> the lov search results show at least one driver returning.</span></li></ul>
+    		<ul concordion:execute="#result = testSearchInActiveDrvByLastName(#drvLastName)"><li> When searching the lov for an inactive driver's last name of <b><span concordion:set="#drvLastName">Camacho</span></b><span concordion:assertFalse="#result"> the lov search results show at least one driver returning.</span></li></ul>
+    		<ul concordion:execute="#result = testSearchActiveDrvByLastName(#drvLastName)"><li> When searching the lov for an active a driver name, whole last name plus whole first name of <b><span concordion:set="#drvLastName">Burden, tom</span></b><span concordion:assertTrue="#result"> the lov search results show at least one driver returning.</span></li></ul>
+    		<ul concordion:execute="#result = testSearchActiveDrvByLastName(#drvLastName)"><li> When searching the lov for an active a driver name, whole last name plus whole first name of <b><span concordion:set="#drvLastName">bur, ste</span></b><span concordion:assertFalse="#result"> the lov search results show no records found.</span></li></ul>
+    		<ul concordion:execute="#result = testSearchActiveDrvByLastName(#drvLastName)"><li> When searching the lov for an active partial driver's last name of <b><span concordion:set="#drvLastName">bu</span></b><span concordion:assertTrue="#result"> the lov search results show at least one driver returning.</span></li></ul>
+    		<ul concordion:execute="#result = testSearchActiveDrvByLastName(#drvLastName)"><li> When searching the lov for an active a driver name, whole last name plus whole first name of <b><span concordion:set="#drvLastName">Burden, to</span></b><span concordion:assertTrue="#result"> the lov search results show at least one driver returning.</span></li></ul>
+    		<ul concordion:execute="#result = testSearchActiveDrvByLastName(#drvLastName)"><li> When searching the lov for driver's last name of <b><span concordion:set="#drvLastName">xyz</span></b><span concordion:assertFalse="#result"> the lov search results show no records found.</span></li></ul>
+    		<ul concordion:execute="#result = testSearchActiveDrvByLastName(#drvLastName)"><li> When searching the lov for driver's last name of <b><span concordion:set="#drvLastName">, ()*)^&amp;$^%#$&amp;</span></b><span concordion:assertFalse="#result"> the lov search results show no records found.</span></li></ul>
+    	<h2>Manual Tests</h2>
+    		<ul><li>TODO: After entering information in search criteria field: test clicking Enter in search field, test clicking Search, test clicking the LOV.</li></ul>
+    		
+    	<h2>Untested (Out of Scope)</h2>
+    		<ul><li>TODO:</li></ul>
+    </body>
+</html>

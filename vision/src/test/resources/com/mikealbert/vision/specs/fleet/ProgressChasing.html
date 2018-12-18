@@ -1,0 +1,85 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Progress Chasing / FM-107, FM-702 Progress Chasing</title>
+    <body>
+    	<h1>Progress Chasing / FM-107, FM-702 Progress Chasing</h1>
+    	<h2>Acceptance Tests (Automated)</h2>
+			<h3>After clicking on the Progress Chasing link, the results will contain:</h3>
+ 			<ul concordion:execute="#result = testProgressChasingDataList(#poStatusDescription)">
+                <li><b><span concordion:set="#poStatusDescription">Preauthorized</span></b> along with the current count:  
+                <span concordion:assertTrue="#result">true</span>
+                </li>
+            </ul>
+            
+			<ul concordion:execute="#result = testProgressChasingDataList(#poStatusDescription)">
+                <li><b><span concordion:set="#poStatusDescription">Scheduled</span></b> along with the current count:  
+                <span concordion:assertTrue="#result">true</span>
+                </li>
+            </ul>
+            
+ 			<ul concordion:execute="#result = testProgressChasingDataList(#poStatusDescription)">
+                <li><b><span concordion:set="#poStatusDescription">Booked-In</span></b> along with the current count:  
+                <span concordion:assertTrue="#result">true</span>
+                </li>
+            </ul>
+            
+			<ul concordion:execute="#result = testProgressChasingDataList(#poStatusDescription)">
+                <li><b><span concordion:set="#poStatusDescription">Waiting on Client Approval</span></b> along with the current count:  
+                <span concordion:assertTrue="#result">true</span>
+                </li>
+            </ul>	
+            
+ 			<ul concordion:execute="#result = testProgressChasingDataList(#poStatusDescription)">
+                <li><b><span concordion:set="#poStatusDescription">In-Progress</span></b> along with the current count:  
+                <span concordion:assertTrue="#result">true</span>
+                </li>
+            </ul>
+            
+			<ul concordion:execute="#result = testProgressChasingDataList(#poStatusDescription)">
+                <li><b><span concordion:set="#poStatusDescription">Waiting on Invoice</span></b> along with the current count:  
+                <span concordion:assertTrue="#result">true</span>
+                </li>
+            </ul> 
+            
+            <ul concordion:execute="#result = testProgressChasingDataList(#poStatusDescription)">
+                <li><b><span concordion:set="#poStatusDescription">Goodwill Pending</span></b> along with the current count:  
+                <span concordion:assertTrue="#result">true</span>
+                </li>
+            </ul> 
+		
+			<h3>Clicking on a PO Status:</h3>
+			<ul concordion:execute="#result = testProgressChasingByPoStatus(#poStatus,#poNumber)">
+ 				<li>After clicking on the PO Status "Waiting on Invoice" <b>(<span concordion:set="#poStatus">WI</span>)</b> and viewing results for po number <b><span concordion:set="#poNumber">J00233506</span></b>
+ 					, the PO Number should be <span concordion:assertEquals="#result.poNumber">J00233506</span>
+  					and the Service Provider Name should be <span concordion:assertEquals="#result.serviceProviderName">Gateway Tire Co Inc - Used Cars</span>
+ 					and the Service Provider Number should be <span concordion:assertEquals="#result.serviceProviderNumber">00070165-1</span>
+					and the Categories should be <span concordion:assertEquals="#result.concatCategoryDescriptions">RECON</span> 					
+ 					and the Start Date should be <span concordion:assertEquals="#result.actualStartDate">2011-04-21 16:26:25.0</span>
+ 					and the Odometer should be <span concordion:assertEquals="#result.odo">148882</span>
+ 					and the PO Status should be <span concordion:assertEquals="#result.maintRequestStatusDescription">Waiting on Invoice</span>
+ 					and the PO Total should be <span concordion:assertEquals="#result.taskTotalCost">34.87</span>
+ 					and the Recharge Total should be <span concordion:assertEquals="#result.rechargeTotal">0.00</span>
+ 					and the Last Updated By should be <span concordion:assertEquals="#result.lastChangedBy">HAAG_S</span>
+ 					and the Last Changed Date should be <span concordion:assertEquals="#result.lastChangedDate">2013-08-27 18:35:24.0</span> 					 					
+				</li>
+ 			</ul>	
+ 			
+ 			<h3>Clicking on a PO Status and filtering:</h3>
+            <ul concordion:execute="#result = testProgressChasingLastUpdatedByFilter(#poStatus,#lastUpdatedByFilter)">
+                <li>When clicking on the PO Status "Waiting on Invoice" <b>(<span concordion:set="#poStatus">WI</span>)</b> and filtering on "Last Updated By" <b><span concordion:set="#lastUpdatedByFilter">HAAG_S</span></b>
+                <span concordion:assertTrue="#result">the results will only show the purchase order/s which contain the "Last Updated By" value = HAAG_S</span>
+                </li>
+            </ul> 			
+ 			
+     	<h2>Manual Tests</h2>
+    	    <ul><b>
+    	       <li>TODO: Verify the data of a number of POs in each status and totals for PO Total and Recharge Total</li>
+    	       <li>TODO: Filter on the Progress Chasing Queue screen and verify the data</li>
+    	       <li>TODO: Click on PO J00331650 and verify that the Edit PO screen is displayed</li> 
+    	       <li>TODO: Select PO line J00334073 from the queue and click on the View Purchase Order button.  Verify that the Edit PO screen is displayed</li> 
+    	       <li>TODO: Click on the Cancel  button and verify that the Progress Chasing launch screen is re-displayed</li> 		    </b></ul>
+
+    	<h2>Untested (Out of Scope)</h2>
+    		<ul><li>TODO:</li></ul>
+    </body>
+</html>

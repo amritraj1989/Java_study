@@ -1,0 +1,46 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Fleet Maintenance / FM 26 Historical Maintenance Category Dialog</title>
+    <body>
+    	<h1>Fleet Maintenance / FM 26 Historical Maintenance Category Dialog</h1>
+    	<h2>Acceptance Tests (Automated)</h2>
+
+		    <ul concordion:execute="#result = getHistoricalMaintCategoryListSize(#unitNumber,#maintCatCode,#mrqId)">
+			    <li>On the Vehicle Search screen, search for unit <b><span concordion:set="#unitNumber">00945108</span></b>.</li>
+			    <ul>
+				    <li>Click Create Purchase Order.</li>
+				    <li>Input service provider: Don's Alternator &amp; Starter Service, Inc. and press the tab key.</li>
+				    <li>Click the "+New Line" button and enter <b><span concordion:set="#maintCatCode">OIL_CHANGE</span></b>-Oil Change in the Maint Category field on the PO Task Item dialog and press tab key. Historical Maint Category Indicator should display.</li>
+		            <li>Click on the Historical Maint Category indicator <span concordion:assertTrue="#result">Historical Main Category dialog is displayed with at least one row in the historical category list.</span></li>
+		            
+				</ul>
+			</ul>
+			<ul concordion:execute="#result = getHistoricalMaintCategoryListSize(#unitNumber,#maintCatCode,#mrqId)">
+				<ul>
+					<li>For unit <b><span concordion:set="#unitNumber">00945108</span></b>, if you enter <b><span concordion:set="#maintCatCode">A/C</b> - Air Conditioning in the Maint Category field on PO Task Item dialog and press Tab key, Historical Maint Category indicator should not display. <span concordion:assertFalse="#result">Thus, the historical maint category list has no results.</span></li>
+				</ul>
+			</ul>
+			<ul concordion:execute="#result = getHistoricalMaintCategoryListSize(#unitNumber,#maintCatCode,#mrqId)">
+			    <li>On the Vehicle Search screen, search for PO J00297769 which is a PO for unit <b><span concordion:set="#unitNumber">00945108</span></b>.</li>
+			    <ul>
+				    <li>Click View Purchase Order.</li>
+				    <li>Click the "+New Line" button and enter <b><span concordion:set="#maintCatCode">MISC_MAINT</span></b>-Misc Maintenance in the Maint Category field on the PO Task Item dialog and press tab key. Historical Maint Category Indicator should display.</li>
+		            <li>Click on the Historical Maint Category indicator <span concordion:assertTrue="#result">Historical Main Category dialog is displayed with at least one row in the historical category list.</span></li>
+		            
+				</ul>
+			</ul>
+			<ul concordion:execute="#result = getHistoricalMaintCategoryListSize(#unitNumber,#maintCatCode,#mrqId)">
+				<ul>
+					<li>For unit <b><span concordion:set="#unitNumber">00945108</span></b>, if you enter <b><span concordion:set="#maintCatCode">RECON</span></b> - Re-conditioning in the Maint Category field on PO Task Item dialog and press Tab key, Historical Maint Category indicator should not display. <span concordion:assertFalse="#result">Thus, the historical maint category list has no results.</span></li>
+				</ul>
+			</ul>
+
+    	<h2>Manual Tests</h2>
+    	    <ul type = "circle"><b>
+    	       <li>TODO: Verify the name and the date/time of the last coordinator who updated the line item when creating a new PO or updating an existing PO for all the vehicle statuses.</li>
+    	    </b></ul>
+
+    	<h2>Untested (Out of Scope)</h2>
+    		<ul><li>TODO:</li></ul>
+    </body>
+</html>

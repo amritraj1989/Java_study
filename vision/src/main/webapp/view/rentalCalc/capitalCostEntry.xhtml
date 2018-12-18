@@ -1,0 +1,162 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	template="../../templates/ui.xhtml">
+
+	<ui:define name="content">
+			<h:form id="breadCrumbForm" prependId="false">
+				<p:breadCrumb model="#{capitalCostEntryBean.breadCrumbTrail}"
+					style="min-width:900px;max-width:100%;width:auto" ajax="false"
+					immediate="true" styleClass="ui-layout" />
+			</h:form>
+			<!-- Error message display -->
+			<p:scrollPanel style="height:50px;max-width:100%;width:auto;"
+				mode="native" styleClass="ui-layout">
+				<p:messages id="messages" showSummary="false" showDetail="true"
+					autoUpdate="true" />
+			</p:scrollPanel>
+
+			<h:form id="capitalCostEntryForm" prependId="false">
+				<p:panel id="pagePanel" style="border:none!important">
+				 <p:focus context="pagePanel"/>				
+				  <p:panel id="capitalCostEntryDatatableTablePanel">
+				
+					<p:panel style="#{capitalCostEntryBean.openEndLease ? 'width:700px;' : 'width:597px;'}">
+						<h:panelGrid columns="3" cellspacing="3">
+							<h:panelGrid columns="1" width="315">
+								<h:panelGroup>
+									<h:outputLabel value="Quote:" style="font-weight:bold" />
+									<h:outputLabel value="#{capitalCostEntryBean.outputQuote}" />
+								</h:panelGroup>
+								<h:outputLabel value="#{capitalCostEntryBean.unitDescription}" />
+							</h:panelGrid>
+							<h:panelGrid columns="1" cellspacing="3"
+								style="text-align:right;">
+								<h:outputLabel value="Base Vehicle Cost:"
+									style="font-weight:bold" />
+								<h:outputLabel value="Factory Equip:" style="font-weight:bold" />
+								<h:outputLabel value="Aftermarket Equip:"
+									style="font-weight:bold" />
+							</h:panelGrid>
+							<h:panelGrid columns="1" cellspacing="3" width="82"
+								style="text-align:right;">
+								<p:inputNumber id="base" style="text-align:right"  
+									value="#{capitalCostEntryBean.baseCost}" size="10" thousandSeparator=","
+									maxlength="10" decimalPlaces="2" maxValue="999999.99"
+									minValue="-999999.99" emptyValue="empty" 
+									styleClass="trackDirtyChildValues" 
+									disabled="#{capitalCostEntryBean.preventBaseEdit or !capitalCostEntryBean.hasPermission('baseCost_update')}">
+
+									<p:ajax event="change"
+										listener="#{capitalCostEntryBean.onCellEdit}"
+										oncomplete="setFocusOnElement('save')"
+										update=":capitalCostEntryForm:totalCostPanelGrid, :capitalCostEntryForm:buttons" />
+									
+								</p:inputNumber>
+
+								<h:outputText value="#{capitalCostEntryBean.factoryEquip}">
+									<f:converter converterId="malDollarValueConverter" />
+								</h:outputText>
+								<h:outputText value="#{capitalCostEntryBean.afterMarketEquip}">
+									<f:converter converterId="malDollarValueConverter" />
+								</h:outputText>
+							</h:panelGrid>
+
+
+
+						</h:panelGrid>
+
+
+						<p:dataTable id="capitalCostEntryTableId" var="element"
+							value="#{capitalCostEntryBean.rowList}" emptyMessage=""
+							scrollable="true" rowIndexVar="elementRowIndex"
+							scrollHeight="#{capitalCostEntryBean.dataTable.height}"
+							rowKey="#{element.quotationCapitalElement.capitalElement.description}">
+
+							<p:column style="width:100px">
+								<f:facet name="header">
+									<h:outputText value="Element" style="font-weight:bold" />
+								</f:facet>
+								<h:outputLabel
+									value="#{element.quotationCapitalElement.capitalElement.description}" />
+							</p:column>
+
+							<p:column style="text-align:center;width:45px">
+								<f:facet name="header">
+									<h:outputText value="Cost" style="font-weight:bold" />
+								</f:facet>
+								<p:inputNumber id="cost#{elementRowIndex}" style="text-align:right"  
+									value="#{element.value}" size="10" thousandSeparator=","
+									maxlength="10" decimalPlaces="2" maxValue="999999.99"
+									minValue="-999999.99" emptyValue="empty" 
+									disabled="#{capitalCostEntryBean.preventCostEdit or element.quotationCapitalElement.capitalElement.code eq 'OE_REV_ASSMNT' or element.quotationCapitalElement.capitalElement.code eq 'OE_REV_INT_ADJ'}"
+									styleClass="rowArray trackDirtyChildValues ui-text-align-right-dev">
+									
+								<p:ajax event="change"
+									listener="#{capitalCostEntryBean.onCellEdit}"
+									update=":capitalCostEntryForm:totalCostPanelGrid, :capitalCostEntryForm:buttons" />
+									
+								</p:inputNumber>
+							</p:column>
+
+							<p:column style="text-align:center;width:30px" rendered="#{capitalCostEntryBean.openEndLease}">
+								<f:facet name="header">
+									<h:outputText value="Client Cost" style="font-weight:bold" />
+								</f:facet>
+								<h:outputLabel value="#{element.finalClientCostFlag ? 'Yes' : null}" />
+							</p:column>
+
+						</p:dataTable>
+
+					</p:panel>
+
+					<h:panelGrid id="totalCostPanelGrid" columns="4" cellspacing="3">
+						<p:spacer width="365" height="1" />
+						<h:outputLabel value="Vehicle Cost:" style="font-weight:bold" />
+						<p:spacer width="#{capitalCostEntryBean.totalCost100k ? '12' : '20'}" height="1" />
+						<h:outputText id="totalCost"
+							value="#{capitalCostEntryBean.totalCost}">
+							<f:converter converterId="malDollarValueConverter" />
+						</h:outputText>
+					</h:panelGrid>
+				</p:panel>
+
+
+				<h:panelGrid id="buttons">
+					<f:facet name="footer">
+						<p:commandButton id="save" tabindex="2" value="Save"
+							disabled="#{(capitalCostEntryBean.preventBaseEdit or !capitalCostEntryBean.hasPermission('baseCost_update')) and capitalCostEntryBean.preventCostEdit}"
+							action="#{capitalCostEntryBean.save}" ajax="false"
+							onclick="lockScreen();" />
+						<p:spacer width="10" />
+						<p:commandButton id="cancel" tabindex="3" value="Cancel"
+							action="#{capitalCostEntryBean.cancel}" ajax="false"
+							onclick="lockScreen();" immediate="true" />
+
+					</f:facet>
+				</h:panelGrid>	
+				</p:panel>	
+			</h:form>
+
+		<script type="text/javascript">
+				         
+		function initializeDirtyDetection() {
+			registerIgnoreButton("save");
+			saveDataForDirtyDetection();
+		}
+		
+		function setFocusOnElement(id){	
+			//$(function(){PrimeFaces.focus(id);});
+			setCurrentElementFocus(id);
+		}
+		
+     	$(window).load(function(){
+     		initializeDirtyDetection();
+		});			
+		
+		</script>
+	</ui:define>
+</ui:composition>

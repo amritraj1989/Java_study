@@ -1,0 +1,122 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+	    xmlns:h="http://java.sun.com/jsf/html"
+	    xmlns:f="http://java.sun.com/jsf/core"
+	    xmlns:p="http://primefaces.org/ui"
+	    xmlns:composite="http://java.sun.com/jsf/composite"
+	    xmlns:comp="http://java.sun.com/jsf/composite/view/component" 
+	    xmlns:pe="http://primefaces.org/ui/extensions" >
+	
+    <composite:interface>
+		<composite:attribute name="processStageObjects" required="false" type="java.util.List" />	  			
+		<composite:attribute name="copyToTarget" required="false" default="true" type="java.lang.String" />
+		<composite:attribute name="windowTitle" required="false" default="Request Client Contact" type="java.lang.String" />
+		<composite:attribute name="onClose" required="false" default="" type="java.lang.String" />			    	 	    	    	    			            
+	</composite:interface>
+	
+	<composite:implementation>
+	    <h:form id="ccRequestClientContactHiddenForm" prependId="false">           
+            <p:commandButton id="ccInitializeBeanHiddenBtn" 
+                    style="display:none"
+                    actionListener="#{requestClientContactBean.init()}" 
+                    oncomplete="PF('ccRequestClientContactWidget').show();"
+                    update="#{':'.concat(cc.attrs.clientId).concat(':ccRequestClientContactDialog')}" />
+		</h:form>
+		        	  	
+	  	<div id="ccRequestClientContactDlg">
+			<p:dialog id="ccRequestClientContactDialog" 
+			        modal="true" 
+			        onShow="init()" 
+			        onHide="onHideListener();"
+			        header="#{requestClientContactBean.windowTitle}" 
+			        widgetVar="ccRequestClientContactWidget" 
+			        dynamic="true" 
+			        resizable="false" 
+			        height="255" width="575" 
+			        closeOnEscape="true" 
+			        appendTo="@(body)">
+		        
+	    	    <!-- Message display -->
+			    <p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:100%;max-width:100%;width:auto;">
+				    <p:messages id="requestClientContactDialogMessages" severity="info,error,fatal" showSummary="true" showDetail="false" autoUpdate="true" />
+			    </p:scrollPanel>  			    		   		        		    	    	        
+            		        
+				<h:form id="ccRequestClientContactForm" prependId="false">   
+	                <p:remoteCommand immediate="true" name="onHideListener" actionListener="#{requestClientContactBean.onHideListener()}" oncomplete="#{cc.attrs.onClose}" />
+	                
+                    <p:focus context="ccRequestClientContactReasonTxt" />	
+                    
+                    
+					<p:panel> 						
+					    <p:panelGrid cellpadding="5" style="white-space:nowrap;">	
+					        <p:row>
+								<p:column>	
+				    				<p:outputLabel for="ccRequestClientContactReasonTxt" value="Client Contact Reason:*" styleClass="ui-label"/>
+				    			</p:column>	
+								<p:column>	
+				    				<p:inputTextarea id="ccRequestClientContactReasonTxt" value="#{requestClientContactBean.reason}" cols="50" rows="4" maxlength="200" 
+				    					autoResize="false" counter="counter" counterTemplate="{0} characters remaining" style="white-space: normal;"/>
+				    				<br />
+				                   <h:outputText id="counter" /> <br /><br />				    				
+				    			</p:column>					    							    							        				    							        
+					        </p:row> 					                   					
+		                </p:panelGrid>		               
+	                </p:panel>
+	                
+	                <p:panel>
+	                    <p:commandButton id="ccRequestClientContactReasonSaveBtn" value="Save" actionListener="#{requestClientContactBean.save}"
+	                    	oncomplete="handleRequestClientContactReasonSaveBtnRequest(xhr, status, args);" process="@form" update="@form"/>
+	                    <p:spacer width="5" />
+	                    <p:commandButton id="ccRequestClientContactReasonCancelBtn" value="Cancel" type="button" onclick="PF('ccRequestClientContactWidget').hide();" update="@form"/>					                                                 	                
+	                </p:panel>	                
+	                                    	                                    	                        		                		         		
+				</h:form>							        
+			</p:dialog>
+	  	</div>	  	   
+		
+	  	<script type="text/javascript">
+	  	
+	  	    /**
+	  	    * Clicks a hidden button to intialize the bean, then
+	  	    * shows the dialog.
+	  	    */
+			function showRequestClientContact(){	
+				$('[id$=ccInitializeBeanHiddenBtn]').click();
+			}			
+				
+	  	    /**
+	  	    * Post save activities.
+	  	    */
+	  	    function ccPostSaveBtnHandler(){
+				$('[id$=ccRequestClientContactReasonCancelBtn]').click();	  	    	
+	  	    }
+	  	    
+			/**
+			* Handels the cancel button click event.
+			*/
+		 	function ccCancelBtnHandler(){
+		 		PF('ccRequestClientContactWidget').hide();				
+		    }
+					 	
+			/**
+			* Place initialization logic here
+			*/
+		 	function init() {								
+				//this.setDirtyData(false)
+				//setTimeout(function(){setFocusPF('ccRequestClientContactForm:ccRequestClientContactReasonTxt'); }, 100);
+		 	}
+			
+			/**
+			* Ported from manufactuererQueue view
+			*/
+            function handleRequestClientContactReasonSaveBtnRequest(xhr, status, args){
+            	if(!args.failure) {    
+            		PF('ccRequestClientContactWidget').hide();
+            		//ajaxStatusHide();
+                }
+            }			
+		 	
+		</script>
+	  	
+	</composite:implementation>
+</html>

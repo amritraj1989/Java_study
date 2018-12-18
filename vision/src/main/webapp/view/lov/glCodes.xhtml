@@ -1,0 +1,108 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	 <p:dialog header="Select Gl Code" widgetVar="glCodeLOV" id="GLCODE_GRID" dynamic="true" resizable="true" appendTo="@(body)"
+						 width="510" height="380"  modal="true"  onShow="setFirstPageGlCodeDataTableWidget(); setFocus('glCodeSelectButton'); ">
+		<h:form id="glCodeLovToolbarForm" name ="glCodeLovToolbarForm" prependId = "false" onkeydown="filter_onkeydown(event,'refresh')">	
+		</h:form>
+		 <h:form id="glCodeLovForm" name ="glCodeLovForm" prependId = "false" onkeydown="body_onkeydown(event,'glCodeSelectButton','glCodeLOV');">
+				
+				<p:dataTable  id="glCodeDataTableId"   widgetVar="glCodeDataTableWidget" var="glCode" scrollable="true" scrollHeight="270" resizableColumns="true"
+                          value="#{glCodeLovBean.glCodeList}" rows="#{glCodeLovBean.rowsPerPage}" paginator="true" paginatorPosition="bottom"  lazy="true"
+                           selection = "#{glCodeLovBean.selectedGlCode}" selectionMode="single"
+                           rowIndexVar="glCodeRowIndex"  rowKey="#{glCode.compositeKey}">
+                           
+                       <p:ajax event="rowDblselect" listener="#{glCodeLovBean.onRowSelect}" 
+                                    update=":glCodeLovForm:lovGlCode :glCodeLovForm:lovGlCodeDesc :glCodeLovForm:rowIndexOnParent" 
+                                    oncomplete="hideGlCodeLov();setGlCodeValues();"  />
+                         
+                       <p:ajax event="rowSelect" listener="#{glCodeLovBean.onRowSelect}" 
+                            	 
+                            	update=":glCodeLovForm:lovGlCode :glCodeLovForm:lovGlCodeDesc :glCodeLovForm:rowIndexOnParent"/>
+                            	
+                      <p:ajax event="page" onstart="clearDataTableSelection('glCodeDataTableWidget');" oncomplete="setScrollDivAtTop();"/>
+                           
+                    	<p:column width="100" >
+                                <f:facet name="header">
+                                    <h:outputText value="Code"/>
+                                </f:facet>
+                                <h:outputText value="#{glCode.code}"></h:outputText>
+                        </p:column> 
+                        <p:column width="180" >
+                                <f:facet name="header">
+                                    <h:outputText value="Description"/>
+                                </f:facet>
+                                <h:outputText value="#{glCode.description}"></h:outputText>
+                        </p:column> 
+                         <p:column width="50" >
+                                <f:facet name="header">
+                                    <h:outputText value="Status"/>
+                                </f:facet>
+                                <h:outputText value="#{glCode.status}"></h:outputText>
+                        </p:column>     
+                </p:dataTable>
+                <p:panel id="glCodeSelectPanel" style="text-align:center; border:none">
+                            <h:outputText style="font-weight:bold;" 
+                                value="Record Count:#{glCodeLovBean.totalRecord}">
+                            </h:outputText>
+                            
+                            <p:commandButton  value="Select" id = "glCodeSelectButton" name ="glCodeSelectButton" style="float:right;" 
+                            oncomplete="hideGlCodeLov();setGlCodeValues();" >
+                            </p:commandButton>
+                            <h:inputHidden id ="rowIndexOnParent"  value = "#{glCodeLovBean.rowIndex}"/>
+               </p:panel>
+                     <h:inputHidden id="inputGlCode" value="glCodeLOV" />		
+    			 	<h:inputHidden id="lovRecordsPerPageGlCode" value="#{glCodeLovBean.rowsPerPage}" />
+    			 	<h:inputHidden id ="lovGlCode"  value = "#{glCodeLovBean.glCode}"/>
+    			 	<h:inputHidden id ="lovGlCodeDesc"  value = "#{glCodeLovBean.glCodeDesc}"/>
+    			 	
+		</h:form>				        
+							
+	</p:dialog>	
+	<script type="text/javascript">
+		
+		function setGlCodeValues(){
+			var lovNameArray = new Array();
+			var lovValueArray = new Array();
+			lovNameArray[0]='GL_CODE';
+			lovValueArray[0]=document.getElementById('lovGlCode').value;
+			lovNameArray[1]='GL_CODE_DESC';
+			lovValueArray[1]=document.getElementById('lovGlCodeDesc').value;
+			lovNameArray[2]='GL_CODE_ROWINDEX_PARENT';
+			lovValueArray[2]=document.getElementById('rowIndexOnParent').value;
+			
+			
+			
+			<!-- This method need to implement in parent page to populate LOV seletion-->
+			setSelectionGl(document.getElementById('inputGlCode').value,lovNameArray,lovValueArray); 
+		}
+		
+		function showGlCodeLov(){
+			showDialog('glCodeLOV');
+		}	
+		
+		function hideGlCodeLov(){
+			hideDialog('glCodeLOV');
+		}
+		
+		function setFirstPageGlCodeDataTableWidget(){
+			setDataTableToFirstPage('glCodeDataTableWidget');
+			// also select the first row, but only if we have data
+			setDataTableToFirstRow('glCodeDataTableWidget');
+		}
+		
+		function filter_onkeydown(event,buttonName) 
+	    {	
+		 	if(event.keyCode==13 &amp;&amp; document.getElementById(buttonName)) 
+	        {
+				document.getElementById(buttonName).click();	
+	        }
+		 	if( event.keyCode==27){
+		 		PF('glCodeLOV').hide();
+			}
+	    }
+	
+		</script>					    
+</ui:composition>

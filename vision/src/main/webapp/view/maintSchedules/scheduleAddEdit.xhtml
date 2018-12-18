@@ -1,0 +1,374 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	template="../../templates/ui.xhtml">
+
+	<ui:define name="content">
+			<h:form id="breadCrumbForm" prependId="false">
+				<p:breadCrumb model="#{scheduleAddEditBean.breadCrumbTrail}"
+					style="min-width:1000px;max-width:100%;width:auto" ajax="false"
+					immediate="true" styleClass="ui-layout" />
+			</h:form>
+			<!-- Error message display -->
+			<p:scrollPanel style="height:50px;max-width:100%;width:auto;"
+				mode="native" styleClass="ui-layout">
+				<p:messages id="messages" showSummary="false" showDetail="true"
+					autoUpdate="true" />
+			</p:scrollPanel>
+
+			<h:form id="mainForm" prependId="false">
+				<p:panel id="schedulePanel" header="Master Schedule" >
+					
+					<h:panelGrid columns="8" cellspacing="5">
+						<p:outputLabel styleClass="ui-label" value = "Type:*" for="type"/>
+						
+						<p:selectOneMenu disabled="#{!scheduleAddEditBean.hasEditPermission or scheduleAddEditBean.vehicleCount > 0}" id="type" value="#{scheduleAddEditBean.selectedType}" styleClass = "trackDirtySelect" tabindex="4" >
+					    	<f:selectItems value="#{scheduleAddEditBean.availableTypes}" />
+					    	<p:ajax listener="#{scheduleAddEditBean.handleTypeSelect}"   update="client" />
+					    </p:selectOneMenu>
+					    <p:spacer height="1" width="10"/>
+					    
+					    <p:outputLabel styleClass="ui-label" value = "Client:" for="client"/>
+						
+						<p:selectOneMenu  disabled="#{!scheduleAddEditBean.hasEditPermission or !scheduleAddEditBean.enableClientAccounts or scheduleAddEditBean.vehicleCount > 0}" id="client" value="#{scheduleAddEditBean.clientAccountCode}" styleClass = "trackDirtySelect" tabindex="5" >
+							<f:selectItem itemLabel="--Select One--" itemValue=""/>
+					    	<f:selectItems value="#{scheduleAddEditBean.availableClients}" />
+					    </p:selectOneMenu>
+					    <p:spacer height="1" width="10"/>
+					    
+					    <p:outputLabel styleClass="ui-label" value = "Rules:" for="rules"/>
+						<h:outputText id="rules" value = "#{scheduleAddEditBean.ruleCount}" styleClass="alignmentRight" >
+							<f:convertNumber type="number" pattern="#,##0" />
+						</h:outputText>
+						
+						
+						<p:outputLabel styleClass="ui-label" value = "Base Interval:*" for="miles"/>
+						<h:panelGroup>
+							<p:inputNumber disabled="#{!scheduleAddEditBean.hasEditPermission or scheduleAddEditBean.vehicleCount > 0}" id="miles" style="text-align:right"  tabindex="10" 
+									value="#{scheduleAddEditBean.miles}" size="6" thousandSeparator=","
+									maxlength="6"  maxValue="99999"
+									minValue="0"
+									styleClass="trackDirtyChildValues">
+									<p:ajax event="blur" update="taskPanel, miles, :taskDialogForm:taskInterval" />
+							</p:inputNumber> 
+						
+							<h:outputText value=" miles or "/>
+							
+							<p:inputNumber disabled="#{!scheduleAddEditBean.hasEditPermission or scheduleAddEditBean.vehicleCount > 0}" id="months" style="text-align:right"  tabindex="12" 
+									value="#{scheduleAddEditBean.months}" size="1" 
+									maxlength="2"  maxValue="99"
+									minValue="0" 
+									styleClass="trackDirtyChildValues" /> 
+
+							<h:outputText value=" months"/>
+						</h:panelGroup>
+						<p:spacer height="1" width="10"/>
+						<p:outputLabel styleClass="ui-label" value = "Description:*" for="description"/>
+						<p:inputText disabled="#{!scheduleAddEditBean.hasEditPermission }" value="#{scheduleAddEditBean.schedule.description}" tabindex="20" maxlength="80"
+							id="description" size="80" styleClass="trackDirtyValue"/>
+						<p:spacer height="1" width="10"/>
+						
+						<p:outputLabel styleClass="ui-label" value = "Vehicles:" for="vehicles"/>
+						<h:outputText id="vehicles" value = "#{scheduleAddEditBean.vehicleCount}"  styleClass="alignmentRight">
+							<f:convertNumber type="number" pattern="#,##0" />
+						</h:outputText>
+						
+
+						<p:outputLabel styleClass="ui-label" value = "Schedule ID:" for="name"/>
+						<h:outputText id="name" value="#{scheduleAddEditBean.schedule.masterCode}" />
+						
+						<p:spacer height="1" width="10"/>
+						
+ 						<p:outputLabel styleClass="ui-label" value = "Hide:" for="hidden"/>
+						<h:selectBooleanCheckbox disabled="#{!scheduleAddEditBean.hasEditPermission }" id="hidden" value="#{scheduleAddEditBean.hiddenFlag}" tabindex="25"
+									title="Hidden Flag" styleClass = "trackDirtyCheckbox" />
+						
+						
+					</h:panelGrid>
+
+				</p:panel>
+
+
+				<p:panel id="taskPanel" header="Tasks" >
+					<p:panel>
+						<p:dataTable value="#{scheduleAddEditBean.schedule.masterScheduleIntervals}" var="task"
+							scrollable="true" 
+							scrollHeight="#{scheduleAddEditBean.dataTable.height}"
+							rowIndexVar="selectedRowIndex"
+							styleClass="ui-datatable-header-align-dev" >
+							 <f:facet name="header">
+							    <p:commandLink id="addTaskLnk" 
+							            style="float:right; border:thin solid gray; text-decoration:none; cursor:pointer;"
+							            title="Add Task" 
+							            rendered="#{scheduleAddEditBean.hasEditPermission and scheduleAddEditBean.vehicleCount == 0}"  tabindex="30" 
+										immediate="true"
+										disabled="#{scheduleAddEditBean.miles == null or scheduleAddEditBean.miles == 0}"
+										action="#{scheduleAddEditBean.addTask}"
+										update=":taskDialogForm:taskDialogPanel"
+										oncomplete="showDialog('taskVar')" >						   
+							        <p:graphicImage style="border-style: none;" value="/images/action_add.png" rendered="#{scheduleAddEditBean.vehicleCount == 0}"/>
+							        <h:outputLabel  style="vertical-align:5px" value="Add &#160;"  /> 						            							            
+							    </p:commandLink>
+							    <p:spacer height="15px;"/>			                    
+			                </f:facet> 
+			                
+	           				<p:column width="#{scheduleAddEditBean.dataTable.col1}" style="text-align:right;align:right;">
+	           					<f:facet name="header">
+									<h:outputText value="Print Order" style ="font-weight:bold"/>
+								</f:facet>
+	           					<h:outputText value="#{task.order}" />
+
+								<p:spacer width="5" />
+								<p:spacer width="12" rendered="#{selectedRowIndex == scheduleAddEditBean.schedule.masterScheduleIntervals.size()-1 and scheduleAddEditBean.vehicleCount == 0}"/>
+								<p:commandLink disabled="#{!scheduleAddEditBean.hasEditPermission }" id="taskDown" tabindex="31" rendered="#{selectedRowIndex != scheduleAddEditBean.schedule.masterScheduleIntervals.size()-1}"
+		                    			update=":mainForm:taskPanel, :mainForm:selectedIndexId"
+		                   		 		actionListener="#{scheduleAddEditBean.reOrderTask}" 
+		                   		 		onclick="setTaskOrderAction('#{scheduleAddEditBean.TASK_ORDER_MOVEDOWN}');setSelectedIndex('#{selectedRowIndex}')" >
+								    
+								    <p:graphicImage value="/images/arrow_down.png" title="Move Down" 								    	style="text-align:right;align:right;border-style:none;"  height="12" width="12"  />
+								</p:commandLink>
+
+
+								<p:spacer width="5" rendered="#{selectedRowIndex != 0  and scheduleAddEditBean.vehicleCount == 0}" />
+								<p:spacer width="17" rendered="#{selectedRowIndex == 0  and scheduleAddEditBean.vehicleCount == 0}"/>
+		                    	<p:commandLink disabled="#{!scheduleAddEditBean.hasEditPermission }" id="taskUp" tabindex="32" rendered="#{selectedRowIndex != 0}"
+		                    			update=":mainForm:taskPanel, :mainForm:selectedIndexId"
+		                   		 		actionListener="#{scheduleAddEditBean.reOrderTask}" 
+		                   		 		onclick="setTaskOrderAction('#{scheduleAddEditBean.TASK_ORDER_MOVEUP}');setSelectedIndex('#{selectedRowIndex}')">
+		                   		  		 
+									<p:graphicImage style="text-align:right;align:right;border-style:none;" 
+										value="/images/arrow_up.png" title="Move Up" height="12" width="12" />
+								</p:commandLink>
+								
+	           				</p:column>
+	           				<p:column width="#{scheduleAddEditBean.dataTable.col2}" style="text-align:right;align:right;">
+	           					<f:facet name="header">
+									<h:outputText value="Interval" style ="font-weight:bold"/>
+								</f:facet>
+
+	           					<h:outputText value="#{task.intervalMultiple * scheduleAddEditBean.miles}" rendered= "#{task.intervalMultiple != 999999999 and task.intervalMultiple != 0}">
+	           						<f:convertNumber pattern="#,##0" />
+	           					</h:outputText>
+	           					<h:outputText value="No Interval"  rendered= "#{task.intervalMultiple == 999999999}"/>
+	           					<h:outputText value="As Needed"  rendered= "#{task.intervalMultiple == 0}"/>
+							</p:column>
+	           				<p:column width="#{scheduleAddEditBean.dataTable.col3}" style="text-align:center" >
+	           					<f:facet name="header">
+									<h:outputText value="Repeats" style ="font-weight:bold"/>
+								</f:facet>
+	           					
+	           					<h:outputText value="#{task.repeatFlag == 'Y' ? 'Yes' : 'No'}"  />
+							</p:column>
+	
+	           				<p:column width="#{scheduleAddEditBean.dataTable.col4}" >
+	           					<f:facet name="header">
+									<h:outputText value="Task Name" style ="font-weight:bold"/>
+								</f:facet>
+	           					<h:outputText value="#{task.serviceTask.serviceCode}" />
+	           				</p:column>
+	
+	           				<p:column width="#{scheduleAddEditBean.dataTable.col5}" style="word-wrap: break-word;">
+	           					<f:facet name="header">
+									<h:outputText value="Task Description" style ="font-weight:bold"/>
+								</f:facet>
+	           					<h:outputText value="#{task.serviceTask.taskDescription}"  />
+							</p:column>
+							
+	           				<p:column width="#{scheduleAddEditBean.dataTable.col6}" headerText="Cost" style="text-align:right;align:right;">
+	           					<f:facet name="header">
+									<h:outputText value="Cost" style ="font-weight:bold"/>
+								</f:facet>
+	           					<h:outputText value="#{task.serviceTask.cost}" > 
+		           					<f:converter converterId="malDollarValueConverter" />
+	           					</h:outputText>
+							</p:column>
+							
+							<p:column rendered="#{scheduleAddEditBean.hasEditPermission}" width="#{scheduleAddEditBean.dataTable.col7}">
+		                    	<p:commandLink id="showDialog" tabindex="40"
+		                    			update=":taskDialogId, :taskDialogForm:taskDialogPanel, :mainForm:selectedIndexId"
+		                   		 		actionListener="#{scheduleAddEditBean.onRowSelect}" onclick="setSelectedIndex('#{selectedRowIndex}')"
+		                   		 		oncomplete="showDialog('taskVar')"   >
+		                   		  		 
+									<p:graphicImage style="text-align:right;align:right;border-style:none;" rendered="#{scheduleAddEditBean.vehicleCount == 0}"
+										value="/images/action_edit.png" title="Edit" />
+								</p:commandLink>
+								<p:spacer width="5" />
+								<p:commandLink id="deleteLnk" tabindex="45"
+		                    			update=":taskDialogId, :taskDialogForm:taskDialogPanel, :mainForm:selectedIndexId"
+		                   		 		actionListener="#{scheduleAddEditBean.onRowSelect}" onclick="setSelectedIndex('#{selectedRowIndex}')"
+		                   		 		oncomplete="showDialog('confirmDeleteTaskVar')"  >
+								    
+								    <p:graphicImage value="/images/action_delete.png" title="Delete" rendered="#{scheduleAddEditBean.vehicleCount == 0}"
+								    	style="text-align:right;align:right;border-style:none;" />
+								</p:commandLink>
+		                    </p:column>
+							
+							
+						</p:dataTable>	
+
+							
+
+
+					</p:panel>
+					<p:spacer width="1" height="5"/>
+
+				</p:panel>
+
+
+	    		<p:panel id="buttonsPanel">
+					<h:panelGrid id="buttons">
+						<f:facet name="footer">
+							<p:commandButton disabled="#{!scheduleAddEditBean.hasEditPermission }" id="saveButton" tabindex="50" value="Save"
+								action="#{scheduleAddEditBean.save('Y')}" ajax="false"
+								onclick="lockScreen();" />
+							<p:spacer width="10" />
+							<p:commandButton  id="deleteButton" tabindex="60" value="Delete Schedule" type="button" onclick="showDialog('confirmDeleteVar')"
+								disabled="#{!scheduleAddEditBean.hasEditPermission or scheduleAddEditBean.copyMode or scheduleAddEditBean.scheduleId == null or scheduleAddEditBean.ruleCount > 0 or scheduleAddEditBean.vehicleCount > 0}" >
+							</p:commandButton>	
+							<p:spacer width="10" />
+							<p:commandButton id="cancelButton" tabindex="70" value="Cancel"
+								action="#{scheduleAddEditBean.cancel}" ajax="false"
+								onclick="lockScreen();" immediate="true" />
+							<p:spacer width="10" />
+							<p:button id="preview" tabindex="43" value="Preview" disabled="#{scheduleAddEditBean.schedule.mschId == null}"
+								onclick="window.open('#{request.contextPath}/view/maintSchedules/report.xhtml?scheduleId=#{scheduleAddEditBean.scheduleId}'); return false"/>
+						</f:facet>
+					</h:panelGrid>
+              	</p:panel>
+              	
+              	<h:inputHidden id="showWarning" name= "showWarning" value="#{scheduleAddEditBean.showWarning}"/>
+				<h:inputHidden id="dirtyTableId" name ="dirtyTable" value = "#{scheduleAddEditBean.dirtyTable}"/>
+				<h:inputHidden id="selectedIndexId" name ="selectedIndex" value = "#{scheduleAddEditBean.selectedIndex}"/>
+				<h:inputHidden id="taskOrderAction" name ="taskOrderAction" value = "#{scheduleAddEditBean.taskOrderAction}"/>
+
+			</h:form>
+
+
+			<p:dialog id="taskDialogId" header="Task" widgetVar="taskVar"   appendTo="@(body)"
+					modal="true" resizable="false" > 
+				  
+				  
+				<h:form id="taskDialogForm" prependId="false">	
+					<p:panel id="taskDialogPanel">
+						<p:panelGrid columns="2" >
+							<p:outputLabel styleClass="ui-label" value = "Print Order: " for="order"/>
+							<h:outputText id="order" value="#{scheduleAddEditBean.selectedTaskInterval.order}"  size="2" />
+							<p:outputLabel styleClass="ui-label" value = "Interval: " for="taskInterval"/>						
+							<p:selectOneMenu id="taskInterval" value="#{scheduleAddEditBean.selectedInterval}" >
+						    	<f:selectItems value="#{scheduleAddEditBean.availableIntervals}" />
+						    </p:selectOneMenu>
+							<p:outputLabel styleClass="ui-label" value = "Task: " for="task"/>						
+							<p:selectOneMenu id="task" value="#{scheduleAddEditBean.selectedTask}" >
+						    	<f:selectItems value="#{scheduleAddEditBean.availableTasks}" />
+						    </p:selectOneMenu>
+							<p:outputLabel styleClass="ui-label" value = "Repeat: " for="repeat"/>
+							<h:selectBooleanCheckbox id="repeat" value="#{scheduleAddEditBean.selectedRepeatFlag}"
+									title="Repeat Flag" />
+						</p:panelGrid>
+					</p:panel>
+						  
+       				<p:commandButton  id="taskDialogUpdateButton" value="Update" ajax="true" process="@form"
+       					oncomplete="PF('taskVar').hide();" actionListener="#{scheduleAddEditBean.updateTask}"   
+       					update=":mainForm:taskPanel, :mainForm:dirtyTableId"  />			  
+        			<p:spacer width="10" />
+        			<p:commandButton  id="taskDialogCancelButton" value="Cancel"  onclick="PF('taskVar').hide();" type="button" />
+				
+				</h:form>
+
+			</p:dialog>
+
+
+			<p:confirmDialog id="duplicateTaskDialogId" appendTo="@(body)"
+					message="There are duplicate tasks #{scheduleAddEditBean.duplicateTasks}.  Is this OK?" 
+					header="Warning"
+					widgetVar="duplicateTaskDialogVar">
+				<h:form prependId="false">
+					<p:commandButton id="duplicateYes" tabindex="300" value="Yes" action="#{scheduleAddEditBean.save('N')}" ajax="false" />
+					<p:commandButton id="duplicateNo" tabindex="310" value="No" onclick="PF('duplicateTaskDialogVar').hide()" type="button" />
+				</h:form>
+			</p:confirmDialog>
+
+			<p:confirmDialog id="confirmDialogId" message="Are you sure?" header="Confirm Delete" appendTo="@(body)"
+					widgetVar="confirmDeleteVar" resizable="false" width="200" height="60" >    
+					
+	           <h:form prependId="false">
+       				<p:commandButton id="deleteYes" tabindex="400" value="Yes" ajax="false" process="@this"	onclick="hideDialog('confirmDeleteVar');lockScreen();" 
+       					actionListener="#{scheduleAddEditBean.delete}"/>			  
+        			<p:spacer width="10" />
+        			<p:commandButton  tabindex="410" value="No"  onclick="PF('confirmDeleteVar').hide();" type="button"/>
+        			
+        		</h:form>
+	        </p:confirmDialog>
+	        
+	        <p:confirmDialog id="confirmDeleteTaskDialogId" message="Are you sure?" header="Confirm Delete" appendTo="@(body)"
+					widgetVar="confirmDeleteTaskVar" resizable="false" width="200" height="60" onShow="setFocus('deleteTaskYes');" >   
+					
+	           <h:form prependId="false">
+       				<p:commandButton id="deleteTaskYes" value="Yes" process="@this" onclick="hideDialog('confirmDeleteTaskVar');" 
+       					actionListener="#{scheduleAddEditBean.removeTask()}" update=":mainForm:selectedIndexId, :mainForm:taskPanel, :mainForm:dirtyTableId"/>			  
+        			<p:spacer width="10" />
+        			<p:commandButton  value="No"  onclick="PF('confirmDeleteTaskVar').hide();" type="button"/>
+        			
+        		</h:form>
+	        </p:confirmDialog>
+		
+		<style type="text/css">	
+			.ui-datatable-header-align-dev .ui-widget-header{
+				overflow:auto !important;
+			}		
+		</style>
+		
+		<script type="text/javascript">
+
+		// removed body.onload because of duplicate body tags, should use this approach instead on body onload=""
+		$(window).load(function(){
+			showWarning();
+			setFocusThisScreen();
+			initializeDirtyDetection();
+		});
+		
+		function initializeDirtyDetection() {
+			registerIgnoreButton("saveButton");
+			registerIgnoreButton("taskAddButton");
+			registerIgnoreButton("reorderTasksButton");
+			registerIgnoreButton("taskDialogUpdateButton");
+			registerIgnoreButton("taskDialogCancelButton");
+			registerIgnoreButton("showDialog");
+			registerManualField("dirtyTableId");
+			saveDataForDirtyDetection();
+		}
+		function setTaskOrderAction(action){
+			document.getElementById('taskOrderAction').value= action
+		}
+
+		function showWarning(){
+			var showWarning = document.getElementById('showWarning').value;
+			
+			if(showWarning == 'true'){
+				showDialog('duplicateTaskDialogVar');
+			}
+		}
+
+		
+		function setSelectedIndex(index) {
+			document.getElementById('selectedIndexId').value = index;
+		}
+		
+		function setFocusThisScreen(){
+			var showWarning = document.getElementById('showWarning').value;
+			if(showWarning == 'true'){
+				setFocus('duplicateYes');
+			}else{
+				//document.getElementById('type_input').focus();
+				setFocusPF('type');
+			}
+		}
+		
+		
+		</script>
+
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,37 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"   
+    template="../../templates/ui.xhtml" >
+	
+    <ui:define name="content">
+    	    <h:form id="launchUnitUpfitNotesBreadCrumbForm" prependId="false">
+   			    <p:breadCrumb model="#{launchUnitUpfitNotesBean.breadCrumbTrail}" ajax="false" immediate="true" style="min-width:980px;max-width:100%;width:auto;"/>
+   		    </h:form>
+   		        
+		    
+		    <comp:logBook id="logBook" 
+		            entity="#{launchUnitUpfitNotesBean.getSelctedFleetMaster()}" 
+		            logBookTypes="#{launchUnitUpfitNotesBean.logBookType}" 
+		            enableFollowUpDate="true" 
+		            enableAddAndClose="false" 
+		            onClose="logBookCallback();" 
+		            resource="logBook_untprg_edit"/>		     
+		                                    
+			<style type="text/css"/>
+			  
+            <script type="text/javascript" >
+                function logBookCallback(){
+                	setTimeout(function(){window.close()}, 100);
+                }  
+                
+             	$(window).load(function(){
+             		showLogBook();
+    			});	                
+                
+            </script>
+	</ui:define>
+	
+</ui:composition>

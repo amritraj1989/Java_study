@@ -1,0 +1,1116 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="../../templates/ui.xhtml">
+
+	<ui:define name="content">
+			<h:form id="driverAddEditBreadCrumbForm" prependId="false">
+				<p:breadCrumb model="#{driverAddEditBean.breadCrumbTrail}"
+					ajax="false" immediate="true" styleClass="ui-layout" />
+			</h:form>
+
+			<h:form id="driverForm" prependId="false">
+
+				<h:inputHidden id="accountAndRechargeAccountAreDifferent"
+					value="#{driverAddEditBean.accountAndRechargeAccountAreDifferent}" />
+				<h:inputHidden id="similarDriverExistForAccount"
+					value="#{driverAddEditBean.similarDriverExistForAccount}" />
+				<h:inputHidden id="relatedDriverAccountAreDifferent"
+					value="#{driverAddEditBean.relatedDriverAccountAreDifferent}" />
+				<h:inputHidden id="activatedParentWithInactiveChildren"
+					value="#{driverAddEditBean.activatedParentWithInactiveChildren}" />
+				<h:inputHidden id="inactivatedParentWithActiveChildren"
+					value="#{driverAddEditBean.inactivatedParentWithActiveChildren}" />
+				<h:inputHidden id="addressSearchPerformed"
+					value="#{driverAddEditBean.addressSearchPerformed}" />
+				<h:inputHidden id="preferredPhone"
+					value="#{driverAddEditBean.preferredPhone}" />
+				<h:inputHidden id="concatAddress"
+					value="#{driverAddEditBean.concatAddress}" />
+				<h:inputHidden id="allocMultUnitsCostCtrAddressChg"
+					value="#{driverAddEditBean.allocMultUnitsCostCtrAddressChg}" />
+
+				<!-- Error message display -->
+				<p:scrollPanel style="height:50px;" mode="native"
+					styleClass="ui-layout">
+					<p:messages id="messages" showSummary="false"
+						severity="info,error,fatal" showDetail="true" autoUpdate="true" />
+				</p:scrollPanel>
+				<p:panel id="driverPanelMain" header="Driver" styleClass="ui-layout">
+					<p:focus context="driverPanelMain" />
+					<!-- Driver Details Top -->
+					<p:panelGrid cellpadding="5">
+						<p:row>
+							<p:column>
+								<p:outputLabel id="customerAccountLabel" for="customerAccount"
+									value="Client *" style="font-weight:bold" />
+							</p:column>
+							<p:column>
+								<h:panelGroup style="white-space:nowrap;">
+									<f:validateBean disabled="true">
+										<p:inputText id="customerAccount"
+											validator="#{driverAddEditBean.validateCustomClient}"
+											onchange="clearLabels(['accountNameOut','accountCode','accountName']);"
+											onkeydown="setTargetKeyCode(event);" tabindex="1"
+											style="width:102px"
+											value="#{driverAddEditBean.customerLOVParam}"
+											disabled="#{!driverAddEditBean.hasPermission() or driverAddEditBean.viewMode == 'Edit'}">
+
+											<p:ajax event="change" onstart="return proceedAjax();"
+												listener="#{driverAddEditBean.decodeAccountByNameOrCode}"
+												process="@this"
+												oncomplete="setFocusOnLOV('customerAccount' , 'customerAccountLOV')"
+												update="customerAccountLabel, customerAccount, rechargeAccountLabel, rechargeAccountName, rechargeAccountNameOut, accountNameOut, accountCode, accountName, rechargeAccountNameOut, rechargeAccount, rechargeAccountCode, driverGradeGroupCodes, costCentreCode" />
+
+										</p:inputText>
+									</f:validateBean>
+									<p:commandButton id='customerAccountLOV' icon="icon-lov"
+										title="lov"
+										onstart="return hasMinAlphaNumericCharacters($('#customerAccount'));"
+										onclick="onClickCustomerLOV('customer')" tabindex="2"
+										oncomplete="showCustomerLov();" immediate="true"
+										actionListener="#{customerLovBean.fetchLOVDataByCustomerName}"
+										process="@all" dynamic="true" async="true"
+										update=":custLovForm:CUSTOMER_GRID"
+										disabled="#{!driverAddEditBean.hasPermission() or driverAddEditBean.viewMode == 'Edit'}">
+										<f:param name="CUSTOMER_LOV_INPUT" value="customerAccount" />
+									</p:commandButton>
+
+
+									<p:commandButton id="customerSelectAccount"
+										style="display:none;"
+										actionListener="#{driverAddEditBean.decodeAccountByNameOrCode}"
+										process="@this,accountCode" dynamic="true" async="true"
+										immediate="true"
+										update="driverGradeGroupCodes accountName accountNameOut accountCode rechargeAccountName rechargeAccountNameOut rechargeAccountCode, costCentreCode">
+										<f:param name="CUSTOMER_LOV_INPUT" value="accountCode" />
+									</p:commandButton>
+
+
+								</h:panelGroup>
+							</p:column>
+
+							<p:column colspan="4">
+								<f:validateBean disabled="true">
+									<h:outputLabel id="accountNameOut"
+										value="#{driverAddEditBean.selectedExternalAccount.accountName}"
+										styleClass="ui-label" />
+									<h:inputHidden id="accountCode"
+										value="#{driverAddEditBean.selectedExternalAccount.externalAccountPK.accountCode}" />
+
+									<h:inputHidden id="accountName"
+										value="#{driverAddEditBean.selectedExternalAccount.accountName}" />
+								</f:validateBean>
+
+
+							</p:column>
+
+							<p:column>
+								<p:outputLabel for="poolManager" value="Pool Manager"
+									styleClass="ui-label" />
+							</p:column>
+							<p:column>
+								<h:selectBooleanCheckbox id="poolManager"
+									value="#{driverAddEditBean.selectedPoolManager}" tabindex="3"
+									disabled="#{!driverAddEditBean.hasPermission()}" />
+							</p:column>
+
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel for="titleCode" value="Title *"
+									style="font-weight:bold" />
+							</p:column>
+							<p:column>
+								<p:selectOneMenu id="titleCode" style="width:50%; max-Width:50px !important;" tabindex="4"
+									value="#{driverAddEditBean.driver.title}"
+									disabled="#{!driverAddEditBean.hasPermission()}">
+									<f:selectItem itemLabel="-----" itemValue="" />
+									<f:selectItems value="#{driverAddEditBean.titleCodes}"
+										var="title" itemLabel="#{title.titleCode}"
+										itemValue="#{title.titleCode}" />
+								</p:selectOneMenu>
+							</p:column>
+
+							<p:column>
+								<p:outputLabel for="driverForename" value="First Name *"
+									style="font-weight:bold">
+								</p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:inputText id="driverForename" tabindex="5"
+									value="#{driverAddEditBean.driver.driverForename}"
+									disabled="#{!driverAddEditBean.hasPermission()}" maxlength="30" />
+							</p:column>
+
+							<p:column>
+								<p:outputLabel for="driverMiddlename" value="Middle Name"
+									style="font-weight:bold" />
+							</p:column>
+							<p:column>
+								<p:inputText id="driverMiddlename"
+									value="#{driverAddEditBean.driver.driverMiddlename}"
+									tabindex="6" maxlength="80" style="width:50%"
+									disabled="#{!driverAddEditBean.hasPermission()}" />
+							</p:column>
+
+							<p:column>
+								<p:outputLabel for="driverSurname" value="Last Name *"
+									style="font-weight:bold" />
+							</p:column>
+							<p:column>
+								<p:inputText id="driverSurname" tabindex="7"
+									value="#{driverAddEditBean.driver.driverSurname}"
+									maxlength="40" disabled="#{!driverAddEditBean.hasPermission()}" />
+							</p:column>
+
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel for="driverGradeGroupCodes" value="Grade *"
+									style="font-weight:bold" />
+							</p:column>
+							<p:column>
+								<p:selectOneMenu id="driverGradeGroupCodes" tabindex="8"
+									value="#{driverAddEditBean.selectedDriverGrade}"
+									style="width:80%; max-width: 120px !important;"
+									disabled="#{!driverAddEditBean.hasPermission()}">
+									<f:selectItem itemLabel="-----" itemValue="" />
+									<f:selectItems value="#{driverAddEditBean.driverGrades}"
+										var="driverGrade"
+										itemLabel="#{driverGrade.gradeCode} - #{driverGrade.gradeDesc}"
+										itemValue="#{driverGrade}" />
+								</p:selectOneMenu>
+							</p:column>
+
+							<p:column>
+								<p:outputLabel for="email" value="Email"
+									style="font-weight:bold" />
+							</p:column>
+							<p:column>
+								<p:inputText id="email" tabindex="9"
+									value="#{driverAddEditBean.driver.email}" maxlength="80"
+									disabled="#{!driverAddEditBean.hasPermission()}" />
+							</p:column>
+							<p:column>
+								<p:outputLabel for="costCentreCode" value="Cost Center"
+									style="font-weight:bold" />
+							</p:column>
+							<p:column colspan="4">
+								<p:selectOneMenu id="costCentreCode" tabindex="10"
+									value="#{driverAddEditBean.selectedCostCenter}"
+									disabled="#{!driverAddEditBean.hasPermission()}" style="width:100%; max-width:250px !important;" >
+									<f:selectItems value="#{driverAddEditBean.costCenters}"
+										var="costCenter"
+										itemLabel="#{costCenter.costCentreCodesPK.costCentreCode}-#{costCenter.description}"
+										itemValue="#{costCenter}" />
+								</p:selectOneMenu>
+							</p:column>
+
+
+						</p:row>
+
+
+					</p:panelGrid>
+
+					<!-- Driver Details Mid Address-->
+					<p:accordionPanel id="driverAddressNumberPanel" multiple="true"
+						activeIndex="0,1">
+						<p:tab id="driverAddressTab" title="Addresses">
+
+							<p:scrollPanel id="driversAddressScrollPanel"
+								style="width:100%;height:160px" mode="native">
+
+								<h:inputHidden id="clickIndex" name="clickIndex"
+									value="#{driverAddEditBean.selectionIndex}" />
+								<p:dataTable id="driverAddressList" var="driverAddress"
+									value="#{driverAddEditBean.driverAddresses}"
+									widgetVar="driverAddressList1"
+									rowKey="#{driverAddress.addressType.addressType}"
+									selection="#{driverAddEditBean.selectedDriverAddress}"
+									rowIndexVar="addressRowIndex" selectionMode="single">
+
+
+									<p:ajax event="rowSelect"
+										listener="#{driverAddEditBean.onRowSelect}"
+										process="@this, :driverForm:driverAddressNumberPanel:clickIndex"
+										update=":driverForm:driverAddressNumberPanel:addressButtonPanel, :driverForm:driverAddressNumberPanel:clickIndex" />
+
+									<p:column style="width:100px">
+										<f:facet name="header">
+											<h:outputText value="Address Type" style="font-weight:bold" />
+										</f:facet>
+										<h:outputText value="#{driverAddress.addressType.addressType}" />
+									</p:column>
+
+									<p:column style="width:50px">
+										<f:facet name="header">
+											<h:outputText value="Business?" style="font-weight:bold" />
+										</f:facet>
+										<h:outputText value="#{driverAddress.businessInd}" />
+									</p:column>
+
+									<p:column style="width:300px">
+										<f:facet name="header">
+											<h:outputText value="Address Lines" style="font-weight:bold" />
+										</f:facet>
+										<h:outputText value="#{driverAddress.businessAddressLine}" />
+										<h:outputText value=" &lt;br /&gt; "
+											rendered="#{driverAddress.businessAddressLine != null ? 'true': 'false'}"
+											escape="false" />
+										<h:outputText value="#{driverAddress.addressLine1}" />
+										<br />
+										<h:outputText value="#{driverAddress.addressLine2}" />
+									</p:column>
+
+									<p:column style="width:200px">
+										<f:facet name="header">
+											<h:outputText value="Location" style="font-weight:bold" />
+										</f:facet>
+										<h:outputText
+											value="#{driverAddress.townCityCode.townDescription}" />
+										<br />
+										<h:outputText
+											value="#{driverAddress.townCityCode.townCityCodesPK.regionCode} #{driverAddress.postcode}" />
+										<br />
+										<h:outputText
+											value="#{driverAddress.townCityCode.countyCode.countyName} County" />
+										<br />
+										<h:outputText
+											value="#{driverAddress.townCityCode.townCityCodesPK.countryCode}" />
+									</p:column>
+
+									<p:column style="width:125px">
+										<f:facet name="header">
+											<h:outputText value="Geo Code" style="font-weight:bold" />
+										</f:facet>
+										<h:outputText value="#{driverAddress.geoCode}"
+											style="width:100%" />
+									</p:column>
+
+								</p:dataTable>
+							</p:scrollPanel>
+
+							<p:panel id="addressButtonPanel" styleClass="ui-layout">
+								<h:panelGrid id="addressButtons" columns="3">
+									<p:commandButton id="addButton" value="Add" tabindex="11"
+										update="driversAddressScrollPanel, :addressDialog"
+										immediate="true"
+										disabled="#{!driverAddEditBean.hasPermission()}"
+										action="#{driverAddEditBean.addNewAddress}"
+										oncomplete="PF('addressDialogWidget').show();hideAndShowBusinessAddressLine();" />
+									<p:commandButton id="editButton" value="Edit" tabindex="12"
+										action="#{driverAddEditBean.editAddress}"
+										update="driversAddressScrollPanel,:addressDialog,:driverForm:concatAddress,:driverForm:addressSearchPerformed"
+										immediate="false"
+										disabled="#{!driverAddEditBean.hasPermission() or driverAddEditBean.disableUpdateButton}"
+										oncomplete="PF('addressDialogWidget').show();hideAndShowBusinessAddressLine();" />
+									<p:commandButton id="deleteButton" value="Remove" tabindex="13"
+										immediate="true"
+										disabled="#{!driverAddEditBean.hasPermission() or driverAddEditBean.disableDeleteButton}"
+										oncomplete="PF('confirmation').show()" />
+								</h:panelGrid>
+							</p:panel>
+
+						</p:tab>
+
+						<p:tab id="driverPhoneTab" title="Phone Numbers">
+
+							<p:selectOneRadio id="customRadio"
+								value="#{driverAddEditBean.preferredPhone}" layout="custom">
+								<f:selectItem itemLabel="Option 1" itemValue="0" />
+								<f:selectItem itemLabel="Option 2" itemValue="1" />
+								<f:selectItem itemLabel="Option 3" itemValue="2" />
+							</p:selectOneRadio>
+
+							<p:panel>
+
+
+								<h:panelGrid id="phoneNumberGrid" columns="3" width="100%">
+									<h:panelGroup>
+										<p:radioButton id="opt1" for="customRadio" itemIndex="0"
+											tabindex="14" onchange="changePreferred('0')"
+											disabled="#{!driverAddEditBean.hasPermission()}" />
+											<p:spacer width="5px" />
+										<h:outputLabel for="cellNumber" styleClass="ui-label"
+											value="Cell Phone Number" />
+										<h:outputText id="cellPreferred" value=" (Preferred)"
+											style="font-style:italic; vertical-align:top;" />
+										<br />
+										<h:outputText value="(" style="font-size:large" />
+										<p:inputMask id="cellAreaCode"
+											value="#{driverAddEditBean.cellPhone.areaCode}" tabindex="15"
+											mask="999" size="3"
+											disabled="#{!driverAddEditBean.hasPermission()}" />
+										<h:outputText value=") " style="font-size:large" />
+										<p:inputMask id="cellNumber"
+											value="#{driverAddEditBean.cellPhone.number}" tabindex="16"
+											mask="999-9999" size="8"
+											disabled="#{!driverAddEditBean.hasPermission()}" />
+										<h:outputText value=" ext " />
+										<p:inputText
+											value="#{driverAddEditBean.cellPhone.extensionNumber}"
+											tabindex="17" size="8" maxlength="8"
+											disabled="#{!driverAddEditBean.hasPermission()}" />
+									</h:panelGroup>
+									<h:panelGroup>
+										<p:radioButton id="opt2" for="customRadio" itemIndex="1"
+											tabindex="18" onchange="changePreferred('1')"
+											disabled="#{!driverAddEditBean.hasPermission()}" />
+										<p:spacer width="5px" />
+										<h:outputLabel for="homeNumber" styleClass="ui-label"
+											value="Home Phone Number" />
+										<h:outputText id="homePreferred" value=" (Preferred)"
+											style="font-style:italic; vertical-align:top;" />
+										<br />
+										<h:outputText value="(" style="font-size:large" />
+										<p:inputMask id="homeAreaCode"
+											value="#{driverAddEditBean.homePhone.areaCode}" tabindex="19"
+											mask="999" size="3"
+											disabled="#{!driverAddEditBean.hasPermission()}" />
+										<h:outputText value=") " style="font-size:large" />
+										<p:inputMask id="homeNumber"
+											value="#{driverAddEditBean.homePhone.number}" tabindex="20"
+											mask="999-9999" size="8"
+											disabled="#{!driverAddEditBean.hasPermission()}" />
+										<h:outputText value=" ext " />
+										<p:inputText
+											value="#{driverAddEditBean.homePhone.extensionNumber}"
+											size="8" tabindex="21" maxlength="8"
+											disabled="#{!driverAddEditBean.hasPermission()}" />
+									</h:panelGroup>
+									<h:panelGroup>
+										<p:radioButton id="opt3" for="customRadio" itemIndex="2"
+											tabindex="22" onchange="changePreferred('2')"
+											disabled="#{!driverAddEditBean.hasPermission()}" />
+										<p:spacer width="5px" />
+										<h:outputLabel for="workNumber" value="Work Phone Number"
+											styleClass="ui-label" />
+										<h:outputText id="workPreferred" value=" (Preferred)"
+											style="font-style:italic; vertical-align:top;" />
+										<br />
+										<h:outputText value="(" style="font-size:large" />
+										<p:inputMask id="wrokAreaCode"
+											value="#{driverAddEditBean.workPhone.areaCode}" tabindex="23"
+											mask="999" size="3"
+											disabled="#{!driverAddEditBean.hasPermission()}" />
+										<h:outputText value=") " style="font-size:large" />
+										<p:inputMask id="workNumber"
+											value="#{driverAddEditBean.workPhone.number}" tabindex="24"
+											mask="999-9999" size="8"
+											disabled="#{!driverAddEditBean.hasPermission()}" />
+										<h:outputText value=" ext " />
+										<p:inputText
+											value="#{driverAddEditBean.workPhone.extensionNumber}"
+											tabindex="25" size="8" maxlength="8"
+											disabled="#{!driverAddEditBean.hasPermission()}" />
+									</h:panelGroup>
+
+								</h:panelGrid>
+							</p:panel>
+						</p:tab>
+
+					</p:accordionPanel>
+
+
+					<!-- Driver Details Bottom -->
+					<p:panelGrid cellpadding="5">
+						<p:row>
+							<p:column>
+								<p:outputLabel id="rechargeAccountLabel" for="rechargeAccount"
+									value="Recharge Acc *" style="font-weight:bold" />
+							</p:column>
+							<p:column>
+								<h:panelGroup style="white-space:nowrap;">
+									<f:validateBean disabled="true">
+										<p:inputText id="rechargeAccount"
+											validator="#{driverAddEditBean.validateCustomRecharge}"
+											onchange="clearLabels(['rechargeAccountNameOut','rechargeAccountCode','rechargeAccountName']);"
+											tabindex="26" onkeydown="setTargetKeyCode(event);"
+											value="#{driverAddEditBean.rechargeCustomerLOVParam}"
+											disabled="#{!driverAddEditBean.hasPermission()}"
+											style="width:102px">
+
+											<p:ajax event="change" onstart="return proceedAjax();"
+												listener="#{driverAddEditBean.decodeRechargeAccountByNameOrCode}"
+												process="@this"
+												oncomplete="setFocusOnLOV('rechargeAccount', 'rechargeAccountLOV')"
+												update="rechargeAccountLabel, rechargeAccountNameOut, rechargeAccount,rechargeAccountName,rechargeAccountCode" />
+
+										</p:inputText>
+
+									</f:validateBean>
+									<p:commandButton id="rechargeAccountLOV" icon="icon-lov"
+										tabindex="27" title="lov"
+										onclick="onClickCustomerLOV('rechargeCustomer')"
+										onstart="return hasMinAlphaNumericCharacters($('#rechargeAccount'));"
+										oncomplete="showCustomerLov();" immediate="true"
+										actionListener="#{customerLovBean.fetchLOVDataByCustomerName}"
+										process="@this,rechargeAccount,rechargeAccountName"
+										dynamic="true" async="true"
+										update=":custLovForm:CUSTOMER_GRID ,rechargeAccount"
+										disabled="#{!driverAddEditBean.hasPermission()}">
+										<f:param name="CUSTOMER_LOV_INPUT" value="rechargeAccount" />
+									</p:commandButton>
+
+									<p:commandButton id="rechargeCustomerSelectAccount"
+										style="display:none;"
+										actionListener="#{driverAddEditBean.decodeRechargeAccountByNameOrCode}"
+										process="@this,rechargeAccountCode" dynamic="true"
+										async="true" immediate="true"
+										update="rechargeAccountCode rechargeAccountName rechargeAccountNameOut"
+										disabled="#{!driverAddEditBean.hasPermission()}">
+										<f:param name="CUSTOMER_LOV_INPUT" value="rechargeAccountCode" />
+									</p:commandButton>
+								</h:panelGroup>
+							</p:column>
+
+							<p:column colspan="2">
+								<f:validateBean disabled="true">
+									<h:outputLabel id="rechargeAccountNameOut"
+										value="#{driverAddEditBean.selectedRechargeExternalAccount.accountName}"
+										styleClass="ui-label" />
+									<h:inputHidden id="rechargeAccountCode"
+										value="#{driverAddEditBean.selectedRechargeExternalAccount.externalAccountPK.accountCode}" />
+									<h:inputHidden id="rechargeAccountName"
+										value="#{driverAddEditBean.selectedRechargeExternalAccount.accountName}" />
+								</f:validateBean>
+							</p:column>
+							<p:column>
+								<h:outputLabel value="Active Ind" styleClass="ui-label" />
+							</p:column>
+							<p:column>
+								<p:selectOneMenu id="activeInd" styleClass="ui-select-dropdown"
+									tabindex="28"
+									disabled="#{!driverAddEditBean.hasPermission() or driverAddEditBean.hasInactiveParent}"
+									value="#{driverAddEditBean.selectedDriverActiveIndicatorFlag}">
+									<f:selectItem itemLabel="ACTIVE" itemValue="Y" />
+									<f:selectItem itemLabel="INACTIVE" itemValue="N" />
+
+								</p:selectOneMenu>
+							</p:column>
+						</p:row>
+
+						<p:row>
+							<p:column>
+								<p:outputLabel for="title" value="Job Title "
+									style="font-weight:bold" />
+							</p:column>
+
+							<p:column>
+								<p:inputText id="title" tabindex="29" maxlength="30"
+									value="#{driverAddEditBean.driver.jobTitle}"
+									disabled="#{!driverAddEditBean.hasPermission()}" />
+							</p:column>
+
+							<p:column>
+								<p:spacer type="verticle" />
+							</p:column>
+							<p:column>
+							</p:column>
+
+							<p:column>
+								<p:outputLabel for="department" value="Department "
+									style="font-weight:bold" />
+							</p:column>
+							<p:column>
+								<p:inputText id="department" tabindex="30" maxlength="30"
+									value="#{driverAddEditBean.driver.department}"
+									disabled="#{!driverAddEditBean.hasPermission()}" />
+							</p:column>
+
+							<p:column>
+								<p:outputLabel for="payrollNo" value="Employee Ref. No. "
+									style="font-weight:bold" />
+							</p:column>
+							<p:column>
+								<p:inputText id="payrollNo" tabindex="31" maxlength="25"
+									value="#{driverAddEditBean.driver.payrollNo}"
+									disabled="#{!driverAddEditBean.hasPermission()}" />
+							</p:column>
+
+
+						</p:row>
+						<p:row>
+							<p:column>
+								<h:outputLabel for="driverStatus" value="Driver Status"
+									style="font-weight:bold" />
+							</p:column>
+							<p:column>
+								<h:outputLabel id="driverStatus"
+									value="#{driverAddEditBean.driverStatus}" />
+							</p:column>
+
+							<p:column>
+								<p:spacer width="155" height="20" />
+							</p:column>
+							<p:column>
+							</p:column>
+
+
+							<p:column>
+								<p:outputLabel for="manualStatus" value="Manual Status "
+									style="font-weight:bold" />
+							</p:column>
+							<p:column>
+								<p:selectOneMenu id="manualStatus" style="width:85%"
+									tabindex="32" value="#{driverAddEditBean.driver.manualStatus}"
+									disabled="#{!driverAddEditBean.hasPermission()}">
+									<f:selectItem itemLabel="-----"
+										itemValue="#{driverAddEditBean.driver.manualStatus}" />
+									<f:selectItems
+										value="#{driverAddEditBean.driverManualStatuses}" var="status"
+										itemLabel="#{status.statusCode}"
+										itemValue="#{status.statusCode}" />
+								</p:selectOneMenu>
+							</p:column>
+
+							<p:column>
+								<p:outputLabel for="rechargeCode" value="Recharge Code"
+									style="font-weight:bold" />
+							</p:column>
+							<p:column>
+								<p:inputText id="rechargeCode" tabindex="33" maxlength="25"
+									value="#{driverAddEditBean.driver.rechargeCode}"
+									disabled="#{!driverAddEditBean.hasPermission()}" />
+							</p:column>
+						</p:row>
+
+					</p:panelGrid>
+					<h:panelGrid>
+						<f:facet name="footer">
+							<p:commandButton id="submit" tabindex="34" value="Save"
+								action="#{driverAddEditBean.save}" ajax="false"
+								onclick="lockScreen();"
+								disabled="#{!driverAddEditBean.hasPermission()}" />
+							<p:spacer width="10" />
+
+							<p:commandButton id="submitAndStay" tabindex="35"
+								value="Save and Stay" action="#{driverAddEditBean.saveAndStay}"
+								ajax="false" onclick="lockScreen();"
+								disabled="#{!driverAddEditBean.hasPermission()}" />
+							<p:spacer width="10" />
+
+							<p:commandButton id="cancel" tabindex="36" value="Cancel"
+								action="#{driverAddEditBean.cancel}" ajax="false"
+								onclick="lockScreen();" immediate="true" />
+							<p:blockUI block="driverPanelMain" trigger="submit,submitAndStay" />
+						</f:facet>
+					</h:panelGrid>
+				</p:panel>
+
+
+			</h:form>
+
+			<!-- Delete Address confirmation dialog -->
+			<h:form>
+				<p:confirmDialog id="confirmDialog" appendTo="@(body)"
+					message="#{msgs.address_delete_confirmation}" header="Confirm"
+					severity="alert" widgetVar="confirmation">
+					<p:hotkey immediate="true" bind="esc" handler="PF('confirmation').hide()" />
+					<p:commandButton id="confirm" value="Ok" process="@this"
+						update=":driverForm:driverAddressNumberPanel:driverAddressList, :driverForm:driverAddressNumberPanel:addressButtonPanel"
+						oncomplete="PF('confirmation').hide()"
+						actionListener="#{driverAddEditBean.deleteAddress}"
+						immediate="true" />
+					<p:commandButton id="decline" value="Cancel"
+						onclick="PF('confirmation').hide()" type="button" />
+				</p:confirmDialog>
+			</h:form>
+
+
+			<!-- client and recharge account mismatch confirmation dialog -->
+
+			<p:confirmDialog id="clientConfirmDialog" appendTo="@(body)"
+				message="#{msgs.account_mismatch_rechargeAccount}"
+				header="Client Confirm" widgetVar="clientConfirmationWidgetVar">
+				<p:focus context="clientConfirmDialog" />
+
+
+				<h:form prependId="false">
+					<p:hotkey immediate="true" bind="esc"
+						handler="cancelClientConfirmation()" />
+					<p:commandButton id="okClientConfirmation" tabindex="37" value="Ok"
+						action="#{driverAddEditBean.saveAfterConfirmation('confirmAccountAndRechargeAccountAreDifferent')}"
+						ajax="false" />
+					<p:commandButton id="declineClientConfirmation" value="Cancel"
+						onclick="cancelClientConfirmation()" type="button" />
+				</h:form>
+			</p:confirmDialog>
+
+			<!-- Similar Driver driver already exist for account dialog -->
+
+			<p:confirmDialog id="similarDriverConfirmDialog" appendTo="@(body)"
+				message="#{msgs.similar_driver_exist_for_account}"
+				header="Driver Name and Email Confirm"
+				widgetVar="similarDriverConfirmationWidgetVar">
+				<p:focus context="similarDriverConfirmDialog" />
+
+
+				<h:form prependId="false">
+					<p:hotkey immediate="true" bind="esc"
+						handler="cancelSimilarDriverConfirmation()" />
+					<p:commandButton id="okSimilarDriverConfirmation" tabindex="37"
+						value="Ok"
+						action="#{driverAddEditBean.saveAfterConfirmation('confirmIsSimilarDriverAlreadyExistForAccount')}"
+						ajax="false" />
+					<p:commandButton id="declineSimilarDriverConfirmation"
+						value="Cancel" onclick="cancelSimilarDriverConfirmation()"
+						type="button" />
+				</h:form>
+			</p:confirmDialog>
+
+			<!-- Address has changed without clicking the search button -->
+
+			<p:confirmDialog id="addressSearchConfirmDialog" appendTo="@(body)"
+				message="#{msgs.zipcode_search_not_performed}"
+				header="Address Search Confirm"
+				widgetVar="addressSearchConfirmWidgetVar">
+				<p:focus context="addressSearchConfirmDialog" />
+
+				<h:form prependId="false">
+					<p:hotkey immediate="true" bind="esc"
+						handler="PF('addressSearchConfirmWidgetVar').hide()" />
+					<p:commandButton id="okAddressSearchConfirm" tabindex="37"
+						value="Ok" onclick="PF('addressSearchConfirmWidgetVar').hide()"
+						oncomplete="hideAndShowBusinessAddressLine();saveAddressChange();" />
+					<p:commandButton id="declineAddresssSearchConfirm" value="Cancel"
+						onclick="PF('addressSearchConfirmWidgetVar').hide()" type="button" />
+				</h:form>
+
+			</p:confirmDialog>
+
+
+			<!-- Related Driver has different account dialog -->
+
+			<p:confirmDialog id="relatedDriverConfirmDialog" appendTo="@(body)"
+				message="#{msgs.related_driver_account_are_different}"
+				header="Warning" widgetVar="relatedDriverConfirmationWidgetVar">
+				<p:focus context="relatedDriverConfirmDialog" />
+
+				<h:form prependId="false">
+					<p:hotkey immediate="true" bind="esc"
+						handler="cancelRelatedDriverAccountAreDifferentConfirmation()" />
+					<p:commandButton id="okRelatedDriverConfirmation" tabindex="37"
+						value="Ok"
+						action="#{driverAddEditBean.saveAfterConfirmation('confirmIsRelatedDriverAccountAreDifferent')}"
+						ajax="false" />
+					<p:commandButton id="declineRelatedDriverConfirmation"
+						value="Cancel"
+						onclick="cancelRelatedDriverAccountAreDifferentConfirmation()"
+						type="button" />
+				</h:form>
+			</p:confirmDialog>
+
+
+			<!-- Cascade parent driver activation to Related children dialog -->
+
+			<p:confirmDialog id="activateParentConfirmDialog" appendTo="@(body)"
+				message="#{msgs.driver_relationships_activate_parent}"
+				header="Warning" widgetVar="activateParentConfirmWidgetVar">
+				<p:focus context="activateParentConfirmDialog" />
+
+				<h:form prependId="false">
+					<p:hotkey immediate="true" bind="esc"
+						handler="cancelActivateParentConfirm()" />
+					<p:commandButton id="okActivateParentConfirm" tabindex="37"
+						value="Ok"
+						action="#{driverAddEditBean.saveAfterConfirmation('confirmDetermineActivatedParentWithInactiveChildren')}"
+						ajax="false" />
+					<p:commandButton id="declineActivateParentConfirm" value="Cancel"
+						onclick="cancelActivateParentConfirm()" type="button" />
+				</h:form>
+			</p:confirmDialog>
+
+			<!-- Cascade parent driver inactivation to Related children dialog -->
+
+			<p:confirmDialog id="inactivateParentConfirmDialog" appendTo="@(body)"
+				message="#{msgs.driver_relationships_inactivate_parent}"
+				header="Warning" widgetVar="inactivateParentConfirmWidgetVar">
+				<p:focus context="inactivateParentConfirmDialog" />
+
+				<h:form prependId="false">
+					<p:hotkey immediate="true" bind="esc"
+						handler="cancelInactivateParentConfirm()" />
+					<p:commandButton id="okInactivateParentConfirm" tabindex="37"
+						value="Ok"
+						action="#{driverAddEditBean.saveAfterConfirmation('confirmDetermineInactivatedParentWithActiveChildren')}"
+						ajax="false" />
+					<p:commandButton id="declineInactivateParentConfirm" value="Cancel"
+						onclick="cancelInactivateParentConfirm()" type="button" />
+				</h:form>
+			</p:confirmDialog>
+
+			<p:confirmDialog id="costCenterAddressChangeConfirmDialog" appendTo="@(body)"
+				message="#{msgs.driver_multiple_units_cost_center_address_change}"
+				header="Warning"
+				widgetVar="costCenterAddressChangeConfirmDialogWidgetVar">
+				<p:focus context="costCenterAddressChangeConfirmDialog" />
+
+				<h:form prependId="false">
+					<p:hotkey immediate="true" bind="esc"
+						handler="cancelCostCenterAddressChangeConfirm()" />
+					<p:commandButton id="okCostCenterAddressChangeConfirm"
+						tabindex="37" value="Ok"
+						action="#{driverAddEditBean.saveAfterConfirmation('confirmIsDriverWithMultUnitsCostCenterAddressChg')}"
+						ajax="false" />
+					<p:commandButton id="declineCostCenterAddressChangeConfirm"
+						value="Cancel" onclick="cancelCostCenterAddressChangeConfirm()"
+						type="button" />
+				</h:form>
+			</p:confirmDialog>
+
+
+
+			<p:dialog id="addressDialog" header="Address Edit"
+				widgetVar="addressDialogWidget" modal="true" resizable="false"
+				appendTo="@(body)" style="min-width: 500px; max-width: 500px;"
+				closeOnEscape="true">
+
+				<p:ajax event="close" listener="#{driverAddEditBean.dialogClose}" />
+				<p:hotkey immediate="true" bind="esc"
+					handler="PF('addressDialogWidget').hide()" />
+
+				<h:form id="addressForm" prependId="true">
+
+					<p:panel id="addressPanel">
+						<p:focus id="focus"
+							rendered="#{driverAddEditBean.addressDoneClicked=='true'}" />
+						<p:messages id="dialogErrorMsgID" showDetail="false"
+							autoUpdate="true" showSummary="true" globalOnly="false" />
+
+						<f:validateBean disabled="true">
+							<h:panelGrid id="addressEntry" columns="2" cellpadding="5"
+								onkeydown="onkeydownESC(event,PF('addressDialogWidget'));">
+								<p:outputLabel for="dialogAddressLine1" value="Address Type *"
+									styleClass="ui-label" />
+								<p:selectOneMenu id="addressType" style="width:100px"
+									value="#{driverAddEditBean.selectedDriverAddress.addressType.addressType}">
+									<f:selectItems
+										value="#{driverAddEditBean.availableAddressTypes}"
+										var="addressType" itemLabel="#{addressType.addressType}"
+										itemValue="#{addressType.addressType}" />
+								</p:selectOneMenu>
+								<p:outputLabel for="dialogBusinessIndicator"
+									value="Business Address?" styleClass="ui-label" />
+								<h:selectBooleanCheckbox id="dialogBusinessIndicator"
+									onclick="adjustBusinessAddressLine()"
+									value="#{driverAddEditBean.selectedBusinessIndicator}" />
+
+								<p:outputLabel id="businessAddressLineLabel"
+									for="businessAddressLine" value="Business Address Line"
+									styleClass="ui-label" />
+								<p:inputText id="businessAddressLine" style="width:300px"
+									maxlength="80"
+									value="#{driverAddEditBean.selectedDriverAddress.businessAddressLine}" />
+
+								<p:outputLabel for="dialogAddressLine1" value="Address Line 1 *"
+									styleClass="ui-label" />
+								<p:inputText id="dialogAddressLine1" style="width:300px"
+									maxlength="80"
+									value="#{driverAddEditBean.selectedDriverAddress.addressLine1}" />
+								<p:outputLabel for="dialogAddressLine2" value="Address Line 2"
+									styleClass="ui-label" />
+								<p:inputText id="dialogAddressLine2" style="width:300px"
+									maxlength="80"
+									value="#{driverAddEditBean.selectedDriverAddress.addressLine2}" />
+
+								<p:outputLabel for="dialogPostcode" value="Postal Code *"
+									styleClass="ui-label" />
+								<h:panelGroup>
+									<p:inputText id="dialogPostcode" onblur="makeUpperCase(this)"
+										maxlength="25"
+										value="#{driverAddEditBean.selectedDriverAddress.postcode}">
+										<p:ajax event="change"
+											listener="#{driverAddEditBean.clearCityGeo}"
+											update="cityId county state country geoCode dialogCitySelector" />
+									</p:inputText>
+									<p:commandButton id="dialogSearchButton" value="Search"
+										action="#{driverAddEditBean.doZipSearch}"
+										update="dialogCitySelector :driverForm:addressSearchPerformed"
+										process="@this, addressEntry, :driverForm:addressSearchPerformed" />
+								</h:panelGroup>
+								<p:outputLabel for="dialogCitySelector" value="Select City *"
+									styleClass="ui-label" />
+								<p:selectOneListbox id="dialogCitySelector" scrollHeight="100" style="width:300px;"
+									value="#{driverAddEditBean.selectedCityKey}">
+									<f:selectItems value="#{driverAddEditBean.cities}" var="city"
+										itemLabel="#{city.townCityCode.townDescription} (#{city.townCityCode.countyCode.countyName})"
+										itemValue="#{city.uniqueUIKey}" />
+									<p:ajax update="addressEntry" event="change"
+										listener="#{driverAddEditBean.loadLocation}"
+										oncomplete="hideAndShowBusinessAddressLine();" />
+								</p:selectOneListbox>
+								<h:outputText value="City *" styleClass="ui-label" />
+								<h:outputText id="cityId"
+									value="#{driverAddEditBean.selectedDriverAddress.townCityCode.townDescription}" />
+								<h:outputText value="County" styleClass="ui-label" />
+								<h:outputText id="county"
+									value="#{driverAddEditBean.selectedDriverAddress.townCityCode.countyCode.countyName}" />
+								<h:outputText value="State" styleClass="ui-label" />
+								<h:outputText id="state"
+									value="#{driverAddEditBean.selectedDriverAddress.townCityCode.townCityCodesPK.regionCode}" />
+								<h:outputText value="Country" styleClass="ui-label" />
+								<h:outputText id="country"
+									value="#{driverAddEditBean.selectedDriverAddress.townCityCode.townCityCodesPK.countryCode}" />
+								<h:outputText value="Geo Code" styleClass="ui-label" />
+								<h:outputText id="geoCode"
+									value="#{driverAddEditBean.selectedDriverAddress.geoCode}" />
+							</h:panelGrid>
+
+
+							<p:separator id="customSeparator" style="width:100%;" />
+
+							<p:commandButton id="dialogDoneButton" value="Done"
+								update="addressPanel,:driverForm:driverAddressNumberPanel:driverAddressList,:driverForm:driverAddressNumberPanel:addressButtonPanel,:driverForm:driverAddressNumberPanel:clickIndex,:driverForm:addressSearchPerformed"
+								process="@this, addressEntry, :driverForm:addressSearchPerformed"
+								onstart="return compareAddresses();"
+								actionListener="#{driverAddEditBean.processDoneDialog}"
+								oncomplete="handleDoneRequest(xhr, status, args);hideAndShowBusinessAddressLine();" />
+
+							<p:commandButton id="hndDoneButton" style="display:none;"
+								update="addressPanel,:driverForm:driverAddressNumberPanel:driverAddressList,:driverForm:driverAddressNumberPanel:addressButtonPanel,:driverForm:driverAddressNumberPanel:clickIndex,:driverForm:addressSearchPerformed"
+								process="@this, addressEntry, :driverForm:addressSearchPerformed"
+								actionListener="#{driverAddEditBean.processDoneDialog}"
+								oncomplete="handleDoneRequest(xhr, status, args);hideAndShowBusinessAddressLine();" />
+						</f:validateBean>
+					</p:panel>
+				</h:form>
+			</p:dialog>
+
+
+			<div id="CUSTOMER_LOV_DIV">
+				<ui:include src="../lov/customers.xhtml" />
+			</div>
+
+			<div id="inputFieldChecks">
+				<ui:include src="../alert/inputFieldChecks.xhtml" />
+			</div>
+
+			<script>
+		
+			// removed body.onload because of duplicate body tags, should use this approach instead on body onload=""
+			$(window).load(function(){
+				processUserAction();
+				setPreferredPhone();
+			});
+			
+		    var lovCaller;	    
+		    
+		    /**
+		    * Capturing the id of the text field that invoked the LOV.
+		    * The id will be used later to evaluate where the return
+		    * value from the LOV should be stored.
+		    */
+		    function onClickCustomerLOV(caller) {	    	
+		    	lovCaller = caller;	
+		    }
+		    
+		    /**
+		    * The LOV calls this function to pass back the selected
+		    * values to the view's controls.
+		    */
+	 		function setSelection( lovName, nameArray, valueArray){				 			
+	 			if(lovName == 'customerLOV') {
+	 			    for(var i=0; i  &lt; nameArray.length ; i++) {	
+	 				    if(nameArray[i] == "CUSTOMER_CODE") {	
+	 					    if(lovCaller == 'customer') {
+	 						    document.getElementById('accountCode').value = valueArray[i];	
+	 							document.getElementById('rechargeAccountCode').value = valueArray[i];
+	 							document.getElementById('customerAccount').value = valueArray[i];
+	 							document.getElementById('rechargeAccount').value = valueArray[i];
+	 							
+	 							//document.getElementById('eaAccountCodeHasAccount').value = valueArray[i];
+	 						}
+	 						if(lovCaller == 'rechargeCustomer'){
+	 						    document.getElementById('rechargeAccountCode').value = valueArray[i];
+	 						    document.getElementById('rechargeAccount').value = valueArray[i];
+	 						   
+	 							//document.getElementById('eaAccountCodeHasAccount').value = valueArray[i];	 						    		
+	 						}
+	 					} else if(nameArray[i] == "CUSTOMER_NAME") {
+	 					    if(lovCaller == 'customer') {	 						    	
+	 						   document.getElementById('accountName').value = valueArray[i];
+	 						   document.getElementById('rechargeAccountName').value = valueArray[i];
+	 						   $("#accountNameOut").html(valueArray[i]);
+	 							//document.getElementById('customerNameMessage').innerHTML="";
+	 						 }
+	 						 if(lovCaller == 'rechargeCustomer'){
+	 						     document.getElementById('rechargeAccountName').value = valueArray[i];
+	 						     $("#rechargeAccountNameOut").html(valueArray[i]);
+	 						  	//document.getElementById('customerNameMessage').innerHTML="";	
+	 						  
+	 						 }
+	 						    	
+	 					}
+	 				}	
+	 			document.getElementById(lovCaller + 'SelectAccount').click();
+	 			if(lovCaller == 'customer') {
+	 					
+	 					setFocus('customerAccount'); 	
+	 				} else {
+	 				    setFocus('rechargeAccount'); 		 						
+	 				}	 			    
+	 			} 	 					 				
+	 		}
+
+			function handleDoneRequest(xhr, status, args) { 
+		    	var iRow  = document.getElementById('driverAddressNumberPanel:clickIndex').value;
+				if(!args.failure) { 
+					PF('addressDialogWidget').hide();
+		        }
+		    } 
+			
+			function saveAddressChange(){
+				$('[id$=hndDoneButton]').click();
+			}
+			
+			function compareAddresses(){
+				var	addressSearchPerformed = document.getElementById('addressSearchPerformed').value;
+				var addressLine1 = document.getElementById('addressForm:dialogAddressLine1').value;
+				var addressLine2 = document.getElementById('addressForm:dialogAddressLine2').value;
+				var businessLine = document.getElementById('addressForm:businessAddressLine').value;
+				var postCode = document.getElementById('addressForm:dialogPostcode').value;
+				var newAddress = "";
+				newAddress = addressLine1.concat(addressLine2,businessLine,postCode);
+				var previousAddress = document.getElementById('concatAddress').value;
+				if(newAddress != previousAddress){
+					if(addressSearchPerformed == 'false'){
+						showDialog('addressSearchConfirmWidgetVar');
+						return false;
+					}
+					else{
+						return true;
+					}
+				}
+				else{
+					document.getElementById('addressSearchPerformed').value = 'true';
+					return true;
+				}
+			}
+			
+			
+			function processUserAction(){				
+				showConfirmation();			
+		    }
+			
+			function cancelClientConfirmation(){				
+				document.getElementById('accountAndRechargeAccountAreDifferent').value ="false";
+				PF('clientConfirmationWidgetVar').hide();
+			}
+			function cancelSimilarDriverConfirmation(){				
+				document.getElementById('similarDriverExistForAccount').value ="false";
+				PF('similarDriverConfirmationWidgetVar').hide();
+			}
+			function cancelRelatedDriverAccountAreDifferentConfirmation(){				
+				document.getElementById('relatedDriverAccountAreDifferent').value ="false";
+				PF('relatedDriverConfirmationWidgetVar').hide();
+			}
+			function cancelActivateParentConfirm(){				
+				document.getElementById('activatedParentWithInactiveChildren').value ="false";
+				PF('activateParentConfirmWidgetVar').hide();
+			}
+			function cancelInactivateParentConfirm(){				
+				document.getElementById('inactivatedParentWithActiveChildren').value ="false";
+				PF('inactivateParentConfirmWidgetVar').hide();
+			}
+			function cancelCostCenterAddressChangeConfirm(){
+				document.getElementById('allocMultUnitsCostCtrAddressChg').value ="false";
+				PF('costCenterAddressChangeConfirmDialogWidgetVar').hide();
+			}
+			
+			function showConfirmation(){
+				
+				var	accountAndRechargeAccountAreDifferent = document.getElementById('accountAndRechargeAccountAreDifferent').value;
+				var	similarDriverExistForAccount = document.getElementById('similarDriverExistForAccount').value;
+				var	relatedDriverAccountAreDifferent = document.getElementById('relatedDriverAccountAreDifferent').value;
+				var	activatedParentWithInactiveChildren = document.getElementById('activatedParentWithInactiveChildren').value;
+				var	inactivatedParentWithActiveChildren = document.getElementById('inactivatedParentWithActiveChildren').value;
+				var	allocMultUnitsCostCtrAddressChg = document.getElementById('allocMultUnitsCostCtrAddressChg').value;
+				
+				if(accountAndRechargeAccountAreDifferent == 'true'  ){ 		
+					showDialog('clientConfirmationWidgetVar');
+				}else if(similarDriverExistForAccount == 'true'  ){ 
+					showDialog('similarDriverConfirmationWidgetVar');
+				}else if(relatedDriverAccountAreDifferent == 'true'  ){ 
+					showDialog('relatedDriverConfirmationWidgetVar');
+				}else if(activatedParentWithInactiveChildren == 'true'  ){ 
+					showDialog('activateParentConfirmWidgetVar');
+				}else if(inactivatedParentWithActiveChildren == 'true'  ){ 
+					showDialog('inactivateParentConfirmWidgetVar');
+				}else if(allocMultUnitsCostCtrAddressChg == 'true'){
+					showDialog('costCenterAddressChangeConfirmDialogWidgetVar');
+				}
+				
+			}
+	
+			function adjustBusinessAddressLine() {
+			
+				var accountName  = document.getElementById('accountName').value;
+				var businessLine  = document.getElementById('addressForm:businessAddressLine').value;
+				
+				if( businessLine.length == 0 ){
+					if(accountName.length &gt; 0  ){
+						businessLine = "c/o "+ accountName;
+						document.getElementById('addressForm:businessAddressLine').value = businessLine;
+					}
+				}
+				
+				hideAndShowBusinessAddressLine();
+			} 	 
+			
+				
+			function hideAndShowBusinessAddressLine() {
+					
+				var dialogBusinessIndicator = document.getElementById("addressForm:dialogBusinessIndicator").checked;
+				var eleLabel = document.getElementById("addressForm:businessAddressLineLabel");
+				var eleText = document.getElementById("addressForm:businessAddressLine");
+					
+				if(dialogBusinessIndicator == false) {
+					
+					eleLabel.style.display = "none";
+			    	eleText.style.display = "none";
+			    		
+			  	}else {
+			  		eleLabel.style.display = "block";
+			  		eleText.style.display = "block";
+					
+				}
+			} 	
+					
+			function setPreferredPhone() {
+				
+				var radioSelection = document.getElementById("preferredPhone");
+				var cell = document.getElementById("driverAddressNumberPanel:cellPreferred");
+				var home = document.getElementById("driverAddressNumberPanel:homePreferred");
+				var work = document.getElementById("driverAddressNumberPanel:workPreferred");
+				
+				if(radioSelection.value == '0') {
+					cell.style.display = "inline";
+					home.style.display = "none";
+					work.style.display = "none";
+			  	}else if(radioSelection.value == '1') {
+					cell.style.display = "none";
+					home.style.display = "inline";
+					work.style.display = "none";
+				} else if(radioSelection.value == '2') {
+					cell.style.display = "none";
+					home.style.display = "none";
+					work.style.display = "inline";
+				} else {
+					cell.style.display = "none";
+					home.style.display = "none";
+					work.style.display = "none";
+				}
+			} 	
+
+			function changePreferred(type) {
+				document.getElementById("preferredPhone").value=type;
+				setPreferredPhone();
+			}
+		 			
+ 		</script>
+	</ui:define>
+</ui:composition>

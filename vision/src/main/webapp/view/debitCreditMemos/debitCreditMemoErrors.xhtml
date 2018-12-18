@@ -1,0 +1,68 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	template="../../templates/ui.xhtml">
+	
+	<ui:define name="content">
+		<h:form id="breadCrumbForm" prependId="false">
+			<p:breadCrumb model="#{debitCreditMemoErrorsBean.breadCrumbTrail}"  
+			 style="min-width:900px;max-width:100%;width:auto" 
+			ajax="false" immediate="true" styleClass="ui-layout"/>
+		</h:form>
+	
+		<!-- Error message display -->
+		<p:scrollPanel style="height:50px;max-width:100%;width:auto;" 
+			mode="native" styleClass="ui-layout">
+			<p:messages id="messages" showSummary="false" showDetail="true"	autoUpdate="true" />
+		</p:scrollPanel>			
+		
+		<h:form id="mainForm" prependId="false">
+			<p:panel id="mainPanel" header="Error Counts" style="width:auto;height:auto;">   		
+	   		
+	   			<p:panel style="width:auto;height:auto;" visible="#{debitCreditMemoErrorsBean.serviceAvailable}">
+		   			<p:panelGrid cellpadding="5">
+						<p:row>
+							<p:column>
+									<p:outputLabel value="Format Errors: " styleClass="ui-label"/>
+							</p:column>
+							<p:column>
+				           		<p:commandLink action="#{debitCreditMemoErrorsBean.navigateToFormatErrors}" ajax="false">
+									<h:outputText value="#{debitCreditMemoErrorsBean.formatErrorCount}" />
+								</p:commandLink>						
+							</p:column>
+		   				</p:row>
+						<p:row>
+							<p:column>
+									<p:outputLabel value="Business Validation Errors: " styleClass="ui-label"/>
+							</p:column>
+							<p:column>
+				           		<p:commandLink action="#{debitCreditMemoErrorsBean.navigateToBusinessErrors}" ajax="false">
+									<h:outputText value="#{debitCreditMemoErrorsBean.businessErrorCount}" />
+								</p:commandLink>
+							</p:column>
+		   				</p:row>
+		   			</p:panelGrid>
+				</p:panel>
+	   			<p:panel style="width:auto;height:auto;" visible="#{!debitCreditMemoErrorsBean.serviceAvailable}">
+				<br />
+				The service is not available.  Try again later or contact the Help Desk for more details.
+				<br />
+				<br />
+				</p:panel>
+				
+				<br />	   		
+   				<p:commandButton id="cancelBtn" value="Cancel" 
+					    action="#{debitCreditMemoErrorsBean.cancel}" ajax="false"
+					    onclick="lockScreen();" immediate="true"/>			
+				
+			</p:panel>
+			
+		</h:form>
+
+			
+			
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,401 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	template="../../templates/ui.xhtml">
+	
+	<ui:define name="content">
+			<h:form id="dcapitalCostsOverviewForm" prependId="false">
+				<p:breadCrumb model="#{capitalCostsOverviewBean.breadCrumbTrail}"  
+				 style="max-width:100%;width:auto;" 
+				ajax="false" immediate="true" styleClass="ui-layout"/>
+			</h:form>
+			<!-- Error message display --> 
+			<p:scrollPanel style="height:50px;max-width:100%;width:auto;" 
+				mode="native" styleClass="ui-layout">
+				<p:messages id="messages" showSummary="false" showDetail="true"	autoUpdate="true" />
+			</p:scrollPanel>			
+			
+			<h:form id="capitalCostForm" prependId="false">
+				
+	    		<p:panel id="capitalCostHeaderPanel" style="max-width:100%;width:auto;" >
+
+		    		<h:panelGrid columns="3">
+			    		<h:panelGrid columns="5">
+			    			<p:outputLabel value="Client:" styleClass="ui-label"/>
+							<p:spacer width="10" height="1"/>
+		    				<h:outputText value="#{capitalCostsOverviewBean.accountCode}" /> 
+	            			<p:spacer width="10" height="1"/>
+	            			<h:outputText value="#{capitalCostsOverviewBean.accountName}" />
+			    			<p:outputLabel value="Unit:" styleClass="ui-label"/>
+							<p:spacer width="10" height="1"/>
+		    				<h:outputText value="#{capitalCostsOverviewBean.unitNo != null ? capitalCostsOverviewBean.unitNo : capitalCostsOverviewBean.quoteType != null ? 'N/A     ' : null}" /> 
+	            			<p:spacer width="10" height="1"/>
+	            			<h:outputText value="#{capitalCostsOverviewBean.modelDescription}" />
+	            			<p:outputLabel value="Quote Type:" styleClass="ui-label"/>
+	            			<p:spacer width="10" height="1"/>
+	            			<h:outputText value="#{capitalCostsOverviewBean.quoteType}" />
+	            		</h:panelGrid>
+						<p:spacer width="200" height="1"/>
+			    		<h:panelGrid columns="5">
+			    			<p:outputLabel value="Ordering Dealer:" styleClass="ui-label"/>
+							<p:spacer width="10" height="1"/>
+		    				<h:outputText value="#{capitalCostsOverviewBean.orderingDealerCode != null ? capitalCostsOverviewBean.orderingDealerCode : 'N/A'}" /> 
+	            			<p:spacer width="10" height="1"/>
+	            			<h:outputText value="#{capitalCostsOverviewBean.orderingDealerName}" />
+			    			<p:outputLabel value="Delivering Dealer:" styleClass="ui-label"/>
+							<p:spacer width="10" height="1"/>
+		    				<h:outputText value="#{capitalCostsOverviewBean.deliveringDealerCode != null ? capitalCostsOverviewBean.deliveringDealerCode : 'N/A'}" /> 
+	            			<p:spacer width="10" height="1"/>
+	            			<h:outputText value="#{capitalCostsOverviewBean.deliveringDealerName}" />
+							<p:spacer width="1" height="10"/>
+	            		</h:panelGrid>
+            		</h:panelGrid>
+            	</p:panel>
+            		
+				<p:scrollPanel style="width:auto;height:#{capitalCostsOverviewBean.dataTable.height}px"  mode="native" > 
+            		
+					<p:panel id="capitalCostDatatableTablePanel" style="max-width:100%;width:auto;" >
+		                <p:dataTable  style ="width:auto;align:center;" id="capitalCostDatatableTable" var="element" 
+		                	value="#{capitalCostsOverviewBean.rowList}" 
+		                	emptyMessage=""  
+		                	scrollable="false"  
+		                	scrollHeight="#{capitalCostsOverviewBean.dataTable.height}">
+		                	
+		                	<p:columnGroup type="header">
+		                    	<p:row>
+		                        	<p:column rowspan="2" width="#{capitalCostsOverviewBean.dataTable.col1}"  headerText=" Cost Elements"  />                           	
+		                            <p:column colspan="2" width="#{capitalCostsOverviewBean.dataTable.col2}"> 
+							    		<f:facet name="header" >
+								    		<h:panelGrid columns="2" styleClass="panelGrid-compact alignmentRight">
+								    			<p:spacer width="1" height="1" />
+								    			<p:spacer width="80" height="1" />
+								    			<p:outputLabel value="Standard Order:" />
+			   					 				<h:outputText value="#{capitalCostsOverviewBean.standardQuoteInfo != null ? capitalCostsOverviewBean.standardQuoteInfo : ''}" /> 
+								    			<p:outputLabel value="Lease Rate:" style="font-size:smaller;font-weight:normal"/>
+			   					 				<h:outputText value="#{capitalCostsOverviewBean.standardOrderLeaseRate}" style="font-size:smaller;font-weight:normal" 
+			   					 					rendered="#{capitalCostsOverviewBean.standardQuoteInfo != null}">
+			   					 					<f:converter converterId="malDollarValueConverter" />
+			   					 				</h:outputText>
+			   					 				<p:spacer width="1" height="1" rendered= "#{capitalCostsOverviewBean.standardQuoteInfo == null}"/> 
+			   					 				<p:outputLabel value="Global Rate:" style="font-size:smaller;font-weight:normal"/>
+			   					 				<h:outputText value="#{capitalCostsOverviewBean.standardOrderGlobalMin}%" style="font-size:smaller;font-weight:normal" 
+			   					 					rendered="#{capitalCostsOverviewBean.standardQuoteInfo != null}" /> 
+			   					 				<h:outputText value="" rendered="#{capitalCostsOverviewBean.standardQuoteInfo == null}" /> 
+								    			<p:outputLabel value="Base Residual:" style="font-size:smaller;font-weight:normal"/>
+			   					 				<h:outputText value="#{capitalCostsOverviewBean.standardOrderQuote.quotationModel.residualValue}" style="font-size:smaller;font-weight:normal" 
+			   					 					rendered="#{capitalCostsOverviewBean.standardQuoteInfo != null}">
+			   					 					<f:converter converterId="malDollarValueConverter" />
+			   					 				</h:outputText> 
+		            						</h:panelGrid>
+				    					</f:facet>
+									</p:column>	                            	   
+		                            <p:column colspan="2"  width="#{capitalCostsOverviewBean.dataTable.col2}">
+							    		<f:facet name="header" >
+								    		<h:panelGrid columns="2" styleClass="panelGrid-compact alignmentRight">
+								    			<p:spacer width="1" height="1" />
+								    			<p:spacer width="80" height="1" />
+								    			<p:outputLabel value="New/Accepted:" />
+			   					 				<h:outputText value="#{capitalCostsOverviewBean.firstQuoteInfo != null ? capitalCostsOverviewBean.firstQuoteInfo : ''}" />
+								    			<p:outputLabel value="Lease Rate:" style="font-size:smaller;font-weight:normal"/>
+			   					 				<h:outputText value="#{capitalCostsOverviewBean.firstLeaseRate}" style="font-size:smaller;font-weight:normal" 
+			   					 					rendered="#{capitalCostsOverviewBean.firstQuoteInfo != null}">
+			   					 					<f:converter converterId="malDollarValueConverter" />
+			   					 				</h:outputText> 
+			   					 				<h:outputText value="" rendered="#{capitalCostsOverviewBean.firstQuoteInfo == null}"/>
+								    			<p:outputLabel value="Global Rate:" style="font-size:smaller;font-weight:normal"/>
+			   					 				<h:outputText value="#{capitalCostsOverviewBean.firstGlobalMin}%" style="font-size:smaller;font-weight:normal" 
+			   					 					rendered="#{capitalCostsOverviewBean.firstQuoteInfo != null}"/>
+			   					 				<h:outputText value="" rendered="#{capitalCostsOverviewBean.firstQuoteInfo == null}"/>
+								    			<p:outputLabel value="Base Residual:" style="font-size:smaller;font-weight:normal"/>
+			   					 				<h:outputText value="#{capitalCostsOverviewBean.firstQuote.quotationModel.residualValue}" style="font-size:smaller;font-weight:normal" 
+			   					 					rendered="#{capitalCostsOverviewBean.firstQuoteInfo != null}">
+			   					 					<f:converter converterId="malDollarValueConverter" />
+			   					 				</h:outputText> 
+		            						</h:panelGrid>
+				    					</f:facet>
+		                            </p:column>
+		                            <p:column colspan="1" width="#{capitalCostsOverviewBean.dataTable.col3}"  headerText="PO" />
+		                           	<p:column colspan="1" width="#{capitalCostsOverviewBean.dataTable.col5}"  headerText="Invoice" />	                             
+		                            <p:column colspan="1" width="#{capitalCostsOverviewBean.dataTable.col4}"  headerText="Recharge" />
+		                            <p:column colspan="2"  width="#{capitalCostsOverviewBean.dataTable.col2}">
+							    		<f:facet name="header" >
+								    		<h:panelGrid columns="2" styleClass="panelGrid-compact alignmentRight">
+								    			<p:spacer width="1" height="1" />
+								    			<p:spacer width="80" height="1" />
+								    			<p:outputLabel value="Finalized:" />
+								    			<h:outputText value="#{capitalCostsOverviewBean.finalizedQuoteInfo != null ? capitalCostsOverviewBean.finalizedQuoteInfo : ''}" />
+								    			<p:outputLabel value="Lease Rate:" style="font-size:smaller;font-weight:normal"/>
+			   					 				<h:outputText value="#{capitalCostsOverviewBean.finalizedLeaseRate}" style="font-size:smaller;font-weight:normal" 
+			   					 					rendered="#{capitalCostsOverviewBean.finalizedQuoteInfo != null}">
+			   					 					<f:converter converterId="malDollarValueConverter" />
+			   					 				</h:outputText> 
+			   					 				<h:outputText value="" rendered="#{capitalCostsOverviewBean.finalizedQuoteInfo == null}"/>
+								    			<p:outputLabel value="Global Rate:" style="font-size:smaller;font-weight:normal"/>
+			   					 				<h:outputText value="#{capitalCostsOverviewBean.finalizedGlobalMin}%" style="font-size:smaller;font-weight:normal" 
+			   					 					rendered="#{capitalCostsOverviewBean.finalizedQuoteInfo != null}"/> 
+			   					 				<h:outputText value="" rendered="#{capitalCostsOverviewBean.finalizedQuoteInfo == null}"/> 
+								    			<p:outputLabel value="Base Residual:" style="font-size:smaller;font-weight:normal"/>
+			   					 				<h:outputText value="#{capitalCostsOverviewBean.finalizedQuote.quotationModel.residualValue}" style="font-size:smaller;font-weight:normal" 
+			   					 					rendered="#{capitalCostsOverviewBean.finalizedQuoteInfo != null}">
+			   					 					<f:converter converterId="malDollarValueConverter" />
+			   					 				</h:outputText> 
+		            						</h:panelGrid>
+				    					</f:facet>
+		                            </p:column> 
+		                        </p:row>
+		                        <p:row>
+		                          	<p:column headerText="Mike Albert" width="#{capitalCostsOverviewBean.dataTable.col4}"  />
+		                            <p:column headerText="Client" width="#{capitalCostsOverviewBean.dataTable.col4}" /> 
+		                            <p:column headerText="Mike Albert" width="#{capitalCostsOverviewBean.dataTable.col4}"  />
+		                            <p:column headerText="Client" width="#{capitalCostsOverviewBean.dataTable.col4}"  />
+		                            <p:column headerText="" width="#{capitalCostsOverviewBean.dataTable.col3}"  />
+		                            <p:column headerText="" width="#{capitalCostsOverviewBean.dataTable.col5}"  />	                            
+		                            <p:column headerText="" width="#{capitalCostsOverviewBean.dataTable.col4}"  />	                               
+		                            <p:column headerText="Mike Albert" width="#{capitalCostsOverviewBean.dataTable.col4}"  />
+		                            <p:column headerText="Client" width="#{capitalCostsOverviewBean.dataTable.col4}"  />
+		                        </p:row>
+		                    </p:columnGroup>
+		                	
+		                    <p:column  width="#{capitalCostsOverviewBean.dataTable.col1}"  style="#{(element.isFooter ? 'text-align:right;font-weight:bold': 'text-align:left;background: #F0F0F0;')}" styleClass="#{(element.isFooter ? 'ui-state-default': '')}"  >  
+		                    	<h:outputLabel value="&#183;" rendered="#{element.isAccessoryData}" /> 
+		                    	<h:outputLabel value="#{element.name}"/> 
+							</p:column>
+		                    <p:column width="#{capitalCostsOverviewBean.dataTable.col4}"  
+		                    style="text-align:right;align:right;#{(element.isFooter ? 'font-weight:bold': '')}" styleClass="#{(element.isFooter ? 'ui-state-default': '')}"  >     
+		                    	<h:outputLabel style="text-align:right;align:right" value="#{element.standardOrderDealCost}" rendered="#{element.standardOrderDealCost != 0.0}" >
+		                        	<f:convertNumber pattern="#,##0.00" />
+		                        </h:outputLabel> 
+		                   	</p:column> 
+		                    <p:column  width="#{capitalCostsOverviewBean.dataTable.col4}"  
+		                    style="text-align:right;align:right;#{(element.isFooter ? 'font-weight:bold': '')}"  styleClass="#{(element.isFooter ? 'ui-state-default': '')}"> 
+		                   		<h:outputLabel  value="#{element.standardOrderCustomerCost}" rendered="#{element.standardOrderCustomerCost != 0.0}" >
+		                        	<f:convertNumber pattern="#,##0.00" />
+		                        </h:outputLabel>                       		                       
+		                    </p:column>  
+		                    <p:column  width="#{capitalCostsOverviewBean.dataTable.col4}" 
+		                     style="text-align:right;align:right;#{(element.isFooter ? 'font-weight:bold': '')}" styleClass="#{(element.isFooter ? 'ui-state-default': '')}" >   
+		                    	<h:outputLabel value="#{element.firstQuoteDealCost}" rendered="#{element.firstQuoteDealCost != 0.0}" >
+		                       		<f:convertNumber pattern="#,##0.00" />
+		                       	</h:outputLabel>                        	                 
+		                   	</p:column>   
+		                    <p:column width="#{capitalCostsOverviewBean.dataTable.col4}"   
+		                     style="text-align:right;align:right;#{(element.isFooter ? 'font-weight:bold': '')}" styleClass="#{(element.isFooter ? 'ui-state-default': '')}">  
+		                   		<h:outputLabel value="#{element.firstQuoteCustomerCost}" rendered="#{element.firstQuoteCustomerCost != 0.0}" >
+		                       		<f:convertNumber pattern="#,##0.00" />
+		                        </h:outputLabel>
+		                    </p:column>
+		                    <p:column width="#{capitalCostsOverviewBean.dataTable.col3}"
+		                    	style="text-align:center;align:center;#{(element.isFooter ? 'font-weight:bold': '')}"  styleClass="#{(element.isFooter ? 'ui-state-default': '')}">
+		                    	<p:graphicImage width="12" height="12" id= "poImgMain" rendered="#{element.poNumber != null}"   style="border-style: none;" value="/images/checkmark_icon.png" />
+           								  <p:tooltip  id="hoverPanelMainPO" for="poImgMain" showEffect="blind"  >  
+							        		<h:panelGrid columns="2" >	
+												<h:outputLabel style="white-space:nowrap;" styleClass="ui-label" value="PO Number:" />
+								 				<h:outputText  value="#{element.poNumber}"    />
+								 				<h:outputLabel style="white-space:nowrap;" styleClass="ui-label" value="PO Released:"  />
+								 				<h:outputText  value="#{element.poOrderDate}" >
+								 					<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+								 				</h:outputText>
+								 				<h:outputLabel style="white-space:nowrap;" styleClass="ui-label" value="Vendor:"  />
+								 				<h:outputText  value="#{element.accountInfo}"  />				
+							 				</h:panelGrid>
+							    		</p:tooltip >
+		                    </p:column>       
+		                   	<p:column width="#{capitalCostsOverviewBean.dataTable.col5}"  
+		                   	 style="text-align:right;align:right;#{(element.isFooter ? 'font-weight:bold': '')}" styleClass="#{(element.isFooter ? 'ui-state-default': '')}">
+		                         
+		                    	<h:outputLabel value="#{element.invoiceCost}" rendered="#{element.invoiceCost != 0.0}" >
+		                        	<f:convertNumber pattern="#,##0.00" />
+		                        </h:outputLabel>
+
+		                   	 	 <p:graphicImage style="text-align:right;align:right;"
+										value="/images/reclaim_icon.png"  title="#{element.hasReclaim ? 'Submitted Reclaim' : ''}"  rendered="#{element.hasReclaim ? true : false}"/>
+		                   	 	 
+		                   	 	 <p:spacer width="16" height="8" rendered="#{element.hasReclaim ? false : true}"/>
+
+		                   	 	 		                        
+		                   	</p:column> 
+		                   
+		                   	<p:column width="#{capitalCostsOverviewBean.dataTable.col4}"  
+		                   	 style="text-align:right;align:right;#{(element.isFooter ? 'font-weight:bold': '')}" styleClass="#{(element.isFooter ? 'ui-state-default': '')}"> 
+		                    	<h:outputLabel value="#{element.rechargeAmt}" rendered="#{element.rechargeAmt != 0.0}" >
+		                        	<f:convertNumber pattern="#,##0.00" />
+		                        </h:outputLabel>
+		                   	</p:column>   
+		                   	<p:column width="#{capitalCostsOverviewBean.dataTable.col4}"  
+		                   	 style="text-align:right;align:right;#{(element.isFooter ? 'font-weight:bold': '')}"  styleClass="#{(element.isFooter ? 'ui-state-default': '')}">  
+		                    	<h:outputLabel value="#{element.finalizedQuoteDealCost}" rendered="#{element.finalizedQuoteDealCost != 0.0}" >
+		                       		<f:convertNumber pattern="#,##0.00" />
+		                        </h:outputLabel>
+		                   	</p:column>  
+		                    <p:column width="#{capitalCostsOverviewBean.dataTable.col4}"  
+		                     style="text-align:right;align:right;#{(element.isFooter ? 'font-weight:bold': '')}" styleClass="#{(element.isFooter ? 'ui-state-default': '')}">  
+		                    	<h:outputLabel value="#{element.finalizedQuoteCustomerCost}" rendered="#{element.finalizedQuoteCustomerCost != 0.0}"  >
+		                       		<f:convertNumber pattern="#,##0.00" />
+		                     	</h:outputLabel>
+		                   	</p:column>
+		                   		
+		                </p:dataTable>
+		              </p:panel>
+	               
+	               <p:panel id= "amedmentHistoryPanel" >
+	             	              	
+	              	<ui:repeat   value= "#{capitalCostsOverviewBean.amendmentHistoryList}"   
+	              		rendered="#{fn:length(capitalCostsOverviewBean.amendmentHistoryList) gt 0}"    	var = "mainQuote"  >
+	              			<p></p>
+	              			<p:dataTable id= "amendTable2" value= "#{mainQuote.afterMarketEquipments}" var = "afterMarket" >
+	              			 	<f:facet name="header">
+	              			 	<h:panelGrid styleClass="panelGrid-compact">
+	              			 	
+  
+		              			 	<h:panelGrid columns="11" styleClass="panelGrid-compact alignmentLeft">
+              			 				<h:outputText value= "#{mainQuote.getAmendmentTypeDescription() }"  rendered="#{mainQuote.amendmentSource eq 'O' ? false:true}"/>
+              							<p:spacer width="40" height="1"/>
+										<h:panelGroup>
+	           								<p:outputLabel value="Quote: " />
+	           								<h:outputText value= "#{mainQuote.quote}" />
+										</h:panelGroup>										
+              							<p:spacer width="40" height="1"/>
+			              				<h:panelGroup>
+				              				<p:outputLabel value="Effective Date: " />
+				              				<h:outputText value= "#{mainQuote.effectiveDate}" >
+				              					<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+				              				</h:outputText>
+			              				</h:panelGroup>
+			              				<p:spacer width="40" height="1"/>
+			              				<h:panelGroup>
+				              				<h:outputLabel styleClass="ui-label"  value="Effective Period: " rendered="#{mainQuote.amendmentSource eq 'O' ? false:true}" /> 
+			           						<h:outputText value="#{mainQuote.effectivePeriod}" rendered="#{mainQuote.amendmentSource eq 'O' ? false:true}" />	 
+			              				</h:panelGroup>		
+		           						<p:spacer width="40" height="1"/>
+										<h:panelGroup>
+			           						<p:outputLabel styleClass="ui-label" value="Lease Rate: " />
+				              				<h:outputText   value="#{mainQuote.leaseRate}">
+				              					<f:converter converterId="malDollarValueConverter" />
+				              				</h:outputText> 
+										</h:panelGroup>
+			              				<p:spacer width="40" height="1"/>
+										<h:panelGroup>
+				              				<p:outputLabel styleClass="ui-label" value="Created By: " />
+				              				<h:outputLabel  value="#{mainQuote.createdBy}"  /> 
+										</h:panelGroup>
+									</h:panelGrid>		           						             			         
+	              			 	</h:panelGrid>
+        						</f:facet>
+	              					 <p:column width="57%"> 
+           								<f:facet name="header">                  
+           									<p:outputLabel styleClass="ui-label">Element</p:outputLabel>
+	              						</f:facet>
+           								
+										<h:outputText value="&#8211;" styleClass="amendment-ind" rendered="#{afterMarket.amendmentTypeInd eq '-'}"/>
+										<h:outputText value="+" styleClass="amendment-ind" rendered="#{afterMarket.amendmentTypeInd eq '+'}"/>
+
+
+           								<p:spacer width="10" height="1"/>
+           								<h:outputText value="#{afterMarket.elementDesc}"/>
+           								
+           								<f:facet name="footer" >  
+           									<h:outputText value="Total Cost to Place In Service:" styleClass="ui-label" />
+            							</f:facet>
+            							<h:panelGroup rendered="#{mainQuote.noChangeInfo != null}" >
+            								<h:outputText value="#{mainQuote.noChangeInfo}"  />
+            								
+           									
+           								</h:panelGroup>
+            							  
+           							</p:column>
+           							<p:column width="#{capitalCostsOverviewBean.dataTable.col4}">  
+           								<f:facet name="header">                  
+           									Monthly         
+           								</f:facet>
+           								<h:outputText  rendered="#{afterMarket.rental!= null}" value="#{afterMarket.rental!= null ? afterMarket.rental:0}" styleClass="alignmentRight">
+           									<f:converter converterId="malDollarValueConverter" />
+           								</h:outputText>
+           							</p:column>
+           							<p:column width="#{capitalCostsOverviewBean.dataTable.col3}" style="text-align:center">  
+           								<f:facet name="header">                  
+           									PO          
+           								</f:facet>
+           								 <p:graphicImage width="12" height="12" id= "poImg" rendered="#{afterMarket.poNumber != null}"  style="border-style: none;" value="/images/checkmark_icon.png" />
+           								  <p:tooltip  id="hoverPanel" for="poImg" showEffect="blind"  >  
+							        		<h:panelGrid columns="2"    >	
+												<h:outputLabel style="white-space:nowrap;" styleClass="ui-label" value="PO Number:" />
+								 				<h:outputText  value="#{afterMarket.poNumber}"  styleClass="alignmentRight"  />
+								 				<h:outputLabel style="white-space:nowrap;" styleClass="ui-label" value="PO Released:"  />
+								 				<h:outputText  value="#{afterMarket.poOrderDate}" styleClass="alignmentRight" >
+								 					<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+								 				</h:outputText>
+								 				<h:outputLabel style="white-space:nowrap;" styleClass="ui-label" value="Vendor:"  />
+								 				<h:outputText  value="#{afterMarket.accountInfo}" styleClass="alignmentRight" />				
+							 				</h:panelGrid>
+							    		</p:tooltip > 		
+           							</p:column>
+           							<p:column width="#{capitalCostsOverviewBean.dataTable.col5}" >  
+           								<f:facet name="header">                  
+           									Invoice         
+           								</f:facet>
+           								<h:outputLabel  rendered="#{afterMarket.invoiceAmt != null and afterMarket.invoiceAmt != 0.0}"    value="#{afterMarket.invoiceAmt}" styleClass="alignmentRight">
+           									<f:converter converterId="malDollarValueConverter" />
+           									<p:spacer width="16" height="8" />
+           								</h:outputLabel>
+           							</p:column>
+           							<p:column width="#{capitalCostsOverviewBean.dataTable.col4}">  
+           								<f:facet name="header">                  
+           									Recharge                
+           								</f:facet>
+           								<h:outputText rendered="#{afterMarket.rechargeAmt != null and afterMarket.rechargeAmt != 0.0}"   value="#{afterMarket.rechargeAmt}" styleClass="alignmentRight">
+		           							<f:converter converterId="malDollarValueConverter" />
+		           						</h:outputText>
+           							</p:column>
+           							<p:column width="#{capitalCostsOverviewBean.dataTable.col4}">  
+           								<f:facet name="header">                  
+           									Mike Albert            
+           								</f:facet>
+           								<h:outputText rendered="#{afterMarket.totalRental != null}"  value="#{afterMarket.totalRental}" styleClass="alignmentRight">
+		           							<f:converter converterId="malDollarValueConverter" />
+		           						</h:outputText>
+		           						<f:facet name="footer">  
+               								<h:outputText  value="#{mainQuote.dealCost != null ? mainQuote.dealCost:0}" styleClass="ui-label alignmentRight">
+		           								<f:converter converterId="malDollarValueConverter" />
+		           							</h:outputText>
+            							</f:facet>  
+           							</p:column>
+           							<p:column width="#{capitalCostsOverviewBean.dataTable.col4}">  
+           								<f:facet name="header">                  
+           									Client            
+           								</f:facet>
+           								<h:outputText rendered="#{afterMarket.totalRental != null}"   value="#{afterMarket.totalRental != null ? afterMarket.totalRental:0}" styleClass="alignmentRight" >
+		           							<f:converter converterId="malDollarValueConverter" />
+		           						</h:outputText>
+		           						<f:facet name="footer">  
+               								<h:outputText  value="#{mainQuote.customerCost != null ? mainQuote.customerCost:0}" styleClass="ui-label alignmentRight" >
+		           								<f:converter converterId="malDollarValueConverter" />
+		           							</h:outputText>
+            							</f:facet>  
+           							</p:column>
+           							
+	              				</p:dataTable>
+	              		
+	              		
+	              	</ui:repeat>
+	              	
+	              </p:panel>
+				</p:scrollPanel>	              
+	              
+	            <h:panelGrid>
+					<f:facet name="footer">
+						
+						<p:commandButton id="PostInvoice" tabindex="36" value="Post Invoice"	actionListener="#{capitalCostsOverviewBean.postInvoice}" />
+						<p:commandButton id="cancel" tabindex="36" value="Cancel"	action="#{capitalCostsOverviewBean.cancel}" ajax="false" onclick="lockScreen();" immediate="true" />
+						
+					</f:facet>
+				</h:panelGrid>
+	              
+	              
+	              
+			</h:form>
+
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,135 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+		<p:panelGrid cellpadding="5">
+			<p:row>
+				<p:column>
+					<p:commandLink id="unitDetailLink" styleClass="ui-icon ui-icon-triangle-1-e" style="float:left; color: green; "
+						onclick="return onUnitDetailClick()" />				
+					<h:outputLabel for="unit" styleClass="ui-label" onclick="onUnitDetailClick();" style="cursor:pointer;" value="Unit " />
+				</p:column>
+				<p:column>			
+					<h:outputLabel id="unit" onclick="return onUnitDetailClick()"
+						value="#{vehicleDisplayBean.vehicleInfo.unitNo} - #{vehicleDisplayBean.vehicleInfo.unitDescription}" />
+				</p:column>
+				<p:column>	
+					<h:outputLabel for="productType" styleClass="ui-label"
+						value="Product Type " />
+				</p:column>
+				<p:column>
+					<h:outputLabel id="productType"
+						value="${vehicleDisplayBean.vehicleInfo.productType}" />
+				</p:column>
+				<p:column>
+					<h:outputLabel for="client" styleClass="ui-label" value="Client " />
+				</p:column>
+				<p:column>
+					<h:outputLabel id="client"
+						value="#{vehicleDisplayBean.vehicleInfo.clientAccountNumber} - #{vehicleDisplayBean.vehicleInfo.clientAccountName}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column colspan="6">
+					<p:panel id="unitDetail" toggleable="true" collapsed="false"
+						visible="false" widgetVar="unitDetailPanel"
+						style="border-color: green">
+						<p:panelGrid cellpadding="5">
+							<p:row>
+								<p:column>
+									<h:outputLabel for="vin" styleClass="ui-label" value="VIN " />
+								</p:column>
+								<p:column>
+									<h:outputLabel id="vin"
+										value="#{vehicleDisplayBean.vehicleInfo.vin}" />
+								</p:column>
+								<p:column>
+									<h:outputLabel for="licensePlateNo" styleClass="ui-label"
+										value="License Plate No " />
+								</p:column>
+								<p:column>
+									<h:outputLabel id="licensePlateNo"
+										value="#{vehicleDisplayBean.vehicleInfo.licensePlateNo}" />
+								</p:column>
+								<p:column>
+									<h:outputLabel for="fleetRefNo" styleClass="ui-label"
+										value="Fleet Ref No " />
+								</p:column>
+								<p:column>
+									<h:outputLabel id="fleetRefNo"
+										value="#{vehicleDisplayBean.vehicleInfo.clientFleetReferenceNumber}" />
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<h:outputLabel for="driver" styleClass="ui-label"
+										value="Driver " />
+								</p:column>
+								<p:column>
+									<h:outputLabel id="driver"
+										value="#{vehicleDisplayBean.vehicleInfo.driverFullNameDisplay} " />
+								</p:column>
+								<p:column>
+									<h:outputLabel for="driverCostCenter" styleClass="ui-label"
+										value="Driver Cost Center " />
+								</p:column>
+								<p:column>
+									<h:outputLabel id="driverCostCenter"
+										value="#{vehicleDisplayBean.vehicleInfo.driverCostCenter}" />
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+					</p:panel>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>
+					<h:outputLabel for="contractStartDate" styleClass="ui-label"
+						value="Start Date " />
+
+				</p:column>
+				<p:column>
+					<h:outputLabel id="contractStartDate"
+						value="#{vehicleDisplayBean.vehicleInfo.contractStartDate}">
+						<f:convertDateTime pattern="MM/dd/yyyy" />
+					</h:outputLabel>
+				</p:column>
+				<p:column>
+					<h:outputLabel for="contractEndDate" styleClass="ui-label"
+						value="End Date " />
+				</p:column>
+				<p:column>
+					<h:outputLabel id="contractEndDate"
+						value="#{vehicleDisplayBean.vehicleInfo.contractEndDate}">
+						<f:convertDateTime pattern="MM/dd/yyyy" />
+					</h:outputLabel>
+				</p:column>
+				<p:column>
+				</p:column>
+				<p:column>
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+
+
+	<script type="text/javascript">
+		var isUnitDetailCollapsed = true;
+
+		function onUnitDetailClick() {
+			if (!isUnitDetailCollapsed) {
+				$('[id$=unitDetail]').hide();
+				$('[id$=unitDetailLink]').attr("class", "ui-commandlink ui-icon ui-icon-triangle-1-e");
+				isUnitDetailCollapsed = true;
+			} else {
+				$('[id$=unitDetail]').show();
+				$('[id$=unitDetailLink]').attr("class", "ui-commandlink ui-icon ui-icon-triangle-1-s");
+				isUnitDetailCollapsed = false;
+			}
+			return false;
+		}
+				
+	</script>
+
+</ui:composition>

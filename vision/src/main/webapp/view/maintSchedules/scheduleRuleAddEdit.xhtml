@@ -1,0 +1,221 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	template="../../templates/ui.xhtml">
+	
+	<ui:define name="content">
+			<h:form id="breadCrumbForm" prependId="false">
+				<p:breadCrumb model="#{scheduleRuleAddEditBean.breadCrumbTrail}"
+					style="min-width:1000px;max-width:100%;width:auto" ajax="false"
+					immediate="true" styleClass="ui-layout" />
+			</h:form>
+			<!-- Error message display -->
+			<p:scrollPanel style="height:50px;max-width:100%;width:auto;"
+				mode="native" styleClass="ui-layout">
+				<p:messages id="messages" showSummary="false" showDetail="true"
+					autoUpdate="true"  />
+			</p:scrollPanel>
+
+			<h:form id="scheduleRuleAddEditBeanForm" prependId="false">
+				<p:panel id="pagePanel" header="Rule" >
+					<p:focus context="pagePanel" />
+						<h:panelGrid columns="4" cellspacing="10">	
+							<p:outputLabel styleClass="ui-label" value = "Year:*" for="#{!scheduleRuleAddEditBean.highMileageFlag ? 'year':'year1977'}"/>
+							<h:panelGroup>
+								<h:panelGroup rendered="#{!scheduleRuleAddEditBean.highMileageFlag}">
+									<p:selectOneMenu   disabled="#{!scheduleRuleAddEditBean.hasEditPermission}" style="width: 150px;"  id="year" value="#{scheduleRuleAddEditBean.selectedYear}" styleClass = "trackDirtySelect" 
+									tabindex="10" >
+									<f:selectItem itemLabel="--Select One--" itemValue=""/>
+							    	<f:selectItems value="#{scheduleRuleAddEditBean.availableYears}" />
+							    	<p:ajax listener="#{scheduleRuleAddEditBean.handleYearSelect}" update="year,make,model" />
+							    </p:selectOneMenu>
+								</h:panelGroup>
+								<h:panelGroup rendered="#{scheduleRuleAddEditBean.highMileageFlag}" >
+									<p:selectOneMenu  disabled="#{!scheduleRuleAddEditBean.hasEditPermission}" style="width: 150px;"  id="year1977" value="#{scheduleRuleAddEditBean.selectedYear}" styleClass = "trackDirtySelect" 
+										tabindex="10" >
+										<f:selectItem itemLabel="--Select One--" itemValue=""/>
+						    			<f:selectItem itemLabel="1977" itemValue="1977"/>
+						    		</p:selectOneMenu>
+								</h:panelGroup>
+						    
+							</h:panelGroup>						 
+							
+							<p:outputLabel styleClass="ui-label" value = "Make:" for="make"/>						 
+							<p:selectOneMenu  style="width: 150px;" id="make" value="#{scheduleRuleAddEditBean.selectedMake}" styleClass = "trackDirtySelect" 
+								tabindex="20" disabled="#{scheduleRuleAddEditBean.disableMake or scheduleRuleAddEditBean.selectedYear == null or !scheduleRuleAddEditBean.hasEditPermission}">
+								<f:selectItem itemLabel="--Select One--" itemValue=""/>
+						    	<f:selectItems value="#{scheduleRuleAddEditBean.availableMakes}"/>
+						    	<p:ajax listener="#{scheduleRuleAddEditBean.handleMakeSelect}"  process="modelType,year,make" update="make,model" />
+						    </p:selectOneMenu>
+						    <p:outputLabel styleClass="ui-label" value = "Model Type:" for="modelType"/>						 
+							<p:selectOneMenu disabled="#{!scheduleRuleAddEditBean.hasEditPermission or scheduleRuleAddEditBean.disableModelType}"  style="width: 150px;" id="modelType" value="#{scheduleRuleAddEditBean.selectedModelType}" styleClass = "trackDirtySelect" 
+									tabindex="30" >
+								<f:selectItem itemLabel="--Select One--" itemValue=""/>
+						    	<f:selectItems value="#{scheduleRuleAddEditBean.availableModelTypes}" />
+						    	<p:ajax listener="#{scheduleRuleAddEditBean.handleModelTypeSelect}"  process="modelType,year,make" update="model" />
+						    </p:selectOneMenu>
+						    <p:outputLabel styleClass="ui-label" value = "Model:" for="model" length="100"/>						 
+							<p:selectOneMenu   style="width: 250px;" id="model" value="#{scheduleRuleAddEditBean.selectedModel}" styleClass = "trackDirtySelect" 
+									tabindex="40" disabled="#{scheduleRuleAddEditBean.disableModel or scheduleRuleAddEditBean.selectedMake == null or scheduleRuleAddEditBean.selectedModelType == null or !scheduleRuleAddEditBean.hasEditPermission}" >
+								<f:selectItem itemLabel="--Select One--" itemValue=""/>
+					    		<f:selectItems value="#{scheduleRuleAddEditBean.availableModels}" />
+					    	</p:selectOneMenu>
+					    	<p:outputLabel style="text-align:right" styleClass="ui-label" value = "Fuel Type:" for="fuelType"/>						 
+							<p:selectOneMenu disabled="#{!scheduleRuleAddEditBean.hasEditPermission}"  id="fuelType" value="#{scheduleRuleAddEditBean.selectedFuelType}" styleClass = "trackDirtySelect" tabindex="50" >
+								<f:selectItem itemLabel="--Select One--" itemValue=""/>
+						    	<f:selectItems value="#{scheduleRuleAddEditBean.availableFuelTypes}" />
+						    </p:selectOneMenu>
+						    <h:outputText value=""/>
+						    <h:outputText value=""/>
+						    
+						    <p:outputLabel style="text-align:right" styleClass="ui-label" value = "High Mileage" for="highMileage"/>
+						    <h:panelGroup>
+						    <h:selectBooleanCheckbox disabled="#{!scheduleRuleAddEditBean.hasEditPermission}"  id="highMileage" value="#{scheduleRuleAddEditBean.highMileageFlag}" tabindex="55"
+								title="High Mileage Flag" styleClass = "trackDirtyCheckbox" >
+								<p:ajax listener="#{scheduleRuleAddEditBean.handleHighMileageSelect}"  update="pagePanel,fuelType,modelType,year,year1977,make,model,current,active"  />
+							</h:selectBooleanCheckbox>
+							<p:spacer height="1" width="10"/>
+							<p:outputLabel value="(#{scheduleRuleAddEditBean.highMilegaeThreshold} miles)" styleClass="ui-label"/>
+						    </h:panelGroup>
+							
+							 <h:outputText value=""/>
+							  <h:outputText value=""/>
+							   
+						    <p:outputLabel style="text-align:right" styleClass="ui-label" value = "Current:" for="current"/>
+							<h:selectBooleanCheckbox disabled="#{!scheduleRuleAddEditBean.hasEditPermission}"  id="current" value="#{scheduleRuleAddEditBean.baseScheduleIndicator}" tabindex="60"
+								title="Current Flag" styleClass = "trackDirtyCheckbox" />
+							 <h:outputText value=""/>
+							   <h:outputText value=""/>
+							<p:outputLabel style="text-align:right" styleClass="ui-label" value = "Active:" for="active"/>
+							<h:selectBooleanCheckbox disabled="#{!scheduleRuleAddEditBean.hasEditPermission}"  id="active" value="#{scheduleRuleAddEditBean.activeFlag}" tabindex="70"
+								title="Active Flag" styleClass = "trackDirtyCheckbox" />
+						    
+						</h:panelGrid>
+				</p:panel>
+				
+				<p:panel id="pagePanel2" header="Schedule" >
+					<h:panelGrid columns="4" cellspacing="10">
+						<p:outputLabel value="Schedule Type:* " styleClass="ui-label" for="schedule"/>
+						
+						<p:selectOneMenu  disabled="#{!scheduleRuleAddEditBean.hasEditPermission}" style="width: 150px;" styleClass = "trackDirtySelect"  id="schedule" value="#{scheduleRuleAddEditBean.selectedClientScheduleType}" 
+								tabindex="100">
+									<f:selectItem itemLabel="--Select One--" itemValue=""/>							
+									<f:selectItems value="#{scheduleRuleAddEditBean.availableScheduleTypes}" />								
+									<p:ajax listener="#{scheduleRuleAddEditBean.handleScheduleTypesSelect}" process="@this,showHiddenSchedules" update="client,scheduleMiles,scheduleNames" />
+						</p:selectOneMenu>
+						<p:outputLabel styleClass="ui-label" value = "Client:" for="client"/>
+						
+						<p:selectOneMenu   disabled="#{!scheduleRuleAddEditBean.hasEditPermission or !scheduleRuleAddEditBean.enableClientAccounts}" id="client" value="#{scheduleRuleAddEditBean.clientAccountCode}" styleClass = "trackDirtySelect" tabindex="101" >
+							<f:selectItem itemLabel="--Select One--" itemValue=""/>
+					    	<f:selectItems value="#{scheduleRuleAddEditBean.availableClients}" />
+					    	<p:ajax listener="#{scheduleRuleAddEditBean.handleClientSelect}" process="@this,showHiddenSchedules" update="client,scheduleMiles,scheduleNames" />
+					    </p:selectOneMenu>
+					    	
+						
+
+						<p:outputLabel value="Interval:* " styleClass="ui-label" for="scheduleMiles"/>
+						<p:selectOneMenu style="width: 150px;" styleClass = "trackDirtySelect" id="scheduleMiles" value="#{scheduleRuleAddEditBean.selectedScheduleMiles}"  
+								tabindex="110" disabled="#{!scheduleRuleAddEditBean.enableInterval or  scheduleRuleAddEditBean.selectedClientScheduleType == null or !scheduleRuleAddEditBean.hasEditPermission }" >
+									<f:selectItem itemLabel="--Select One--" itemValue=""/>							
+									<f:selectItems value="#{scheduleRuleAddEditBean.availableScheduleMiles}" />									
+									<p:ajax listener="#{scheduleRuleAddEditBean.handleIntervalSelect}" process="@this,showHiddenSchedules" update="scheduleNames"/>
+						</p:selectOneMenu>
+							
+						<p:outputLabel value="Schedule:* " styleClass="ui-label" for="scheduleNames"/>
+						<p:selectOneMenu  styleClass = "trackDirtySelect" id="scheduleNames" value="#{scheduleRuleAddEditBean.selectedScheduleNames}"  
+								tabindex="120" disabled="#{!scheduleRuleAddEditBean.enableScheduleName or scheduleRuleAddEditBean.selectedScheduleMiles == null or !scheduleRuleAddEditBean.hasEditPermission}">
+							<f:selectItem itemLabel="--Select One--" itemValue=""/>							
+							<f:selectItems value="#{scheduleRuleAddEditBean.availableScheduleNames}"  />
+							<p:ajax update="buttonsPanel" />
+						</p:selectOneMenu>
+						
+					</h:panelGrid>
+					<h:panelGrid columns="2" cellspacing="10">
+					<p:outputLabel style="text-align:right" styleClass="ui-label" value = "Show Only Hidden Schedules:" for="showHiddenSchedules"/>
+						<h:selectBooleanCheckbox disabled="#{  !scheduleRuleAddEditBean.hasEditPermission}" id="showHiddenSchedules" value="#{scheduleRuleAddEditBean.showHiddenSchedules}" tabindex="130"
+								title="Hidden Flag" styleClass = "trackDirtyCheckbox" >
+								<p:ajax listener="#{scheduleRuleAddEditBean.handleScheduleTypesSelect}" process="@this,schedule" update="scheduleMiles,scheduleNames" />
+						</h:selectBooleanCheckbox>
+						
+					</h:panelGrid>
+				</p:panel>
+				
+				<p:panel id="buttonsPanel">
+					<h:panelGrid id="buttons">
+						<f:facet name="footer">
+							<p:commandButton id="saveButton" tabindex="140" value="Save" disabled="#{!scheduleRuleAddEditBean.hasEditPermission}"
+								action="#{scheduleRuleAddEditBean.save}" ajax="false"
+								onclick="lockScreen();" />   												
+   							<p:spacer width="10" />
+							<p:commandButton id="cancelButton" tabindex="150" value="Cancel"
+								action="#{scheduleRuleAddEditBean.cancel}" ajax="false"
+								onclick="lockScreen();" immediate="true" />
+							<p:spacer width="10" />
+							<p:button id="preview" tabindex="43" value="Preview" disabled="#{scheduleRuleAddEditBean.scheduleRuleId == null and scheduleRuleAddEditBean.selectedScheduleNames == null}"
+								onclick="window.open('#{request.contextPath}/view/maintSchedules/report.xhtml?scheduleId=#{scheduleRuleAddEditBean.getSchedulePreviewBeforeSave()}'); return false"/>	
+						</f:facet>
+					</h:panelGrid>
+              	</p:panel> 
+			</h:form>
+			       	
+        	<div id="CUSTOMER_LOV_DIV">
+				<ui:include src="../lov/customers.xhtml" />
+			</div>
+			
+			<div id="inputFieldChecks">
+				<ui:include src="../alert/inputFieldChecks.xhtml" />
+			</div>
+        	
+        	<script>
+        	/**
+		    * Capturing the id of the text field that invoked the LOV.
+		    * The id will be used later to evaluate where the return
+		    * value from the LOV should be stored.
+		    */
+		    var lovCaller;
+			
+			function initializeDirtyDetection() {
+				registerIgnoreButton("saveButton");
+				saveDataForDirtyDetection();
+			}
+        	
+		    function onClickCustomerLOV(caller) {	    	
+		    	lovCaller = caller;	
+		    }
+		    
+		    /**
+		    * The LOV calls this function to pass back the selected
+		    * values to the view's controls.
+		    */
+	 		function setSelection( lovName, nameArray, valueArray){				 			
+	 			if(lovName == 'customerLOV') {
+	 			    for(var i=0; i  &lt; nameArray.length ; i++) {	
+	 				    if(nameArray[i] == "CUSTOMER_CODE") {	
+	 					    if(lovCaller == 'customer') {
+	 						    document.getElementById('accountCode').value = valueArray[i];	
+	 							document.getElementById('customerAccount').value = valueArray[i];
+	 						}
+	 					} else if(nameArray[i] == "CUSTOMER_NAME") {
+	 					    if(lovCaller == 'customer') {	 						    	
+	 						   document.getElementById('accountName').value = valueArray[i];
+	 						   $("#accountNameOut").html(valueArray[i]);
+	 						 }		 						    	
+	 					}
+	 				}	
+	 			document.getElementById(lovCaller + 'SelectAccount').click();
+	 			if(lovCaller == 'customer') {
+	 					setFocus('customerAccount'); 	
+	 				}    
+	 			} 	 					 				
+	 		}	
+		    
+	     	$(window).load(function(){
+	     		initializeDirtyDetection();
+			});			    
+		    </script>
+
+	</ui:define>
+</ui:composition>

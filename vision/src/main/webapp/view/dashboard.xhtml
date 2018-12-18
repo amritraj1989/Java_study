@@ -1,0 +1,33 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" template="../templates/ui.xhtml">
+
+	<ui:define name="content">
+		<!-- Message display -->
+		<p:panel id="dashboardPanel" header="Vision Workbench" style="min-width:980px;max-width:100%;width:auto;min-height:700px;max-height:100%;height:auto;">
+		<h:form id="dashboardForm" prependId="false">     		
+		<div style="display: flex; flex-flow: row wrap; justify-content: space-around;">
+   		   <ui:repeat var="menuG" value="#{menuBean.menuGroupList}" varStatus="status" >
+   		   <div style="width:240px; float:left; margin:2%;">
+   		   <p:panel id="menuEntry_#{status.index}" header="#{menuG.groupName}">
+		    	<p:dataList value="#{menuG.menuItemList}" var="link" width="160" type="none">
+             		<p:commandLink action="#{menuBean.selectMenuItemAction(menuG.groupName,link.displayName)}" ajax="false">
+						<h:outputText value="#{link.displayName}" />
+					</p:commandLink>
+					<p></p>
+                 </p:dataList>	
+           </p:panel>
+   		   </div>
+
+		   </ui:repeat>
+		</div>
+   		
+		</h:form>
+		
+		</p:panel>
+
+	</ui:define>
+
+</ui:composition>

@@ -1,0 +1,10 @@
+This project contains (core) business services and service methods; application specific services should be 
+part of the application itself (i.e. quotation related services would be here, but capital cost overview 
+service should be in the vision project). 
+
+This code was made core after the driver module was completed and as such there were a few services
+that were cross coupled (had generic or were used by generic/core services/service methods but also had Vision specific 
+code. They are LookupCacheService, NotificationService, UserService and DriverService. They should be revisited
+when time permits and risk is less.
+
+  

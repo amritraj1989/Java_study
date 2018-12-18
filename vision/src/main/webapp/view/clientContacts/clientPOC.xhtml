@@ -1,0 +1,164 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"   
+	xmlns:pe="http://primefaces.org/ui/extensions" 
+    template="../../templates/ui.xhtml" >
+	
+    <ui:define name="content">
+     
+    	<h:form id="fleetSearchBreadCrumbForm" prependId="false">
+   				<p:breadCrumb model="#{clientPOCBean.breadCrumbTrail}" ajax="false" immediate="true" style="min-width:980px;max-width:100%;width:auto;"/>
+   		</h:form>
+   		
+        <h:form id="hiddenInputForm" prependId="false">
+        
+        </h:form>   		
+    		
+    	<!-- Message display -->
+		<p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:980px;max-width:100%;width:auto;">
+			<p:messages id="messages" showSummary="false" showDetail="true" autoUpdate="false" />
+		</p:scrollPanel>
+		
+		 
+   		<h:form id="clientContactsForm" prependId="false">   
+			<p:panel id="clientInfoPanel" header="Client Information">  
+				<div id="clientDisplayPanel">
+					<comp:clientDisplay id="clientDisplayId" 
+					    cId="#{clientPOCBean.cId}" 
+					    accountType="#{clientPOCBean.accountType}" 
+					    accountCode="#{clientPOCBean.accountCode}" 
+					    parentBean="#{clientPOCBean}"
+					    update=":clientContactsForm:pocs :clientContactsForm:clientInfoPanel :clientContactsForm:defaultContactPanel" 
+				        ajax="true"/>
+				</div>
+			</p:panel>
+					
+			<p:panel id="defaultContactPanel" header="Default Contact(s)">
+			    <p:outputLabel value="Name:" styleClass="ui-label"/>
+			    <p:spacer width="10" />
+			    <p:outputLabel id="defaultContactName" value="#{clientPOCBean.defaultClientContactName}"/>
+			    
+			    <p:spacer width="10" />	
+			    			    
+				<p:commandLink id="editLnk" 
+				        action="#{clientPOCBean.editClientDefaultContacts}"
+					    ajax="false"
+					    title="Assign POC"
+					    rendered="#{clientPOCBean.hasPermission()}">				    
+					<p:graphicImage value="/images/action_edit.png" style="border-style: none"/>
+			    </p:commandLink>			    
+			</p:panel>
+			          	   		     				  		  
+	        <p:panel id="pocPanelDataTablePanel" header="Points of Communication">	  
+	        	<p:toolbar id="searchToolbar">  
+  				    <p:toolbarGroup style="vertical-align:top;text-align:left">  
+  				    	<p:spacer width="10"/>
+				        <h:outputText for="clientSystemFilter" value="POC Category : " />
+				        <p:spacer width="10"/>  
+				        <p:selectOneMenu id="clientSystemFilter"
+				        				 style="vertical-align:top;"
+				        				 value="#{clientPOCBean.selectedClientSystem}" 
+				        				 onkeypress="return doKeypressFilter(event)" tabindex="10"
+				        				 converter="ClientSystemConverter"> 
+	        				<p:ajax listener="#{clientPOCBean.selectOneMenuListener}" update=":clientContactsForm"/> 
+	        				<f:selectItem itemValue="" itemLabel="ALL"></f:selectItem>
+				            <f:selectItems 
+				            	value="#{clientPOCBean.clientSystems}" 
+				            	var="category"
+				            	itemLabel="#{category.description}"
+				            	itemValue="#{category}" /> 
+				        </p:selectOneMenu>  
+				    </p:toolbarGroup>  
+				</p:toolbar>
+				<p:focus context="pocPanelDataTablePanel"/> 
+				          
+			    <p:dataTable id="pocs" var="element"
+			        value="#{clientPOCBean.rowList}" emptyMessage=""
+					scrollable="true" rowIndexVar="elementRowIndex"
+					scrollHeight="#{clientPOCBean.dataTable.height}"
+					resizableColumns="true"
+					rowKey="#{element.poc.name}">
+					
+					<p:column headerText="POC Category" width="#{clientPOCBean.dataTable.col1}">				
+				        <f:facet name="header">
+							<h:outputText value="POC Category" style="font-weight:bold" />
+						</f:facet>										    
+					    <h:outputLabel id="clientSystem" value="#{element.poc.clientSystem.description}" />
+					</p:column>
+										
+				    <p:column headerText="POC Name" width="#{clientPOCBean.dataTable.col2}">								
+					    <p:outputLabel id="pointName" value="#{element.poc.name}" />
+					</p:column>		
+					
+				    <p:column headerText="POC Description" width="#{clientPOCBean.dataTable.col3}">								
+					    <p:outputLabel id="pointDescription" value="#{element.poc.description}" />
+					</p:column>									
+					
+				    <p:column headerText="Contact(s)" width="#{clientPOCBean.dataTable.col4}">								  					    
+                        <p:dataTable value="#{clientPOCBean.assignedContacts(element)}" 
+                                rendered="#{clientPOCBean.hasContacts(element)}"
+                                var="cc" 
+                                scrollable="true" 
+                                scrollHeight="70" 
+                                scrollWidth="85%" 
+                                style="width:95%"
+                                styleClass="hide-column-header">
+				            <p:column width="10">	                        
+                                #{cc.contact.lastName}, #{cc.contact.firstName} 
+                            </p:column>                             
+                        </p:dataTable> 	                      				    
+					</p:column>	
+					
+				    <p:column headerText="Send To Driver" width="#{clientPOCBean.dataTable.col5}">								
+					    <p:outputLabel id="driverInd" value="#{clientPOCBean.isDriverAssigned(element) ? 'Yes' : 'No'}"/>
+					</p:column>							
+					
+				    <p:column headerText="" width="#{clientPOCBean.dataTable.col6}">								
+					    <p:commandLink id="editLnk" 
+					        action="#{clientPOCBean.assignContacts(element)}"
+							ajax="false"
+							onclick="lockScreen();"
+							title="Assign Contact(s) to POC"
+					    	rendered="#{clientPOCBean.hasPermission() and clientPOCBean.contactsAssignable}">				    
+							<p:graphicImage value="/images/action_edit.png" style="border-style: none"/>
+					    </p:commandLink>
+					    
+                        <p:spacer width="10"/>	
+                        				    
+                        <p:commandLink id="costCentreFinanceParamCommandLink" 
+                            action="#{clientPOCBean.viewCostCenters(element)}"
+                            immediate="true" 
+                            value="CC" 
+                            ajax="false"
+                            title="Click to see Cost Centers"
+                            disabled="#{!clientPOCBean.isCostCenterAvailable()}"
+                            onclick="lockScreen();"
+                            rendered="#{clientPOCBean.hasPermission() and clientPOCBean.contactsAssignable}"
+                            styleClass="#{clientPOCBean.hasCostCenterContact(element) ? 'mafs-button-indicator' : ''}"/>					    
+					</p:column>																											
+					
+				</p:dataTable>	            
+	        </p:panel>
+	        
+	        <p:panel>
+				<p:commandButton id="done" 
+				    value="Done"
+					action="#{clientPOCBean.cancel}" 
+					ajax="false" 
+					immediate="true"
+					onclick="lockScreen();" 
+					tabindex="155" />	        
+	        </p:panel>	        
+        </h:form>              	
+			
+		<script type="text/javascript"> 
+			
+		</script>
+
+	</ui:define>
+	
+	
+</ui:composition>

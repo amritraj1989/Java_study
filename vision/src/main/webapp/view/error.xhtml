@@ -1,0 +1,45 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="../templates/ui.xhtml">
+
+	<ui:define name="content">
+		<script type="text/javascript"> 
+		function toggle() {
+			var ele = document.getElementById("toggleText");
+			var text = document.getElementById("displayText");
+			if(ele.style.display == "block") {
+		    		ele.style.display = "none";
+				text.innerHTML = "View Error Details..";
+		  	}
+			else {
+				ele.style.display = "block";
+				text.innerHTML = "Hide Error Details..";
+			}
+		} 
+</script>
+
+		<h:form prependId="false">
+
+			<p:panel id="panel" header="RunTime Exception">
+				Vision has encountered a problem. We apologize for any inconvenience.  
+				If the problem persists, please notify to Vision support team.
+      			
+    			<p/>
+    			   			
+    			<a id="displayText" href="javascript:toggle();">See Error Details..</a> 
+					<div id="toggleText" style="display: none">
+						<p/>
+						#{currentView}
+    					#{flash.exceptionInfo}
+    				
+    				</div>
+			</p:panel>
+
+		</h:form>
+
+	</ui:define>
+
+</ui:composition>

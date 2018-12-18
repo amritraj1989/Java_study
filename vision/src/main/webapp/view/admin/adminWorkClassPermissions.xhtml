@@ -1,0 +1,129 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" template="../../templates/ui.xhtml">
+
+	<ui:define name="content">
+			<h:form id="adminWorkClassPermissionsBreadCrumbForm"
+				prependId="false">
+				<p:breadCrumb
+					model="#{adminWorkClassPermissionsBean.breadCrumbTrail}"
+					ajax="false" immediate="true" />
+			</h:form>
+			<!-- Message display -->
+			<p:scrollPanel style="height:50px;" mode="native">
+				<p:messages id="messages" showSummary="false" showDetail="true"
+					autoUpdate="true" />
+			</p:scrollPanel>
+
+			<h:form id="adminWorkClassPermissionsForm" prependId="false">
+
+				<!-- Driver Detail Panel -->
+				<p:panel id="workclassPermissionsPanel"
+					header="Work Class Permissions" styleClass="ui-layout">
+					<p:panel styleClass="ui-layout">
+						<h:outputLabel value="Corporate Entity : " styleClass="ui-label" />
+						<p:spacer width="10"></p:spacer>
+						<p:selectOneMenu id="corpId" styleClass="ui-select-dropdown"
+							valueChangeListener="#{adminWorkClassPermissionsBean.changeCorpEntity}"
+							value="#{adminWorkClassPermissionsBean.selectedCorpEntity}"
+							converter="CorporateEntityConverter">
+							<p:ajax update="workclassPermissionsPanel" />
+							<f:selectItems
+								value="#{adminWorkClassPermissionsBean.corpEntities}"
+								var="corpEntity" itemLabel="#{corpEntity.displayName}"
+								itemValue="#{corpEntity}" />
+						</p:selectOneMenu>
+					</p:panel>
+
+					<p:panelGrid>
+						<p:row>
+							<p:column>
+								<p:dataTable id="workClassDataTable" var="workClass"
+									value="#{adminWorkClassPermissionsBean.availableWorkClasses}"
+									rowKey="#{workClass.workClassName}" scrollable="true"
+									scrollHeight="#{adminWorkClassPermissionsBean.dataTable.height}"
+									selection="#{adminWorkClassPermissionsBean.selectedWorkClass}"
+									selectionMode="single" rowIndexVar="workClassRowIndex">
+									<p:ajax event="rowSelect"
+										listener="#{adminWorkClassPermissionsBean.onRowSelect}"
+										update=":adminWorkClassPermissionsForm:workclassPermissionsPanel"></p:ajax>
+									<f:facet name="header">
+										<h:outputText value="Work Classes" style="font-weight:bold" />
+									</f:facet>
+									<p:column
+										width="#{adminWorkClassPermissionsBean.dataTable.col1}">
+										<h:outputText value="#{workClass.workClassName}" />
+									</p:column>
+								</p:dataTable>
+
+							</p:column>
+							<p:column>
+
+								<p:dataTable id="permissionSetDataTable" var="permissionSet"
+									value="#{adminWorkClassPermissionsBean.permissionSets}"
+									rowKey="#{permissionSet.permissionSetName}" scrollable="true"
+									scrollHeight="#{adminWorkClassPermissionsBean.dataTable.height}"
+									selection="#{adminWorkClassPermissionsBean.selectedPermissionSets}">
+									<p:column styleClass="checkboxSelector"
+										selectionMode="multiple" width="20" />
+									<p:column
+										width="#{adminWorkClassPermissionsBean.dataTable.col1 - 80}">
+										<f:facet name="header">
+											<h:outputText
+												value="Permission Sets for: #{adminWorkClassPermissionsBean.selectedWorkClass.id.workClass}"
+												style="font-weight:bold" />
+										</f:facet>
+										<h:outputText value="#{permissionSet.permissionSetName}" />
+									</p:column>
+									<p:column width="20">
+										<f:facet name="header">
+											<h:outputText value="  " style="font-weight:bold" />
+										</f:facet>
+										<p:commandLink id="showInfoForPermissionSet"
+											update=":adminWorkClassPermissionsForm:workclassPermissionsPanel, :infoForm:dialogForInfo"
+											action="#{adminWorkClassPermissionsBean.selectActivePermissionSet(permissionSet)}"
+											oncomplete="PF('dlgInfo').show();">
+											<p:graphicImage
+												style="text-align:right;align:right;border-style:none;"
+												value="/images/custins.png" id="permissionSetDesc"
+												title="Information about Permission Set" />
+										</p:commandLink>
+									</p:column>
+								</p:dataTable>
+
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+				</p:panel>
+
+				<p:panel id="controlPanel" styleClass="ui-layout">
+					<p:commandButton id="save" value="Save"
+						action="#{adminWorkClassPermissionsBean.save}" />
+					<p:spacer width="10" />
+
+					<p:commandButton id="cancel" tabindex="1" value="Cancel"
+						action="#{adminWorkClassPermissionsBean.cancel}" ajax="false"
+						onclick="lockScreen();" immediate="true" />
+				</p:panel>
+			</h:form>
+
+			<h:form id="infoForm">
+				<p:dialog width="360" height="180" id="dialogForInfo" modal="true"
+					header="Information (#{adminWorkClassPermissionsBean.activePermissionSet.permissionSetName})"
+					widgetVar="dlgInfo" appendTo="@(body)">
+					<h:outputText
+						value="#{adminWorkClassPermissionsBean.activePermissionSet.description}" />
+				</p:dialog>
+			</h:form>
+
+		<style type="text/css">
+			.ui-datatable TBODY TD {
+				border-style: solid !important;
+				}
+		</style> 
+
+	</ui:define>
+
+</ui:composition>

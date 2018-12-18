@@ -1,0 +1,217 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	template="../../templates/ui.xhtml">
+	
+	<ui:define name="content">
+			<h:form id="breadCrumbForm" prependId="false">
+				<p:breadCrumb model="#{maintScheduleQueuesBean.breadCrumbTrail}"  
+				 style="min-width:900px;max-width:100%;width:auto" 
+				ajax="false" immediate="true" styleClass="ui-layout"/>
+			</h:form>
+			<!-- Error message display -->
+			<p:scrollPanel style="height:50px;max-width:100%;width:auto;" 
+				mode="native" styleClass="ui-layout">
+				<p:messages id="messages" showSummary="false" showDetail="true"	autoUpdate="true" />
+			</p:scrollPanel>			
+			
+			<h:form id="mainForm" prependId="false">
+					
+	    		<p:panel id="inputPanel" header="Schedule Queue/Counts">
+					    		
+	    			<h:panelGrid columns="11" >
+
+						<h:outputText value="Next to Print: " style ="font-weight:bold"/>
+						<p:spacer width="5" />
+						<p:commandLink id="nextPrintLink"  
+								action="#{maintScheduleQueuesBean.getNextPrintList}"
+								style="cursor:pointer;"
+								update=":resultForm:resultsPanel, :resultForm:buttonsPanel, :mainForm:inputPanel"
+								oncomplete="PF('resultTableWidget').sort($(PrimeFaces.escapeClientId('#{p:component('expectedPrintID')}')), '1')"  >					
+							<h:outputText value="#{maintScheduleQueuesBean.nextPrint}"/>
+						</p:commandLink>						
+						<p:spacer width="15" />
+						<h:outputText value="Errors: " style ="font-weight:bold"/>
+						<p:spacer width="5" />
+						<p:commandLink id="errorLink"  
+								action="#{maintScheduleQueuesBean.getErrorList}"
+								style="cursor:pointer;"
+								update=":resultForm:resultsPanel, :resultForm:buttonsPanel, :mainForm:inputPanel"
+								oncomplete="PF('resultTableWidget').sort($(PrimeFaces.escapeClientId('#{p:component('expectedPrintID')}')), '1')" >					
+							<h:outputText value="#{maintScheduleQueuesBean.errors}"/>
+						</p:commandLink>						
+						<p:spacer width="15" />
+						<h:outputText value="Printed Previous 30 Days: " style ="font-weight:bold"/>
+	    				<p:spacer width="5" />
+	    				<p:commandLink id="previousPrintLink"  
+								action="#{maintScheduleQueuesBean.getPreviousPrintList}"
+								style="cursor:pointer;"
+								update=":resultForm:resultsPanel, :resultForm:buttonsPanel, :mainForm:inputPanel"
+								oncomplete="PF('resultTableWidget').sort($(PrimeFaces.escapeClientId('#{p:component('expectedPrintID')}')), '1')" >					
+							<h:outputText value="#{maintScheduleQueuesBean.previousPrint}"/>
+						</p:commandLink>						
+	    			
+						
+
+					</h:panelGrid>
+						
+              	</p:panel>
+			</h:form>
+			
+			<h:form id="resultForm" prependId="false">
+	    		<p:panel id="resultsPanel">
+	    			 
+		    		<f:facet name="header" >
+	    				<h:outputText value="#{maintScheduleQueuesBean.queueName}"/>
+		    		</f:facet>
+	    			 
+	                <p:dataTable  id="resultsTable" var="result" 
+	                	widgetVar="resultTableWidget"  
+	                	value="#{maintScheduleQueuesBean.rowList}" 
+	                	scrollable="true"  
+	                	scrollHeight="#{maintScheduleQueuesBean.dataTable.height}"
+						paginator= "true"
+						rows="500"
+						paginatorPosition="bottom" 
+						rowIndexVar="selectedRowIndex"
+						selection="#{maintScheduleQueuesBean.selectedRows}"  
+						sortBy="#{result.maintScheduleProcessed.expectedPrintDate}"
+						sortOrder="ascending"
+						rowKey="#{result.fmsId}" >
+
+						<p:ajax event="toggleSelect" update=":resultForm:buttonsPanel" listener="#{maintScheduleQueuesBean.checkButtons}"  />						 
+						<p:ajax event="rowSelectCheckbox" update=":resultForm:buttonsPanel" listener="#{maintScheduleQueuesBean.checkButtons}" />
+						<p:ajax event="rowUnselectCheckbox" update=":resultForm:buttonsPanel" listener="#{maintScheduleQueuesBean.checkButtons}" />						
+						<p:ajax event="rowSelect" update=":resultForm:buttonsPanel" listener="#{maintScheduleQueuesBean.checkButtons}" />
+						<p:ajax event="rowUnselect" update=":resultForm:buttonsPanel" listener="#{maintScheduleQueuesBean.checkButtons}" />												
+
+						
+						<p:column selectionMode="multiple" headerText="Select" width="5%" style="text-align:center" />
+                  
+	                   	<p:column width="#{maintScheduleQueuesBean.dataTable.col1}" sortBy="#{result.maintScheduleProcessed.fleetMaster.unitNo}" >
+	                    	<f:facet name="header"  >
+								<h:outputText value="Unit" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputText value="#{result.maintScheduleProcessed.fleetMaster.unitNo}" /><br />
+	                    	<h:outputText value="#{result.unitDescription}" /><br />
+	                    	<h:outputText value="#{result.maintScheduleProcessed.fleetMaster.model.modelType.description}" /><br />
+	                    	<h:outputText value="#{result.fuelTypeGroupDescription}" />
+	                   	</p:column> 
+	                   	<p:column width="#{maintScheduleQueuesBean.dataTable.col2}" sortBy="#{result.formattedName}">
+	                    	<f:facet name="header"  >
+								<h:outputText value="Send To" style ="font-weight:bold"/>
+							</f:facet>
+		                    <h:outputText value="#{result.formattedName}" /><br />
+		                    <h:outputText value="#{result.clientContactVO.addressDisplay}" escape="false" />
+	                   	</p:column> 
+
+	                   	<p:column width="#{maintScheduleQueuesBean.dataTable.col3}" sortBy="#{result.accountCode}" >
+	                    	<f:facet name="header"  >
+								<h:outputText value="Client" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputText value="#{result.accountCode}" /><br />
+	                    	<h:outputText value="#{result.accountName}" />
+	                   	</p:column> 
+	                   	<p:column width="#{maintScheduleQueuesBean.dataTable.col4}" sortBy="#{result.formattedSchedule}" >
+	                    	<f:facet name="header"  >
+								<h:outputText value="Schedule" style ="font-weight:bold"/>
+							</f:facet>
+							<h:outputText value="#{result.formattedSchedule}" escape="false" />
+	                   	</p:column> 
+	                   	<p:column id="expectedPrintID" width="#{maintScheduleQueuesBean.dataTable.col5}" sortBy="#{result.maintScheduleProcessed.expectedPrintDate}"
+	                   	style="text-align: center;" >
+	                    	<f:facet name="header"  >
+								
+								<h:outputText value=" Expected Generate" style ="font-weight:bold"/><br />
+								<h:outputText value="Date" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputText value="#{result.maintScheduleProcessed.expectedPrintDate}" rendered="#{result.overDueFlag}" styleClass="mafs-overdue-indicator">
+	                    		<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+	                    	</h:outputText>
+	                    	<h:outputText value="#{result.maintScheduleProcessed.expectedPrintDate}" rendered="#{!result.overDueFlag}"  >
+	                    		<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+	                    	</h:outputText>
+	                   	</p:column> 
+	                   	<p:column width="#{maintScheduleQueuesBean.dataTable.col6}" sortBy="#{result.status}" >
+	                    	<f:facet name="header"  >
+								<h:outputText value="Status" style ="font-weight:bold"/>
+							</f:facet>
+	                    	<h:outputText value="#{result.status}" />
+	                   	</p:column> 
+	                   	
+	                    
+
+	                </p:dataTable>	    			
+
+              	</p:panel>
+
+	    		<p:panel id="buttonsPanel">
+					<h:panelGrid id="buttons" columns="5">
+						<p:commandButton id="deleteButton" tabindex="140" value="Delete" 
+								update=":resultForm:resultsPanel, :resultForm:buttonsPanel, :mainForm:inputPanel"
+								rendered="#{maintScheduleQueuesBean.showDeleteButton}"
+								onclick="showDialog('confirmVar');" 
+								disabled="#{!maintScheduleQueuesBean.hasPermission() or maintScheduleQueuesBean.deleteDisabled}"/>
+						<p:spacer width="5" />
+						<p:commandButton id="reprintScheduleButton" tabindex="161" value="Reprint Schedule" 
+								oncomplete="showDialog('reprintScheduleVar')" ajax="true"
+								rendered="#{maintScheduleQueuesBean.queueName == 'Printed Previous 30 Days'}"
+								disabled="#{!maintScheduleQueuesBean.hasPermission() or maintScheduleQueuesBean.reprintScheduleDisabled}" />
+						<p:spacer width="5" rendered="#{maintScheduleQueuesBean.queueName == 'Printed Previous 30 Days'}"/>
+						<p:commandButton  value="Cancel" action="#{maintScheduleQueuesBean.cancel}" ajax="false" immediate="true" />
+						
+					</h:panelGrid>
+              	</p:panel>
+
+
+
+
+
+			</h:form>
+		
+		  	<p:confirmDialog id="confirmDialogId" message="Are you sure?" header="Confirm Delete" appendTo="@(body)"
+				widgetVar="confirmVar" resizable="false" width="200" height="60" update=":resultForm:buttonsPanel">    
+				
+	           <h:form prependId="false">
+       				<p:commandButton  value="Yes" ajax="false" process="@this"	onclick="hideDialog('confirmVar');lockScreen();" 
+       					action="#{maintScheduleQueuesBean.delete}"/>			  
+        			<p:spacer width="10" />
+        			<p:commandButton  value="No"  onclick="PF('confirmVar').hide();" type="button"/>
+        			
+        		</h:form>
+        	</p:confirmDialog>			 
+			
+			<p:confirmDialog id="reprintScheduleDialog" message="" header="Alert" widgetVar="reprintScheduleVar" appendTo="@(body)"> 
+				 <f:facet name="message">
+					<h:outputText value="Vehicle maintenance schedule will be reprinted and delivered to client." />
+					<br /><br />
+					<h:outputText value="The client will be charged a replacement fee for this service." />
+				</f:facet>
+				
+		<p:focus context="reprintScheduleDialog" />
+
+		<h:form prependId="false">
+			<p:hotkey immediate="true" bind="esc"
+				handler="PF('reprintScheduleVar').hide(); focusSourceElement()" />
+			<p:commandButton id="rePriVehSchAlertBtn" value="Ok"  
+					action="#{maintScheduleQueuesBean.rePrintSchedule}" 
+					ajax="true" 
+					onclick="hideDialog('reprintScheduleVar');" >	 
+			</p:commandButton>
+			<p:commandButton id="cancelReprintAlert" value="Cancel"
+				onclick="PF('reprintScheduleVar').hide(); focusSourceElement()"
+				type="button" />
+		</h:form>
+	</p:confirmDialog>
+			<script>	
+			
+			
+			
+			</script>
+			
+			
+	</ui:define>
+</ui:composition>

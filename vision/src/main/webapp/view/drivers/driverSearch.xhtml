@@ -1,0 +1,341 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../templates/ui.xhtml" >
+	
+    <ui:define name="content">
+    	<h:form id="driverSearchBreadCrumbForm" prependId="false">
+   				<p:breadCrumb model="#{driverSearchBean.breadCrumbTrail}" ajax="false" immediate="true" styleClass="ui-layout"/>
+   		</h:form>
+    	<!-- Message display -->
+		<p:scrollPanel style="height:50px;" mode="native" styleClass="ui-layout">
+			<p:messages id="messages" showSummary="false" severity="info,error,fatal" showDetail="true" autoUpdate="false" />
+		</p:scrollPanel>
+   		<h:form id="driverSearchForm" prependId="false">   	
+   		<h:inputHidden id="hiddenScrollPosition" value="#{driverSearchBean.scrollPosition}" />	
+   		  <p:panel id="searchPanel" header="Search" styleClass="ui-layout">
+				<h:panelGrid  columns="8"  cellspacing="5">
+						<h:outputLabel for="driverName" value="Driver "  styleClass="ui-label" />
+					      <h:panelGroup style="white-space:nowrap;">					   		
+							<p:inputText id="driverName" value="#{driverSearchBean.driverName}"  title="Last name, First name"  tabindex="10" onchange="clearDriverId();" onkeypress="return doKeypressSearch(event);" />
+							<p:commandButton id="driverLOVId" icon="icon-lov" title="lov" tabindex="20" oncomplete="showDriverLov()" onstart="return hasMinAlphaNumericCharacters($('#driverName'));"
+								actionListener="#{driverLovBean.fetchLOVData}" process="@this,driverName"
+								dynamic="true" async="true" update=":drvLovForm:DRIVER_GRID">
+								<f:param name="DRIVER_NAME_INPUT" value="driverName"/>								
+							</p:commandButton>
+							<h:inputHidden id ="driverId" name="driverId" value="#{driverSearchBean.driverId}"/>
+					     </h:panelGroup>
+						
+						<h:outputLabel for="unitNo" value="Unit No "  styleClass="ui-label" />
+						<h:panelGroup style="white-space:nowrap;">								
+							<p:inputText id="unitNo" title="Unit No" tabindex="30" value="#{driverSearchBean.unitNo}" onkeypress="return doKeypressSearch(event)" />
+						</h:panelGroup>	
+						<h:outputLabel for="vin" value="VIN Last 6 "  styleClass="ui-label" />
+						<h:panelGroup style="white-space:nowrap;">
+							<p:inputText id="vin" title="Enter 6 or more of the last characters " tabindex="40" value="#{driverSearchBean.vin}" onkeypress="return doKeypressSearch(event)"/>
+							<p:commandButton icon="icon-lov" title="lov" tabindex="50" oncomplete="showVinLov();" onstart="return hasMinAlphaNumericCharacters($('#vin'));"
+								actionListener="#{vinLovBean.fetchLOVData}" process="@this,vin" 
+								dynamic="true" async="true" update=":vinLovForm:VIN_GRID">
+								<f:param name="VIN_PARAM_NAME" value="vin" />
+							</p:commandButton>
+						</h:panelGroup>
+						<h:outputLabel value="Active Ind" styleClass="ui-label"/>
+						<p:selectOneMenu id="activeInd"  styleClass="ui-select-dropdown" tabindex="55"  onkeydown="return doKeypressSearch(event);" 
+							value="#{driverSearchBean.selectedDriverActiveIndicatorFlag}">							
+							<f:selectItem itemLabel="ACTIVE" itemValue="Y" />
+							<f:selectItem itemLabel="INACTIVE" itemValue="N" />
+							<f:selectItem itemLabel="BOTH" itemValue=" " />
+						</p:selectOneMenu>
+						<h:outputLabel for="fleetRefNo" value="Fleet Ref No " styleClass="ui-label"/>
+						<h:panelGroup style="white-space:nowrap;">							
+							<p:inputText id="fleetRefNo" title="Fleet Ref No" tabindex="60" value="#{driverSearchBean.fleetRefNo}" onkeypress="return doKeypressSearch(event)" />
+						</h:panelGroup>
+						<h:outputLabel for="licensePlate" value="License Plate "  styleClass="ui-label"/>
+						<h:panelGroup style="white-space:nowrap;">						
+						<p:inputText id="licensePlate" title="License Plate" tabindex="70"
+							value="#{driverSearchBean.licensePlate}" onkeypress="return doKeypressSearch(event)" />
+						</h:panelGroup>				
+						<h:outputLabel for="client" value="Client" styleClass="ui-label"  />
+						<h:panelGroup style="white-space:nowrap;">							
+							<p:inputText id="client" title="Client" tabindex="80" value="#{driverSearchBean.client}" onchange="clearDriverId();" onkeypress="return doKeypressSearch(event)" />
+							<p:commandButton id='clientLOV' tabindex="90" icon="icon-lov" title="lov"
+									oncomplete="showCustomerLov();" immediate="true"
+									actionListener="#{customerLovBean.fetchLOVDataByCustomerName}"
+									process="@this,client" dynamic="true" async="true"
+									onstart="return hasMinAlphaNumericCharacters($('#client'));"
+									update=":custLovForm:CUSTOMER_GRID">
+									<f:param name="CUSTOMER_LOV_INPUT" value="client" />
+							</p:commandButton>
+						</h:panelGroup>
+						<h:outputLabel value="" />
+						<p:commandButton ajax="true" id="search" title="Search" tabindex="100"
+							value="Search" onstart="return validateSearch(event);" style="float:right"
+							actionListener="#{driverSearchBean.performSearch}" oncomplete="setDefaultPage(); setScrollDivAtTop();document.getElementById('search').blur();"  update="resultsPanel"	/>
+					
+				</h:panelGrid>
+			</p:panel>
+			
+	        <p:panel id="resultsPanel" header="Drivers" styleClass="ui-layout">
+	        	
+	       		 <h:inputHidden id="clickIndex" name ="clickIndex" value = "#{driverSearchBean.selectionIndex}"/> 
+	       		
+	        	<p:dataTable id="driverDataTable" widgetVar="driverDataTableWidget"
+						var="driverUnit" value="#{driverSearchBean.driverUnitLazyList}" 
+						scrollable="true" scrollHeight="#{driverSearchBean.dataTable.height}"
+						selection="#{driverSearchBean.selectedSearchVO}"
+						emptyMessage = "#{driverSearchBean.dataTableMessage}"
+						rows="#{driverSearchBean.resultPerPage}" 
+ 						paginator="true" paginatorPosition="bottom" 
+ 						lazy="true"
+						selectionMode="single"
+						resizableColumns="true">
+						
+			            <p:ajax event="rowSelect" listener="#{driverSearchBean.onRowSelect}" update=":driverSearchForm:clickIndex, :driverSearchForm:commandPanel"></p:ajax>
+			          	<p:ajax event="page"  onstart="clearDataTableSelection('driverDataTableWidget');"  oncomplete="setDataTableToFirstRow('driverDataTableWidget');setScrollDivAtTop();"  update = ":driverSearchForm:clickIndex ,:driverSearchForm:commandPanel" />
+									            
+			           	<p:column sortBy="#{driverForename}" width="#{driverSearchBean.dataTable.col2}">
+			                <f:facet name="header">
+			                <h:outputText value="Driver"  style ="font-weight:bold"/>
+			                </f:facet>
+			                <h:outputText value="#{driverUnit.driverSurname},  #{driverUnit.driverForename} " /><br/>
+			                <h:outputText value="#{driverUnit.poolManager}" converter="PoolManagerConverter"/><br/>
+			                <h:outputLink onclick="loadClientEmail('#{driverUnit.driverEmail}'); return false;">#{driverUnit.driverEmail}</h:outputLink><br/>
+			                <h:outputText value="#{driverUnit.driverPhone}" />
+			            </p:column>
+			           	<p:column width="#{driverSearchBean.dataTable.col3}"> 
+			                <f:facet name="header">
+			                <h:outputText value="Address" style ="font-weight:bold"/>
+			                </f:facet>			       
+			                <h:outputText value="#{driverUnit.businessaddressLine}"/>
+			                <h:outputText value=" &lt;br /&gt; "  rendered="#{driverUnit.businessaddressLine != null ? 'true': 'false'}"  escape="false" />          
+			                <h:outputText value="#{driverUnit.addressLine1}"/><br/>
+			                <h:outputText value="#{driverUnit.addressLine2}"/><br/>
+			                <h:outputText value="#{driverUnit.townCity}, #{driverUnit.region} #{driverUnit.postcode}"/>
+			        
+			            </p:column>
+			            <p:column sortBy="#{accountName}" width="#{driverSearchBean.dataTable.col4}"> 
+			                <f:facet name="header">
+			                <h:outputText value="Client"  style ="font-weight:bold"/>
+			                </f:facet>
+			                <h:outputText value="#{driverUnit.accountName}" /><br/>
+			                <h:outputText value="Client No: #{driverUnit.accountCode}" /><br/>
+			                <h:outputText value="Cost Center: #{driverUnit.costCentre}" rendered="#{driverUnit.hasCostCentre}" />
+			            </p:column>
+			            <p:column sortBy="#{unitNo}" width="#{driverSearchBean.dataTable.col5}"> 
+			                <f:facet name="header">
+			                <h:outputText value="Unit" style ="font-weight:bold"/>
+			                </f:facet>
+			                <h:outputText  value="Unit No : #{driverUnit.unitNo}"  rendered="#{driverUnit.hasUnit}" style="font-weight:bold;"  /><br/>
+			                <h:outputText value="#{driverUnit.modelDesc}" /><br/>
+			                <h:outputText  value="VIN : #{driverUnit.vin}"  rendered="#{driverUnit.hasUnit}" /><br/>
+			            </p:column>
+			            <p:column  width="#{driverSearchBean.dataTable.col6}"> 
+			                <f:facet name="header">
+			                <h:outputText value="Status" style ="font-weight:bold"/>
+			                </f:facet>			                
+			                <h:outputText value="#{driverUnit.vehicleStatus}" /><br/>
+			                <h:outputText  value=""  rendered="#{driverUnit.hasUnit}"/>
+			                <h:outputText  value="#{driverUnit.contractLineStartDate}" rendered="#{driverUnit.hasUnit}">
+							 <f:convertDateTime type="date" pattern="MM/dd/yyyy" /> 
+							</h:outputText>
+			                <h:outputText  value=" - "  rendered="#{driverUnit.hasEndDate}"/>
+			                <h:outputText  value="#{driverUnit.contractLineEndDate}" rendered="#{driverUnit.hasEndDate}">
+							 <f:convertDateTime type="date" pattern="MM/dd/yyyy" /> 
+							</h:outputText>							
+							
+			             </p:column>
+			             <p:column width="#{driverSearchBean.dataTable.col7}"> 
+			                <f:facet name="header">
+			                <h:outputText value="Fleet Ref No" style ="font-weight:bold"/>
+			                </f:facet>			                
+			                <h:outputText value="#{driverUnit.fleetRefNo}"/><br/>			                	        
+			            </p:column>
+			             <p:column width="#{driverSearchBean.dataTable.col8}"> 
+			                <f:facet name="header">
+			                <h:outputText value="License Plate" style ="font-weight:bold"/>
+			                </f:facet>			                
+			                <h:outputText value="#{driverUnit.licensePlate}"/>		        
+			            </p:column>
+			             <p:column width="#{driverSearchBean.dataTable.col9}"> 
+			                <f:facet name="header">
+			                <h:outputText value="Active Ind" style ="font-weight:bold"/>
+			                </f:facet>		
+			                <h:outputText value="ACTIVE" rendered="#{driverUnit.activeInd == 'Y'}" />
+							<h:outputText value="INACTIVE" rendered="#{driverUnit.activeInd == 'N'}" />	
+			            </p:column>
+			           
+			            	<f:facet name="footer">
+							Record Count: <h:outputText value="#{driverSearchBean.driverUnitLazyList.rowCount}"/>
+						</f:facet>
+									
+				</p:dataTable>
+
+				<p:panel id="commandPanel" styleClass="ui-layout">
+					<p:commandButton ajax="false" id="editDriver" tabindex="200" value="View/Edit" onclick="saveScrollPosition();lockScreen();" update="hiddenScrollPosition"  actionListener="#{driverSearchBean.editDriver}" disabled="#{driverSearchBean.driverEditDisallowed}" />
+					<p:spacer width="10" />
+					<p:commandButton ajax="false" id="reAllocate" tabindex="210" value="Deallocate/Allocate" onclick="saveScrollPosition();lockScreen();" update="hiddenScrollPosition"  actionListener="#{driverSearchBean.editAllocation}" disabled="#{!driverSearchBean.hasPermission()  or driverSearchBean.driverAllocateDisallowed}" />
+					<p:spacer width="10" />
+					<p:commandButton ajax="false" id="history" tabindex="220" value="Drivers by Unit"  onclick="saveScrollPosition();lockScreen();" update="hiddenScrollPosition"  actionListener="#{driverSearchBean.viewAllocationHistory}" disabled="#{driverSearchBean.allocateHistoryDisallowed}" />
+					<p:spacer width="10" />
+					<p:commandButton ajax="false" id="overview" tabindex="225" value="Driver Overview"  onclick="saveScrollPosition();lockScreen();" update="hiddenScrollPosition"  actionListener="#{driverSearchBean.viewDriverOverview}" disabled="#{driverSearchBean.driverOverviewDisallowed}" />
+					<p:spacer width="10" />
+					<p:commandButton ajax="false" id="relationship" tabindex="230" value="Related Drivers"  onclick="saveScrollPosition();lockScreen();" update="hiddenScrollPosition"  actionListener="#{driverSearchBean.viewRelationship}" disabled="#{driverSearchBean.relationshipDisallowed}" />					
+					<p:spacer width="10" />
+					<p:commandButton id="cancel" value="Cancel" action="#{driverSearchBean.cancel}" ajax="false" onclick="lockScreen();" immediate="true" />
+					
+				</p:panel>
+				
+	        </p:panel>
+        </h:form>              
+        
+        <div id="DRIVER_LOV_DIV" >
+			<ui:include src="../lov/drivers.xhtml"/>
+		</div>
+		
+		<div id="VIN_LOV_DIV">
+			<ui:include src="../lov/VIN.xhtml" />
+		</div>
+		
+		<div id="CUSTOMER_LOV_DIV">
+			<ui:include src="../lov/customers.xhtml" />
+		</div>
+		
+		<div id="inputFieldChecks">
+			<ui:include src="../alert/inputFieldChecks.xhtml" />
+		</div>			
+		
+		<script type="text/javascript"> 
+		
+        function saveScrollPosition() {
+        	document.getElementById('hiddenScrollPosition').value = $('#driverDataTable .ui-datatable-scrollable-body').scrollTop();
+        }
+        function setScrollPosition() {
+        	$('#driverDataTable .ui-datatable-scrollable-body').scrollTop(document.getElementById('hiddenScrollPosition').value);
+        }
+        
+		// removed body.onload because of duplicate body tags, should use this approach instead on body onload=""
+		$(window).load(function(){
+			setDefaultFocus();
+			setScrollDivAtTop();
+			setScrollPosition();
+		});
+		
+		function setDefaultFocus(){ 
+			var clickIndex = document.getElementById('clickIndex').value
+			if(clickIndex == "-1" || clickIndex == "0"){
+				var driverName = document.getElementById('driverName').value;
+				if ( driverName.length == 0 ){
+					setFocus('driverName');
+				} else {	
+					setDefaultPage();
+				}					
+			} 
+		}	
+			        
+		function setDefaultPage(){
+			// also select the first row, but only if we have data
+			setDataTableToFirstRow('driverDataTableWidget');
+		}  
+
+		var driverName;		
+			
+		function clearDriverId(){
+			if(document.getElementById('driverName').value != driverName){
+				document.getElementById('driverId').value = '';
+			} 
+		}
+		
+		/**
+		* Handles the search button's client side validation before the ajax search happens. A minimum alphanumric character 
+		* check is performed. The search process either continues or not based on
+		* on the check's boolean result.
+		*/
+		function validateSearch(event){	
+			var searchCriteria;				
+				searchCriteria = $('#driverName').val() + $('#unitNo').val();
+				searchCriteria += $('#vin').val() + $('#fleetRefNo').val(); 
+				searchCriteria += $('#licensePlate').val() + $('#client').val();
+					
+				if(!hasMinAlphaNumericCharacters(window.event.srcElement, searchCriteria)) {	
+					return false;
+				} else {
+					return true;
+				}		
+		}
+		
+		/**
+		* Detects the Enter key and programatically clicks
+		* the search button. The search button event handler
+		* will perform the min. alphanumeric check.
+		*/
+		function doKeypressSearch(event){
+			if (event.keyCode == 13) {	
+			   $('#search').click();
+			   return false;
+			}
+			return true;	
+		}
+			
+		function setScrollDivAtTop() {	
+			jQuery("div").scrollTop(0);
+			jQuery("div").scrollLeft(0);	
+	    }
+		
+	    /**
+	    * The LOV calls this function to pass back the selected
+	    * values to the view's controls.
+	    */
+		function setSelection( lovName, nameArray, valueArray)
+		{	
+				if(lovName == 'driverLOV'){	
+					for(var i=0; i  &lt; nameArray.length ; i++)
+					{								
+						if(nameArray[i] == "DRIVER_ID") 
+						{
+							document.getElementById('driverId').value = valueArray[i];	
+						}
+						else if(nameArray[i] == "DRIVER_FULLNAME") 
+						{
+							driverName = valueArray[i];
+							document.getElementById('driverName').value = valueArray[i];							
+						}
+						else if(nameArray[i] == "UNIT_NUMBER") 
+						{
+								//document.getElementById('unitNumber').value = valueArray[i];
+						}
+						else if(nameArray[i] == "CLIENT_NAME") 
+						{
+							document.getElementById('client').value = valueArray[i];
+						}
+					}
+					setFocus('driverName');
+					
+				}
+				else if(lovName == 'vinLOV'){
+					for(var i=0; i  &lt; nameArray.length ; i++){
+						if(nameArray[i] == 'VIN_NUMBER'){
+							var vin  = valueArray[i];
+							vin = vin.substring(parseInt(vin.length-6))							
+							document.getElementById('vin').value = vin;	
+						}
+					}
+					setFocus('vin');
+				}
+				else if(lovName == 'customerLOV'){
+					for(var i=0; i  &lt; nameArray.length ; i++){
+						if(nameArray[i] == 'CUSTOMER_NAME'){
+							document.getElementById('client').value = valueArray[i];
+						}
+					}
+					setFocus('client');
+				}
+				
+		}
+
+		</script>
+	</ui:define>
+	
+	
+</ui:composition>

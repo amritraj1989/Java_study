@@ -1,0 +1,169 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"   
+	xmlns:pe="http://primefaces.org/ui/extensions"	  
+    template="../../templates/ui.xhtml" >
+	
+    <ui:define name="content">
+    	    <h:form id="webUserEditBreadCrumbForm" prependId="false">
+   			    <p:breadCrumb model="#{webUserEditBean.breadCrumbTrail}" ajax="false" immediate="true" 
+   			    style="min-width:980px;max-width:100%;width:auto;"/>
+   		    </h:form>
+   		        
+    	    <!-- Message display -->
+		    <p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:980px;max-width:100%;width:auto;">
+			    <p:messages id="messages" showSummary="false" showDetail="true" autoUpdate="true" />
+		    </p:scrollPanel>   
+		    	
+			<h:form id="webUserEditForm" prependId="false">
+			
+				<p:remoteCommand name="addAssociation" actionListener="#{webUserEditBean.add}" update="webUserAssociationsPanel" oncomplete="clearField();" />
+			
+				<h:inputHidden id ="accountCode" name="accountCode" value="#{webUserEditBean.accountCode}"/>
+				<h:inputHidden id ="newAssociationId" name="newAssociationId" value="#{webUserEditBean.newAssociationId}"/>
+				<p:panel id="webUserEditPanel" header="Web User">
+					<h:panelGrid columns="14" cellspacing="5">
+	                	<h:outputLabel for="id" value="Id:" styleClass="ui-label" />
+		                <h:outputText id="id" value="#{webUserEditBean.selectedWebsiteUser.driver.drvId}" />
+		                <p:spacer width="15"/>
+		                <h:outputLabel for="name" value="Name:" styleClass="ui-label" title="Name" />
+		                <h:outputText id="name" value="#{webUserEditBean.selectedWebsiteUser.driver.driverForename} #{webUserEditBean.selectedWebsiteUser.driver.driverSurname}" />
+		                <p:spacer width="15"/>
+		                <h:outputLabel for="email" value="Email:" styleClass="ui-label" title="Email" />
+		                <h:outputText id="email" value="#{webUserEditBean.selectedWebsiteUser.driver.email}" />
+		                <p:spacer width="15"/>
+		                <h:outputLabel for="userType" value="User Type:" styleClass="ui-label" title="user type" />
+		                <h:outputText id="userType" value="#{webUserEditBean.selectedWebsiteUser.websiteUserType}" />
+					</h:panelGrid>					
+				</p:panel>
+				<p:panel id="webUserAssociationsPanel" header="Current Associations">
+					<p:dataTable id="DT_UI_ID"
+						var="association" 
+						value="#{webUserEditBean.websiteUserAssociationVOList}"
+						scrollable="true" 
+						scrollHeight="#{webUserEditBean.dataTable.height}"
+						rows="50"
+ 						paginator="true" 
+ 						paginatorPosition="bottom" 
+						resizableColumns="true"
+						>
+						
+						<p:column width="10%"> 
+			                <f:facet name="header">
+			                	<h:outputText value="Id"/>
+			                </f:facet>
+			                <h:outputText value="#{association.websiteUserAssociation.associationId}" />
+			            </p:column>
+						<p:column width="27%"> 
+			                <f:facet name="header">
+			                	<h:outputText value="Name"/>
+			                </f:facet>
+			                <h:outputText value="#{association.firstName} #{association.lastName}" />
+			            </p:column>
+						<p:column width="27%"> 
+			                <f:facet name="header">
+			                	<h:outputText value="Email"/>
+			                </f:facet>
+			                <h:outputText value="#{association.email}" />
+			            </p:column>
+						<p:column width="27%"> 
+			                <f:facet name="header">
+			                	<h:outputText value="Address"/>
+			                </f:facet>
+			                <h:outputText value="#{association.formattedAddress}" escape="false" />
+			            </p:column>
+			            <p:column width="9%" style="text-align:center;">
+			                <f:facet name="header">
+			                	<h:outputText value="Remove"/>
+			                </f:facet>
+							<p:commandLink id="deleteLnk" tabindex="45" ajax="true" update="webUserAssociationsPanel"
+	                    			actionListener="#{webUserEditBean.remove(association)}" 
+	                   		 		>
+							    
+							    <p:graphicImage value="/images/action_delete.png" title="Delete"
+							    	style="text-align:right;align:right;border-style:none;" />
+							</p:commandLink>
+		          		</p:column>
+			            
+						
+					</p:dataTable>
+					
+					
+				</p:panel>
+				
+				<p:panel id="addPanel" header="Add Association">
+					<p:focus context="addPanel" />
+					<h:panelGrid columns="3" cellspacing="5">
+						<h:outputLabel for="addName" value="Last Name:" styleClass="ui-label"  />
+			            <p:inputText id="addName" value="#{webUserEditBean.addName}" size="30"/>
+			            <p:commandButton id="driverLOVId" icon="icon-lov" title="lov"
+			            	 oncomplete="showDriverLov();clearAssociationId()" onstart="return hasMinAlphaNumericCharacters($('#addName'));"
+								actionListener="#{driverLovBean.fetchLOVData}" process="@this,addName,accountCode"
+								dynamic="true" async="true" update=":drvLovForm:DRIVER_GRID">
+								<f:param name="DRIVER_NAME_INPUT" value="addName"/>
+								<f:param name="CUSTOMER_CODE_INPUT" value="accountCode"/>
+								<f:param name="DONOT_FETCH_RELATED_DRIVERS" value="Y" />
+								<f:param name="FETCH_RELATED_CUSTOMER_ACCOUNT" value="N" />	
+								<f:param name="FETCH_OPEN_CUSTOMER_ONLY" value="Y" />
+								<f:param name="FETCH_ACTIVE_DRIVER_ONLY" value="N" />
+						</p:commandButton>
+			            
+					</h:panelGrid>
+										
+				</p:panel>
+				
+				<p:panel id="btnPanel">
+					<p:commandButton id="saveButton" value="Save"
+								action="#{webUserEditBean.save}" ajax="false" 
+								onclick="lockScreen()" 
+								disabled="#{!webUserEditBean.hasPermission()}" />
+					<p:spacer width="10" />
+					
+					<p:commandButton id="cancelId" value="Cancel" action="#{webUserEditBean.cancel}" ajax="false" immediate="true" onclick="lockScreen();" />
+				</p:panel>
+				
+			</h:form>
+			
+	        <div id="DRIVER_LOV_DIV" >
+				<ui:include src="../lov/drivers.xhtml"/>
+			</div>
+			
+			<div id="inputFieldChecks">
+				<ui:include src="../alert/inputFieldChecks.xhtml" />
+			</div>			
+			
+			
+			
+			<SCRIPT type="text/javascript">
+			
+			function setSelection( lovName, nameArray, valueArray) {	
+				if(lovName == 'driverLOV'){	
+					for(var i=0; i  &lt; nameArray.length ; i++)
+					{								
+						if(nameArray[i] == "DRIVER_ID") 
+						{
+							document.getElementById('newAssociationId').value = valueArray[i];
+							addAssociation();
+						}
+					}
+				}					
+			}
+
+			function clearField() {
+				document.getElementById('addName').value = '';
+			}
+				
+			function clearAssociationId(){
+				document.getElementById('newAssociationId').value = ''; 
+			}
+
+			
+			</SCRIPT>
+						
+						
+	</ui:define>
+	
+</ui:composition>

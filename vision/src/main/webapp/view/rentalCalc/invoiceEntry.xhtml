@@ -1,0 +1,320 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	template="../../templates/ui.xhtml">
+	<ui:define name="content" >
+	 <style type="text/css">
+	 	td {
+		vertical-align: top;
+		padding:0 !important;
+		margin:0 !important;
+		}
+		.alignmentleft{
+			text-align : left;
+ 			float: left;
+		}
+		.fixedwidthlabel {
+  	width:80px;
+  	display: inline-block;
+  	
+	}
+	
+	</style>
+			<h:form id="invoiceHeaderFormBreadCrumbForm" prependId="false">
+				<h:inputHidden id = "invalidAccessPath"  name = "invalidAccessPath" value = "#{invoiceEntryBean.invalidAccessPath}"/>
+				<p:breadCrumb style ="min-width:1200px;max-width:100%;width:auto" model="#{invoiceEntryBean.breadCrumbTrail}" ajax="false" immediate="true" styleClass="ui-layout"/>
+			</h:form>
+			<!-- Error message display -->
+			<p:scrollPanel style="min-width:1200px;max-width:100%;width:auto;height:50px;" mode="native" styleClass="ui-layout">
+				<p:messages id="messages" showSummary="false" showDetail="true"	autoUpdate="true" />
+			</p:scrollPanel>
+		
+			<h:form prependId="false" name = "invoiceHeaderForm">	
+				<p:panel id="staticHeaderPanel" style ="min-width:1000px;max-width:100%;width:auto">
+					
+						<h:panelGrid columns="3">
+							<p:outputLabel styleClass="ui-label" value = "PO Number:"/>
+							<h:panelGroup>
+								<h:panelGrid columns="2"> 
+									<h:panelGroup> 
+									<h:outputText value="#{invoiceEntryBean.invoiceEntryVO.poNumber}"/>
+									<h:outputText value="/" />
+									<h:outputText value="#{invoiceEntryBean.invoiceEntryVO.poRevNo}" />
+									</h:panelGroup>
+								</h:panelGrid>
+								
+							</h:panelGroup>
+							<p:spacer height="30"/>
+							
+							<p:outputLabel styleClass="ui-label" value = "Vendor:"/>
+							<h:panelGroup>
+								<h:panelGrid columns="3">
+									<h:outputText value="#{invoiceEntryBean.invoiceEntryVO.vendorCode}"/>
+									<p:spacer width="15"/> 
+									<h:outputText value="#{invoiceEntryBean.invoiceEntryVO.vendorName}"/>
+								</h:panelGrid>
+								
+							</h:panelGroup>
+							
+							<p:spacer height="30" rendered="#{invoiceEntryBean.invoiceEntryVO.thirdPartyPO ? 'false':'true'}"/>
+							<h:panelGroup rendered="#{invoiceEntryBean.invoiceEntryVO.thirdPartyPO ? 'true':'false'}">
+								<h:panelGrid columns="4" >
+								<p:outputLabel value="Change Vendor:" styleClass="ui-label" />
+								<h:panelGroup>
+									<h:outputText id="vendorCode" value="#{invoiceEntryBean.vendorCode}" />
+									<h:inputHidden id="vendorCodeHidden" value="#{invoiceEntryBean.vendorCode}" />
+
+								</h:panelGroup>
+								
+								
+								<p:inputText id="vendorInput"  value="#{invoiceEntryBean.vendorName}" size="40" tabindex="13" 
+												onkeydown="setTargetKeyCode(event);" onchange="clearLabels(['vendorCode']); clearVendorCodeHidden();">
+												
+									<p:ajax event="change" partialSubmit="true" onstart="return proceedAjax();"
+												listener="#{invoiceEntryBean.decodeVendorByNameOrCode}"
+												process="@this , vendorInput " oncomplete="setFocusOnLOV('vendorInput', 'vendorLOV')"
+												update="vendorInput vendorCode , vendorCodeHidden" />
+								</p:inputText>
+
+								<p:commandButton id='vendorLOV' icon="icon-lov" title="lov"
+										oncomplete="showVendorLov();" immediate="true"
+										actionListener="#{vendorLovBean.fetchLOVData}" onstart="return hasMinAlphaNumericCharacters($('#vendorInput'));"
+										process="@this,vendorInput"
+										dynamic="true" async="true" update=":VENDOR_GRID">
+										<f:param name="VENDOR_INPUT" value="vendorInput" />									
+								</p:commandButton>
+							</h:panelGrid>
+						</h:panelGroup>
+						
+							
+							<p:outputLabel styleClass="ui-label" value = "Unit:"/>
+							<h:panelGroup>
+								<h:panelGrid columns="3">
+									<h:outputText value="#{invoiceEntryBean.invoiceEntryVO.unitNumber}"/> 
+									<p:spacer width="15"/>
+									<h:outputText value="#{invoiceEntryBean.invoiceEntryVO.unitDesc}"/>
+								</h:panelGrid>
+								
+							</h:panelGroup>
+							<p:spacer height="20"/>
+						</h:panelGrid>
+
+				</p:panel>
+				
+						<p:panel id="invoiceDetailPanel" style ="width:auto" > 
+							<h:panelGrid columns="2">
+								<h:panelGroup>
+									<p:outputLabel styleClass="ui-label" value = "Invoice Number:" for="invoiceNumber"/>
+									<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>
+								</h:panelGroup>
+								<p:inputText value="#{invoiceEntryBean.invoiceEntryVO.invoiceNumber}" 
+								id="invoiceNumber" onchange="makeUpperCase(this)" 
+								tabindex="1"	styleClass="trackDirtyValue"/>
+								
+								<h:panelGroup>
+									<p:outputLabel styleClass="ui-label" value = "Invoice Amount:" for="invoiceAmount"/>
+									<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>
+								</h:panelGroup> 
+								<p:inputNumber style="text-align:right" symbol="$" symbolPosition="p"  maxlength="30" maxValue="99999999999999999999999999999.99999" 
+									value="#{invoiceEntryBean.invoiceEntryVO.invoiceAmount}" id="invoiceAmount" decimalPlaces="2" decimalSeparator="." 
+									tabindex="2" thousandSeparator=","  styleClass="trackDirtyChildValues  ui-text-align-right-dev"/>
+								
+								<h:panelGroup>
+									<p:outputLabel styleClass="ui-label" value = "Received Date:" for="receivedDate"/>
+									<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>
+								</h:panelGroup> 
+						
+								<p:calendar id="receivedDate" widgetVar="receivedDateWidget" tabindex="3"  	
+										onchange="formatDate(this);" title="Calendar"
+										pattern="MM/dd/yyyy"	value="#{invoiceEntryBean.invoiceEntryVO.receivedDate}" showOn="button" 
+										styleClass="trackDirtyChildValues"> 
+									<f:convertDateTime pattern="MM/dd/yyyy" />		    									
+								</p:calendar>	
+					
+						
+								<h:panelGroup>
+								<p:outputLabel styleClass="ui-label" value = "Invoice Date:" for="invoiceDate"/>
+								<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>
+								</h:panelGroup> 	
+								<p:calendar id="invoiceDate" widgetVar="invoiceDateWidget"    tabindex="4"	
+												onchange="formatDate(this);" title="Calendar"	
+												value="#{invoiceEntryBean.invoiceEntryVO.invoiceDate}"
+												pattern="MM/dd/yyyy" showOn="button" styleClass="trackDirtyChildValues">
+												
+									<f:convertDateTime pattern="MM/dd/yyyy" />	
+									<p:ajax event="change" listener="#{invoiceEntryBean.updateDueDate}" update="dueDate"  oncomplete="setFocusPF('dueDate');"/>  
+								</p:calendar>
+								
+								<h:panelGroup>
+									<p:outputLabel styleClass="ui-label" value = "Due Date:" for ="dueDate"/>
+									<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>
+								</h:panelGroup> 			
+						
+								<p:calendar id="dueDate" widgetVar="dueDateWidget"  tabindex="5"
+										onchange="formatDate(this);changeHiddenDueDate();"	title="Calendar"
+										value="#{invoiceEntryBean.invoiceEntryVO.dueDate}"
+										pattern="MM/dd/yyyy" showOn="button">
+									<f:convertDateTime pattern="MM/dd/yyyy" />	
+								</p:calendar>
+								<input type="hidden" id="hiddenDueDate" value="" />
+								
+						</h:panelGrid>					
+					</p:panel>
+				
+					<p:panel id="vehicleDetailPanel"  rendered="#{invoiceEntryBean.invoiceEntryVO.thirdPartyPO ? 'false':'true'}"
+					style ="width:auto" >
+						<h:panelGrid columns="2" >
+							<h:panelGrid columns="3" >
+								<h:panelGroup>
+									<p:outputLabel styleClass="ui-label" value = "VIN:" for="vin"/>
+									<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>
+								</h:panelGroup> 
+								<p:inputText value="#{invoiceEntryBean.invoiceEntryVO.vin}" tabindex="6"
+								id="vin" onchange="makeUpperCase(this)" size="25" styleClass="trackDirtyValue"/>
+								<p:spacer height="1"/>
+								
+								<h:panelGroup>
+									<p:outputLabel styleClass="ui-label" value = "MSRP:" for="msrp"/>
+									<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>
+								</h:panelGroup>	
+								<p:inputNumber style="text-align:right" maxlength="18" symbol="$" tabindex="7"
+								symbolPosition="p" decimalPlaces="2" decimalSeparator="." size="25"  
+									thousandSeparator="," value="#{invoiceEntryBean.invoiceEntryVO.msrp}" id="msrp" styleClass="trackDirtyChildValues  ui-text-align-right-dev"/>
+								<p:spacer height="1"/>	
+								
+								<p:outputLabel styleClass="ui-label" value = "GVW:" for ="gvw"/>
+								<p:inputNumber style="text-align:right" thousandSeparator="" tabindex="8"
+								decimalPlaces="0" maxValue="9999999"  maxlength="18" size="25" 
+									value="#{invoiceEntryBean.invoiceEntryVO.grossVehicleWeight}" id="gvw" styleClass="trackDirtyChildValues ui-text-align-right-dev" />
+								<p:spacer height="1"/>
+									
+								<p:outputLabel styleClass="ui-label" value = "Shipping Weight:" for="shipWeight"/>						
+								<p:inputText style="text-align:right"   size="25"   tabindex="9" maxlength="18" value="#{invoiceEntryBean.invoiceEntryVO.shipWeight}" 
+									id="shipWeight" styleClass="trackDirtyValue  ui-text-align-right-dev"/>
+								<p:spacer height="1"/>
+								
+								<p:outputLabel styleClass="ui-label" value = "Key Code:" for="keyCode"/>
+								<p:inputText value="#{invoiceEntryBean.invoiceEntryVO.keyCode}" tabindex="10"
+								id="keyCode"  size="25" onchange="makeUpperCase(this)" 
+									styleClass="trackDirtyValue"/>
+							</h:panelGrid>
+							<h:panelGrid columns="2" id= "keyCodesGrid"  >
+								<h:panelGroup>
+									<p:spacer width="20" height="1"/>
+									<p:outputLabel styleClass="ui-label "  value = "Existing Key Codes:" />
+								</h:panelGroup>
+								
+								<p:outputLabel rendered="#{fn:length(invoiceEntryBean.invoiceEntryVO.existingKeyCodes) gt 0 ? false:true}" 
+									styleClass="fixedwidthlabel"  value ="none"/> 
+								<p:dataGrid rendered="#{fn:length(invoiceEntryBean.invoiceEntryVO.existingKeyCodes) gt 0}" id = "keyCodesDataGrid" 
+									styleClass="ui-noBorder alignmentleft"   style="border:1px solid" value="#{invoiceEntryBean.invoiceEntryVO.existingKeyCodes}" 
+									var="keyCode" columns="1">
+									<p:outputLabel styleClass="fixedwidthlabel"  value ="#{keyCode.keyCode}"/> 
+		    						<p:spacer width="30" height="1"/>
+		    						<p:outputLabel   value ="#{keyCode.keyTypeCode.keyType}"/>
+		    					</p:dataGrid>
+
+							</h:panelGrid>
+						</h:panelGrid>
+						
+					</p:panel>
+				
+				<p:panel id="buttonPanel">
+					<p:commandButton name = "nextBtn" id = "nextBtn" tabindex="11" value="Next" ajax="false" onclick="lockScreen();"
+					actionListener="#{invoiceEntryBean.next}"/>
+						<p:spacer width="10"/>
+					<p:commandButton name = "cancelBtn" id = "cancelBtn" tabindex="12" value="Cancel" action="#{invoiceEntryBean.cancel}" ajax="false"
+								onclick="lockScreen();" immediate="true" />
+								
+					<p:commandButton widgetVar="updateDueDateBtnWidget" id = "updateDueDateBtn"
+					name ="updateDueDateBtn"  style="display:none" actionListener="#{invoiceEntryBean.updateDueDate}" 
+					update="dueDate" oncomplete="setFocus('invoiceNumber')"/>			
+				</p:panel>
+				<h:inputHidden id="showWarning" name= "showWarning" value="#{invoiceEntryBean.showWarning}"/>
+				
+			</h:form>
+			
+		<p:confirmDialog id="confirmDialogId" appendTo="@(body)"
+		 message="#{invoiceEntryBean.warningMessage}. Continue?"
+		header="VIN Confirmation"  
+		widgetVar="confirmWidgetVar" resizable="false" width="500" height="60" onShow="setFocus('okBtnId');">    
+        	<p:focus context="confirmDialogId" />
+	           <h:form id="confirmDialogForm" prependId="false">
+	               		<p:hotkey immediate="true" bind="esc" handler="PF('confirmWidgetVar').hide();setFocus('vin')"/>
+		       				<p:commandButton  value="Ok" id="okBtnId" ajax="false"
+		       							process="@this"	onclick="hideDialog('confirmWidgetVar');lockScreen();" actionListener="#{invoiceEntryBean.saveOnConfirm}"/>
+		       				<h:outputText value="&#160;"/>			  
+		        			<p:commandButton  value="Cancel"  id="cancelBtnId" actionListener="#{invoiceEntryBean.cancelOnConfirm}" process="@this" onclick="hideDialog('confirmWidgetVar');setFocus('vin')"/>
+        			
+        		</h:form>
+        </p:confirmDialog>
+         <div id="VENDOR_LOV_DIV" >
+			<ui:include src="../lov/vendors.xhtml"/>
+		</div>
+		<div id="inputFieldChecks">
+			<ui:include src="../alert/inputFieldChecks.xhtml" />
+		</div>
+		
+		<script type="text/javascript">
+		function setSelection( lovName, nameArray, valueArray)
+		{	
+				if(lovName == 'vendorLOV'){
+                    for(var i=0; i  &lt; nameArray.length ; i++){
+                        if(nameArray[i] == 'VENDOR_CODE'){
+                            $('[id$=vendorCode]').html(valueArray[i]);
+                            $('[id$=vendorCodeHidden]').val(valueArray[i]);
+                            
+                        }
+                        if(nameArray[i] == 'VENDOR_NAME'){
+                            $('[id$=vendorInput]').val(valueArray[i]);
+                            
+                        }
+                       
+                    }
+                    //updateDueDateBtnWidget.click();
+                    document.getElementById('updateDueDateBtn').click();
+                }
+				
+		}
+		
+		function showWarning(){
+				var showWarning = document.getElementById('showWarning').value;
+				
+				if(showWarning == 'true'){
+					showDialog('confirmWidgetVar');
+				}
+			}
+			
+			
+			
+			function initializeDirtyDetection() {
+				registerIgnoreButton("nextBtn");
+				registerManualField("hiddenDueDate");
+				saveDataForDirtyDetection();
+			}
+			
+			function changeHiddenDueDate() {
+				newValue = document.getElementById("dueDate_input").value;
+				document.getElementById("hiddenDueDate").value = newValue;
+			}		
+			
+			 function clearVendorCodeHidden(){	
+			    	$('[id$=vendorCodeHidden]').val(''); 
+			    }
+
+	     	$(window).load(function(){
+	     		setFocus('invoiceNumber');
+	     		showWarning();
+	     		changeHiddenDueDate();
+	     		initializeDirtyDetection();
+			});				
+			
+		</script>
+
+</ui:define>
+	
+</ui:composition>

@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	 <style type="text/css">
+	 
+		button:disabled span.ui-button-text {
+		     color: #b3b3b3;
+		}		 
+	 
+		.ui-widget-content .ui-state-hover {
+			background: #e6e6e6;
+			font-weight: normal /*{fwDefault}*/;
+			color: #212121 /*{fcHover}*/;
+		}
+		
+		.ui-state-hover,.ui-widget-header .ui-state-hover,.ui-state-focus,.ui-widget-content .ui-state-focus,.ui-widget-header .ui-state-focus
+			{
+			background: #E2F1CE;
+			font-weight: normal /*{fwDefault}*/;
+			color: #212121 /*{fcHover}*/;
+		}
+		
+		.ui-state-active,.ui-widget-content .ui-state-active,.ui-widget-header .ui-state-active
+			{
+			border: 1px solid #aaaaaa /*{borderColorActive}*/;
+			background: #8CC63F;
+			font-weight: normal /*{fwDefault}*/;
+			color: #FFFFFF /*{fcActive}*/;
+		}
+		
+		.ui-widget {
+			font-size: 75%;
+		}
+		
+		.themeMenu {
+			overflow: auto;
+			height: 300px;
+			width: 200px;
+		}
+		
+		.ui-layout-north {
+			z-index: 20 !important;
+			overflow: visible;
+		}
+		
+		.ui-layout-north .ui-layout-unit-content {
+			overflow: visible;
+		}
+		
+		.ui-select-dropdown {
+			height: 25px;
+		}
+		
+		.ui-component-bg {
+			background: white;
+		}
+		
+		.ui-label {
+			font-weight: bold;
+			vertical-align: top;
+		}
+		.ui-label-smallfont {
+			font-weight: bold;
+			vertical-align: top;
+			font-size:.80em;
+		}
+		
+		.ui-label label {
+			font-weight: bold;
+			vertical-align: top;
+		}
+		
+		.alignmentRight {
+	 		text-align : right;
+ 			float: right;
+		}
+
+		.alignmentLeft {
+	 		text-align : left;
+ 			float: left;
+		}
+
+		
+		td {
+			vertical-align: center;
+		}
+		
+		.ui-menu-highlight {
+			font-weight: bold;
+			color: #8CC63F;
+		}
+
+        .ui-datatable-odd {
+            background: #f5f5f5;
+        }
+        
+        .ui-datatable-none {
+            background: white;
+        }
+		
+        .ui-datatable .ui-datatable-data td {
+            border-color:darkGrey darkGrey;               
+        	white-space: normal;      
+        }
+        
+        .ui-datatable th {
+        	font-weight: bold !important;
+        }
+        
+        .ui-datatable .ui-state-highlight {
+   			background: #E2F1CE !important;
+        }
+        		
+		.ui-datatable-data-empty {
+			font-weight: bold;
+		}
+		
+		.ui-tablerow-blue {
+			color: #0147FA;
+		}
+		
+		.ui-tablerow-strike-through {
+			text-decoration: line-through;
+		}	
+		
+		.ui-tablerow-strike-through-align-right {
+			text-decoration: line-through;
+ 			float: right;			
+		}
+		
+		.ui-tablerow-black {
+			color: #000000;
+		}
+		
+		.ui-datatable-data-empty .ui-dt-c {
+			width: 100% !important;
+		}
+		
+		.ui-growl-item-container { 
+			background-color: #FFFFFF; 
+			border:2px solid;
+			border-color:#8CC63F;
+		}
+
+		
+		.ModalScreen {
+			background: #FFFFFF none repeat scroll 0 0;
+			position: absolute;
+			cursor: not-allowed;
+			padding: 0;
+			margin: 0;
+			top: 0px;
+			left: 0px;
+			width: 100%;
+			display: none;
+			height: 100%;
+			z-index: 1000;
+			opacity: 0.6;
+			filter: alpha(opacity = 60);
+		}
+		
+		.ui-layout {
+			min-width: 900px;
+			max-width: 100%;
+			width: auto"
+		}
+
+		.ui-panelgrid tr, .ui-panelgrid td {
+    		border: none;
+		}
+
+		.ui-noBorder  div, .ui-noBorder tr, .ui-noBorder td {
+    		border: none !important;
+		}
+
+		.ui-border  div, .ui-border tr, .ui-border td {
+    		border: 1px solid lightgrey !important;
+		}
+		
+		.ui-radiobutton-box {
+		    background: url("/vision/images/radio_button.png") no-repeat !important;
+		    border-style: none !important;
+		}
+
+		.ui-border-none {
+		    border-style: none !important;
+		}
+
+		.ui-radiobutton .ui-radiobutton-box {
+		    width: 18px !important;
+    		height: 18px !important;
+		}
+		
+		.ui-datalist, .ui-datalist-content, .ui-datalist-data {
+		    background: transparent;
+		    border: none;
+		}	
+				
+		.alignmentRight {
+ 			text-align : right;
+ 			float: right;
+		}	
+				
+		.ui-autocomplete .ui-button-icon-only {
+		    background-image: url("/vision/images/circle_unfilled.png");
+		    background-repeat: no-repeat !important;
+		    background-position: 0 0 !important;
+		}		
+		
+		.ui-editor {
+        	width: 99.5% !important;
+		}
+		.ui-hr {
+		 	border: 0;
+  			width: 105%;
+  			color: black;
+			background-color: black;
+			height: 1.2px;
+			
+		}
+		
+		.mafs-button-indicator{
+		    color:red !important;
+		    font-weight: bold !important;
+		}
+		
+		.mafs-button-indicator-green{
+		    color:green !important;
+		    font-weight: bold !important;
+		}
+				
+		.enabledTextButton {
+			float:right; 
+			border:thin solid gray;   
+			text-decoration:none; 
+			cursor: pointer;
+		}
+		
+		.disabledTextButton {
+			float:right; 
+			border:thin solid Silver;   
+			text-decoration:none; 
+			cursor: pointer;
+			color:LightGray  !important;
+		}
+		
+		TABLE.dynaPanelCSS {
+    	width: 900px;
+		}
+		
+		.ui-dollar-ind{
+			color :red !important;
+			font-style:italic;
+		}
+		
+		.amendment-ind{
+			font-size: 135%;
+			font-weight: bold;
+		}
+
+		.panelGrid-compact tr td {
+			padding: 1px;
+			margin: 1px;
+			border: none !important;
+		}
+
+		.panelGrid-top td {
+			vertical-align: top;
+		}
+
+		.panelGrid-middle td {
+			vertical-align: middle;
+		}
+
+        .ui-chkbox-box.ui-widget.ui-corner-all.ui-state-default.ui-state-disabled{
+            background: #E0E0E0 !important;
+        } 
+        
+        .hide-column-header table thead tr {
+            display: none;
+        }
+         
+		.mafs-overdue-indicator{
+		    color:red !important;
+		    font-weight: bold !important;
+		    font-style:italic !important;
+		}
+/* Overiding to resolve UI issues after upgrade */
+/* LOVs */        
+        .ui-panelgrid tr, .ui-panelgrid td{
+		 	border:none !important;
+		}
+		
+        .ui-panelgrid-border tr, .ui-panelgrid-border td{
+		 	border-top-style: solid !important; 
+			border-bottom-style: solid !important;
+			border-right-style: solid !important;
+			border-left-style: solid !important; 
+			border-top-width: 1px !important;
+			border-bottom-width: 1px !important;
+			border-left-width: 1px !important;
+			border-right-width: 1px !important;
+			border-color: darkgrey !important; 
+		 	
+		}
+		
+		
+		.ui-button-icon-only .ui-button-text {
+			text-indent: -9999999px;
+			padding-top: 0.4em; 
+			padding-right: 0.4em;
+			padding-bottom: 0.4em;
+			padding-left: 0.4em;		
+		}
+		
+		.ui-button .ui-button-text {
+			line-height: 1.4;
+			display:block;
+		}
+		
+/* Drop Downs  */    
+		.ui-selectonemenu{
+			overflow: hidden;
+			display: inline-block;
+			position: relative;
+			cursor: pointer;
+			zoom: 1;
+			min-width: auto !important;
+		}
+
+/* Buttons */
+		.ui-button-text-only .ui-button-text{
+			padding-top: 0.4em;
+			padding-right: 1em;
+			padding-bottom: 0.4em;
+			padding-left: 1em;			
+		}
+/* Data Tables */
+		
+		.ui-datatable .ui-column.resizer {
+			border-right-color: darkgrey !important;		 
+		 }
+		 
+		.ui-datatable TBODY TD {
+			overflow: hidden;
+			padding-top: 4px;
+			padding-right: 10px;
+			padding-bottom: 4px;
+			padding-left: 10px;
+			border-top-style: solid; 
+			border-bottom-style: solid;
+			border-right-style: solid;
+			border-left-style: solid; 
+			border-top-width: 1px !important;
+			border-bottom-width: 1px !important;
+			border-left-width: 1px !important;
+			border-right-width: 1px !important;
+			border-color: darkgrey !important; 
+						
+		}			 
+	.ui-paginator{border-top: 1px solid #aaaaaa !important;}
+	
+	/* Labels */
+	.ui-label-smallfont {
+		font-size: 0.8em !important;
+	}
+	
+	/* Datatable header cell division when enabled resizing of columns */
+	.ui-datatable .ui-column-resizer {
+				border-right-color : darkgrey !important;
+			}	
+			
+	/* Text Right Alignment */
+	
+	.ui-text-align-right-dev .ui-inputfield {
+		text-align : right;
+	}
+	
+	/* Input field disabled look and feel */
+	.ui-inputfield.ui-state-disabled {
+    	color:darkgray
+	}
+	
+	/* Avoiding double header in TreeTable when sortable is true */
+	.ui-tree-datatable-sortable-dev .ui-treetable-scrollable-theadclone {
+		display:none;
+	}
+	
+	 .dispalyNone {
+            display: none;
+       }
+        
+   
+	
+</style>
+<title>Vision #{menuBean.getBuildVersion()} #{menuBean.databaseName} 
+	<h:outputText value="#{menuBean.dbRefreshInfo}">		
+	</h:outputText>
+</title>
+</h:head>
+
+<h:body onclick="lockDuringBreadcrum(event);">
+
+<h:outputScript library="js" name="dirtyDetection.js" target="head" />
+
+    <script type="text/javascript">
+        /**
+        * Supresses the Enter and Esc key events
+        * at the doc level on all the the views
+        * that uses this template.					
+        */
+         $(document).keypress(function(e){
+        	if(e.keyCode == 13 || e.keyCode == 27){
+				if(e.target.nodeName.toUpperCase() == 'TEXTAREA') {
+					return true;
+				}
+        		if(e.target.type){
+	        		if((e.target.type) != 'submit'
+	        				&amp;&amp; $(e.target.type) != 'button'){
+	                   return false;
+	        		}
+        		}
+            }
+        });
+    
+    /* <![CDATA[ */    
+    $(document).unbind('keydown').bind('keydown', function (event) {
+	    var doPrevent = false;
+	    if (event.keyCode === 8) {
+	        var d = event.srcElement || event.target;
+	        if ((d.tagName.toUpperCase() === 'INPUT' && (d.type.toUpperCase() === 'TEXT' || d.type.toUpperCase() === 'PASSWORD' || d.type.toUpperCase() === 'FILE')) 
+	             || d.tagName.toUpperCase() === 'TEXTAREA') {
+	            doPrevent = d.readOnly || d.disabled;
+	        }
+	        else {
+	            doPrevent = true;
+	        }
+	    }
+	
+	    if (doPrevent) {
+	        event.preventDefault();
+	    }
+	});
+	
+	/* ]]> */
+	
+    </script>
+
+	<div id="dvQuickModal" class="ModalScreen"
+                     style="display: none; height: 100%; width: 100%;">
+                    
+    </div>
+
+	<p:layout fullPage="true" widgetVar="pLayoutVar">
+
+
+		<p:ajax event="toggle" listener="#{menuBean.handleToggle}"
+			process="@this,:defaultForm:data_table_id" />
+
+		<p:layoutUnit id="left" collapsed="#{menuBean.collapseMenu}"
+			position="west" size="200" resizable="true" collapsible="true"
+			header="Menu" minSize="200">
+
+
+
+
+			<div class="ui-widget ui-widget-header">
+				<p:graphicImage style="text-align:right;align:right;"
+					value="/images/logo.png" width="190"/>
+			</div>
+
+
+
+
+
+			<h:form id="defaultForm">
+				<h:inputHidden id="data_table_id" name="data_table_name" />
+				<div class="logoutlinks">
+					
+					#{userBean.username} 
+					<p:spacer width="20"/>
+					
+					<p:commandLink action="/view/notImplemented.xhtml?faces-redirect=true" 
+						ajax="false">
+						<h:outputText value="Help"  style="text-align: right; align: right" />
+					</p:commandLink>
+					
+				</div>
+			</h:form>
+			<p></p>
+			<h:form id="menuForm">
+				<p:accordionPanel collapsible="true" autoHeight="false" value="#{menuBean.menuGroupList}" var="menuG"  activeIndex="#{menuBean.selectedGroupIndex}">	
+                	<p:tab title="#{menuG.groupName}" >
+				    	<p:dataList value="#{menuG.menuItemList}" var="link" width="160" type="none">
+               				<p:commandLink action="#{menuBean.selectMenuItemAction(menuG.groupName,link.displayName)}" ajax="false">
+								<h:outputText rendered="#{link.active  == false}" value="#{link.displayName}" />
+								<h:outputText styleClass="ui-menu-highlight" rendered="#{link.active  != false}" value="#{link.displayName}" />
+							</p:commandLink>
+							<p></p>
+                    	</p:dataList>	
+					</p:tab>
+				</p:accordionPanel>
+			</h:form>
+		</p:layoutUnit>
+
+		<p:ajaxStatus onstart="ajaxStatusShow();"
+			oncomplete="ajaxStatusHide();" />
+
+
+		<p:layoutUnit id="center" position="center">
+
+			<div id="statusDialog" style="display: none;">
+				<p:graphicImage value="/images/ajaxloading.gif" />
+				Loading...
+			</div>
+			<div id="content" class="ui-widget">
+				
+				<div id="content_logout">
+				    <h:form id="content_logout_form">		
+					    <a href="#" onclick="window.close();"><p:graphicImage value="/images/exitvision.png" style="border:none"/></a>
+ 				  	</h:form>
+ 				</div>
+				<div class="post">
+					<ui:insert name="content">...</ui:insert>
+				</div>
+			</div>
+
+		</p:layoutUnit>
+
+	</p:layout>
+</h:body>
+
+<script type="text/javascript">
+	
+javascript:window.history.forward(1);
+document.getElementById("left").style.zIndex= "";
+document.getElementById("center").style.zIndex= "";
+showLogoutDivButtonIconAtRight();
+Number.prototype.numberFormat = function(decimals, inputType) {
+    var dec_point =  '.';
+    var thousands_sep =  ',';
+    var parts = this.toFixed(decimals).toString().split(dec_point);
+    if(inputType =='AMOUNT'){
+    	//prepare comma seperated value
+    	 parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousands_sep);
+    }
+    return parts.join(dec_point);
+}
+
+	function showLogoutDivButtonIconAtRight(){
+		var popUp = document.getElementById('content_logout');
+		popUp.style.display = "block";		
+		popUp.style.position = "absolute";
+		popUp.style.left = "91%";	
+		popUp.style.top = "1%"; 
+	}
+	
+	// This is a wrapper around PF().show() because in the past we've had customization around showing dialogs
+	// and if we need to again then this is a central place.
+	function showDialog(widgetVar){
+		PF(widgetVar).show();
+	}
+	
+	function hideDialog(widgetVar){
+		PF(widgetVar).hide();
+	}
+		
+	function showSkinPreferences(){
+
+		document.getElementById('themeForm:themeMenuID').style.display = "block";	
+		PF('themeMenu').show();
+		
+	}
+	function ajaxStatusShow(){
+		var popUp = document.getElementById('statusDialog');
+		popUp.style.display = "block";		
+		popUp.style.position = "absolute";
+		popUp.style.left = "83%";	
+		popUp.style.top = "1%";	
+		showAjaxLoading($(this));		
+	}
+
+	
+	function ajaxStatusHide(){
+		document.getElementById('statusDialog').style.display = "none";;
+		document.getElementById('dvQuickModal').style.display = "none";
+		if(document.getElementById('dvQuickModalDialog')){
+			document.getElementById('dvQuickModalDialog').style.display = "none";
+		}
+	}
+	
+	function setDataTableToFirstPage( tableWidgetVar ){
+		var paginator = PF(tableWidgetVar).getPaginator();
+		if(paginator){
+			paginator.setPage(0,true);
+		}		
+	}
+	
+	function setDataTableToFirstRow(tableWidgetVar){
+		if(dataTableHasData(tableWidgetVar)){
+			PF(tableWidgetVar).selectRow(0,false);
+		}		
+	}	
+	
+	function dataTableHasData(tableWidgetVar){
+		var paginator = PF(tableWidgetVar).getPaginator();
+		if(paginator.cfg.rowCount > 0){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	
+	function clearDataTableSelection( tableWidgetVar ){
+		PF(tableWidgetVar).unselectAllRows();
+	}
+	
+	function clearOutputText(arr){
+		for( i = 0 ; i &lt; arr.length ; i++ )
+		{	
+			if(document.getElementById(arr[i]))
+			{
+				document.getElementById(arr[i]).innerHTML = "";
+			}
+		}
+	}
+	
+	function clearInputText(arr){
+		for( i = 0 ; i &lt; arr.length ; i++ )
+		{	
+			if(document.getElementById(arr[i]))
+			{
+				document.getElementById(arr[i]).value = "";
+			}
+		}
+	}
+	function body_onkeydown(event,buttonName,LovWidgetName) 
+    {	
+	 	var userBwser = navigator.appName;
+	 	if(event.keyCode==13 &amp;&amp; document.getElementById(buttonName)) 
+        {
+				document.getElementById(buttonName).click();	
+        }
+	 	
+		 if( event.keyCode==27){
+			if(PF(LovWidgetName)){
+				PF(LovWidgetName).hide();
+			}
+		 }
+		 
+		 if(event.keyCode==8){
+			 var activeElement = document.activeElement;
+			 if(activeElement == null){
+				 window.event.keyCode = 0;
+			 }else if(activeElement.nodeName != "INPUT" ){
+				 window.event.keyCode = 0;
+			 }else if(activeElement.readOnly){
+				 window.event.keyCode = 0;
+			 }
+		 }
+    }
+
+	function onkeydownESC(event, LovWidgetName) 
+    {	
+		
+		if( event.keyCode==27){
+			PF(LovWidgetName).hide();
+		}		 	
+    }	
+	
+	function onKeyPressBkSpce(){
+		if(event.keyCode==8){
+			window.event.keyCode = 0;
+		}
+	}
+	
+	function setElementFocus(elementId){
+		if(document.getElementById(elementId)){
+			document.getElementById(elementId).focus();
+		}
+	}
+
+	function makeUpperCase(obj){
+		obj.value = obj.value.toUpperCase();
+	}
+		function setFocus(fieldId){
+		var ctrl = $('[id$='+ fieldId +']');
+		
+		if (canSetFocus(fieldId)){
+			ctrl.focus();
+		}
+	}
+	
+	function setFocusPF(id){	
+		$(function(){PrimeFaces.focus(id);});
+	}
+	
+	// returns a boolean to indicate whether the field we are trying to set focus on 
+	// is not disabled and is focusable (can have focus set to it)
+	// this is used in setFocus as well as a few other places to conditionally set focus on 
+	// enabled elements
+	function canSetFocus(fieldId){
+		var ctrl = $('[id$='+ fieldId +']');
+		var canHaveFocus = false;
+		if (!ctrl.is(':disabled')){
+		    jQuery(document).ready(function() { 
+			    if(ctrl){
+				    if(!ctrl.disabled){
+				    	if(ctrl.is(":focusable")){
+					       canHaveFocus = true;
+				    	}
+				    }
+			    }
+		    });
+		}
+		return canHaveFocus;
+	}
+	/**
+     * HACK: Post ajax cols to set focus on LOV icon.
+     */
+	function setFocusOnLOV(txtId, lovId){
+		setFocus(txtId);
+		setFocus(lovId);
+	}
+	
+	function doSubmitButton(event, btnName){
+		
+		if(event.keyCode == 13){
+			if(document.getElementById(btnName)){
+				if(!document.getElementById(btnName).disabled){
+					document.getElementById(btnName).click(); return false;
+				}
+			}
+		}
+	}
+	
+	function handleChangePasswordRequest(xhr, status, args, widgetNameVar){		
+        if(!args.failure) { 
+        	hideDialog('widgetNameVar');
+        	if(document.getElementById('unitNumber')){
+        		setFocus('unitNumber');	
+        	}else if(document.getElementById('userName')){
+        		setFocus('userName');	
+        	}        	
+        }
+	}
+	
+	
+	function showAjaxLoading(control){
+			var dvQuickModal = document.getElementById('dvQuickModal');   
+		       dvQuickModal.style.height = $(document).height(); 
+		       dvQuickModal.style.width = $(document).width();
+		       dvQuickModal.style.display = 'inline';
+		       //dvQuickModal.style.zIndex = 9999;
+	 	    
+			 var dvQuickModalDialog = document.getElementById('dvQuickModalDialog');
+			 if(dvQuickModalDialog){
+				dvQuickModalDialog.style.height = $(document).height(); 
+				dvQuickModalDialog.style.width = $(document).width();
+				dvQuickModalDialog.style.display = 'inline';
+				 $(document).keydown(function(objEvent) {
+			           if (objEvent.keyCode == 9 || objEvent.keyCode == 13) {  //tab pressed
+			               objEvent.preventDefault(); // stops its action
+			           }
+				 })
+			}  
+		}
+	
+
+	function setFocusOnThis(event,elementName){
+		if(event.keyCode == 13){
+			setFocus(elementName);
+		}
+	}
+
+	function lockScreen(){
+		ajaxStatusShow();	
+	}
+	
+	var targetKeyCode;
+	
+	function setTargetKeyCode(event){
+		targetKeyCode = event.keyCode;
+	}
+	
+	function proceedAjax(){
+		
+		if(targetKeyCode == 9){
+			targetKeyCode = -1;
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	function clearLabels(arr){
+		for( i=0; i &lt; arr.length; i++ ){	
+			if(document.getElementById(arr[i])){				
+				$("#"+arr[i]).html("");
+			}
+		}
+	}
+  
+	/**
+	* To be used by text input fields to restrict
+	* input to numeric values.
+	*/
+	function numericInput(event){
+		if((event.keyCode &lt; 48 || event.keyCode &gt; 57) &amp;&amp; event.keyCode != 9){
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	function setCurrentElementFocus(inputObject){
+		if(document.activeElement.id.length > 0){
+			$("*:focus").focus();
+		}else{
+			 setFocus(inputObject);
+		}
+	
+	}
+    
+	function selectLovRecord(id) { 
+        if(document.getElementById(id)) {
+        	document.getElementById(id).click();
+        }
+    }
+	
+	function setScrollDivAtTop() {	
+		jQuery("div").scrollTop(0);
+		jQuery("div").scrollLeft(0);	
+    }
+		
+	function numberOnly(control, event){
+		var charCode = (event.which) ? event.which : event.keyCode;					
+		var supp = control.value;
+		var suppLastIndex = 0;
+		suppLastIndex = supp.indexOf(".");
+        if (suppLastIndex != -1 &amp;&amp; charCode == 46){
+        	return false;
+        }       
+		if ( (charCode &lt; 48 || charCode &gt; 57) &amp;&amp; charCode != 46 ){			 			
+	        return false;
+		}else{
+			return true;
+		}
+	}	
+
+	function isNumberKey(control, event) 
+    { 
+        var charCode = (event.which) ? event.which : event.keyCode;
+        
+        if(trim(control.value) != "") {
+        	var supp = trim(control.value);
+        	if(!isNaN(supp)) {
+        		var suppLastIndex = 0;
+        		suppLastIndex = supp.indexOf(".");
+		        if (suppLastIndex != -1 &amp;&amp; charCode == 46){
+		        	return false;
+		        }
+		        if(suppLastIndex != -1){
+		        	supp = supp.substring(suppLastIndex +1, supp.length);					        	
+		        	if(supp.length > 2){					        		
+		        		control.value = Math.round(control.value*100)/100;
+		        		updateInvoiceAmounts();
+		        		return false;
+		        	}
+		        }
+        	}
+        }
+        
+ 		if ( (charCode &lt; 48 || charCode &gt; 57) &amp;&amp; charCode != 46 ){			 			
+ 		        return false;
+ 		}else{
+          		return true;
+ 		}
+    }
+	
+	function trim(stringToTrim){
+		i = 0;
+		while(i == 0){
+			stringlength = stringToTrim.length;
+			if(stringToTrim.substr(0,1) == " ")
+				stringToTrim = stringToTrim.substring(1,stringlength);
+			else
+				i = 1;
+		}
+		while(i == 0 || i==1){
+			stringlength = stringToTrim.length;
+			if(stringToTrim.substr(stringlength - 1,1) == " ")
+				stringToTrim = stringToTrim.substring(0,stringlength - 1);
+			else
+				i = 2;
+		}
+		return stringToTrim;
+	}
+	
+	  /**
+	  * Increases or decreases a primeface dialog dimensions.
+	  *     PARAM: 
+	  *        control - The primeface widget object
+	  *        width - The amount to increase or decrease the dialog's width by. 
+	  *        height - The amount to increase or decrease the dialog's height by.
+	  * NOTE: Pass in a negative number to decrease dimension(s).
+	  */
+	  function resizeDialog(control, width, height){
+         var currentWidth = parseInt($('[id$=' + PF(control).id + ']').css('width').match(/[0-9]+/g));
+		  var currentHeight = parseInt($('[id$=' + PF(control).id + ']').css('height').match(/[0-9]+/g));
+		  
+		  if(width){				  
+			  $('[id$=' + PF(control).id + ']').css('width', (currentWidth + width) + 'px');
+		  }
+		  
+		  if(height){
+			  $('[id$=' + PF(control).id + ']').css('height', (currentHeight + height) + 'px');
+		  }
+	  }	
+	
+	  /**
+	  * Gets the dialog's height
+	  *     PARAM: 
+	  *        control - The primeface widget object	  
+	  */
+	function getDialogHeight(control){
+		 var currentHeight = parseInt($('[id$=' + PF(control).id + ']').css('height').match(/[0-9]+/g));
+		 return currentHeight;
+    }
+
+    
+	 /**
+	  * format date input supported by  MAFS standard date format 
+	  *      6/2/14 , 6/2/2014 ,  6/02/14 ,06/2/14 ,  053114 are valid format
+	  */ 	
+	  function formatDate(cont){
+		
+		 var input = cont.value;
+			if(String(input).length == 0){
+				return;
+			}
+	    	 if(input.indexOf('/') == -1 ){
+	    		 input = [input.slice(0, 2), '/', input.slice(2)].join('');		
+	    		 input = [input.slice(0, 5), '/', input.slice(5)].join('');
+	    	 } 
+	    	 
+			var res = input.split('/'); 
+			var year = res[2];
+			if(String(year).length == 2){
+				year = '20' + 	year;
+			}
+			input = res[0] +'/'+res[1] +'/'+year;
+		
+			try{
+				var temp = $.datepicker.parseDate('mm/dd/yy', input);					
+				cont.value = res[0] +'/'+res[1] +'/'+temp.getFullYear();
+			}catch(err){
+				cont.value = '';
+			}
+						
+	}
+		  
+    /**
+	  * Restricts input to a MAFS standard date format
+	  *     PARAM: 
+	  *        control -  input control
+	  *        event -  event containing the keycode that was fired 
+	  */ 	 
+	 function dateInput(control, event){
+	     var isValid = false;
+		
+		 if(event.keyCode &gt; 46 &amp;&amp; event.keyCode &lt; 58) {				
+		     switch(String(control.value).length){
+			     case 2:
+				     control.value = String(control.value) + String.fromCharCode(47);
+				     break;
+				 case 5:
+				     control.value = String(control.value) + String.fromCharCode(47);
+				     break;			  
+			 }
+			
+			 if(event.keyCode == 47 || control.value.length == 10){
+			     event.keyCode = null;
+			 }
+				
+			 isValid = true;
+		} else {  
+		    event.keyCode = null;			
+		    isValid = false;
+		}
+						
+		return isValid;
+	}	
+	
+	/**
+	  * Formats the date input to MAFS standard date time format.
+	  *     PARAM: 
+	  *        widget - Calendar control which the formatted date time will be assigned
+	  *        input -  The date the user typed into the calendar control
+	  * NOTE: It is assumed that the input will be 'MM/DD/YY' or 'MM/DD/YYYY format
+	  * TODO: Update to convert inputs of 'MMDDYY' or 'MMDDYYYY' to 'MM/DD/YYYY'
+	  */ 		 
+	function formatCalendarDateTime(widget, input){
+		var inputDate = PF(widget).getDate();
+		var currentDate = new Date();		
+		
+		if(String(input).length == 8 || String(input).length == 10){		
+			PF(widget).setDate(new Date(inputDate.getFullYear(), inputDate.getMonth(), inputDate.getDate(), currentDate.getHours(), currentDate.getMinutes()));				
+		}
+	}
+	
+    /**
+     * Use to select text within a text control when it has focus.
+     * USAGE - Assign this method as a handler for the onfocus event
+     * PARAMETER 
+     *     id - The id of the control
+     */
+    function selectText(id){  	 
+    	document.getElementById(id).select();
+    }
+    
+	/**
+	 * The LPA function pads the left-side of a string with a specific set of characters (when string1 is not null)
+	 *     PARAM: 
+	 *        str -  is the string to pad characters to (the left-hand side).
+	 *        width -  is the number of characters to return. 
+	 *        height - This is the string that will be padded to the left-hand side of string1.
+	 */
+	function lpad(str, width, padStr){
+		 return String(str).length &lt; width ? lpad(String(padStr) + '' + String(str), width, String(padStr)) : '' + String(str);
+    }
+	  
+	/**
+	 * The rpad function pads the right-side of a string with a specific set of characters (when string1 is not null)
+	 *     PARAM: 
+	 *        str -  is the string to pad characters to (the left-hand side).
+	 *        width -  is the number of characters to return. 
+	 *        height - This is the string that will be padded to the left-hand side of string1.
+	 */  
+	 function rpad(str, width, padStr){
+		 return String(str).length &lt; width ? rpad(String(str) + String(padStr), width, String(padStr)) : String(str);
+	 } 
+
+	 /**
+	  * Replaces JavaScript's toFixed method. It will perform the same functionality, 
+	  * but with predictable/accurate results. The JS method is extremely buggy when 
+	  * it comes to rounding as result differ based on browser.
+	  *     PARAM: 
+	  *        number -  Number with decimal
+	  *        precision -  Number of digits permitted to the right of the decimal 
+	  */
+	 function toFixed(number, precision) {
+		    var multiplier = Math.pow( 10, precision );
+		    return Math.round( number * multiplier ) / multiplier;
+	 }
+	 	
+	//These 2 functions are being used in java code
+	function markRedForError(elementId){
+		if(document.getElementById(elementId)) {
+			document.getElementById(elementId).style.borderColor="#CC3300"
+		}
+	}
+	function unMarkRedForError(elementId){
+		if(document.getElementById(elementId)) {
+			document.getElementById(elementId).style.borderColor="transparent"			
+		}
+	}
+	
+	 /**
+	  * TODO: Implement subject and body
+	  *
+	  * Load client's default mail client to send email
+	  * 
+	  *     PARAM: 
+	  *        recipient -  email address
+	  *        subject -  emai's subject
+	  *        body - content for the email's body
+	  */	
+	  function loadClientEmail(emailRecipient, emailSubject, emailBody){
+		  var mailToString;
+		  mailToString = "mailto:" + emailRecipient;
+		  window.open(mailToString);			  
+	  }
+	  
+ 	function lockDuringBreadcrum(event) {
+		if(event.srcElement){
+			if(event.srcElement.parentNode){
+				if(event.srcElement.parentNode.parentNode){
+					if(event.srcElement.parentNode.parentNode.parentNode){
+						if(event.srcElement.parentNode.parentNode.parentNode.parentNode){
+							if(event.srcElement.parentNode.parentNode.parentNode.parentNode.id){
+								var className = event.srcElement.parentNode.parentNode.parentNode.parentNode.className;
+								var isItBreadcrumb = className.indexOf("breadcrumb");
+								if(isItBreadcrumb != null &amp;&amp; isItBreadcrumb != -1){
+									if(event.srcElement.parentNode.tagName){
+										if(event.srcElement.parentNode.tagName == 'A'){
+											lockScreen();
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}	
+	  
+    </script>
+    
+</html>

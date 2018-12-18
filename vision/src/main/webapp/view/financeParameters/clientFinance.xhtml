@@ -1,0 +1,165 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"   
+	xmlns:pe="http://primefaces.org/ui/extensions" 
+    template="../../templates/ui.xhtml" >
+
+    <ui:define name="content"> 
+		<h:form id="clientFinanceBreadCrumbForm" prependId="false">
+ 		<p:breadCrumb model="#{clientFinanceBean.breadCrumbTrail}"
+				ajax="false" immediate="true" />
+		</h:form>   
+    	<!-- Message display -->
+		<p:scrollPanel style="height:50px;" mode="native">
+			<p:messages id="messages" severity="info,error,fatal" showSummary="false" showDetail="true" 
+				autoUpdate="true" />
+		</p:scrollPanel>
+   		
+   		<h:form id="clientLevelFeesForm" prependId="false"> 
+			<p:panel id="clientInfoPanel" header="Client Information">  
+				<div id="clientDisplayPanel">
+					<comp:clientDisplay id="clientDisplayId" cId="#{clientFinanceBean.accountCId}" accountType="#{clientFinanceBean.accountType}" accountCode="#{clientFinanceBean.accountCode}" parentBean="#{clientFinanceBean}"
+										update=":clientLevelFeesForm:clientFinanceDataTablePanel :clientLevelFeesForm:clientInfoPanel" ajax="true"/>
+				</div>
+			</p:panel>
+
+			<p:panel id="clientFinanceDataTablePanel" header="Client Finance Fees">
+
+   				<p:toolbar id="searchToolbar">  
+  				    <p:toolbarGroup style="vertical-align:top;text-align:left">  
+  				    	<p:spacer width="10"/>
+				        <h:outputText for="financeCategoryFilter" value="Fee Category : " />
+				        <p:spacer width="10"/>  
+				        <p:selectOneMenu id="financeCategoryFilter"
+				        				 style="vertical-align:top;"
+				        				 value="#{clientFinanceBean.selectedFinanceCategory}" 
+				        				 onkeypress="return doKeypressFilter(event)" 
+				        				 converter="FinanceParameterCategoryConverter" tabindex="10"> 
+	        				<p:ajax listener="#{clientFinanceBean.selectOneMenuListener}" update=":clientLevelFeesForm"/> 
+	        				<f:selectItem itemValue="" itemLabel="ALL"></f:selectItem>
+				            <f:selectItems 
+				            	value="#{clientFinanceBean.financeParameterCategories}" 
+				            	var="category"
+				            	itemLabel="#{category.categoryName}"
+				            	itemValue="#{category}" /> 
+				        </p:selectOneMenu>  
+				    </p:toolbarGroup>  
+				</p:toolbar> 
+				<p:focus context="clientFinanceDataTablePanel"/>
+
+				<p:dataTable id="clientFinanceTable" var="element"
+					value="#{clientFinanceBean.rowList}" emptyMessage=""
+					scrollable="true" rowIndexVar="elementRowIndex"
+					scrollHeight="#{clientFinanceBean.dataTable.height}"
+					rowKey="#{element.description}">
+
+					<p:column style="width:10px">
+						<f:facet name="header">
+							<h:outputText value="Description" style="font-weight:bold" />
+						</f:facet>
+						<h:outputLabel
+							value="#{element.description}" />
+					</p:column>
+					<p:column style="width:10px">
+						<f:facet name="header">
+							<h:outputText value="Fee Category" style="font-weight:bold" />
+						</f:facet>
+						<h:outputLabel
+							value="#{element.financeParamCategory}" />
+					</p:column>					
+					<p:column style="width:10px">
+						<f:facet name="header">
+							<h:outputText value="Default Value" style="font-weight:bold" />
+						</f:facet>
+						<h:outputLabel style="float:right"
+							value="#{element.defaultnvalue}" />
+					</p:column>	
+					<p:column style="width:10px">
+						<f:facet name="header">
+							<h:outputText value="Client Value" style="font-weight:bold" />
+						</f:facet>
+						<p:inputText id="cost" style="text-align:right; width:90%" disabled="#{!clientFinanceBean.hasPermission()}"  
+							value="#{element.financeParameterValue}" maxlength="40" tabindex="20"
+							styleClass="rowArray trackDirtyChildValues">
+						</p:inputText>					
+					</p:column>	
+					<p:column style="width:10px">
+						<f:facet name="header">
+							<h:outputText value="Last Updated" style="font-weight:bold" />
+						</f:facet>
+						<h:outputLabel
+							value="#{element.lastUpdated}">
+								<f:convertDateTime pattern="MM/dd/yyyy"/>
+						</h:outputLabel>
+					</p:column>
+					<p:column style="width:10px">
+			<p:outputLabel value="GG" rendered="#{!clientFinanceBean.gradeGroupsExistForClient}"/>
+            <p:commandLink id="gradeGroupFinanceParamCommandLink" immediate="true" value="GG" ajax="false"
+            		  action="#{clientFinanceBean.gradeGroupFinanceParam(element)}"
+                      title="Click to see Grade Group Finance Parameters"
+                      onclick="lockScreen();" rendered="#{clientFinanceBean.gradeGroupsExistForClient}"
+                      style="#{element.ggIndicator == 'Y' ? 'color:red;' : 'color:black'}"/>
+            <p:spacer width="10"/>
+            <p:outputLabel id= "costCentreFinanceParamCommandLabel" value="CC" rendered="true"/>
+            
+            <!-- left the command link with rendering false for future use -->
+            
+            <p:commandLink id="costCentreFinanceParamCommandLink" immediate="true" value="CC" ajax="false"
+                      action="#{clientFinanceBean.costCentreFinanceParam(element)}"
+                      title="Click to see Cost Center Finance Parameters"
+                      onclick="lockScreen();" rendered="#{clientFinanceBean.costCentersExistForClient}" 
+                      style="display:none"/>    
+            <p:spacer width="10"/>
+            <p:outputLabel value="QP" rendered="#{!clientFinanceBean.isExistQuoteProfileFinanceParam(element.parameterId)}"/>
+            <p:commandLink id="quoteProfileCommandLink" immediate="true" value="QP"
+                			update=":quoteProfileFinanceParamForm"
+                			action="#{quoteProfileFinanceBean.initDialog(clientFinanceBean.clientAccount, element.parameterId)}"
+                			oncomplete="PF('quoteProfileFinanceParamDialogWidget').show();"
+                			title="Click to see quotation profiles"
+                			rendered="#{clientFinanceBean.isExistQuoteProfileFinanceParam(element.parameterId)}"
+                			style="color:red;"/>
+          </p:column>
+				</p:dataTable>				
+			</p:panel>
+	  		<p:panel id="commandPanel" style="min-width:980px;max-width:100%;width:auto;">
+				<p:commandButton id="savePage" value="Save" tabindex="40" action="#{clientFinanceBean.saveClientFinanceParams}" update=":clientLevelFeesForm" process="@form" disabled="#{!clientFinanceBean.hasPermission()}"/>
+				<p:spacer width="10" />				    
+				<p:commandButton id="cancelPage" value="Cancel" tabindex="50" action="#{clientFinanceBean.cancel}" ajax="false" immediate="true" onclick="lockScreen();"
+					rendered="#{clientFinanceBean.cancelEnabled}"/>
+			</p:panel>
+   		</h:form>
+   		
+		<div id="quoteProfileFinanceParamInclude">
+			<ui:include src="../../resources/view/component/quoteProfileFinanceParam.xhtml" />
+		</div>
+		
+		<script type="text/javascript">	
+			
+			/**
+			* Detects the Enter key and programatically clicks
+			* the filter button. The search button event handler
+			* will perform the min. alphanumeric check.
+			*/
+			function doKeypressFilter(event){
+				if (event.keyCode == 13) {
+					source = event.srcElement.id;
+				   $('#filter').click();
+				   return false;
+				}
+				return true;	
+			}
+			
+			function initializeDirtyDetection() {
+				registerIgnoreButton("savePage");
+				saveDataForDirtyDetection();
+			}	
+			
+	     	$(window).load(function(){
+	     		initializeDirtyDetection();
+			});				
+		</script>
+	</ui:define>
+</ui:composition>    

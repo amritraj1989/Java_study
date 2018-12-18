@@ -1,0 +1,116 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:pe="http://primefaces.org/ui/extensions" >
+	
+	
+		 <p:dialog header="Select Quotation Profile" widgetVar="quotationProfileLOV" id="QUOTATION_PROFILE_GRID" dynamic="true" resizable="true" appendTo="@(body)"
+						 width="1000" height="380"  modal="true" onShow="setFirstPageProfileDataTableWidget();setFocus('profileSelectVar');">
+ 		<h:form id="quotationProfiles" prependId="false">
+			<p:panel id="quotationProfilesTable" header="Quotation Profiles"
+				style="min-width:980px;max-width:100%;width:auto;">
+				<p:panel>
+					<p:panelGrid>
+						<p:row>
+							<p:column>
+								<h:outputLabel value="Client: " styleClass="ui-label" />
+							</p:column>
+							<p:column>
+								<h:outputText
+									value="#{quotationProfilesLovBean.accountCode}" />
+							</p:column>
+							<p:column>
+								<h:outputText
+									value="#{quotationProfilesLovBean.accountName}" />
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+				</p:panel>
+				
+				<p:panel>
+					<p:dataTable var="profile"
+						value="#{quotationProfilesLovBean.profileList}"
+						sortBy="#{profile.effectiveFrom}" sortOrder="descending"
+						selection="#{quotationProfilesLovBean.selectedProfile}"
+						rowKey="#{profile.profileCode}" 
+						selectionMode="single"
+						widgetVar="quoteProfileDataTableVar"
+						rows="20" 
+						paginator="true"
+						paginatorPosition="bottom">
+						
+						<p:ajax event="rowSelect" listener="#{quotationProfilesLovBean.onRowSelect}" />
+						
+						
+						<p:column headerText="Profile Code" width="20%"
+							sortBy="#{profile.profileCode}">
+							<h:outputText value="#{profile.profileCode} " />
+							<h:outputText value=" (current)" style="font-weight: bold;font-style: italic;" 
+							rendered="#{profile.qprId == quotationProfilesLovBean.profileId}"/>
+						</p:column>
+						<p:column headerText="Profile Description" sortBy="#{profile.description}" width="30%">
+							<h:outputText value="#{profile.description}" />
+						</p:column>
+						<p:column headerText="Interest Index" sortBy="#{profile.itcInterestType}" width="10%">
+							<h:outputText value="#{profile.itcInterestType}" />
+						</p:column>
+						<p:column headerText="Float/Non-float" sortBy="#{profile.variableRate}" width="10%">
+							<h:outputText value="#{profile.variableRate.equals('F') ? 'Non-float' : 'Float'}" />
+						</p:column>
+						<p:column headerText="Effective From" width="10%"
+							sortBy="#{profile.effectiveFrom}">
+							<h:outputText value="#{profile.effectiveFrom}">
+								<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Status" width="20%"
+							sortBy="#{profile.profileStatus}">
+							<h:outputText value="#{profile.profileStatus}" />
+						</p:column>
+					</p:dataTable>
+				</p:panel>
+			</p:panel>
+			<p:panel id="commandPanel" style ="min-width:980px;max-width:100%;width:auto">
+			
+				<p:commandButton id="profileSelectButton" value="Select" widgetVar="profileSelectVar" process="@this"
+					update="lovSelectedQuoteProfileId" oncomplete="setQuoteProfileValues();hideDialog('quotationProfileLOV');"/>
+				 
+			</p:panel>
+			
+			<h:inputHidden id="lovSelectedQuoteProfileId" value="#{quotationProfilesLovBean.selectedProfileId}" />
+			
+
+		</h:form> 
+		
+	</p:dialog>	
+	
+	<script>	
+
+	function showQuotationProfileLov() {
+		showDialog('quotationProfileLOV');			
+	}
+	
+	function setQuoteProfileValues(){
+		var lovNameArray = new Array();
+		var lovValueArray = new Array();
+
+		lovNameArray[0]='QUOTE_PROFILE_ID';
+		lovValueArray[0]=document.getElementById('lovSelectedQuoteProfileId').value;
+		
+		<!-- This method need to implement in parent page to populate LOV seletion-->
+		setSelection('quoteProfileLOV',lovNameArray,lovValueArray);
+	}
+
+	function setFirstPageProfileDataTableWidget(){
+		clearDataTableSelection( 'quoteProfileDataTableVar' );
+		setDataTableToFirstPage('quoteProfileDataTableVar');
+		// also select the first row, but only if we have data
+		setDataTableToFirstRow('quoteProfileDataTableVar');
+	}
+	
+	</script>
+
+
+</ui:composition>

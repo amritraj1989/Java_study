@@ -1,0 +1,432 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"   
+	xmlns:pe="http://primefaces.org/ui/extensions"	  
+    template="../../templates/ui.xhtml" >
+	
+    <ui:define name="content">
+    	    <h:form id="clientFacingQueueBreadCrumbForm" prependId="false">
+   			    <p:breadCrumb model="#{clientFacingQueueBean.breadCrumbTrail}" ajax="false" immediate="true" style="min-width:980px;max-width:100%;width:auto;"/>
+   		    </h:form>
+   		        
+    	    <!-- Message display -->
+		    <p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:980px;max-width:100%;width:auto;">
+			    <p:messages id="messages" showSummary="false" showDetail="true" autoUpdate="true" />
+		    </p:scrollPanel>   
+		    	
+		   <comp:logBook id="logBook" 
+		            entities="#{clientFacingQueueBean.getSelectedFleetMasterList()}" 
+		            logBookTypes="#{clientFacingQueueBean.logBookType}" 
+		            combineLogBooks="true" 
+		            enableFollowUpDate="true" 
+		            enableAddAndClose="false" 
+		            onClose="callRefreshFollowUpDate()" />
+		     
+		                                    
+           <h:form id="clientFacingQueueForm" prependId="false">
+           		 <p:remoteCommand name="refreshFollowUpDate" actionListener="#{clientFacingQueueBean.populateFollowUpDate()}" />
+            	<p:panel id="clientFacingTablePanel" header="Client Facing Queue"> 
+            	<p:toolbar id="searchToolbar">  
+				    <p:toolbarGroup align="left">  
+				    	 <p:focus context="searchToolbar"/>	
+				    		<p:separator></p:separator>	
+							<p:outputLabel for="cssTxt" value="CSS/TM : " />								
+							<p:inputText id="cssTxt" style="width:100px" title="CSS/TM" value="#{clientFacingQueueBean.cssFilter}" onkeypress="return doKeypressFilter(event)"/>
+							<p:separator ></p:separator>
+												    		
+				    		<p:outputLabel for="unitNoTxt" value="Unit No : " />								
+							<p:inputText id="unitNoTxt" style="width:100px" title="Unit No" value="#{clientFacingQueueBean.unitNoFilter}" onkeypress="return doKeypressFilter(event)"/>
+							<p:separator ></p:separator>
+							
+				    		<p:outputLabel for="clientNameTxt" value="Client : " />								
+							<p:inputText id="clientNameTxt" style="width:200px" title="Client" value="#{clientFacingQueueBean.clientNameFilter}" onkeypress="return doKeypressFilter(event)" />
+							<p:separator></p:separator>
+							
+							<p:commandButton  value="Search" id="filter" title="Filter" update="clientFacingTablePanel btnPanel" actionListener="#{clientFacingQueueBean.performFilter}" oncomplete="resetUIState();" />
+				    </p:toolbarGroup>  
+				</p:toolbar> 
+			   	<p:dataTable id="clientFacingTable" var="element" widgetVar="clientFacingTableVar"             	  
+				        value="#{clientFacingQueueBean.filteredList}" 
+						scrollable="true" rowIndexVar="elementRowIndex" 
+						scrollHeight="#{clientFacingQueueBean.dataTable.height}"
+						resizableColumns="true" 
+						rowKey="#{element.unitNo}"
+						rows="50"	
+						sortBy="#{element.toleranceYN}" sortOrder="ascending"					
+						paginator="true" paginatorPosition="bottom" 
+						selection="#{clientFacingQueueBean.selectedClientFacingQueueList}" >						
+						
+						<p:ajax event="toggleSelect" onstart="adjustBtnState();return false;"  />						 
+						<p:ajax event="rowSelectCheckbox" onstart="adjustBtnState();return false;"  />	
+						<p:ajax event="rowUnselectCheckbox" onstart="adjustBtnState();return false;"  />						
+						<p:ajax event="rowSelect" onstart="adjustBtnState();return false;"  />	
+						<p:ajax event="rowUnselect" onstart="adjustBtnState();return false;"  />	
+						
+						<p:ajax event="sort" update=":clientFacingQueueForm:completeContactBtn :clientFacingQueueForm:maintNotesBtn" listener="#{clientFacingQueueBean.onSortOperation}" oncomplete="resetUIState();moveScrollbarToTop();" />
+						<p:ajax event="page" update=":clientFacingQueueForm:completeContactBtn :clientFacingQueueForm:maintNotesBtn" listener="#{clientFacingQueueBean.onPageChange}"  oncomplete="resetUIState();moveScrollbarToTop();" />
+       					
+       					<p:column selectionMode="multiple" style="text-align:center;padding:0px;" width="#{clientFacingQueueBean.dataTable.col1}" exportable="false"/>
+       					
+	                    <p:column width="24" sortBy="#{element.toleranceYN}" style="text-align:center;padding:0px;" exportable="false">               
+		            	   <p:graphicImage value="/images/overdue.png" title="Overdue" style="border-style: none" onclick="selectCurrentRow('clientFacingTableVar',#{elementRowIndex});" rendered="#{element.toleranceYN eq 'N' ? 'true' : 'false'}" />
+		                </p:column>       					
+       					 
+       					<p:column sortBy="#{element.cssOrTm}" headerText="CSS/TM" width="#{clientFacingQueueBean.dataTable.col2}" exportable="false">				
+							<h:outputText id="cssTMLbl" value="#{empty element.cssOrTm ? 'NO CSS/TM ASSIGNED' : element.cssOrTm}" />
+						</p:column>
+						 
+						<p:column id="unitNoCol" headerText="Unit No" sortBy="#{element.unitNo}" width="#{clientFacingQueueBean.dataTable.col3}"  exportable="false">				
+						    <h:panelGrid id="unitInfo" column="1" styleClass="ui-noBorder">	
+						   		 <h:panelGroup style="white-space:nowrap;">
+						   		 	<p:commandLink id="noteLink"
+                               				actionListener="#{clientFacingQueueBean.setSelectedFleetMasterVO(element)}"	
+                               				oncomplete="showLogBook();selectCurrentRow('clientFacingTableVar',#{elementRowIndex});"						                             
+			                                title="View Notes" immediate="true">
+									 <p:graphicImage value="/images/notes.png" title="Notes" style="border-style: none" />
+									</p:commandLink>
+									<h:outputText value="&#160;" />		
+									<p:commandLink id="unitInfoLink" 
+		                                actionListener="#{clientFacingQueueBean.showUnitDetails(element)}"
+		                                oncomplete="PF('unitInfoDialogWidget').show();selectCurrentRow('clientFacingTableVar',#{elementRowIndex});"
+		                                update=":unitInfoDialog" 
+		                                title="View Unit Info" immediate="true">
+									<p:graphicImage value="/images/custins.png" style="border-style: none" />
+									</p:commandLink>
+									<h:outputText value="&#160;" />
+									<h:outputText id="unitNo" value="#{element.unitNo}" />
+								 </h:panelGroup>								 
+							</h:panelGrid>
+						</p:column>
+						
+						<p:column headerText="Variant" width="#{clientFacingQueueBean.dataTable.col4}" exportable="false">				
+							<h:outputText id="modelDesc" value="#{element.modelDesc}" />
+						</p:column>
+						
+						<p:column headerText="Client" sortBy="#{element.accountName}" width="#{clientFacingQueueBean.dataTable.col5}" exportable="false">								
+							  <h:panelGroup style="white-space:nowrap;">							  			
+						  			<p:commandLink id="clientContactInfoLink" 
+						  					actionListener="#{clientFacingQueueBean.getSelectedClientContact(element)}"		
+                               				oncomplete="PF('contactInfoWidget').show();selectCurrentRow('clientFacingTableVar',#{elementRowIndex});"					                              
+			                                update=":contactInfoDialog" 
+			                                title="View Client Contact Info" immediate="true">
+										<p:graphicImage value="/images/custins.png" style="border-style: none" />	
+									</p:commandLink>
+									<h:outputText value="&#160;" />
+									<h:outputText id="clientName" value="#{element.accountName}" styleClass="textWrap" />
+							 </h:panelGroup>
+						</p:column>		
+						
+					 	<p:column id="requestedDate" sortBy="#{element}" sortFunction="#{clientFacingQueueBean.requestedDateCustomSort}" headerText="Reqd By" width="#{clientFacingQueueBean.dataTable.col6}" exportable="false" >	
+						    <h:outputText value="#{element.requestedDate}">
+							</h:outputText>
+						</p:column>
+						
+						<p:column id="expectedDate" headerText="Expected Date" width="#{clientFacingQueueBean.dataTable.col7}" exportable="false">								
+						    <h:outputText id="readyDateLabel" value="#{element.expectedDate}">
+						     <f:convertDateTime type="date" pattern="MM/dd/yyyy" /> 
+							</h:outputText>
+						</p:column>
+						
+						<p:column id="clientETADate" headerText="ETA" width="#{clientFacingQueueBean.dataTable.col8}" exportable="false">								
+						    <h:outputText id="clientETADateLbl" value="#{element.clientETADate}">
+						     <f:convertDateTime type="date" pattern="MM/dd/yyyy" /> 
+							</h:outputText>
+						</p:column>
+						
+						<p:column id="followUpDate" sortBy="#{element.followUpDate}" headerText="Follow Up" width="#{clientFacingQueueBean.dataTable.col9}" exportable="false">	
+						    <h:outputText id="cellFollupDateLbl" value="#{element.followUpDate}">
+						     <f:convertDateTime type="date" pattern="MM/dd/yyyy" /> 
+							</h:outputText>
+						</p:column>
+						
+						<p:column headerText="Reason" width="#{clientFacingQueueBean.dataTable.col10}" exportable="false">											
+							<h:panelGroup rendered="true">
+							    	<h:outputText value="&#8226;&#160;"/><h:outputText  value="#{element.reason.replaceAll('\\|\\|','&lt;br/&gt;&#8226;&#160;')}" escape="false" />
+							 </h:panelGroup>							
+						</p:column>
+
+						<f:facet  name="footer"  >
+							Record Count: <h:outputText value="#{clientFacingQueueBean.filteredList.size()}" />
+							<div style= "text-align:right;">
+							     <h:commandLink title="Export To Excel" onclick="monitorDownload('#{clientFacingQueueBean.filteredList.size()}');" >
+					               <p:graphicImage value="/images/excel.png" styleClass="ui-border-none" />	
+					                <p:dataExporter type="xls" target=":clientFacingQueueForm:clientFacingQueueDld" fileName="client_facing" 
+					                preProcessor="#{clientFacingQueueBean.preProcessDownloadXLS}" postProcessor="#{clientFacingQueueBean.postProcessDownloadXLS}" />
+					            </h:commandLink>
+					        </div>
+						</f:facet>	
+					</p:dataTable>  
+				</p:panel>
+
+				<p:dataTable value="#{clientFacingQueueBean.downloadableRowsData}" var="row"  id="clientFacingQueueDld"  rendered="false">
+				    <p:columns value="#{clientFacingQueueBean.downloadableColumns}" var="column">		
+				   	 <f:facet name="header">
+                			<h:outputText value="#{column}" />
+            			</f:facet>		       
+				        <h:outputText value="#{row[column]}" />	
+				    </p:columns>
+				</p:dataTable>
+				
+				<p:panel id="btnPanel">
+					<p:commandButton id="completeContactBtn" widgetVar="completeContactBtnVar" value="Complete Contact" actionListener="#{clientFacingQueueBean.completeContactListener}"
+						oncomplete="PF('completeContactDialogWidget').show();"  />
+					<p:spacer width="5" />
+					<p:commandButton id="maintNotesBtn" widgetVar="maintNotesBtnVar"  value="Notes" actionListener="#{clientFacingQueueBean.setSelectedFleetMasterVOs}" 
+						oncomplete="showLogBook();" />
+					<p:spacer width="5" />	
+					<p:commandButton id="done" value="Cancel" action="#{clientFacingQueueBean.cancel}" ajax="false" immediate="true" onclick="lockScreen();" />
+				</p:panel>           
+            </h:form>                                   
+			
+	        <p:dialog id="contactInfoDialog" widgetVar="contactInfoWidget" modal="true" header="Contact Information" resizable="false" appendTo="@(body)" style="min-width: 400px; max-width: 800px;"
+                closeOnEscape="true" onShow="setFocus('contactInfoDialogDoneBtn');">
+	            <h:form id="contactInfoForm" prependId="false">
+					<p:panel id="contactInfoPanel" >  
+					    <h:panelGrid  columns="2" cellpadding="5" style="white-space:nowrap;" rendered="#{clientFacingQueueBean.requestedContactInfo != null ? 'true': 'false'}">			    
+								<p:column>	
+				    				<p:outputLabel value="Contact Name: " styleClass="ui-label" style="white-space:nowrap;"/>
+				    			</p:column>
+				    			<p:column>	 
+			                      	<p:outputLabel value="#{clientFacingQueueBean.requestedContactInfo.name}" />
+			                    </p:column>
+			                    <p:column>	
+			                      	<p:outputLabel value="Contact Phone: " styleClass="ui-label" style="white-space:nowrap;"/>
+			                    </p:column>
+			                    <p:column>	
+			                      	<p:outputLabel value="#{clientFacingQueueBean.requestedContactInfo.phone}" />		                 
+              					</p:column>   
+              					 <p:column>	
+			                      	<p:outputLabel value="Contact Email: " styleClass="ui-label" style="white-space:nowrap;"/>
+			                    </p:column>
+			                    <p:column>	
+			                      	<h:outputLink onclick="loadClientEmail('#{clientFacingQueueBean.requestedContactInfo.email}'); return false;" rendered="#{clientFacingQueueBean.requestedContactInfo.email ne 'NO EMAIL AVAILABLE'}">#{clientFacingQueueBean.requestedContactInfo.email}</h:outputLink>
+			                      	<p:outputLabel value="#{clientFacingQueueBean.requestedContactInfo.email}" rendered="#{clientFacingQueueBean.requestedContactInfo.email eq 'NO EMAIL AVAILABLE'}" />
+              					</p:column>
+		                </h:panelGrid>
+		                
+		                <h:panelGrid columns="2" cellpadding="5" style="white-space:nowrap;" rendered="#{clientFacingQueueBean.requestedContactInfo != null ? 'false': 'true'}">			    
+							<p:column colspan="2">	
+			    				<p:outputLabel value="NO CONTACT AVAILABLE" styleClass="ui-label" style="white-space:nowrap;"/>
+			    			</p:column>
+		                </h:panelGrid>
+	                </p:panel>
+	                <br/>
+				 	<p:commandButton id="contactInfoDialogDoneBtn" value="Done" type="button" onclick="PF('contactInfoWidget').hide();" />               
+	            </h:form>
+	        </p:dialog> 
+	        
+	        <p:dialog id="unitInfoDialog" widgetVar="unitInfoDialogWidget" modal="true"
+                header="Unit Information - Unit #{clientFacingQueueBean.selectedUnitNo}" resizable="false" appendTo="@(body)" style="min-width: 500px; max-width: 800px;"
+                closeOnEscape="true" onShow="setFocus('unitInfoDialogDoneBtn');">
+	            <h:form id="unitInfoForm" prependId="false">
+					<p:panel id="unitInfoInfoHeaderPanel">  
+					    <h:panelGrid  columns="2" cellpadding="5" style="white-space:nowrap;">			    
+								<p:column>	
+				    				<p:outputLabel value="Trim: " styleClass="ui-label" style="white-space:nowrap;"/>
+				    			</p:column>
+				    			<p:column>	 
+			                      	<p:outputLabel value="#{clientFacingQueueBean.requestedUnitInfo.trim}" />
+			                    </p:column>
+			                    <p:column>	
+			                      	<p:outputLabel value="Exterior Color: " styleClass="ui-label" style="white-space:nowrap;"/>
+			                    </p:column>
+			                    <p:column>	
+			                      	<p:outputLabel value="#{clientFacingQueueBean.requestedUnitInfo.color}" />		                 
+              					</p:column>
+              					<p:column>	
+			                      	<p:outputLabel value="VIN: " styleClass="ui-label" style="white-space:nowrap;"/>
+			                    </p:column>
+			                    <p:column>	
+			                      	<p:outputLabel value="#{clientFacingQueueBean.requestedUnitInfo.vin}" />		                 
+              					</p:column>              					
+		                </h:panelGrid>
+	                </p:panel>
+		    	  	<br/><br/>		    	   
+					<p:commandButton id="unitInfoDialogDoneBtn" value="Done" type="button" onclick="PF('unitInfoDialogWidget').hide();" />               
+					              
+	            </h:form>
+	        </p:dialog> 
+	        
+	        <p:dialog id="completeContactDialog" widgetVar="completeContactDialogWidget" modal="true" dynamic="true"
+                header="Complete Contact" resizable="false" appendTo="@(body)" height="300" width="625"
+                closeOnEscape="true">
+                
+			    <p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:100%;max-width:100%;width:auto;">
+				    <p:messages id="completeContactDialogMessages" severity="info,error,fatal" showSummary="true" showDetail="false" autoUpdate="true" />
+			    </p:scrollPanel> 
+			                    
+	            <h:form id="completeContactForm" prependId="false">
+	            
+	                <p:focus context="noteContactNameTxt" />	 
+	                           
+					<p:panel id="completeContactPanel">  
+					    <p:panelGrid cellpadding="5" style="white-space:nowrap;">	
+					        <p:row>
+								<p:column>	
+				    				<p:outputLabel for="noteContactNameTxt" value="Contact Name:*" styleClass="ui-label"/>
+				    			</p:column>	
+								<p:column>	
+				    				<p:inputText id="noteContactNameTxt" value="#{clientFacingQueueBean.noteContactName}" maxlength="30" styleClass="ui-label" style="white-space:nowrap;"/>
+				    			</p:column>	
+				    			<p:column>
+								    <p:outputLabel for="noteContactDateCal" value="Contact Date:*" styleClass="ui-label" />				    			
+				    			</p:column>
+								<p:column>	
+									<p:spacer width="10" />							        
+							        <p:calendar id="noteContactDateCal" 
+							                size="10"
+								            value="#{clientFacingQueueBean.noteContactDate}"
+								            pattern="MM/dd/yyyy" 
+								            style="width:20px" 
+								            showOn="button" 
+								            disabled="#{not clientFacingQueueBean.hasPermission('manageClient')}"
+								            onchange="formatDate(this);">
+									    <f:convertDateTime pattern="MM/dd/yyyy" />		    									
+									</p:calendar> 
+								</p:column> 				    			
+				    		</p:row>
+				    		<p:row>
+				    			<p:column colspan="4">
+								    <p:outputLabel for="completeContactNoteTA" value="Note:*" styleClass="ui-label" />				    			
+				    			</p:column>				    		
+				    		</p:row>
+				    		<p:row>
+                                <p:column colspan="4">
+			                        <p:inputTextarea 
+			                                id="completeContactNoteTA"
+			                                rows="4" 
+			                                cols="85" 
+			                                value="#{clientFacingQueueBean.noteComment}" 
+			                                counter="counter" 
+			                                disabled="#{!clientFacingQueueBean.hasPermission('manageClient')}"
+			                                maxlength="130" 
+			                                counterTemplate="{0} characters remaining" autoResize="false"
+			                                style="white-space: normal;"/>
+			                                <br />
+			                            <h:outputText id="counter" /> <br /><br />	
+                                 </p:column>  				    							        				    							        
+					        </p:row> 					                   					
+		                </p:panelGrid>		               
+	                </p:panel>  	  
+	                <p:panel>
+	                    <p:commandButton id="completeContactSaveBtn" value="Save" actionListener="#{clientFacingQueueBean.saveCompleteContactListener}" 
+	                    	update="@form    :completeContactForm:completeContactPanel  :clientFacingQueueForm:clientFacingTable" 
+	                    	oncomplete="if (!args.failure) {handleSaveRequest();}"/>
+	                    <p:spacer width="5" />
+	                    <p:commandButton id="completeContactCancelBtn" value="Cancel" onclick="PF('completeContactDialogWidget').hide();" update="@form"/>					                                                 	                
+	                </p:panel>               					              
+	            </h:form>
+	        </p:dialog> 	        
+	        	        
+		<style type="text/css">
+			.ui-datatable thead th {
+				white-space: normal;
+				text-align: center;
+			}
+			
+			.textWrap {
+				white-space: normal;
+			}
+		</style>  
+			                                                                                               
+        <script type="text/javascript"> 
+        	$(document).ready(function() {
+        		$.cookie("client.excel.download", null, { path: '/'});
+        	});
+        	
+            function monitorDownload(recordCount) { 
+            	if(recordCount > 0){
+            		if(cookiesEnabled()){
+            			ajaxStatusShow();
+            			setTimeout("checkDownloadStatus();",250); 
+            		}
+            	}
+            }
+            
+            function checkDownloadStatus(){ 
+            	if($.cookie("client.excel.download")){
+            		$.cookie("client.excel.download", null, { path: '/'});
+            		ajaxStatusHide();
+            	}else{
+            		setTimeout("checkDownloadStatus();",250); 
+            	}
+            }   
+            
+            function cookiesEnabled() {
+    			var c = (navigator.cookieEnabled) ? true : false;
+    			if (typeof navigator.cookieEnabled === "undefined") {
+    				if(!c){
+    					document.cookie = "tcookie";
+    					c = (document.cookie.indexOf("tcookie") !== -1) ? true : false;
+    			 	}
+    			}
+    			return (c);
+    		}
+            
+            function callRefreshFollowUpDate(){    
+            	refreshFollowUpDate();         	
+        	}
+        	
+           	function doKeypressFilter(event){
+    			if (event.keyCode == 13) {
+    				source = event.srcElement.id;
+    			   $('#filter').click();
+    			   return false;
+    			}
+    			return true;	
+    		}
+           	
+            function moveScrollbarToTop() {
+           		$('#clientFacingTable .ui-datatable-scrollable-body').scrollTop(0);
+           	}
+           	
+            function selectCurrentRow(table,index){
+            	if(index > (Number(50) -1)){//here 50 is rows being display in per page in dt
+            		index = index % 50;	
+            	}
+                PF(table).unselectAllRows();
+              	PF(table).selectRow(index ,false);
+            }
+            
+            function handleSaveRequest() {
+            	PF('completeContactDialogWidget').hide();
+            	resetUIState();
+           	}
+            
+            function resetUIState() {
+              PF('clientFacingTableVar').unselectAllRows();
+              adjustBtnState()
+           	}
+            
+            var  hasPermissionManageClient =  #{clientFacingQueueBean.hasPermission('manageClient')};
+            function adjustBtnState() {
+       			if(PF('clientFacingTableVar').selection.length == 1){
+       				PF('maintNotesBtnVar').enable();
+       				if(hasPermissionManageClient == true){
+       					PF('completeContactBtnVar').enable();	       				
+	       			}
+       			}else if(PF('clientFacingTableVar').selection.length > 1){
+       				if(hasPermissionManageClient == true){
+       					PF('completeContactBtnVar').enable();
+	       				PF('maintNotesBtnVar').enable();
+	       			}else{
+	       				PF('completeContactBtnVar').disable();//although its should happen implicitly.
+	       				PF('maintNotesBtnVar').disable();	
+	       			}
+       			}else if(PF('clientFacingTableVar').selection.length == 0){
+       				PF('completeContactBtnVar').disable();
+       				PF('maintNotesBtnVar').disable();
+       			}
+       			PF('clientFacingTableVar').updateHeaderCheckbox();
+           	  }
+            
+         	  $(window).load(function(){
+         		 adjustBtnState();
+			  });            
+		    </script>
+	</ui:define>
+	
+</ui:composition>

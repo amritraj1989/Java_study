@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 5.6.2.final using JasperReports Library version 5.6.1  -->
+<!-- 2015-08-10T12:04:26 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ClientOrderConfirmationEmailed" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ac0b74fc-9c7b-41d9-a56c-1aa91107ea95">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="80">
+			<frame>
+				<reportElement x="0" y="19" width="554" height="61" uuid="cfebe7d9-cc4e-4101-9c4e-2fa4babcd29e"/>
+				<staticText>
+					<reportElement x="10" y="10" width="530" height="42" uuid="db54f9ab-1334-4c8c-ba5f-4b3d463040c4"/>
+					<textElement textAlignment="Center">
+						<font size="18"/>
+					</textElement>
+					<text><![CDATA[Client Order Confirmation sent via email]]></text>
+				</staticText>
+			</frame>
+		</band>
+	</title>
+</jasperReport>

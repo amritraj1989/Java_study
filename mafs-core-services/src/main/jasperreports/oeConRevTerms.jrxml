@@ -1,0 +1,2695 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.1.0.final using JasperReports Library version 6.1.0  -->
+<!-- 2018-05-21T03:13:41 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="oeConRevTerms" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9aa87cf3-61fc-43fd-b15b-9a3334f22663">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="oe-con-rev-terms-data-adapter "/>
+	<style name="Crosstab_CH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab_CG" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab_CT" mode="Opaque" backcolor="#005FB3">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab_CD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 1_CH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 1_CG" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 1_CT" mode="Opaque" backcolor="#005FB3">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 1_CD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 2_CH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 2_CG" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 2_CT" mode="Opaque" backcolor="#005FB3">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 2_CD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 3_CH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 3_CG" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 3_CT" mode="Opaque" backcolor="#005FB3">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 3_CD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 4_CH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 4_CG" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 4_CT" mode="Opaque" backcolor="#005FB3">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 4_CD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 5_CH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 5_CG" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 5_CT" mode="Opaque" backcolor="#005FB3">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 5_CD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 6_CH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 6_CG" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 6_CT" mode="Opaque" backcolor="#005FB3">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 6_CD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 7_CH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 7_CG" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 7_CT" mode="Opaque" backcolor="#005FB3">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 7_CD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 8_CH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 8_CG" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 8_CT" mode="Opaque" backcolor="#005FB3">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 8_CD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 9_CH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 9_CG" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 9_CT" mode="Opaque" backcolor="#005FB3">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 9_CD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 10_CH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 10_CG" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 10_CT" mode="Opaque" backcolor="#005FB3">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 10_CD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 11_CH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 11_CG" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 11_CT" mode="Opaque" backcolor="#005FB3">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 11_CD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 12_CG" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 13_CG" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 14_CH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 14_CG" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 14_CT" mode="Opaque" backcolor="#005FB3">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 14_CD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 15_CH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 15_CG" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 15_CT" mode="Opaque" backcolor="#005FB3">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 15_CD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 16_CH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.0" lineColor="#000000"/>
+			<topPen lineWidth="0.0" lineColor="#000000"/>
+			<leftPen lineWidth="0.0" lineColor="#000000"/>
+			<bottomPen lineWidth="0.0" lineColor="#000000"/>
+			<rightPen lineWidth="0.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 16_CG" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.0" lineColor="#000000"/>
+			<topPen lineWidth="0.0" lineColor="#000000"/>
+			<leftPen lineWidth="0.0" lineColor="#000000"/>
+			<bottomPen lineWidth="0.0" lineColor="#000000"/>
+			<rightPen lineWidth="0.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 16_CT" mode="Opaque" backcolor="#005FB3">
+		<box>
+			<pen lineWidth="0.0" lineColor="#000000"/>
+			<topPen lineWidth="0.0" lineColor="#000000"/>
+			<leftPen lineWidth="0.0" lineColor="#000000"/>
+			<bottomPen lineWidth="0.0" lineColor="#000000"/>
+			<rightPen lineWidth="0.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 16_CD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.0" lineColor="#000000"/>
+			<topPen lineWidth="0.0" lineColor="#000000"/>
+			<leftPen lineWidth="0.0" lineColor="#000000"/>
+			<bottomPen lineWidth="0.0" lineColor="#000000"/>
+			<rightPen lineWidth="0.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 17_CH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.0" lineColor="#000000"/>
+			<topPen lineWidth="0.0" lineColor="#000000"/>
+			<leftPen lineWidth="0.0" lineColor="#000000"/>
+			<bottomPen lineWidth="0.0" lineColor="#000000"/>
+			<rightPen lineWidth="0.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 17_CG" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.0" lineColor="#000000"/>
+			<topPen lineWidth="0.0" lineColor="#000000"/>
+			<leftPen lineWidth="0.0" lineColor="#000000"/>
+			<bottomPen lineWidth="0.0" lineColor="#000000"/>
+			<rightPen lineWidth="0.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 17_CT" mode="Opaque" backcolor="#005FB3">
+		<box>
+			<pen lineWidth="0.0" lineColor="#000000"/>
+			<topPen lineWidth="0.0" lineColor="#000000"/>
+			<leftPen lineWidth="0.0" lineColor="#000000"/>
+			<bottomPen lineWidth="0.0" lineColor="#000000"/>
+			<rightPen lineWidth="0.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 17_CD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.0" lineColor="#000000"/>
+			<topPen lineWidth="0.0" lineColor="#000000"/>
+			<leftPen lineWidth="0.0" lineColor="#000000"/>
+			<bottomPen lineWidth="0.0" lineColor="#000000"/>
+			<rightPen lineWidth="0.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 18_CH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.0" lineColor="#000000"/>
+			<topPen lineWidth="0.0" lineColor="#000000"/>
+			<leftPen lineWidth="0.0" lineColor="#000000"/>
+			<bottomPen lineWidth="0.0" lineColor="#000000"/>
+			<rightPen lineWidth="0.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 18_CG" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.0" lineColor="#000000"/>
+			<topPen lineWidth="0.0" lineColor="#000000"/>
+			<leftPen lineWidth="0.0" lineColor="#000000"/>
+			<bottomPen lineWidth="0.0" lineColor="#000000"/>
+			<rightPen lineWidth="0.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 18_CT" mode="Opaque" backcolor="#005FB3">
+		<box>
+			<pen lineWidth="0.0" lineColor="#000000"/>
+			<topPen lineWidth="0.0" lineColor="#000000"/>
+			<leftPen lineWidth="0.0" lineColor="#000000"/>
+			<bottomPen lineWidth="0.0" lineColor="#000000"/>
+			<rightPen lineWidth="0.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 18_CD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.0" lineColor="#000000"/>
+			<topPen lineWidth="0.0" lineColor="#000000"/>
+			<leftPen lineWidth="0.0" lineColor="#000000"/>
+			<bottomPen lineWidth="0.0" lineColor="#000000"/>
+			<rightPen lineWidth="0.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 19_CH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.0" lineColor="#000000"/>
+			<topPen lineWidth="0.0" lineColor="#000000"/>
+			<leftPen lineWidth="0.0" lineColor="#000000"/>
+			<bottomPen lineWidth="0.0" lineColor="#000000"/>
+			<rightPen lineWidth="0.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 19_CG" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.0" lineColor="#000000"/>
+			<topPen lineWidth="0.0" lineColor="#000000"/>
+			<leftPen lineWidth="0.0" lineColor="#000000"/>
+			<bottomPen lineWidth="0.0" lineColor="#000000"/>
+			<rightPen lineWidth="0.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 19_CT" mode="Opaque" backcolor="#005FB3">
+		<box>
+			<pen lineWidth="0.0" lineColor="#000000"/>
+			<topPen lineWidth="0.0" lineColor="#000000"/>
+			<leftPen lineWidth="0.0" lineColor="#000000"/>
+			<bottomPen lineWidth="0.0" lineColor="#000000"/>
+			<rightPen lineWidth="0.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab 19_CD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.0" lineColor="#000000"/>
+			<topPen lineWidth="0.0" lineColor="#000000"/>
+			<leftPen lineWidth="0.0" lineColor="#000000"/>
+			<bottomPen lineWidth="0.0" lineColor="#000000"/>
+			<rightPen lineWidth="0.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="CurrentContractDetailsDataSet" uuid="080bf27b-71b5-42a5-8d8f-c221148bcefc">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="oe-con-rev-terms-data-adapter "/>
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+		<field name="fromPeriod" class="java.lang.Long"/>
+		<field name="leaseRate" class="java.math.BigDecimal"/>
+		<field name="toPeriod" class="java.lang.Long"/>
+		<field name="finalLeaseRate" class="java.math.BigDecimal"/>
+	</subDataset>
+	<subDataset name="ServicesLeaseRateDateSet" uuid="d083953a-8d83-4ce3-bc28-27c97ef7815d">
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+		<field name="description" class="java.lang.String"/>
+		<field name="monthlyCost" class="java.math.BigDecimal"/>
+		<field name="fromPeriod" class="java.lang.Long"/>
+		<field name="toPeriod" class="java.lang.Long"/>
+	</subDataset>
+	<subDataset name="RevisedContractDetailsDataSet" uuid="a3eac15f-97ca-495f-9946-5ddf6fd47eb4">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+		<field name="fromPeriod" class="java.lang.Long"/>
+		<field name="toPeriod" class="java.lang.Long"/>
+		<field name="leaseRate" class="java.math.BigDecimal"/>
+		<field name="finalLeaseRate" class="java.math.BigDecimal"/>
+	</subDataset>
+	<subDataset name="RevisionServicesLeaseRateDataset" uuid="8b8aba2a-c595-4550-871e-ae340ea2c0e9">
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+		<field name="description" class="java.lang.String"/>
+		<field name="monthlyCost" class="java.math.BigDecimal"/>
+		<field name="fromPeriod" class="java.lang.Long"/>
+		<field name="toPeriod" class="java.lang.Long"/>
+	</subDataset>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="logo" class="java.lang.String">
+		<fieldDescription><![CDATA[logo]]></fieldDescription>
+	</field>
+	<field name="currentOEQuoteVO" class="com.mikealbert.data.vo.QuoteOEVO">
+		<fieldDescription><![CDATA[currentOEQuoteVO]]></fieldDescription>
+	</field>
+	<field name="clientContactVO" class="com.mikealbert.data.vo.ClientContactVO">
+		<fieldDescription><![CDATA[clientContactVO]]></fieldDescription>
+	</field>
+	<field name="vehicleInformationVO" class="com.mikealbert.data.vo.VehicleInformationVO">
+		<fieldDescription><![CDATA[vehicleInformationVO]]></fieldDescription>
+	</field>
+	<field name="revisionOEQuoteVO" class="com.mikealbert.data.vo.QuoteOEVO">
+		<fieldDescription><![CDATA[revisionOEQuoteVO]]></fieldDescription>
+	</field>
+	<field name="monthsRemaining" class="java.lang.Long">
+		<fieldDescription><![CDATA[monthsRemaining]]></fieldDescription>
+	</field>
+	<field name="signatureSection" class="java.lang.String">
+		<fieldDescription><![CDATA[signatureSection]]></fieldDescription>
+	</field>
+	<field name="totalOneTimeCharges" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[totalOneTimeCharges]]></fieldDescription>
+	</field>
+	<field name="signatureLine" class="java.lang.String">
+		<fieldDescription><![CDATA[signatureLine]]></fieldDescription>
+	</field>
+	<field name="oeContractRevisionTitle" class="java.lang.String">
+		<fieldDescription><![CDATA[oeContractRevisionTitle]]></fieldDescription>
+	</field>
+	<field name="currentQuotationStepStructureVOList" class="java.util.List">
+		<fieldDescription><![CDATA[currentQuotationStepStructureVOList]]></fieldDescription>
+	</field>
+	<field name="currentServicesLeaseRateByPeriodVOList" class="java.util.List">
+		<fieldDescription><![CDATA[currentServicesLeaseRateByPeriodVOList]]></fieldDescription>
+	</field>
+	<field name="revisionQuotationStepStructureVOList" class="java.util.List">
+		<fieldDescription><![CDATA[revisionQuotationStepStructureVOList]]></fieldDescription>
+	</field>
+	<field name="revisionServicesLeaseRateByPeriodVOList" class="java.util.List">
+		<fieldDescription><![CDATA[revisionServicesLeaseRateByPeriodVOList]]></fieldDescription>
+	</field>
+	<field name="monthsCompleted" class="java.lang.Long">
+		<fieldDescription><![CDATA[monthsCompleted]]></fieldDescription>
+	</field>
+	<field name="revisionStartDate" class="java.util.Date">
+		<fieldDescription><![CDATA[revisionStartDate]]></fieldDescription>
+	</field>
+	<field name="revisionEndDate" class="java.util.Date">
+		<fieldDescription><![CDATA[revisionEndDate]]></fieldDescription>
+	</field>
+	<field name="inRateRevisionAssessment" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[inRateRevisionAssessment]]></fieldDescription>
+	</field>
+	<field name="inRateRevisionInterestAdjustment" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[inRateRevisionInterestAdjustment]]></fieldDescription>
+	</field>
+	<field name="oneTimeRevisionAssessment" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[oneTimeRevisionAssessment]]></fieldDescription>
+	</field>
+	<field name="oneTimeRevisionInterestAdjustment" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[oneTimeRevisionInterestAdjustment]]></fieldDescription>
+	</field>
+	<field name="address" class="java.lang.String">
+		<fieldDescription><![CDATA[address]]></fieldDescription>
+	</field>
+	<field name="revisionInterestAdjustmentMonths" class="java.lang.String">
+		<fieldDescription><![CDATA[revisionInterestAdjustmentMonths]]></fieldDescription>
+	</field>
+	<field name="currentInterestComponent" class="java.lang.String">
+		<fieldDescription><![CDATA[currentInterestComponent]]></fieldDescription>
+	</field>
+	<field name="revisionInterestComponent" class="java.lang.String">
+		<fieldDescription><![CDATA[revisionInterestComponent]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="110">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<image>
+				<reportElement x="0" y="10" width="180" height="93" uuid="d9527524-52b3-4747-b707-2499a89d914f"/>
+				<imageExpression><![CDATA[$F{logo}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="230" y="30" width="231" height="50" uuid="84d72421-f0f6-460c-bc09-3859fbaa42a7"/>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{oeContractRevisionTitle}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="63">
+			<frame>
+				<reportElement x="0" y="0" width="500" height="52" uuid="490919ab-5839-4d65-aee1-b91b95eb21c2"/>
+				<frame>
+					<reportElement x="260" y="0" width="218" height="52" uuid="346959cf-6b6c-4503-ab65-a5570cc2b279"/>
+					<staticText>
+						<reportElement x="0" y="0" width="110" height="13" uuid="09b83dc1-0255-4c8f-86de-20946186e8f0">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5" rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Reference No:]]></text>
+					</staticText>
+					<textField>
+						<reportElement x="110" y="0" width="100" height="13" uuid="b2019915-c306-4b83-aff7-22db4464142e">
+							<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{revisionOEQuoteVO}.getQuote()]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="0" y="13" width="110" height="13" uuid="55fb59c7-5ff0-4c44-ba09-dd0d9a5c2dfc">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5" rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Quotation Date:]]></text>
+					</staticText>
+					<textField pattern="MMM d, yyyy">
+						<reportElement x="110" y="13" width="100" height="13" uuid="15135db2-71b9-4b40-8e76-93fa5954670e"/>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{revisionOEQuoteVO}.getQuotationModel().getRevisionDate()]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="0" y="39" width="110" height="13" uuid="2cd48df0-a066-46a6-a033-84a7fb5862c5">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5" rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Amended Effective Date:]]></text>
+					</staticText>
+					<textField pattern="MMM d, yyyy">
+						<reportElement x="110" y="39" width="100" height="13" uuid="eed86d1f-8dab-42fb-b882-33fafb65ea38"/>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{revisionOEQuoteVO}.getQuotationModel().getAmendmentEffectiveDate()]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="0" y="26" width="110" height="13" uuid="0a96df3b-ec9c-455f-bdd6-61e7891ec2d5">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5" rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Quote Expiration Date:]]></text>
+					</staticText>
+					<textField pattern="MMM d, yyyy">
+						<reportElement x="110" y="26" width="100" height="13" uuid="ce21da78-62ef-465b-824a-591ad99f7474"/>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{revisionOEQuoteVO}.getQuotationModel().getRevisionExpDate()]]></textFieldExpression>
+					</textField>
+				</frame>
+				<frame>
+					<reportElement x="50" y="0" width="191" height="52" uuid="d200a923-b3b4-428a-89e2-6e03113f5bce"/>
+					<box>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textField>
+						<reportElement x="0" y="0" width="185" height="13" uuid="51a3a5ae-d669-47d3-b68a-d1a648e4318a">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{currentOEQuoteVO}.getAccountCode() + ' ' + '-' + ' ' + $F{currentOEQuoteVO}.getAccountName()]]></textFieldExpression>
+					</textField>
+					<textField isBlankWhenNull="true">
+						<reportElement x="0" y="13" width="185" height="39" uuid="8bd07889-5164-4cf4-92a0-d56e43363b8e">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						</reportElement>
+						<box topPadding="0" leftPadding="5" bottomPadding="0" rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement markup="html">
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
+					</textField>
+				</frame>
+				<staticText>
+					<reportElement x="0" y="0" width="50" height="13" uuid="65d5979f-837a-4883-bc03-f10a90f04e70">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" isBold="true" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[LESSEE:]]></text>
+				</staticText>
+			</frame>
+		</band>
+		<band height="61">
+			<frame>
+				<reportElement x="0" y="0" width="571" height="60" uuid="4e586f35-4c59-4f1f-94db-91340e2f1029">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<staticText>
+					<reportElement x="0" y="0" width="140" height="13" uuid="e4517263-1f05-40c4-af3c-79d8ed2cbe2a">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" isBold="true" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[VEHICLE DETAILS:]]></text>
+				</staticText>
+				<frame>
+					<reportElement x="0" y="13" width="571" height="46" uuid="2b00e78a-c150-4e1d-9645-18da4ef4738f"/>
+					<staticText>
+						<reportElement x="0" y="13" width="50" height="13" uuid="5f347350-06d8-4f10-9b2b-9184b4015f2c">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Unit #:]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="0" y="0" width="50" height="13" uuid="e43b0316-8721-4bfe-9519-de11031153c8">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Vehicle:]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="0" y="26" width="50" height="13" uuid="48490dd2-acc5-472d-aa00-f3f9c19d7c23">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Driver:]]></text>
+					</staticText>
+					<textField isBlankWhenNull="true">
+						<reportElement x="50" y="26" width="190" height="13" uuid="90941bb1-2199-47b4-8800-04c6ce26ca8a">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{vehicleInformationVO}.getDriverFullNameDisplay()]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="50" y="0" width="475" height="13" uuid="40f90212-3720-444a-8184-4cb1535492a4">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{currentOEQuoteVO}.getUnitDesc()]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="50" y="13" width="190" height="13" uuid="d38ac099-86a5-4378-8594-088fc13ea3c2">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{currentOEQuoteVO}.getUnitNo()]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="260" y="13" width="61" height="13" uuid="fafeba6f-b968-44dd-bb57-472bac9768a3">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Serial #:]]></text>
+					</staticText>
+					<textField>
+						<reportElement x="321" y="13" width="149" height="13" uuid="54bdb171-5189-48c0-b450-32b198d60fd6">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{vehicleInformationVO}.getVin()]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="260" y="26" width="61" height="13" uuid="4b3fa4e9-54f6-4a57-ac9c-620782bfdbaf">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Fleet Ref #:]]></text>
+					</staticText>
+					<textField isBlankWhenNull="true">
+						<reportElement x="321" y="26" width="149" height="13" uuid="523950fd-4bd1-46d3-ba00-00943b12ea19">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{vehicleInformationVO}.getClientFleetReferenceNumber()]]></textFieldExpression>
+					</textField>
+				</frame>
+			</frame>
+		</band>
+		<band height="150">
+			<frame>
+				<reportElement x="0" y="0" width="571" height="150" uuid="dfc25204-3a9a-4625-86c2-15bd7314a3ad">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<staticText>
+					<reportElement x="0" y="2" width="140" height="13" uuid="c9fbb53f-fcd3-4081-b345-d3ff3b3e212d">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<box leftPadding="0" rightPadding="0"/>
+					<textElement>
+						<font fontName="Calibri" isBold="true" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[CURRENT CONTRACT TERMS:]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="140" y="2" width="115" height="13" uuid="4dcf4f68-a731-4b6e-9def-e73f1aefc2bf">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<box leftPadding="5"/>
+					<textElement>
+						<font fontName="Calibri"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{currentOEQuoteVO}.getQuote()]]></textFieldExpression>
+				</textField>
+				<frame>
+					<reportElement x="0" y="15" width="535" height="65" uuid="32ebc389-602d-4897-9118-0ea5617ddf0b">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<staticText>
+						<reportElement x="0" y="0" width="140" height="13" uuid="73c32992-c017-475e-a587-2b38c3646e3d">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Contract Months:]]></text>
+					</staticText>
+					<textField>
+						<reportElement x="140" y="0" width="115" height="13" uuid="3570e91c-c7fa-490f-bce0-d0e43611fb86">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{currentOEQuoteVO}.getTerm()]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="0" y="13" width="140" height="13" uuid="11a753b7-8958-47de-a1ac-dd15f1f217fe">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Contract Miles:]]></text>
+					</staticText>
+					<textField pattern="#,###.###">
+						<reportElement x="140" y="13" width="115" height="13" uuid="e117835d-5a67-463d-8f64-2b53d5f0e2b3">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{currentOEQuoteVO}.getDistance()]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="0" y="26" width="140" height="13" uuid="99819dbd-0078-4869-97f8-2222cf8f4912">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Start Date:]]></text>
+					</staticText>
+					<textField pattern="MMM d, yyyy">
+						<reportElement x="140" y="26" width="115" height="13" uuid="f7c1193a-eac3-42bf-b715-bc0937b45a93">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{currentOEQuoteVO}.getQuotationModel().getContractLine().getStartDate()]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="0" y="39" width="140" height="13" uuid="f4f9f1f4-f11f-465d-9edd-f8004513ae62">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[End Date:]]></text>
+					</staticText>
+					<textField pattern="MMM d, yyyy">
+						<reportElement x="140" y="39" width="115" height="13" uuid="de154a2e-328e-43f4-9907-b4b263d81777">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{currentOEQuoteVO}.getQuotationModel().getContractLine().getEndDate()]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="260" y="0" width="100" height="13" uuid="267dd978-a15a-41c3-8973-cda90db80869">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5" rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Capitalized Cost:]]></text>
+					</staticText>
+					<textField pattern="¤#,##0.00;¤-#,##0.00">
+						<reportElement x="360" y="0" width="115" height="13" uuid="d95f7b06-19c8-45af-9d9b-925966eb65c0">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{currentOEQuoteVO}.getCustomerCost()]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="260" y="13" width="100" height="13" uuid="45a396ed-088a-41b6-856f-2fa8c14f9d37">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5" rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Months Completed:]]></text>
+					</staticText>
+					<textField pattern="#,##0.###">
+						<reportElement x="360" y="13" width="115" height="13" uuid="f4597245-ca96-4a0a-a0e8-4f338c59c6e3">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{monthsCompleted}]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="260" y="26" width="100" height="13" uuid="4a00a5c0-d1c0-4dcd-8f8c-f635322a4158">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5" rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Book Value:]]></text>
+					</staticText>
+					<textField pattern="¤#,##0.00;¤-#,##0.00">
+						<reportElement x="360" y="26" width="115" height="13" uuid="9dc9ed85-fe44-4216-af89-25c8989523f4">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{currentOEQuoteVO}.getEffDateNBV()]]></textFieldExpression>
+					</textField>
+				</frame>
+				<frame>
+					<reportElement x="0" y="79" width="571" height="60" uuid="a7d16766-66f0-4776-9b1d-6590f645f18e">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<staticText>
+						<reportElement x="0" y="5" width="284" height="13" uuid="45567f77-a32b-4d62-88dd-85d8b89d6e18">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Lease Rate Factor is comprised of the following:]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="10" y="18" width="115" height="13" uuid="4211b8dd-f3e8-4fb2-8355-fe5a8db8c26f">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Depreciation Factor:]]></text>
+					</staticText>
+					<textField pattern="#,##0.0000000%">
+						<reportElement x="125" y="18" width="90" height="13" uuid="fd0b0b89-fe60-46e1-9402-a20f907a1309">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{currentOEQuoteVO}.getDepreciationFactor().divide(new BigDecimal(100))]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="10" y="31" width="115" height="13" uuid="a2b4531f-af3e-4dac-9a79-a4a8ed51dc44">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Admin Factor:]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="10" y="44" width="95" height="13" uuid="f4e826ba-9c09-42cc-bfaa-87643beeea40">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="0" rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Interest Component:]]></text>
+					</staticText>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement x="105" y="44" width="466" height="13" uuid="3348f194-77dd-4438-abf7-a0ac4c48c527">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri" size="10"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{currentInterestComponent}]]></textFieldExpression>
+					</textField>
+					<textField pattern="#,##0.00##%">
+						<reportElement x="125" y="31" width="90" height="13" uuid="df81b069-f50f-4920-a613-836586743518">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{currentOEQuoteVO}.getAdminFactor().divide(new BigDecimal(1000))]]></textFieldExpression>
+					</textField>
+				</frame>
+			</frame>
+		</band>
+		<band height="38">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<frame>
+				<reportElement x="0" y="0" width="500" height="30" uuid="6203d3d0-1658-4795-a86d-f1e909af77be"/>
+				<componentElement>
+					<reportElement x="180" y="0" width="50" height="30" uuid="c0f6dafe-d008-4524-92a6-50844b999f41">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Horizontal" ignoreWidth="true">
+						<datasetRun subDataset="CurrentContractDetailsDataSet" uuid="c41ab05d-00e7-48e2-9fe8-8b2b82b6ff5e">
+							<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{currentQuotationStepStructureVOList})]]></dataSourceExpression>
+						</datasetRun>
+						<jr:listContents height="30" width="50">
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="50" height="13" uuid="c5ad5209-2a67-49d9-884c-553b8d55996d">
+									<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								</reportElement>
+								<box leftPadding="0" rightPadding="5">
+									<topPen lineWidth="0.0"/>
+									<leftPen lineWidth="0.0"/>
+									<bottomPen lineWidth="0.0"/>
+									<rightPen lineWidth="0.0"/>
+								</box>
+								<textElement textAlignment="Right">
+									<font fontName="Calibri" isBold="true" isUnderline="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{fromPeriod}.toString() + '-' + $F{toPeriod}.toString()]]></textFieldExpression>
+							</textField>
+							<textField pattern="¤#,##0.00;¤-#,##0.00" isBlankWhenNull="true">
+								<reportElement x="0" y="13" width="50" height="13" uuid="1e87791e-ac84-4e94-9246-093ce9e74e6e">
+									<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								</reportElement>
+								<box rightPadding="5">
+									<topPen lineWidth="0.0"/>
+									<leftPen lineWidth="0.0"/>
+									<bottomPen lineWidth="0.0"/>
+									<rightPen lineWidth="0.0"/>
+								</box>
+								<textElement textAlignment="Right">
+									<font fontName="Calibri"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{leaseRate}]]></textFieldExpression>
+							</textField>
+						</jr:listContents>
+					</jr:list>
+				</componentElement>
+				<staticText>
+					<reportElement x="0" y="0" width="180" height="13" uuid="46973673-f8f6-4c7b-80f1-5a9037779c87">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" isBold="true" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[CURRENT CONTRACT DETAILS:]]></text>
+				</staticText>
+				<textField pattern="#,##0.0000%">
+					<reportElement x="0" y="13" width="180" height="13" uuid="366ddf29-59c9-44fc-af58-0ed0d5a510d6">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement>
+						<font fontName="Calibri"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{currentOEQuoteVO}.getProductName()]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+		<band height="39">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<crosstab>
+				<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="500" height="30" uuid="7d983c2c-6c86-4877-9877-b50834a7244a"/>
+				<crosstabDataset isDataPreSorted="true">
+					<dataset>
+						<datasetRun subDataset="ServicesLeaseRateDateSet" uuid="9ba72652-7cc4-473e-a3a6-64bafe554298">
+							<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{currentServicesLeaseRateByPeriodVOList})]]></dataSourceExpression>
+						</datasetRun>
+					</dataset>
+				</crosstabDataset>
+				<rowGroup name="description1" width="180">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{description}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents mode="Opaque" style="Crosstab 17_CH">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="180" height="13" uuid="ae9a0917-f552-4c75-b480-f61dd0b0f4c9">
+									<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+									<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+								</reportElement>
+								<box leftPadding="0"/>
+								<textElement>
+									<font fontName="Calibri"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{description1}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents mode="Opaque" style="Crosstab 7_CT">
+							<staticText>
+								<reportElement x="0" y="0" width="60" height="20" forecolor="#FFFFFF" uuid="f1c371af-3523-490f-a9ff-a20187fe86ac"/>
+								<text><![CDATA[Total description1]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="fromPeriod1" height="13">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{fromPeriod}.toString() + '-' + $F{toPeriod}.toString()]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents mode="Opaque" style="Crosstab 17_CH">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="50" height="13" uuid="8bf0e862-72cc-4f03-9406-65a8920a140d">
+									<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+									<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+								</reportElement>
+								<box rightPadding="5"/>
+								<textElement textAlignment="Right">
+									<font fontName="Calibri" isBold="true" isUnderline="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{fromPeriod1}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents mode="Opaque" style="Crosstab 7_CT">
+							<staticText>
+								<reportElement x="0" y="0" width="60" height="20" forecolor="#FFFFFF" uuid="52948fc8-3cea-42ac-afee-73efce942dbd"/>
+								<text><![CDATA[Total fromPeriod1]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="monthlyCost_MEASURE1" class="java.math.BigDecimal">
+					<measureExpression><![CDATA[$F{monthlyCost}]]></measureExpression>
+				</measure>
+				<crosstabCell width="50" height="13">
+					<cellContents mode="Opaque" style="Crosstab 17_CD">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<textField pattern="¤#,##0.00;¤-#,##0.00" isBlankWhenNull="true">
+							<reportElement x="0" y="0" width="50" height="13" uuid="30e01366-d3c6-4292-a71e-0b9b08d3e240">
+								<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+							</reportElement>
+							<box rightPadding="5"/>
+							<textElement textAlignment="Right">
+								<font fontName="Calibri"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{monthlyCost_MEASURE1}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="60" height="20" columnTotalGroup="fromPeriod1">
+					<cellContents mode="Opaque" style="Crosstab 17_CT">
+						<textField>
+							<reportElement x="0" y="0" width="60" height="20" forecolor="#FFFFFF" uuid="3ab86f8b-f336-49cd-acd3-10f00ea1ae87"/>
+							<textFieldExpression><![CDATA[$V{monthlyCost_MEASURE1}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="60" height="20" rowTotalGroup="description1">
+					<cellContents mode="Opaque" style="Crosstab 17_CT">
+						<textField>
+							<reportElement x="0" y="0" width="60" height="20" forecolor="#FFFFFF" uuid="74db8efa-7f23-4e3a-b29a-f2d25b8e2aed"/>
+							<textFieldExpression><![CDATA[$V{monthlyCost_MEASURE1}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="60" height="20" rowTotalGroup="description1" columnTotalGroup="fromPeriod1">
+					<cellContents mode="Opaque" style="Crosstab 17_CT">
+						<textField>
+							<reportElement x="0" y="0" width="60" height="20" forecolor="#FFFFFF" uuid="00e0ac25-95f3-48da-91f4-1a0416b4de07"/>
+							<textFieldExpression><![CDATA[$V{monthlyCost_MEASURE1}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+			</crosstab>
+			<staticText>
+				<reportElement x="0" y="0" width="150" height="13" uuid="6f2a7b49-5c27-44ad-b4d2-7a72b0218fee">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Calibri" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[SPECIFIED SERVICES / ITEMS:]]></text>
+			</staticText>
+		</band>
+		<band height="39">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<frame>
+				<reportElement x="0" y="0" width="500" height="30" uuid="bd1d3c29-cc4c-483b-890e-c682ec6a025c"/>
+				<componentElement>
+					<reportElement x="180" y="0" width="50" height="30" uuid="ac200fb9-99f5-48b5-8ba5-92749a97bf14">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Horizontal" ignoreWidth="true">
+						<datasetRun subDataset="CurrentContractDetailsDataSet" uuid="6cd2c332-6564-4329-834a-1fcadf2a6676">
+							<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{currentQuotationStepStructureVOList})]]></dataSourceExpression>
+						</datasetRun>
+						<jr:listContents height="30" width="50">
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="50" height="13" uuid="5b72dc75-6fa8-4930-a36b-edc0f8036ee1">
+									<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								</reportElement>
+								<box leftPadding="0" rightPadding="5">
+									<topPen lineWidth="0.0"/>
+									<leftPen lineWidth="0.0"/>
+									<bottomPen lineWidth="0.0"/>
+									<rightPen lineWidth="0.0"/>
+								</box>
+								<textElement textAlignment="Right">
+									<font fontName="Calibri" isBold="true" isUnderline="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{fromPeriod}.toString() + '-' + $F{toPeriod}.toString()]]></textFieldExpression>
+							</textField>
+							<textField pattern="¤#,##0.00;¤-#,##0.00" isBlankWhenNull="true">
+								<reportElement x="0" y="13" width="50" height="13" uuid="ce2ec83c-21a3-4b3b-98ad-0c465e3cf8e4">
+									<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								</reportElement>
+								<box rightPadding="5">
+									<topPen lineWidth="0.0"/>
+									<leftPen lineWidth="0.0"/>
+									<bottomPen lineWidth="0.0"/>
+									<rightPen lineWidth="0.0"/>
+								</box>
+								<textElement textAlignment="Right">
+									<font fontName="Calibri"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{finalLeaseRate}]]></textFieldExpression>
+							</textField>
+						</jr:listContents>
+					</jr:list>
+				</componentElement>
+				<staticText>
+					<reportElement x="0" y="13" width="180" height="13" uuid="0d6f267a-35d9-476c-aacc-938be58c12ce">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" isBold="true" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[FINAL MONTHLY LEASE RATE:]]></text>
+				</staticText>
+			</frame>
+		</band>
+		<band height="148">
+			<frame>
+				<reportElement x="0" y="0" width="571" height="139" uuid="5d31f747-d0b7-4356-9f68-c311acb11965">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<frame>
+					<reportElement x="0" y="13" width="571" height="126" uuid="3c66ddd5-0efa-4b0f-b519-c17da3fb71d7">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<staticText>
+						<reportElement x="0" y="0" width="140" height="13" uuid="ee318f30-9292-4d12-a569-8704a8616bc4">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="0" rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Contract Months:]]></text>
+					</staticText>
+					<textField>
+						<reportElement x="140" y="0" width="115" height="13" uuid="40261598-b95d-4238-8bbc-50fd333c9429">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{revisionOEQuoteVO}.getTerm()]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="0" y="13" width="140" height="13" uuid="7e2fd403-d038-48bf-bbfa-e4c6f7e71361">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="0" rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Contract Miles:]]></text>
+					</staticText>
+					<textField pattern="#,###.###">
+						<reportElement x="140" y="13" width="115" height="13" uuid="298d64d8-1757-40d7-9896-ae8398bf2c81">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{revisionOEQuoteVO}.getDistance()]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="0" y="26" width="140" height="13" uuid="e2285ed8-7dcb-40a5-81ed-5fe7ef33be10">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="0" rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Start Date:]]></text>
+					</staticText>
+					<textField pattern="MMM d, yyyy">
+						<reportElement x="140" y="26" width="115" height="13" uuid="41ca8884-93c8-41d4-9404-f02396728aac">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{revisionStartDate}]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="0" y="39" width="140" height="13" uuid="f31ad312-0743-462b-9fa0-2a691c56ee1b">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="0" rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[End Date:]]></text>
+					</staticText>
+					<textField pattern="MMM d, yyyy">
+						<reportElement x="140" y="39" width="115" height="13" uuid="e5a65ead-5e63-46f1-ad89-a2aab320e4c4">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{revisionEndDate}]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="260" y="52" width="150" height="13" uuid="092af2e6-56e7-494e-849a-df46f406e195">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5" rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Revised Capitalized Cost:]]></text>
+					</staticText>
+					<textField pattern="¤#,##0.00;¤-#,##0.00">
+						<reportElement x="410" y="52" width="115" height="13" uuid="26465671-5118-49b4-83e1-ae348aaaf3cf">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{revisionOEQuoteVO}.getCustomerCost()]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="0" y="52" width="140" height="13" uuid="84fd7f32-209a-4d6c-bfe9-adf4d5eef611">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="0" rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Months Remaining:]]></text>
+					</staticText>
+					<textField pattern="#,###.###">
+						<reportElement x="140" y="52" width="115" height="13" uuid="01025539-bed0-4030-abc4-80ec1840c377">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{monthsRemaining}]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="260" y="0" width="150" height="13" uuid="e5173657-629b-4343-aca7-7f11e745500f">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5" rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Book Value:]]></text>
+					</staticText>
+					<textField pattern="¤#,##0.00;¤-#,##0.00">
+						<reportElement x="410" y="0" width="115" height="13" uuid="35d5a1fa-70f7-487a-9438-625e1b66cdd1">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{revisionOEQuoteVO}.getEffDateNBV()]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="0" y="74" width="236" height="13" uuid="63bc0257-467a-443d-9387-0e55978e4117">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="0" rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Lease Rate Factor is comprised of the following:]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="25" y="87" width="115" height="13" uuid="86e81ecb-89b0-4417-aee3-f65edb8b08cb">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="0" rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Depreciation Factor:]]></text>
+					</staticText>
+					<textField pattern="#,##0.0000000%">
+						<reportElement x="140" y="87" width="156" height="13" uuid="96c2f929-c881-4700-801c-a33a6dfb9f07">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{revisionOEQuoteVO}.getDepreciationFactor().divide(new BigDecimal(100))]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="25" y="100" width="115" height="13" uuid="3f5e3be0-c398-4958-b0d1-3a3a98bca48a">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="0" rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Admin Factor:]]></text>
+					</staticText>
+					<textField pattern="#,##0.00#%">
+						<reportElement x="140" y="100" width="156" height="13" uuid="652ebd34-cf45-4b53-9984-19a9c61c7ae5">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{revisionOEQuoteVO}.getAdminFactor().divide(new BigDecimal(1000))]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="25" y="113" width="95" height="13" uuid="1f5177e2-0b10-4f73-847c-9fb5a8a823ad">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="0" rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Interest Component:]]></text>
+					</staticText>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement x="120" y="113" width="451" height="13" uuid="5d9efa12-0206-471e-92f3-a3d735cac1b8">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri" size="10"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{revisionInterestComponent}]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="260" y="13" width="150" height="13" uuid="68d5a4a2-3655-4bb0-969c-e8263fb2414b">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5" rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[In Rate Revision Assessment:]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="260" y="26" width="150" height="13" uuid="5bc1f032-18aa-4289-8dfc-50625702d7f0">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5" rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[In Rate Revision Interest Adj:]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="260" y="39" width="150" height="13" uuid="17e039f0-8a9b-4f57-a98b-b171c8b70183">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5" rightPadding="0">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement textAlignment="Left">
+							<font fontName="Calibri" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Client Capital Contribution:]]></text>
+					</staticText>
+					<textField pattern="¤#,##0.00;¤-#,##0.00">
+						<reportElement x="410" y="13" width="115" height="13" uuid="f0d3388c-697e-40e6-8126-998177448763">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{inRateRevisionAssessment}]]></textFieldExpression>
+					</textField>
+					<textField pattern="¤#,##0.00;¤-#,##0.00">
+						<reportElement x="410" y="26" width="115" height="13" uuid="52af0c8d-af3f-4ee9-bc91-4c31d45cdeaf">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{inRateRevisionInterestAdjustment}]]></textFieldExpression>
+					</textField>
+					<textField pattern="¤#,##0.00;¤-#,##0.00">
+						<reportElement x="410" y="39" width="115" height="13" uuid="d343b6e8-430f-4c97-895b-cb296a762924">
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.0"/>
+							<leftPen lineWidth="0.0"/>
+							<bottomPen lineWidth="0.0"/>
+							<rightPen lineWidth="0.0"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{revisionOEQuoteVO}.getCapitalContribution()]]></textFieldExpression>
+					</textField>
+				</frame>
+				<staticText>
+					<reportElement x="0" y="0" width="140" height="13" uuid="6553deca-4a0d-44b7-af0b-3b18576aa7dc">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" isBold="true" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[REVISED CONTRACT TERMS:]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="140" y="0" width="115" height="13" uuid="cd389fe9-1dad-4ab5-9984-ef1eaf95dc33">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<box leftPadding="5"/>
+					<textElement>
+						<font fontName="Calibri"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{revisionOEQuoteVO}.getQuote()]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+		<band height="38">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<frame>
+				<reportElement x="0" y="0" width="500" height="30" uuid="610058c2-009d-4fff-8b5f-b372fb2410dc"/>
+				<textField pattern="#,##0.0000%">
+					<reportElement x="0" y="13" width="180" height="13" uuid="3d25e83b-e2a3-4aad-ad61-73bb0790519c">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<box leftPadding="0" rightPadding="0">
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Left">
+						<font fontName="Calibri"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{revisionOEQuoteVO}.getProductName()]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="0" width="180" height="13" uuid="c146f24a-ea1b-48f2-a9d2-f55123c373f3">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" isBold="true" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[REVISED CONTRACT DETAILS:]]></text>
+				</staticText>
+				<componentElement>
+					<reportElement x="180" y="0" width="50" height="30" uuid="0a683d49-8bcb-496f-a451-2c7e97933ff8"/>
+					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Horizontal" ignoreWidth="true">
+						<datasetRun subDataset="RevisedContractDetailsDataSet" uuid="4205ff55-5a04-4162-960f-75d2f1a86055">
+							<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{revisionQuotationStepStructureVOList})]]></dataSourceExpression>
+						</datasetRun>
+						<jr:listContents height="30" width="50">
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="50" height="13" uuid="ef0073ff-07f5-4911-b8b9-c13abdc67830">
+									<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+									<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								</reportElement>
+								<box rightPadding="5">
+									<topPen lineWidth="0.0"/>
+									<leftPen lineWidth="0.0"/>
+									<bottomPen lineWidth="0.0"/>
+									<rightPen lineWidth="0.0"/>
+								</box>
+								<textElement textAlignment="Right">
+									<font fontName="Calibri" isBold="true" isUnderline="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{fromPeriod}.toString() + '-' + $F{toPeriod}.toString()]]></textFieldExpression>
+							</textField>
+							<textField pattern="¤#,##0.00;¤-#,##0.00" isBlankWhenNull="true">
+								<reportElement x="0" y="13" width="50" height="13" uuid="0c8da987-a2c7-4430-b413-fadb096d2fc5">
+									<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+									<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								</reportElement>
+								<box rightPadding="5">
+									<topPen lineWidth="0.0"/>
+									<leftPen lineWidth="0.0"/>
+									<bottomPen lineWidth="0.0"/>
+									<rightPen lineWidth="0.0"/>
+								</box>
+								<textElement textAlignment="Right">
+									<font fontName="Calibri"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{leaseRate}]]></textFieldExpression>
+							</textField>
+						</jr:listContents>
+					</jr:list>
+				</componentElement>
+			</frame>
+		</band>
+		<band height="39">
+			<crosstab>
+				<reportElement x="0" y="0" width="500" height="30" uuid="1fa7dd5b-d9ed-437a-a88c-ef54340960b8"/>
+				<crosstabDataset isDataPreSorted="true">
+					<dataset>
+						<datasetRun subDataset="RevisionServicesLeaseRateDataset" uuid="359eefd0-f7bf-453c-b992-78df7fc5e599">
+							<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{revisionServicesLeaseRateByPeriodVOList})]]></dataSourceExpression>
+						</datasetRun>
+					</dataset>
+				</crosstabDataset>
+				<rowGroup name="description1" width="180">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{description}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents mode="Opaque" style="Crosstab 19_CH">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="180" height="13" uuid="6a42a0b5-8884-4779-9ffb-8abf3ce03eb6">
+									<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+									<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								</reportElement>
+								<box rightPadding="0"/>
+								<textElement textAlignment="Left">
+									<font fontName="Calibri"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{description1}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents>
+							<staticText>
+								<reportElement x="0" y="0" width="-2147483648" height="-2147483648" uuid="817baa73-f3e2-4bbf-8e5e-94aad858cf38"/>
+								<text><![CDATA[Total description1]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="fromPeriod1" height="13">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{fromPeriod}.toString() + '-' + $F{toPeriod}.toString()]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents mode="Opaque" style="Crosstab 19_CH">
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="50" height="13" uuid="727e93c7-20fe-43c5-815f-be0029a8fc08">
+									<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+									<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								</reportElement>
+								<box rightPadding="5"/>
+								<textElement textAlignment="Right">
+									<font fontName="Calibri" isBold="true" isUnderline="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{fromPeriod1}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents>
+							<staticText>
+								<reportElement x="0" y="0" width="-2147483648" height="-2147483648" uuid="d5251ca2-0719-4dc5-a5ed-992ae9c2e67e"/>
+								<text><![CDATA[Total fromPeriod1]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="monthlyCost_MEASURE1" class="java.math.BigDecimal">
+					<measureExpression><![CDATA[$F{monthlyCost}]]></measureExpression>
+				</measure>
+				<crosstabCell width="50" height="13">
+					<cellContents mode="Opaque" style="Crosstab 19_CD">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<textField pattern="¤#,##0.00;¤-#,##0.00" isBlankWhenNull="true">
+							<reportElement x="0" y="0" width="50" height="13" uuid="ce227ab1-7df2-4a83-8b3e-5f0e08366acf">
+								<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							</reportElement>
+							<box rightPadding="5"/>
+							<textElement textAlignment="Right">
+								<font fontName="Calibri"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{monthlyCost_MEASURE1}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="60" height="20" columnTotalGroup="fromPeriod1">
+					<cellContents mode="Opaque" style="Crosstab 19_CT">
+						<textField>
+							<reportElement x="0" y="0" width="60" height="20" forecolor="#FFFFFF" uuid="d7fea963-753b-4701-a68c-c37804711dcd"/>
+							<textFieldExpression><![CDATA[$V{monthlyCost_MEASURE1}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="60" height="20" rowTotalGroup="description1">
+					<cellContents mode="Opaque" style="Crosstab 19_CT">
+						<textField>
+							<reportElement x="0" y="0" width="60" height="20" forecolor="#FFFFFF" uuid="6ba5e51a-59ae-4e64-bb14-b86b66357841"/>
+							<textFieldExpression><![CDATA[$V{monthlyCost_MEASURE1}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="60" height="20" rowTotalGroup="description1" columnTotalGroup="fromPeriod1">
+					<cellContents mode="Opaque" style="Crosstab 19_CT">
+						<textField>
+							<reportElement x="0" y="0" width="60" height="20" forecolor="#FFFFFF" uuid="d18d1aa4-e136-4663-9ced-322667fec96b"/>
+							<textFieldExpression><![CDATA[$V{monthlyCost_MEASURE1}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+			</crosstab>
+			<staticText>
+				<reportElement x="0" y="0" width="150" height="13" uuid="b3c65ab5-bdf7-4c5d-99b9-bcc8a1bcc4cf">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Calibri" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[SPECIFIED SERVICES / ITEMS:]]></text>
+			</staticText>
+		</band>
+		<band height="39">
+			<frame>
+				<reportElement x="0" y="0" width="500" height="30" uuid="9067ee3b-61f5-4aa6-8e57-599a9b7ba733"/>
+				<staticText>
+					<reportElement x="0" y="13" width="180" height="13" uuid="c355dace-0d7b-49dc-981f-b75a31dafa37">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" isBold="true" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[FINAL REVISED MONTHLY LEASE RATE:]]></text>
+				</staticText>
+				<componentElement>
+					<reportElement x="180" y="0" width="50" height="30" uuid="b5fe26bc-5912-414d-aa80-15e8315fa6d8"/>
+					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Horizontal" ignoreWidth="true">
+						<datasetRun subDataset="RevisedContractDetailsDataSet" uuid="0da85302-fc9f-4ea5-ba18-f4191fd334b6">
+							<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{revisionQuotationStepStructureVOList})]]></dataSourceExpression>
+						</datasetRun>
+						<jr:listContents height="30" width="50">
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="50" height="13" uuid="756aee69-8e93-4dd2-9d46-324df70f2f90">
+									<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+									<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								</reportElement>
+								<box rightPadding="5">
+									<topPen lineWidth="0.0"/>
+									<leftPen lineWidth="0.0"/>
+									<bottomPen lineWidth="0.0"/>
+									<rightPen lineWidth="0.0"/>
+								</box>
+								<textElement textAlignment="Right">
+									<font fontName="Calibri" isBold="true" isUnderline="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{fromPeriod}.toString() + '-' + $F{toPeriod}.toString()]]></textFieldExpression>
+							</textField>
+							<textField pattern="¤#,##0.00;¤-#,##0.00" isBlankWhenNull="true">
+								<reportElement x="0" y="13" width="50" height="13" uuid="aac51206-fec6-495b-952f-2852864c3062">
+									<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+									<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								</reportElement>
+								<box rightPadding="5">
+									<topPen lineWidth="0.0"/>
+									<leftPen lineWidth="0.0"/>
+									<bottomPen lineWidth="0.0"/>
+									<rightPen lineWidth="0.0"/>
+								</box>
+								<textElement textAlignment="Right">
+									<font fontName="Calibri"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{finalLeaseRate}]]></textFieldExpression>
+							</textField>
+						</jr:listContents>
+					</jr:list>
+				</componentElement>
+			</frame>
+		</band>
+		<band height="59">
+			<frame>
+				<reportElement x="0" y="13" width="500" height="44" uuid="26425224-351d-40c9-8f03-734b5379df1c">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<staticText>
+					<reportElement x="0" y="0" width="180" height="13" uuid="3615fafb-c582-4f36-acd8-b3a8df45b38f">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<box leftPadding="0">
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement>
+						<font fontName="Calibri" isBold="false"/>
+					</textElement>
+					<text><![CDATA[Revision Assessment:]]></text>
+				</staticText>
+				<textField pattern="¤#,##0.00;¤-#,##0.00">
+					<reportElement x="180" y="0" width="51" height="13" uuid="39358a2a-0fc4-46c3-b81a-0d6824442d88">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<box leftPadding="0" rightPadding="5">
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="Calibri"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{oneTimeRevisionAssessment}]]></textFieldExpression>
+				</textField>
+				<textField pattern="¤#,##0.00;¤-#,##0.00">
+					<reportElement x="180" y="13" width="51" height="13" uuid="c07146da-b2d9-4ecd-8d15-e619068a822d">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<box leftPadding="0" rightPadding="5">
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="Calibri"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{oneTimeRevisionInterestAdjustment}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="26" width="180" height="13" uuid="4916d943-c333-43ab-bf75-737af0b610b2">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<box leftPadding="0" rightPadding="5">
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="Calibri" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Total:]]></text>
+				</staticText>
+				<textField pattern="¤#,##0.00;¤-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="180" y="26" width="51" height="13" uuid="bbb6995f-da28-4b62-bba0-fe11b92a5004">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<box leftPadding="0" rightPadding="5">
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="Calibri"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{totalOneTimeCharges}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="186" y="26" width="40" height="1" uuid="fdfac8f0-2503-4ba5-a791-4bc70edc9bd7"/>
+				</line>
+				<textField>
+					<reportElement x="0" y="13" width="180" height="13" uuid="81356708-0bdd-4c5e-ad72-8a9a4a00488d">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{revisionInterestAdjustmentMonths}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<staticText>
+				<reportElement x="0" y="0" width="180" height="13" uuid="2b11f60e-87d2-45ea-bd9d-9830a5bb3e5f">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Calibri" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[ONE TIME CHARGES:]]></text>
+			</staticText>
+		</band>
+		<band height="21">
+			<frame>
+				<reportElement x="0" y="0" width="571" height="21" uuid="66c4c550-f524-4e31-b97a-696b81698ba2">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="6" width="571" height="13" uuid="2e2d8cde-3034-4265-922b-5168f977fbde">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement markup="html">
+						<font fontName="Calibri"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{signatureSection}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="3" width="571" height="1" uuid="0b37c047-18a2-4ac8-bbe2-6b4ba20a2ffa">
+						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					</reportElement>
+				</line>
+			</frame>
+		</band>
+		<band height="24">
+			<frame>
+				<reportElement x="0" y="0" width="571" height="19" uuid="1f2d855a-7df9-42a0-ab43-6d24cbbd1f36"/>
+				<line>
+					<reportElement x="0" y="1" width="281" height="1" uuid="91911e1d-bf5b-4428-b3f9-a4d45783944b">
+						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					</reportElement>
+				</line>
+				<line>
+					<reportElement x="330" y="1" width="180" height="1" uuid="8a3aaed6-1fe8-4078-b70f-8b4600dc6ab1">
+						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					</reportElement>
+				</line>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="4" width="281" height="13" uuid="9a66c83b-1550-48b3-b447-7e8b7dbe7225">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement markup="html">
+						<font fontName="Calibri"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{signatureLine}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="331" y="4" width="100" height="13" uuid="89992b94-1dad-4c4d-9441-66530c47d642">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri"/>
+					</textElement>
+					<text><![CDATA[Date]]></text>
+				</staticText>
+			</frame>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="19" splitType="Stretch">
+			<textField evaluationTime="Master">
+				<reportElement x="432" y="0" width="140" height="13" uuid="aeadbbb2-ace5-4ae9-b82b-d9dbd2844e75">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Calibri"/>
+				</textElement>
+				<textFieldExpression><![CDATA[msg("Page {0} of {1}", $V{MASTER_CURRENT_PAGE}, $V{MASTER_TOTAL_PAGES})]]></textFieldExpression>
+			</textField>
+			<textField pattern="MMMM d, yyyy">
+				<reportElement x="0" y="0" width="100" height="13" uuid="cc38bca6-2d3a-4ac5-a1b9-b6204357ea5a">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Calibri"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

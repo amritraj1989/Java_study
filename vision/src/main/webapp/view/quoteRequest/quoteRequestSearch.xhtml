@@ -1,0 +1,426 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"   
+	xmlns:pe="http://primefaces.org/ui/extensions"	  
+    template="../../templates/ui.xhtml" >
+	
+    <ui:define name="content">
+    	    <h:form id="quoteRequestBreadCrumbForm" prependId="false">
+   			    <p:breadCrumb model="#{quoteRequestSearchBean.breadCrumbTrail}" ajax="false" immediate="true" style="min-width:980px;max-width:100%;width:auto;"/>
+   		    </h:form>
+   		        
+    	    <!-- Message display -->
+		    <p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:980px;max-width:100%;width:auto;">
+			    <p:messages id="messages" showSummary="false" showDetail="true" autoUpdate="true" />
+		    </p:scrollPanel>   
+		    	
+			<h:form id="quoteRequestSearchForm" prependId="false">
+				<p:panel id="quoteRequestQueueSearchPanel" header="Search Criteria">
+					<h:inputHidden id="hiddenScrollPosition" value="#{quoteRequestSearchBean.scrollPosition}" />
+					<p:focus context="quoteRequestQueueSearchPanel" />
+					<h:panelGrid columns="10" cellspacing="5">																		
+						<h:outputLabel for="clientId" value="Client:" styleClass="ui-label" title="Client" />
+						<h:panelGroup style="white-space:nowrap;">							
+							<p:inputText id="clientId" title="Client" value="#{quoteRequestSearchBean.client}" onkeypress="return doKeypressSearch(event);"/>
+							<p:commandButton id='clientLOVId' icon="icon-lov" title="lov"
+								oncomplete="showCustomerLov();" immediate="true"
+								actionListener="#{customerLovBean.fetchLOVDataByCustomerName}"
+								process="@this,clientId" dynamic="true" async="true"
+								onstart="return hasMinAlphaNumericCharacters($('#clientId'));"
+								update=":custLovForm:CUSTOMER_GRID">
+								<f:param name="CUSTOMER_LOV_INPUT" value="clientId" />
+								<f:param name="INCLUDE_CLOSED_ACCOUNTS" value="Y" />
+							</p:commandButton>
+						</h:panelGroup>
+						
+						<h:outputLabel for="vehicleDescId" value="Vehicle Description:"  styleClass="ui-label" />
+						<h:panelGroup style="white-space:nowrap;">							
+							<p:inputText id="vehicleDescId" title="Vehicle Description" style="width:150px;" value="#{quoteRequestSearchBean.criteria.vehicleDescription}" onkeypress="return doKeypressSearch(event);"/>
+						</h:panelGroup>
+						
+						<h:outputLabel for="requestStatusId" value="Request Status:"  styleClass="ui-label" />
+						<h:panelGroup style="white-space:nowrap;">
+							<p:selectCheckboxMenu id="requestStatusId" 
+												widgetVar="requestStatusWidgetVar" 
+												filter="true" 
+												style="width:150px;height:25px" 
+												onkeydown="return doKeypressSearch(event);" 
+												value="#{quoteRequestSearchBean.criteria.requestStatuses}" label="">
+								<f:selectItems var="requestStatus" value="#{quoteRequestSearchBean.quoteRequestStatusList}" itemLabel="#{requestStatus.name}" itemValue="#{requestStatus.code}" />
+					        </p:selectCheckboxMenu>	
+						</h:panelGroup>
+						
+						<h:outputLabel for="requestorId" value="Requestor:" styleClass="ui-label"/>
+						<h:panelGroup style="white-space:nowrap;">							
+							<p:inputText id="requestorId" title="Requestor" value="#{quoteRequestSearchBean.criteria.requestor}" onchange="clearRequestorEmpNo();" onkeypress="return doKeypressSearch(event);"/>
+							<p:commandButton id='requestorLOVId' icon="icon-lov" title="lov"
+								oncomplete="showWillowUserLov();" immediate="true"
+								actionListener="#{willowUserLovBean.fetchLOVData}"
+								process="@this,requestorId" dynamic="true" async="true"
+								onstart="return hasMinAlphaNumericCharacters($('#requestorId'));"
+								update=":WILLOW_USER_GRID">
+								<f:param name="WILLOW_USER_LOV_NAME" value="requestorLOV" />
+								<f:param name="WILLOW_USER_LOV_INPUT_HEADER" value="Select Requestor" />
+								<f:param name="WILLOW_USER_LOV_INPUT_NAME" value="requestorId" />
+								<f:param name="WILLOW_USER_LOV_INPUT_NO" value="requestorEmpNo" />
+							</p:commandButton>
+							<h:inputHidden id ="requestorEmpNo" name="requestorEmpNo" value="#{quoteRequestSearchBean.criteria.requestorNo}"/>
+						</h:panelGroup>
+						
+						<h:outputLabel for="requestId" value="Request Id:" styleClass="ui-label" title="Client" />
+						<h:panelGroup style="white-space:nowrap;">							
+							<p:inputText id="requestId" title="Request Id" style="width:100px;" value="#{quoteRequestSearchBean.criteria.requestId}" onkeypress="return doKeypressSearch(event);"/>
+						</h:panelGroup>
+						
+						<h:outputLabel for="assignedToId" value="Assigned To:" styleClass="ui-label"/>
+						<h:panelGroup style="white-space:nowrap;">							
+							<p:inputText id="assignedToId" title="Assigned To" value="#{quoteRequestSearchBean.criteria.assignedTo}" onchange="clearAssignedToEmpNo();" onkeypress="return doKeypressSearch(event);"/>
+							<p:commandButton id='assignedToLOVId' icon="icon-lov" title="lov"
+								oncomplete="showWillowUserLov();" immediate="true"
+								actionListener="#{willowUserLovBean.fetchLOVData}"
+								process="@this,assignedToId" dynamic="true" async="true"
+								onstart="return hasMinAlphaNumericCharacters($('#assignedToId'));"
+								update=":WILLOW_USER_GRID">
+								<f:param name="WILLOW_USER_LOV_NAME" value="assignedToLOV" />
+								<f:param name="WILLOW_USER_LOV_INPUT_HEADER" value="Select Assigned To" />
+								<f:param name="WILLOW_USER_LOV_INPUT_NAME" value="assignedToId" />
+								<f:param name="WILLOW_USER_LOV_INPUT_NO" value="assignedToEmpNo" />
+							</p:commandButton>
+							<h:inputHidden id ="assignedToEmpNo" name="assignedToEmpNo" value="#{quoteRequestSearchBean.criteria.assignedToNo}"/>
+						</h:panelGroup>
+						
+						<h:outputLabel for="requestTypeId" value="Request Type:" styleClass="ui-label" />
+						<h:panelGroup style="white-space:nowrap;">
+							<p:selectCheckboxMenu id="requestTypeId" widgetVar="requestTypeWidgetVar" filter="true" style="width:150px;height:25px" onkeydown="return doKeypressSearch(event);" value="#{quoteRequestSearchBean.criteria.requestTypes}" label="">
+								<f:selectItems var="requestType" value="#{quoteRequestSearchBean.quoteRequestTypeList}" itemLabel="#{requestType.name}" itemValue="#{requestType.code}" />
+					        </p:selectCheckboxMenu>						
+						</h:panelGroup>
+						
+						<h:outputLabel for="requestEtaId" value="Due Date:"  styleClass="ui-label" />
+						<h:panelGroup style="white-space:nowrap;">
+							<p:calendar id="requestEtaId" title="Due Date"
+					        	size="10"
+						        value="#{quoteRequestSearchBean.criteria.requestedEta}"
+						        pattern="MM/dd/yyyy"
+						        onchange="formatDate(this);"
+							    style="width:20px" 
+						        showOn="button" 
+						        autocomplete="off"
+						        onkeypress="return doKeypressSearch(event);">
+						        <f:convertDateTime pattern="MM/dd/yyyy" />		    									
+							</p:calendar>
+						</h:panelGroup>
+						
+						<h:outputLabel for="dateSubmittedFromId" value="Date Submitted:" styleClass="ui-label" />
+						<h:panelGroup style="white-space:nowrap;">
+							<p:calendar id="dateSubmittedFromId" widgetVar="dateSubmittedFromWidgetVar" title="Date Request Submitted From"
+					        	size="10"
+						        value="#{quoteRequestSearchBean.criteria.dateSubmittedFrom}" 
+						        pattern="MM/dd/yyyy"
+						        onchange="formatDate(this);"
+							    style="width:20px" 
+						        showOn="button" 
+						        autocomplete="off"
+						        onkeypress="return doKeypressSearch(event);">
+						        <f:convertDateTime pattern="MM/dd/yyyy" />		    									
+							</p:calendar>
+							<p:spacer style="width:10px">
+							</p:spacer>
+							<h:outputLabel for="dateSubmittedToId" value="To"  styleClass="ui-label" style="vertical-align: middle" />
+							<p:spacer style="width:10px">
+							</p:spacer>
+						
+						
+						
+							<p:calendar id="dateSubmittedToId" title="Date Request Submitted To"
+					        	size="10"
+						        value="#{quoteRequestSearchBean.criteria.dateSubmittedTo}" 
+						        pattern="MM/dd/yyyy"
+						        onchange="formatDate(this);"
+							    style="width:20px" 
+						        showOn="button" 
+						        autocomplete="off"
+						        onkeypress="return doKeypressSearch(event);">
+						        <f:convertDateTime pattern="MM/dd/yyyy" />		    									
+							</p:calendar>
+							</h:panelGroup>
+						<h:panelGroup/>
+						
+						<h:panelGroup>
+							<p:commandButton id="searchId" widgetVar="searchButtonWidgetVar" title="Search"
+								actionListener="#{quoteRequestSearchBean.performSearch}" update="quoteRequestQueueTablePanel btnPanel"
+								onstart="return validateSearch(event);lockScreen();" ajax="true" oncomplete="resetUIState();"
+								value="Search" style="float:right"/>
+						</h:panelGroup>
+					</h:panelGrid>
+				</p:panel>
+            	<p:panel id="quoteRequestQueueTablePanel" header="Quote Requests"> 
+				   	<p:dataTable id="DT_UI_ID" 
+				   			var="element" 
+				   			widgetVar="quoteRequestSearchTableVar"
+				   			lazy="true" 
+				   			emptyMessage = "#{quoteRequestSearchBean.dataTableMessage}"             	  
+					        value="#{quoteRequestSearchBean.lazyQuoteRequestSearchResults}" 
+							scrollable="true" rowIndexVar="elementRowIndex" 
+                            scrollHeight="#{quoteRequestSearchBean.dataTable.height}"
+							resizableColumns="true" 
+							rowKey="#{element.qrqId}"
+							rows="#{quoteRequestSearchBean.resultPerPage}"	
+							paginator="true" paginatorPosition="bottom" 
+							selectionMode="single"
+							selection="#{quoteRequestSearchBean.selectedQuoteRequestQueueVO}">						
+						
+						<p:ajax event="sort" listener="#{quoteRequestSearchBean.onSortOperation}" oncomplete="resetUIState();"/>
+						<p:ajax event="page" listener="#{quoteRequestSearchBean.onPageChange}" oncomplete="resetUIState();" />
+						<p:ajax event="rowSelect" update=":quoteRequestSearchForm:viewQuoteRequestBtn" />
+						<p:ajax event="rowUnselect"  update=":quoteRequestSearchForm:viewQuoteRequestBtn" />						
+	                
+       				    <p:column width="#{quoteRequestSearchBean.dataTable.col1}" sortBy="#{element.toleranceYN}" style="text-align:center;padding:0px;" exportable="false">               
+		            	   <p:graphicImage value="/images/overdue.png" title="Overdue" style="border-style: none" 
+		            	   				rendered="#{element.toleranceYN eq 'N' and element.requestStatus ne quoteRequestSearchBean.completedStatus and element.requestStatus ne quoteRequestSearchBean.closedStatus}"  />
+		                </p:column>   
+
+       					<p:column id="REQUEST_UI_ID" sortBy="#{element.qrqId}" headerText="Request Id" width="#{quoteRequestSearchBean.dataTable.col2}" style="#{not empty element ? 'text-align:right;' : ''  }" exportable="false">				
+							<h:outputText  value="#{element.qrqId}" />
+						</p:column>
+								                       					 
+       					<p:column id="CLIENT_UI_ID" sortBy="#{element.clientAccountName}" headerText="Client" width="#{quoteRequestSearchBean.dataTable.col3}" exportable="false">				
+							<h:outputText  value="#{element.clientAccountCode.concat(' - ').concat(element.clientAccountName)}" />
+						</p:column>
+						 
+						<p:column id="REQUEST_TYPE_UI_ID" sortBy="#{element.requestType}" headerText="Request Type" width="#{quoteRequestSearchBean.dataTable.col4}" exportable="false">
+							<h:outputText id="requestTypeValue" value="#{element.requestType}" />
+							<p:tooltip id="hoverPanel" for="requestTypeValue" showEffect="blind" rendered="#{element.requestType != null}" >  
+								<h:panelGrid columns="1"    >	
+									<h:outputLabel style="white-space:nowrap;" styleClass="ui-label" value="Vehicle Description" />
+									<p:columnGroup>
+										<h:outputText value="&#8226;&#160;"/><h:outputText  value="#{element.vehicleDescription.replaceAll(',', '&lt;br/&gt;&#8226;&#160;')}" escape="false" />
+									</p:columnGroup>
+								</h:panelGrid>
+							</p:tooltip >
+						</p:column>
+						 
+						<p:column id="DT_REQ_SUB_UI_ID" headerText="Date Submitted" sortBy="#{element.dateRequestSubmitted}" width="#{quoteRequestSearchBean.dataTable.col5}"  exportable="false">				
+						    <h:outputText id="cellDateReqSubLbl" value="#{element.dateRequestSubmitted}">
+						     	<f:convertDateTime type="date" pattern="MM/dd/yyyy" /> 
+							</h:outputText>
+						</p:column>
+						
+						<p:column id="DUE_DATE_UI_ID" sortBy="#{element.dueDate}" headerText="Due Date" width="#{quoteRequestSearchBean.dataTable.col6}" exportable="false">
+							<h:outputText id="cellDueDateLbl" value="#{element.dueDate}">
+								<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+							</h:outputText>
+						</p:column>
+						
+						<p:column headerText="Requestor" width="#{quoteRequestSearchBean.dataTable.col7}" exportable="false" sortBy="#{element.requestor}">								
+				  			<h:outputText value="#{element.requestor}" />
+						</p:column>	
+						
+						<p:column headerText="Assigned To" width="#{quoteRequestSearchBean.dataTable.col8}" exportable="false" sortBy="#{element.assignedTo}">								
+				  			<h:outputText value="#{element.assignedTo}" />
+						</p:column>
+						
+						<p:column headerText="Status" width="#{quoteRequestSearchBean.dataTable.col9}" exportable="false" sortBy="#{element.requestStatus}">								
+				  			<div id="bar" style="display: #{element.requestSubStatus eq null ? 'none' : 'block'}">
+							  <div id="progress" style="width: #{element.percentCompleted}%">
+							    <div id="label"><h:outputText value="#{element.requestSubStatus}" /></div>
+							  </div>
+							</div>
+				  			<h:outputText id="reqStatus" value="#{element.requestStatus}" rendered="#{element.requestSubStatus eq null ? true : false}" />
+				  			<p:tooltip id="requestStatusToolTip" for="reqStatus" showEffect="blind" rendered="#{element.requestStatus eq quoteRequestSearchBean.completedStatus or element.requestStatus eq quoteRequestSearchBean.closedStatus}" >  
+								<h:panelGrid columns="1"    >	
+								<h:outputText id="statusDate" value="#{element.requestStatus eq quoteRequestSearchBean.completedStatus ? element.completedDate : element.closedDate}">
+							     	<f:convertDateTime type="date" pattern="MM/dd/yyyy" /> 
+								</h:outputText>
+								</h:panelGrid>
+							</p:tooltip >
+						</p:column>
+						
+						<f:facet  name="footer"  >
+							Record Count: <h:outputText value="#{quoteRequestSearchBean.lazyQuoteRequestSearchResults.rowCount}" />
+						</f:facet>	
+					</p:dataTable>  
+				</p:panel>
+
+								
+				<p:panel id="btnPanel">
+					<p:commandButton id="addQuoteRequestBtn" widgetVar="addQuoteRequestBtnVar"  value="Add Request" onclick="lockScreen();"
+					        ajax="false" action="#{quoteRequestSearchBean.navigateToAddQuoteRequest}" disabled="#{!quoteRequestSearchBean.hasPermission('quoteRequestAddEdit')}" />
+					        
+					<p:spacer width="10" />	
+					
+				    <p:commandButton id="viewQuoteRequestBtn" widgetVar="viewQuoteRequestBtnVar" value="View/Edit Request" onclick="saveScrollPosition();lockScreen();" 
+				            ajax="false"  actionListener="#{quoteRequestSearchBean.navigateToEditViewQuoteRequest}" disabled="#{empty quoteRequestSearchBean.selectedQuoteRequestQueueVO}" />	
+
+					<p:spacer width="10" />	
+									            				
+					<p:commandButton id="done" value="Cancel" action="#{quoteRequestSearchBean.cancel}" ajax="false" immediate="true" onclick="lockScreen();" />
+				</p:panel>
+				
+            </h:form>
+  
+	  		<div id="CUSTOMER_LOV_DIV">
+				<ui:include src="../lov/customers.xhtml" />
+			</div>
+			
+			<div id="WILLOW_USER_LOV_DIV">
+				<ui:include src="../lov/willowUsers.xhtml" />
+			</div>
+			
+			<div id="inputFieldChecks">
+				<ui:include src="../alert/inputFieldChecks.xhtml" />
+			</div>
+			
+			<SCRIPT type="text/javascript">
+			
+			$(window).load(function(){
+	        	adjustBtnState();
+	        	setScrollPosition();
+			});
+			
+			var  hasPermissionEditQuoteRequest =  #{quoteRequestSearchBean.hasPermission('quoteRequestAddEdit')};
+            function adjustBtnState() {
+            	if(hasPermissionEditQuoteRequest == true){
+            		PF('addQuoteRequestBtnVar').enable();
+            	}else{
+            		PF('addQuoteRequestBtnVar').disable();
+            	}
+           	  }
+			
+			function validateSearch(event){
+				var searchCriteria;
+				
+				var requestTypeSelection = PF('requestTypeWidgetVar').inputs.filter(":checked").length;
+				if(requestTypeSelection == 0 ){
+					requestTypeSelection = '';
+				}
+				
+				var requestStatusSelection = PF('requestStatusWidgetVar').inputs.filter(":checked").length;
+				if(requestStatusSelection == 0 ){
+					requestStatusSelection = '';
+				}
+				searchCriteria = requestStatusSelection + $('#clientId').val();
+				searchCriteria += requestTypeSelection + $('#dateSubmittedFromId_input').val(); 
+				searchCriteria += $('#dateSubmittedToId_input').val() + $('#requestEtaId_input').val();
+				searchCriteria += $('#requestorId').val() + $('#assignedToId').val();
+				searchCriteria += $('#vehicleDescId').val();
+				searchCriteria += $('#requestId').val();				
+				
+				if(!hasMinAlphaNumericCharacters(event.srcElement, searchCriteria)) {		
+					return false;
+				} else {
+					return true;
+				}		
+			}
+			
+			function setSelection(lovName, nameArray, valueArray) {
+				if(lovName == 'customerLOV'){
+					for(var i=0; i  &lt; nameArray.length ; i++){
+						if(nameArray[i] == 'CUSTOMER_NAME'){
+							document.getElementById('clientId').value = valueArray[i];
+						}
+					}
+					setFocus('clientId');
+				}
+				
+				if(lovName == 'requestorLOV'){
+					for(var i=0; i  &lt; nameArray.length ; i++){
+						if(nameArray[i] == 'EMPLOYEE_NO'){
+							document.getElementById('requestorEmpNo').value = valueArray[i];
+						}
+						
+						if(nameArray[i] == 'EMPLOYEE_NAME'){
+							document.getElementById('requestorId').value = valueArray[i];
+						}
+					}
+					setFocus('requestorId');
+				}
+				
+				if(lovName == 'assignedToLOV'){
+					for(var i=0; i  &lt; nameArray.length ; i++){
+						if(nameArray[i] == 'EMPLOYEE_NO'){
+							document.getElementById('assignedToEmpNo').value = valueArray[i];
+						}
+						
+						if(nameArray[i] == 'EMPLOYEE_NAME'){
+							document.getElementById('assignedToId').value = valueArray[i];
+						}
+					}
+					setFocus('assignedToId');
+				}
+			}
+			
+			function clearRequestorEmpNo(){
+				document.getElementById('requestorEmpNo').value = '';
+			}
+			
+			 function clearAssignedToEmpNo(){
+				document.getElementById('assignedToEmpNo').value = '';
+			}
+			
+			function doKeypressSearch(event){
+				if (event.keyCode == 13) {
+					setFocus('searchId');
+				   $('#searchId').click();
+				   return false;
+				}
+				return true;	
+			}
+			
+			function resetUIState() {
+	        	setScrollDivAtTop();
+	        }
+			
+			function saveScrollPosition() {
+            	document.getElementById('hiddenScrollPosition').value = $('#DT_UI_ID .ui-datatable-scrollable-body').scrollTop();
+            }
+            function setScrollPosition() {
+            	$('#DT_UI_ID .ui-datatable-scrollable-body').scrollTop(document.getElementById('hiddenScrollPosition').value);
+            }
+			
+			</SCRIPT>
+		
+  			<style type="text/css">
+				.dateTimeField input {
+					width: 75px;
+				}
+				
+				.ui-datatable thead th {
+					white-space: normal;
+					text-align: center;
+				}
+				
+				.textWrap {
+					white-space: normal;
+				}
+				.ui-selectcheckboxmenu .ui-selectcheckboxmenu-label {
+					height:19px;
+				}		
+				
+				#bar {
+				  position: relative;
+				  width: 100%;
+				  height: 30px;
+				  background-color: LightGrey;
+				}
+				
+				#progress {
+				  position: absolute;
+				  height: 100%;
+				  background-color: #8CC63F;
+				}
+				
+				#label {
+				  text-align: left;
+				  line-height: 30px;
+				  color: White;
+				  white-space: nowrap;
+				}
+						
+			</style>  
+	</ui:define>
+	
+</ui:composition>

@@ -1,0 +1,240 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	template="../../templates/ui.xhtml">
+
+	<ui:define name="content">
+			<h:form id="breadCrumbForm" prependId="false">
+				<p:breadCrumb model="#{fuelTypeMappingBean.breadCrumbTrail}"
+					style="min-width:1000px;max-width:100%;width:auto" ajax="false"
+					immediate="true" styleClass="ui-layout" />
+			</h:form>
+			<!-- Error message display -->
+			<p:scrollPanel style="height:50px;max-width:100%;width:auto;"
+				mode="native" styleClass="ui-layout">
+				<p:messages id="messages" showSummary="false" showDetail="true"
+					autoUpdate="true" />
+			</p:scrollPanel>
+
+			<h:form id="mainForm" prependId="false">
+				<p:panel id="pagePanel" header="Fuel Type Mappings" style="width:#{fuelTypeMappingBean.tableWidth}" >
+					<p:focus context="pagePanel" />
+
+				    <p:dataTable id="tableId" var="fuelMap" value="#{fuelTypeMappingBean.fuelMappings}" 
+				    		scrollable="true" scrollHeight="400">                    
+				        <p:column style="width:180px;">
+				            <f:facet name="header">
+				                <h:outputText value="Fuel Type" />
+				            </f:facet>
+				            <h:outputText value="#{fuelMap.fuelTypeValue.fuelType}" />
+				        </p:column>
+				        <p:column style="width:180px;" rendered="#{fuelTypeMappingBean.header[0] != null}">
+				            <f:facet name="header">
+				                <h:outputText value="#{fuelTypeMappingBean.header[0]} Fuel Group" />
+				            </f:facet>
+				            <h:outputText value="#{fuelMap.fuelGroupCode0.fuelGroupDescription}" rendered="#{fuelMap.fuelGroupCode0 != null}"/>
+							<p:selectOneMenu value="#{fuelMap.fuelGroupCode0}" rendered="#{fuelMap.fuelGroupCode0 == null}" 
+								 converter="FuelGroupCodeConverter" styleClass = "trackDirtySelect">
+						 		<f:selectItem itemLabel="--Select one--" itemValue="" />
+						    	<f:selectItems value="#{fuelTypeMappingBean.availableGroups}" var="fgc" 
+						    		itemLabel="#{fgc.fuelGroupDescription}" itemValue="#{fgc}"/>
+						    </p:selectOneMenu>
+				        </p:column>
+				        <p:column style="width:180px;" rendered="#{fuelTypeMappingBean.header[1] != null}">
+				            <f:facet name="header">
+				                <h:outputText value="#{fuelTypeMappingBean.header[1]} Fuel Group" />
+				            </f:facet>
+				            <h:outputText value="#{fuelMap.fuelGroupCode1.fuelGroupDescription}" rendered="#{fuelMap.fuelGroupCode1 != null}"/>
+							<p:selectOneMenu value="#{fuelMap.fuelGroupCode1}" rendered="#{fuelMap.fuelGroupCode1 == null}" 
+								 converter="FuelGroupCodeConverter" styleClass = "trackDirtySelect">
+						 		<f:selectItem itemLabel="--Select one--" itemValue="" />
+						    	<f:selectItems value="#{fuelTypeMappingBean.availableGroups}" var="fgc" 
+						    		itemLabel="#{fgc.fuelGroupDescription}" itemValue="#{fgc}"/>
+						    </p:selectOneMenu>
+				        </p:column>
+				        <p:column style="width:180px;" rendered="#{fuelTypeMappingBean.header[2] != null}">
+				            <f:facet name="header">
+				                <h:outputText value="#{fuelTypeMappingBean.header[2]}  Fuel Group" />
+				            </f:facet>
+				            <h:outputText value="#{fuelMap.fuelGroupCode2.fuelGroupDescription}" rendered="#{fuelMap.fuelGroupCode2 != null}"/>
+							<p:selectOneMenu value="#{fuelMap.fuelGroupCode2}" rendered="#{fuelMap.fuelGroupCode2 == null}" 
+								 converter="FuelGroupCodeConverter" styleClass = "trackDirtySelect">
+						 		<f:selectItem itemLabel="--Select one--" itemValue="" />
+						    	<f:selectItems value="#{fuelTypeMappingBean.availableGroups}" var="fgc" 
+						    		itemLabel="#{fgc.fuelGroupDescription}" itemValue="#{fgc}"/>
+						    </p:selectOneMenu>
+				        </p:column>
+				        <p:column style="width:180px;" rendered="#{fuelTypeMappingBean.header[3] != null}">
+				            <f:facet name="header">
+				                <h:outputText value="#{fuelTypeMappingBean.header[3]} Fuel Group" />
+				            </f:facet>
+				            <h:outputText value="#{fuelMap.fuelGroupCode3.fuelGroupDescription}" rendered="#{fuelMap.fuelGroupCode3 != null}"/>
+							<p:selectOneMenu value="#{fuelMap.fuelGroupCode3}" rendered="#{fuelMap.fuelGroupCode3 == null}" 
+								 converter="FuelGroupCodeConverter" styleClass = "trackDirtySelect">
+						 		<f:selectItem itemLabel="--Select one--" itemValue="" />
+						    	<f:selectItems value="#{fuelTypeMappingBean.availableGroups}" var="fgc" 
+						    		itemLabel="#{fgc.fuelGroupDescription}" itemValue="#{fgc}"/>
+						    </p:selectOneMenu>
+				        </p:column>
+				        <p:column style="width:180px;" rendered="#{fuelTypeMappingBean.header[4] != null}">
+				            <f:facet name="header">
+				                <h:outputText value="#{fuelTypeMappingBean.header[4]} Fuel Group" />
+				            </f:facet>
+				            <h:outputText value="#{fuelMap.fuelGroupCode4.fuelGroupDescription}" rendered="#{fuelMap.fuelGroupCode4 != null}"/>
+							<p:selectOneMenu value="#{fuelMap.fuelGroupCode4}" rendered="#{fuelMap.fuelGroupCode4 == null}" 
+								 converter="FuelGroupCodeConverter" styleClass = "trackDirtySelect">
+						 		<f:selectItem itemLabel="--Select one--" itemValue="" />
+						    	<f:selectItems value="#{fuelTypeMappingBean.availableGroups}" var="fgc" 
+						    		itemLabel="#{fgc.fuelGroupDescription}" itemValue="#{fgc}"/>
+						    </p:selectOneMenu>
+				        </p:column>
+				        <p:column style="width:180px;" rendered="#{fuelTypeMappingBean.header[5] != null}">
+				            <f:facet name="header">
+				                <h:outputText value="#{fuelTypeMappingBean.header[5]} Fuel Group" />
+				            </f:facet>
+				            <h:outputText value="#{fuelMap.fuelGroupCode5.fuelGroupDescription}" rendered="#{fuelMap.fuelGroupCode5 != null}"/>
+							<p:selectOneMenu value="#{fuelMap.fuelGroupCode5}" rendered="#{fuelMap.fuelGroupCode5 == null}" 
+								 converter="FuelGroupCodeConverter" styleClass = "trackDirtySelect">
+						 		<f:selectItem itemLabel="--Select one--" itemValue="" />
+						    	<f:selectItems value="#{fuelTypeMappingBean.availableGroups}" var="fgc" 
+						    		itemLabel="#{fgc.fuelGroupDescription}" itemValue="#{fgc}"/>
+						    </p:selectOneMenu>
+				        </p:column>
+				        <p:column style="width:180px;" rendered="#{fuelTypeMappingBean.header[6] != null}">
+				            <f:facet name="header">
+				                <h:outputText value="#{fuelTypeMappingBean.header[6]} Fuel Group" />
+				            </f:facet>
+				            <h:outputText value="#{fuelMap.fuelGroupCode6.fuelGroupDescription}" rendered="#{fuelMap.fuelGroupCode6 != null}"/>
+							<p:selectOneMenu value="#{fuelMap.fuelGroupCode6}" rendered="#{fuelMap.fuelGroupCode6 == null}" 
+								 converter="FuelGroupCodeConverter" styleClass = "trackDirtySelect">
+						 		<f:selectItem itemLabel="--Select one--" itemValue="" />
+						    	<f:selectItems value="#{fuelTypeMappingBean.availableGroups}" var="fgc" 
+						    		itemLabel="#{fgc.fuelGroupDescription}" itemValue="#{fgc}"/>
+						    </p:selectOneMenu>
+				        </p:column>
+				        <p:column style="width:180px;" rendered="#{fuelTypeMappingBean.header[7] != null}">
+				            <f:facet name="header">
+				                <h:outputText value="#{fuelTypeMappingBean.header[7]} Fuel Group" />
+				            </f:facet>
+				            <h:outputText value="#{fuelMap.fuelGroupCode7.fuelGroupDescription}" rendered="#{fuelMap.fuelGroupCode7 != null}"/>
+							<p:selectOneMenu value="#{fuelMap.fuelGroupCode7}" rendered="#{fuelMap.fuelGroupCode7 == null}" 
+								 converter="FuelGroupCodeConverter" styleClass = "trackDirtySelect">
+						 		<f:selectItem itemLabel="--Select one--" itemValue="" />
+						    	<f:selectItems value="#{fuelTypeMappingBean.availableGroups}" var="fgc" 
+						    		itemLabel="#{fgc.fuelGroupDescription}" itemValue="#{fgc}"/>
+						    </p:selectOneMenu>
+				        </p:column>
+				        <p:column style="width:180px;" rendered="#{fuelTypeMappingBean.header[8] != null}">
+				            <f:facet name="header">
+				                <h:outputText value="#{fuelTypeMappingBean.header[8]} Fuel Group" />
+				            </f:facet>
+				            <h:outputText value="#{fuelMap.fuelGroupCode8.fuelGroupDescription}" rendered="#{fuelMap.fuelGroupCode8 != null}"/>
+							<p:selectOneMenu value="#{fuelMap.fuelGroupCode8}" rendered="#{fuelMap.fuelGroupCode8 == null}" 
+								 converter="FuelGroupCodeConverter" styleClass = "trackDirtySelect">
+						 		<f:selectItem itemLabel="--Select one--" itemValue="" />
+						    	<f:selectItems value="#{fuelTypeMappingBean.availableGroups}" var="fgc" 
+						    		itemLabel="#{fgc.fuelGroupDescription}" itemValue="#{fgc}"/>
+						    </p:selectOneMenu>
+				        </p:column>
+				        <p:column style="width:180px;" rendered="#{fuelTypeMappingBean.header[9] != null}">
+				            <f:facet name="header">
+				                <h:outputText value="#{fuelTypeMappingBean.header[9]} Fuel Group" />
+				            </f:facet>
+				            <h:outputText value="#{fuelMap.fuelGroupCode9.fuelGroupDescription}" rendered="#{fuelMap.fuelGroupCode9 != null}"/>
+							<p:selectOneMenu value="#{fuelMap.fuelGroupCode9}" rendered="#{fuelMap.fuelGroupCode9 == null}" 
+								 converter="FuelGroupCodeConverter" styleClass = "trackDirtySelect">
+						 		<f:selectItem itemLabel="--Select one--" itemValue="" />
+						    	<f:selectItems value="#{fuelTypeMappingBean.availableGroups}" var="fgc" 
+						    		itemLabel="#{fgc.fuelGroupDescription}" itemValue="#{fgc}"/>
+						    </p:selectOneMenu>
+				        </p:column>
+
+				    </p:dataTable>
+
+				</p:panel>
+
+	    		<p:panel id="buttonsPanel">
+					<h:panelGrid id="buttons">
+						<f:facet name="footer">
+							<p:commandButton disabled="#{!fuelTypeMappingBean.hasEditPermission or !fuelTypeMappingBean.savePossible}" id="saveButton" tabindex="30" value="Save"
+								onclick="showDialog('confirmVar');" />
+   							<p:spacer width="10" />
+							<p:commandButton disabled="#{!fuelTypeMappingBean.hasEditPermission}" id="addButton" tabindex="50" value="Add Group" process="@this"
+								onclick="showDialog('addVar');" actionListener="#{fuelTypeMappingBean.clearDialog}" 
+								update=":addDialogForm:addDialogPanel" />
+   							<p:spacer width="10" />
+							<p:commandButton id="cancelButton" tabindex="70" value="Cancel"
+								action="#{fuelTypeMappingBean.cancel}" ajax="false"
+								onclick="lockScreen();" immediate="true" />
+						</f:facet>
+					</h:panelGrid>
+              	</p:panel>
+
+			</h:form>
+		
+
+
+			<p:dialog id="addDialogId" header="Add Group" widgetVar="addVar" modal="true" resizable="false" appendTo="@(body)"  > 
+
+				<h:form id="addDialogForm" prependId="false" >	
+					
+					<p:panel id="addDialogPanel">
+						<p:messages id="dialogErrorMsgID" showDetail="false" autoUpdate="true" showSummary="true" globalOnly="false"/>	
+						<p:panel id="addDialogDetailPanel">
+							<p:focus  context="addDialogDetailPanel"/>					
+							<p:panelGrid columns="2" >
+								<p:outputLabel styleClass="ui-label" value = "Group Code:* " for="groupCodeId"/>
+								<p:inputText id="groupCodeId" value="#{fuelTypeMappingBean.groupCode}" size="11" maxlength="10"/>
+								<p:outputLabel styleClass="ui-label" value = "Group Description:* " for="groupDescId"/>
+								<p:inputText id="groupDescId" value="#{fuelTypeMappingBean.groupDescription}" size="40" maxlength="80"/>
+							</p:panelGrid>
+						</p:panel>
+					</p:panel>
+						  
+       				<p:commandButton  id="addDialogSaveButton" value="Save" ajax="true" process="@form"  
+       					oncomplete="handlePopupDoneRequest(xhr, status, args);saveDataForDirtyDetection();" actionListener="#{fuelTypeMappingBean.addGroup}"   
+       					update=":mainForm:pagePanel, addDialogPanel"  />			  
+        			<p:spacer width="10" />
+        			<p:commandButton  id="addDialogCancelButton" value="Cancel"  onclick="PF('addVar').hide();" type="button"/>
+				
+				</h:form>		
+
+
+			</p:dialog>
+		
+		<p:confirmDialog id="confirmDialogId" message="Once saved, the values cannot be changed.  Are you sure they are correct?" header="Confirm Save"
+				widgetVar="confirmVar" resizable="false" width="300" height="60" appendTo="@(body)">    
+				
+	           <h:form prependId="false">
+       				<p:commandButton  id="confirmSave" value="Yes"  process="@this"	ajax="false" 
+       					actionListener="#{fuelTypeMappingBean.save}" />			  
+        			<p:spacer width="10" />
+        			<p:commandButton  value="No"  onclick="PF('confirmVar').hide();" type="button"/>
+        			
+        		</h:form>
+        </p:confirmDialog>
+			
+        
+		<script type="text/javascript">
+		
+		function initializeDirtyDetection() {
+			registerIgnoreButton("confirmSave");
+			saveDataForDirtyDetection();
+		}
+		
+		function handlePopupDoneRequest(xhr, status, args) { 
+            if(!args.failure) { 
+                PF('addVar').hide();                                
+            }
+		}
+
+     	$(window).load(function(){
+     		initializeDirtyDetection();
+		});			
+
+		</script>
+	</ui:define>
+</ui:composition>

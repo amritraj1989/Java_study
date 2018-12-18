@@ -1,0 +1,188 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+	    xmlns:h="http://java.sun.com/jsf/html"
+	    xmlns:f="http://java.sun.com/jsf/core"
+	    xmlns:p="http://primefaces.org/ui"
+	    xmlns:composite="http://java.sun.com/jsf/composite"
+	    xmlns:comp="http://java.sun.com/jsf/composite/view/component" 
+	    xmlns:pe="http://primefaces.org/ui/extensions" >
+	
+    <composite:interface>
+		<composite:attribute name="upfitter" required="true" type="com.mikealbert.data.entity.ExternalAccount" />	  
+		<composite:attribute name="trim" required="true" type="com.mikealbert.data.entity.Model" />
+		<composite:attribute name="resource" required="true" default="" type="java.lang.String" />			
+		<composite:attribute name="update" required="false" default="none" type="java.lang.String" />
+		<composite:attribute name="onClose" required="false" default="" type="java.lang.String" />	    	 	    	    	    			            
+	</composite:interface>
+	
+	<composite:implementation>
+	    <h:form id="ccAddDealerAccessoryHiddenForm" prependId="false">           
+            <p:commandButton id="ccInitializeBeanHiddenBtn" 
+                    style="display:none"
+                    actionListener="#{addDealerAccessoryBean.init()}" 
+                    oncomplete="PF('ccAddDealerAccessoryWidget').show();"
+                    update="#{':'.concat(cc.attrs.clientId).concat(':ccAddDealerAccessoryForm')}" />
+		</h:form>
+		        	  	
+	  	<div id="ccAddDealerAccessoryDlg">
+			<p:dialog id="ccAddDealerAccessoryDialog" 
+			        modal="true" 
+			        onShow="init()" 
+			        onHide="onHideListener();"
+			        header="Add Dealer Accessory" 
+			        widgetVar="ccAddDealerAccessoryWidget" 
+			        dynamic="true" 
+			        resizable="false" 
+			        height="425px" width="625px" 
+			        closeOnEscape="true" 
+			        appendTo="@(body)">
+		        
+	    	    <!-- Message display -->
+			    <p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:100%;max-width:100%;width:auto;">
+				    <p:messages id="messages" severity="info,fatal,error" showSummary="false" showDetail="true" autoUpdate="true" />
+			    </p:scrollPanel>   	
+			    		
+		        <p:panel>
+			        <comp:modelDisplay id="modelDisplayPnl" style="width:100%" entities="#{addDealerAccessoryBean.trims}"/>
+	            </p:panel>		    		        		    	    	        
+            		        
+				<h:form id="ccAddDealerAccessoryForm" prependId="false">   
+	                <p:remoteCommand immediate="true" name="onHideListener" actionListener="#{addDealerAccessoryBean.onHideListener()}" oncomplete="#{cc.attrs.onClose}" />
+	                
+	                <p:focus context="ccAccessoryCodeTxt" />
+	                
+	                <p:panel>
+	                    <f:validateBean disabled="true">
+			                <p:panelGrid columns="4">
+		                        <h:outputLabel value="Vendor:" styleClass="ui-label" />
+		                        <h:outputLabel value="#{addDealerAccessoryBean.upfitter.externalAccountPK.accountCode.concat(' - ').concat(addDealerAccessoryBean.upfitter.accountName)}" />	 	                                       	             	                
+			                </p:panelGrid>
+			                
+			                <p:separator />
+			                
+			                <p:panelGrid columns="2">		               
+						        <p:outputLabel for="ccAccessoryCodeTxt" value="Code:*" styleClass="ui-label" /> 
+							    <p:inputText id="ccAccessoryCodeTxt" 
+							            value="#{addDealerAccessoryBean.dealerAccessoryCode.newAccessoryCode}" 
+							            size="20" 
+							            maxlength="10" 
+							            style="text-transform: uppercase;" 
+							            disabled="#{!addDealerAccessoryBean.hasPermission()}" />
+							    
+								<p:outputLabel for="ccAccessoryDescriptionTxt" value="Description:*" styleClass="ui-label" />
+								<p:inputText id="ccAccessoryDescriptionTxt" 
+								        value="#{addDealerAccessoryBean.dealerAccessoryCode.description}" 
+								        maxlength="80" 
+								        size="65" 
+								        disabled="#{!addDealerAccessoryBean.hasPermission()}" />
+								
+							    <p:outputLabel for="ccCategoryMnu" value="Category:*" styleClass="ui-label" />
+								<p:selectOneMenu id="ccCategoryMnu" value="#{addDealerAccessoryBean.dealerAccessoryCode.optionAccessoryCategory}" converter="#{optionAccessoryCategoryConverter}" disabled="#{!addDealerAccessoryBean.hasPermission()}" >
+								    <f:selectItem itemValue="" itemLabel="" />								
+									<f:selectItems value="#{addDealerAccessoryBean.accessoryCategories}" var="category" itemLabel="#{empty category.mafsDescription ? category.description : category.mafsDescription}" itemValue="#{category}" itemDescription="#{empty category.mafsDescription ? category.description : category.mafsDescription}"/>
+								</p:selectOneMenu>	
+								
+							    <p:outputLabel for="ccBasePrice" value="Price:*" styleClass="ui-label" />							
+						        <p:inputNumber id="ccBasePrice"
+						                symbol="$" symbolPosition="p" 
+									    style="text-align:right; width:100px"									    							    
+									    value="#{addDealerAccessoryBean.dealerAccessoryPrice.basePrice}" 										
+									    decimalPlaces="2"
+									    decimalSeparator="." 
+							            minValue="-999999.99" 
+									    maxValue="999999.99" 
+									    autocomplete="off" 	
+									    disabled="#{!addDealerAccessoryBean.hasPermission()}" /> 
+									    
+							    <p:outputLabel for="ccEffectiveDate" value="Effective Date:*" styleClass="ui-label" />								    
+			                    <p:calendar id="ccEffectiveDate" 
+			                            size="10"
+				                        value="#{addDealerAccessoryBean.dealerAccessoryPrice.effectiveDate}"
+				                        pattern="MM/dd/yyyy" 
+				                        style="width:25px" 
+				                        showOn="button" 
+				                        onchange="formatDate(this);"
+							            autocomplete="off"				                        
+				                        disabled="#{!addDealerAccessoryBean.hasPermission()}" >
+									<f:convertDateTime pattern="MM/dd/yyyy" />		    									
+								</p:calendar>
+								
+							    <h:outputLabel for="ccLeadTimeNbr" value="Lead Time:" styleClass="ui-label" />
+								<p:inputNumber id="ccLeadTimeNbr" 
+								        style="width:25px"
+								        value="#{addDealerAccessoryBean.dealerAccessoryCode.leadTime}" 
+								        decimalPlaces="0" 
+								        maxlength="3" 
+								        maxValue="999" 
+									    autocomplete="off"
+									    disabled="#{!addDealerAccessoryBean.hasPermission()}" />							     								    								
+																										    	                		                    			            	                              
+				            </p:panelGrid>	
+			        </f:validateBean>		    
+                    </p:panel>	
+                    
+					<p:panel>
+						<p:commandButton id="ccSaveDealerAccessoryBtn" 
+						        value="Save"
+						        widgetVar="ccSaveDealerAccessoryBtnWidgetVar"
+					            actionListener="#{addDealerAccessoryBean.save()}" 
+					            process="@form" 
+					            update="@form"
+					            disabled="#{!addDealerAccessoryBean.hasPermission()}"  />
+					            
+						<p:spacer width="10" />					         
+						   
+						<p:commandButton id="ccSaveAndStayDealerAccessoryBtn" rendered="false"
+						        value="Save and Stay"
+					            actionListener="#{addDealerAccessoryBean.saveAndStay()}" 
+					            update="@form"
+					            process="@form" 
+					            disabled="#{!addDealerAccessoryBean.hasPermission()}"  />
+					            
+						<p:spacer width="10" />	
+										            					        
+						<p:commandButton id="ccCancelDealerAccessoryBtn" 
+						        value="Cancel"
+						        type="button"
+						        onclick="ccCancelBtnHandler();"  />
+					</p:panel>                    	                        		                		         		
+				</h:form>							        
+			</p:dialog>
+	  	</div>	  	   
+		
+	  	<script type="text/javascript">
+	  	
+	  	    /**
+	  	    * Clicks a hidden button to intialize the bean, then
+	  	    * shows the dialog.
+	  	    */
+			function showCCAddDealerAccessory(){	
+				$('[id$=ccInitializeBeanHiddenBtn]').click();
+			}			
+				
+	  	    /**
+	  	    * Post save activities.
+	  	    */
+	  	    function ccPostSaveBtnHandler(){
+				$('[id$=ccCancelDealerAccessoryBtn]').click();	  	    	
+	  	    }
+	  	    
+			/**
+			* Handels the cancel button click event.
+			*/
+		 	function ccCancelBtnHandler(){
+				PF('ccAddDealerAccessoryWidget').hide();				
+		    }
+					 	
+			/**
+			* Place initialization logic here
+			*/
+		 	function init() {								
+				this.setDirtyData(false)
+				setTimeout(function(){setFocusPF('ccAddDealerAccessory:ccAccessoryCodeTxt'); }, 100);
+		 	}
+		 	
+		</script>
+	  	
+	</composite:implementation>
+</html>

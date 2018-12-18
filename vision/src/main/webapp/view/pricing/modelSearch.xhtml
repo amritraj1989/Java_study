@@ -1,0 +1,301 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"     
+    template="../../templates/ui.xhtml" >
+	
+    <ui:define name="content">
+    	<h:form id="modelSearchBreadCrumbForm" prependId="false">
+   				<p:breadCrumb model="#{modelSearchBean.breadCrumbTrail}" ajax="false" immediate="true" style="min-width:980px;max-width:100%;width:auto;"/>
+   		</h:form>
+    	<!-- Message display -->
+		<p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:980px;max-width:100%;width:auto;">
+			<p:messages id="messages" showSummary="false" showDetail="true" autoUpdate="false" />
+		</p:scrollPanel>
+			
+	    <h:form id="hdnForm" prependId="false">	    
+	    </h:form>	 
+	    		    
+   		<h:form id="modelSearchForm" prependId="false">   
+   		    <p:remoteCommand name="filterBasedOnMfgCode" update="year,make" actionListener="#{modelSearchBean.changeMfgCode}" oncomplete="setFocusPF('year');"/>
+   		       		     				  		  
+   		    <p:focus for="mfgCode" />
+   		    <p:panel id="searchPanel" header="Search Criteria" style="min-width:980px;max-width:100%;width:auto;">
+				<h:panelGrid  columns="8"  cellspacing="5">
+						    <h:outputLabel for="mfgCode" value="Mfg. Code "  styleClass="ui-label" />
+						    <h:panelGroup style="white-space:nowrap;">								
+                                <p:inputText id="mfgCode" value="#{modelSearchBean.criteria.mfgCode}" onchange="handleMfgCodeChange(this.id);" tabindex="10" onkeypress="return doKeypressSearch(event)" /> 
+						    </h:panelGroup>					        
+
+						    <h:outputLabel for="year" value="Year "  styleClass="ui-label" />
+						    <h:panelGroup style="white-space:nowrap;">							
+                                <p:selectOneMenu id="year" widgetVar="yearWidget" value="#{modelSearchBean.criteria.year}" style= "width:50px" tabindex="20">   
+                                    <f:selectItem itemLabel=" " />                                 
+                                    <f:selectItems value="#{modelSearchBean.years}" var="year" itemLabel="#{year}" itemValue="#{year}"/> 
+                                    <p:ajax process="@parent" listener="#{modelSearchBean.changeYear}" update="make" />                                                                                                                                                                            
+                                </p:selectOneMenu> 							
+						    </h:panelGroup>				        
+				        
+						    <h:outputLabel for="make" value="Make "  styleClass="ui-label" />
+						    <h:panelGroup style="white-space:nowrap;">
+                                <p:selectOneMenu id="make" value="#{modelSearchBean.criteria.make}" style= "width:150px" tabindex="30">  
+                                    <f:selectItem itemLabel=" " />  
+                                    <f:selectItems var="make" value="#{modelSearchBean.makes}" itemLabel="#{make}" itemValue="#{make}" />  
+                                    <p:ajax process="@parent" update="model" />                                  
+                                </p:selectOneMenu>
+						    </h:panelGroup>                                 
+						    						    		        
+						    <h:outputLabel for="model" value="Model "  styleClass="ui-label" />
+						    <h:panelGroup style="white-space:nowrap;">							
+							    <p:inputText id="model" title="Model" value="#{modelSearchBean.criteria.model}" 
+							            onkeypress="return doKeypressSearch(event)" tabindex="40"/>
+							    <p:commandButton id='modelLOV' 
+							            icon="icon-lov" 
+							            title="lov"
+							            oncomplete="showModelLOV();" 
+							            immediate="true"
+									    actionListener="#{modelLOVBean.fetchLOVDataByModelDescription}"
+									    process="@parent" 
+									    dynamic="true" 
+									    async="true"
+									    onstart="return hasMinAlphaNumericCharacters($('#model'));"
+									    update=":modelLovForm:MODEL_GRID" tabindex="50">
+									<f:param name="MODEL_LOV_INPUT_MFG_CODE" value="mfgCode" />
+									<f:param name="MODEL_LOV_INPUT_YEAR" value="year_input" />
+									<f:param name="MODEL_LOV_INPUT_MAKE" value="make_input" />
+									<f:param name="MODEL_LOV_INPUT_MODEL" value="model" />
+							    </p:commandButton>	
+	                            <h:inputHidden id="hiddenModelCode" value="#{modelSearchBean.criteria.modelCode}" />							    					    
+						    </h:panelGroup>				        
+					
+						    <h:outputLabel for="trim" value="Trim "  styleClass="ui-label" />
+						    <h:panelGroup style="white-space:nowrap;">							
+							    <p:inputText id="trim" title="Trim" value="#{modelSearchBean.criteria.trim}"  tabindex="60"
+							            onkeypress="return doKeypressSearch(event)" style="width:250px;"/>
+						    </h:panelGroup>										    
+											
+						<h:outputLabel for="modelType" value="Model Type "  styleClass="ui-label" />
+						    <h:panelGroup style="white-space:nowrap;">														            
+                                <p:selectOneMenu id="modelType" widgetVar="modelTypeWidget" value="#{modelSearchBean.criteria.modelType}" tabindex="70" style= "width:80px">   
+                                    <f:selectItem itemLabel=" " />                                 
+                                    <f:selectItems value="#{modelSearchBean.modelTypes}" var="modelType" itemLabel="#{modelType.description}" itemValue="#{modelType.description}"/>                                                                                                                                                                                                                 
+                                </p:selectOneMenu> 								            
+						    </h:panelGroup>			
+																
+						<h:outputLabel for="lbl1" value=""  styleClass="ui-label" />
+						<h:panelGroup style="white-space:nowrap;">								
+                            <p:outputLabel id="lbl1" value="#{modelSearchBean.make}"/> 
+						</h:panelGroup>																
+																	
+						<h:outputLabel value="" />
+						<p:commandButton id="search" widgetVar="searchButtonWidgetVar" title="Search" tabindex="80" onclick="PF('searchButtonWidgetVar').disable();"
+							value="Search" onstart="return validateSearch(event);" style="float:right" onmouseover="handleSearch = true;" onmouseout="handleSearch = false;"
+							actionListener="#{modelSearchBean.performSearch}" oncomplete="setDataTableToFirstPage('searchResultDataTableWidget'); PF('searchButtonWidgetVar').enable();" update="resultsPanel,commandPanel, :messages"	/>					
+				</h:panelGrid>
+			</p:panel>
+			
+	        <p:panel id="resultsPanel" header="Vehicle Trims" style="min-width:980px;max-width:100%;width:auto;">
+	            <h:inputHidden id="selectedRecordIndex" name ="selectedRecordIndex" value = "#{modelSearchBean.selectionIndex}"/>	        	
+	       		<h:inputHidden id="clickIndex" name ="clickIndex" value = "#{modelSearchBean.selectionIndex}"/>
+	       		
+	        	<p:dataTable id="searchResultDataTable"
+	        	        widgetVar="searchResultDataTableWidget"
+	        			lazy="true"
+						var="trim" 
+						value="#{modelSearchBean.lazyModelSearchResults}" 
+						scrollable="true" 
+						scrollHeight="#{modelSearchBean.dataTable.height}"
+						selection="#{modelSearchBean.selectedResultVOs}"
+						emptyMessage = "#{modelSearchBean.dataTableMessage}"
+						rows="#{modelSearchBean.resultPerPage}" 
+ 						paginator="true" 
+ 						paginatorPosition="bottom" 
+						resizableColumns="true"
+						>
+						 
+						<p:ajax event="toggleSelect" update=":modelSearchForm:modelPricingBtn" listener="#{modelSearchBean.onRowSelect}"  />						 
+						<p:ajax event="rowSelectCheckbox" update=":modelSearchForm:modelPricingBtn" listener="#{modelSearchBean.onRowSelect}"  />
+						<p:ajax event="rowUnselectCheckbox" update=":modelSearchForm:modelPricingBtn" listener="#{modelSearchBean.onRowUnselect}" />						
+						<p:ajax event="rowSelect" update=":modelSearchForm:modelPricingBtn" listener="#{modelSearchBean.onRowSelect}" />
+						<p:ajax event="rowUnselect" update=":modelSearchForm:modelPricingBtn" listener="#{modelSearchBean.onRowUnselect}" />
+						<p:ajax event="sort"  onstart="clearDataTableSelection('searchResultDataTableWidget');" />												
+			          	<p:ajax event="page"  onstart="clearDataTableSelection('searchResultDataTableWidget');"  oncomplete="setScrollDivAtTop();" update = ":modelSearchForm:clickIndex ,:modelSearchForm:commandPanel" />
+						
+						<p:column selectionMode="multiple" style="text-align:center" width="#{modelSearchBean.dataTable.col1}" />					
+						
+						<p:column sortBy="#{trim.year}" width="#{modelSearchBean.dataTable.col2}"> 
+			                <f:facet name="header">
+			                <h:outputText value="Year"/>
+			                </f:facet>
+			                <h:outputText  value="#{trim.year}" style="font-weight:bold;"  />
+			            </p:column>						
+			            
+			           	<p:column sortBy="#{trim.make}" width="#{modelSearchBean.dataTable.col3}">
+			                <f:facet name="header">
+			                <h:outputText value="Make"/>
+			                </f:facet>
+							<h:outputText value="#{trim.make}" escape="false" />
+			            </p:column>
+
+			            <p:column sortBy="#{trim.model}" width="#{modelSearchBean.dataTable.col4}"> 
+			                <f:facet name="header">
+			                <h:outputText value="Model"/>
+			                </f:facet>
+			                <h:outputText value="#{trim.model}" escape="false" />
+			            </p:column>
+			            
+						<p:column  sortBy="#{trim.trim}" width="#{modelSearchBean.dataTable.col5}" >
+							<f:facet name="header">
+			                <h:outputText value="Trim"/>
+			                </f:facet>
+			                <h:outputText value="#{trim.formattedTrimTableDisplay()}" escape="false" style="white-space:nowrap;" />		                	                
+			            </p:column>	
+			            
+						<p:column width="#{modelSearchBean.dataTable.col6}">
+							<f:facet name="header">
+			                <h:outputText value="Model Type"/>
+			                </f:facet>
+			                <h:outputText value="#{trim.modelType}" />
+			            </p:column>	
+			            
+						<p:column sortBy="#{trim.mfgCode}" width="#{modelSearchBean.dataTable.col7}">
+							<f:facet name="header">
+			                <h:outputText value="Mfg. Code"/>
+			                </f:facet>
+			                <h:outputText value="#{trim.mfgCode}" />
+			            </p:column>		
+			            
+						<p:column width="#{modelSearchBean.dataTable.col8}">
+							<f:facet name="header">
+			                <h:outputText value="Quote Permitted"/>
+			                </f:facet>
+			                <h:outputText value="#{trim.quotePermitted ? 'Yes' : 'No'}" />
+			            </p:column>					            		            			            
+				            
+			            <f:facet name="footer">
+							Record Count: <h:outputText value="#{modelSearchBean.lazyModelSearchResults.rowCount}"/>
+						</f:facet>
+						
+									
+				</p:dataTable>
+                
+                <h:inputHidden id="rowCount" name ="rowCount" value = "#{modelSearchBean.lazyModelSearchResults.rowCount}"/>
+                <h:inputHidden id="returnedFromNextPage" name ="returnedFromNextPage" value = "#{modelSearchBean.returnedFromNextPage}"/>
+				
+	        </p:panel>
+
+			<p:panel id="commandPanel" style="min-width:980px;max-width:100%;width:auto;">
+				<p:commandButton ajax="false" id="modelPricingBtn" tabindex="200" value="Maintain Trim" onclick="lockScreen();" actionListener="#{modelSearchBean.maintainModelPricing}" disabled="#{modelSearchBean.modelPricingDisabled}" />
+				<p:spacer height="0" width="10px"/>	
+				<p:commandButton  value="Cancel" action="#{modelSearchBean.cancel}" ajax="false" immediate="true" />			
+			</p:panel>
+	        
+        </h:form>              
+				
+		<div id="MODEL_LOV_DIV">
+			<ui:include src="../lov/model.xhtml" />
+		</div>
+        
+		<div id="inputFieldChecks">
+			<ui:include src="../alert/inputFieldChecks.xhtml" />
+		</div>	
+		
+		<div id="maintenanceProfileInclude">
+			<ui:include src="../../resources/view/component/maintenanceProfile.xhtml" />
+		</div>	
+		
+		<script type="text/javascript"> 
+		
+		var driverName;
+		var source;
+		var handleSearch = false;
+		var UI_ID_MFG_CODE = 'mfgCode';
+
+		/**
+		* Handles the search button's client side validation before the ajax search happens. A minimum alphanumric character 
+		* check is performed. The search process either continues or not based on
+		* on the check's boolean result.
+		*/
+		function validateSearch(event){			
+			var searchCriteria = "";
+			
+			searchCriteria += $('#mfgCode').val()
+			searchCriteria += $('#year_input').val();
+			searchCriteria += $('#make_input').val();
+			searchCriteria += $('#model').val();
+			searchCriteria += $('#trim').val();	
+			searchCriteria += $('#modelType_input').val();	
+			
+			if(!hasMinAlphaNumericCharacters(event.srcElement, searchCriteria)) {		
+				return false;
+			} else {
+				return true;
+			}
+
+		}
+		
+				
+		/**
+		* Detects the Enter key and programatically clicks
+		* the search button. The search button event handler
+		* will perform the min. alphanumeric check.
+		*/
+		function doKeypressSearch(event){
+			if (event.keyCode == 13) {
+				source = event.srcElement.id;
+			   $('#search').click();
+			   focus();
+			   return false;
+			}
+			return true;	
+		}
+		
+	    /**
+	    * The LOV calls this function to pass back the selected
+	    * values to the view's controls.
+	    */
+		function setSelection( lovName, nameArray, valueArray){	
+				if(lovName == 'modelLOV'){
+					for(var i=0; i  &lt; nameArray.length ; i++){
+						if(nameArray[i] == 'MODEL_DESCRIPTION'){
+							document.getElementById('model').value = valueArray[i];
+						}
+						if(nameArray[i] == 'MODEL_CODE'){
+							document.getElementById('hiddenModelCode').value = valueArray[i];						
+						}
+					}
+					setFocus('model');
+				}				
+		}
+	    
+			
+	    function handleMfgCodeChange(id){
+	    	//alert(id);
+	    	
+	    	switch(id) {
+	    	    case UI_ID_MFG_CODE:
+	    	    	//alert('code');
+	    	    	filterBasedOnMfgCode();
+	    	    	break;
+	    	    default:
+	    	    	alert('unrecognized code' );
+	    		
+	    	}
+	    	
+	    	if(handleSearch){
+	    		$('[id$=search]').click();
+	    		handleSearch = false;
+	    		
+	    	} 
+	    }
+	    
+     	$(window).load(function(){
+     		setScrollDivAtTop();
+		});		    
+		</script>
+	</ui:define>
+	
+	
+</ui:composition>

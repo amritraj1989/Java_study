@@ -1,0 +1,54 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Drivers By Unit</title>
+    <body>
+    	<h1>Drivers By Unit</h1>
+    	<h2>Acceptance Tests (Automated)</h2>
+			<ul><li>All of the drivers that have ever been allocated to unit <b><span concordion:set="#unit">00955889</span></b> show in the following results.</li></ul>
+    		<p align="center">
+    		<table concordion:verifyRows="#drivers : testFindDriverAllocatedByUnit(#unit)">
+		        <tr>
+		        	<th concordion:assertEquals="#drivers.driverForename">First Name</th>
+		        	<th concordion:assertEquals="#drivers.driverSurname">Last Name</th>
+		        </tr>
+		        <tr>
+		        	<td>Faye</td>
+		        	<td>Green</td>
+		        </tr>
+		        <tr>
+		        	<td>T. Ray</td>
+		        	<td>Mauldin</td>
+		        </tr>
+		        <tr>
+		        	<td>Faye</td>
+		        	<td>Green</td>
+		        </tr>
+		        <tr>
+		        	<td>T. Ray</td>
+		        	<td>Mauldin</td>
+		        </tr>
+            </table>
+            </p>
+            
+            <ul><li>All addresses for the driver named (Last,First) <b><span concordion:set="#driverName">Steen #4,Kenny</span></b> of customer number <b><span concordion:set="#custNo">00006561</span></b> are as follows.</li></ul>
+    		<p align="center">
+    		<table concordion:verifyRows="#driverAddresses : testFindDriverAddresses(#driverName, #custNo)">
+		        <tr>
+		        	<th concordion:assertEquals="#driverAddresses.addressLine1">Address Line 1</th>
+		        </tr>
+		        <tr>
+		        	<td>437 Maccorkle Ave Sw Bldg 314</td>
+		        </tr>
+		        <tr>
+		        	<td>Greenwood, Inc.</td>
+		        </tr>
+            </table>
+            </p>
+    	<h2>Manual Tests</h2>
+    		<ul><li>1. The functionality around changing allocation dates on the Drivers By Unit screen.  The ability to perform this action is allowed only by users in the SALES/CUST ADM work class.  </li></ul>
+    		
+    	<h2>Untested (Out of Scope)</h2>
+    		
+
+    </body>
+</html>

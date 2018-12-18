@@ -1,0 +1,2341 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"   
+	xmlns:pe="http://primefaces.org/ui/extensions"	  
+    template="../../templates/ui.xhtml" >
+	
+    <ui:define name="content">
+    	    <h:form id="quoteRequestAddEditBreadCrumbForm" prependId="false">
+   			    <p:breadCrumb model="#{quoteRequestAddEditBean.breadCrumbTrail}" ajax="false" immediate="true" style="min-width:980px;max-width:100%;width:auto;"/>
+   		    </h:form>
+   		    
+		   <p:growl id="growl" for="warnings" severity="warn" escape="false" redisplay="false" showDetail="true" sticky="false"  />   		    
+   		        
+    	    <!-- Message display -->
+		    <p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:980px;max-width:100%;width:auto;">
+			    <p:messages id="messages" showSummary="false" showDetail="true" autoUpdate="true" severity="info,error,fatal" />
+		    </p:scrollPanel> 
+		    
+		   <comp:logBook id="logBook" 
+		    		entity="#{quoteRequestAddEditBean.quoteRequest.quoteRequest}" 
+		            logBookTypes="#{quoteRequestAddEditBean.logBookType}" 
+		            enableFollowUpDate="true" 
+		            enableAddAndClose="false"
+		            resource="quoteRequestAddEdit"
+		            onClose="logBookCallback()" />		      
+		    	
+			<h:form id="quoteRequestAddEditForm" prependId="false">
+
+				<p:remoteCommand name="updateForPostRework" process="@this" update="@form" actionListener="#{quoteRequestAddEditBean.postRework()}" oncomplete="saveDataForDirtyDetection();"/>				
+				<p:remoteCommand name="updateDetailsForSelectedClient" process="" update=":quoteRequestAddEditForm:accordionPanel:vrfClientDetailsPanelMain :quoteRequestAddEditForm:accordionPanel:quoteSectionPanel :accordionPanel:drvPhone :accordionPanel:driverInfoLOVId " actionListener="#{quoteRequestAddEditBean.populateDetailsForSelectedClient}" oncomplete="setFocusPF('modal');"/>				
+				<p:remoteCommand name="updateDriverDetails" process="" update=":quoteRequestAddEditForm:accordionPanel:driverSectionPanel :quoteRequestAddEditForm:accordionPanel:quoteSectionPanel" actionListener="#{quoteRequestAddEditBean.populateDriversSection}" oncomplete="setFocusPF('modal');driverPanelShow();"/>
+				<p:remoteCommand name="updateQuoteDetails" update=":quoteRequestAddEditForm:accordionPanel:quoteSectionPanel" actionListener="#{quoteRequestAddEditBean.populateQuoteSection}"/>
+				<p:remoteCommand name="updateVehicleDetails" update=":quoteRequestAddEditForm:accordionPanel:vehicleSectionLocatePanel" /> 
+				<p:remoteCommand name="updateVehicleDetailsCommon" update=":quoteRequestAddEditForm:accordionPanel:vehicleSectionCommonPanel" /> 								
+				<p:remoteCommand name="updateNotesButton" update=":quoteRequestAddEditForm:notesBtn" />				
+				<p:remoteCommand name="updateStockUnitDetails" process="" 
+					update=":quoteRequestAddEditForm:accordionPanel:unitInfoId" 
+					actionListener="#{quoteRequestAddEditBean.populateStockUnitDetails}" oncomplete="setFocusPF('modal');"/>
+				<p:remoteCommand name="clearSelectedDriver" process="" oncomplete="driverPanelHide()"
+					update=":quoteRequestAddEditForm:accordionPanel:driverSectionPanel :quoteRequestAddEditForm:accordionPanel:quoteSectionPanel" 
+					actionListener="#{quoteRequestAddEditBean.clearSelectedDriver}"/>
+				<p:remoteCommand name="setDealerValues" process="" 
+					update=":quoteRequestAddEditForm:accordionPanel:dealerNameId :quoteRequestAddEditForm:accordionPanel:contactNameId :quoteRequestAddEditForm:accordionPanel:contactPhoneId" 
+					actionListener="#{quoteRequestAddEditBean.decodeDealerByNameOrCode}"/>
+				<p:remoteCommand name="clearSelectedDealer" process=""
+					update=":quoteRequestAddEditForm:accordionPanel:dealerNameId :quoteRequestAddEditForm:accordionPanel:contactNameId :quoteRequestAddEditForm:accordionPanel:contactPhoneId" 
+					actionListener="#{quoteRequestAddEditBean.clearSelectedDealer}"/>
+				<p:remoteCommand name="updateClientContactDetails" process=""
+					update=":quoteRequestAddEditForm:accordionPanel:clientContactNameId :quoteRequestAddEditForm:accordionPanel:clientContactPhoneId :quoteRequestAddEditForm:accordionPanel:clientContactEmailId" 
+					actionListener="#{quoteRequestAddEditBean.populateClientContactDetails}" />
+
+				<h:inputHidden id="stockUnitFmsId" value="#{quoteRequestAddEditBean.selectedStockUnitFmsId}" />
+				<h:inputHidden id="clientContactId" value="#{quoteRequestAddEditBean.selectedClientContactId}" />
+								
+				<p:panel id="quoteRequestAddEditPanel" header="">
+					<p:focus context="quoteRequestAddEditPanel" />
+					<p:panelGrid >
+						<p:row>
+							<p:column>
+								<p:outputLabel for="requestTypeId" value="Request Type:*" styleClass="ui-label" />
+							</p:column>
+							<p:column>
+								<h:panelGroup style="white-space:nowrap;">
+									<p:selectOneMenu id="requestTypeId" converter="${quoteRequestTypeConverter}" value="#{quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestType}"
+											disabled="#{!quoteRequestAddEditBean.isRequestTypeEditable() or quoteRequestAddEditBean.isQuoteRequestInProgress or !quoteRequestAddEditBean.hasPermission()}"
+											style="width:230px" styleClass = "trackDirtySelect" >
+										<f:selectItem itemValue="" itemLabel="" />
+										<f:selectItems var="requestType" value="#{quoteRequestAddEditBean.quoteRequestTypeList}" itemLabel="#{requestType.name}" itemValue="#{requestType}" />									            
+										<p:ajax process="@this" event="change" update="accordionPanel:VehicleSectionId startBtnId accordionPanel" listener="#{quoteRequestAddEditBean.selectRequestType}" />
+									</p:selectOneMenu>								
+								</h:panelGroup>
+							</p:column>
+							<p:column>
+								<p:outputLabel id="clientIdLabel" for="clientId" value="Client:*" style="font-weight:bold"/>							
+							</p:column>
+							<p:column>
+								<h:panelGroup style="white-space:nowrap;">	
+									<f:validateBean disabled="true">
+										<p:inputText id="clientId" title="Client" styleClass="trackDirtyValue"
+														value="#{quoteRequestAddEditBean.customerLOVParam}" 
+														onkeydown="setTargetKeyCode(event);" 
+														onchange="clearLabels(['accountNameOut','accountCode','accountName', 'accountType','accountCid']); clearOutputText(['accordionPanel:drvAddress', 'accordionPanel:drvPhone', 'accordionPanel:unitAllocated', 'accordionPanel:eolDate', 'accordionPanel:quoteProfileDesc', 'accordionPanel:productType', 'accordionPanel:term']); clearInputText(['accordionPanel:driverName', 'accordionPanel:drvDrvId', 'accordionPanel:drvFmsId']); PF('startBtn').disable();"
+														disabled="#{!quoteRequestAddEditBean.hasPermission() or !quoteRequestAddEditBean.isClientEditable() or quoteRequestAddEditBean.started}">
+											<p:ajax event="change" onstart="return proceedAjax();"
+															listener="#{quoteRequestAddEditBean.decodeAccountByNameOrCode}"
+															process="@this" 
+															oncomplete="setFocusOnLOV('clientId' , 'clientLOVId')"
+															update="clientIdLabel clientLOVId accountName accountNameOut accountCode accountCid accountType clientId :quoteRequestAddEditForm:accordionPanel:vrfClientDetailsPanelMain
+																	:quoteRequestAddEditForm:accordionPanel:quoteSectionPanel :accordionPanel:driverInfoLOVId startBtnId">
+											</p:ajax>				
+															
+										</p:inputText>
+									</f:validateBean>
+									<p:commandButton id='clientLOVId' icon="icon-lov" title="lov"
+										oncomplete="showCustomerLov();" immediate="true"
+										actionListener="#{customerLovBean.fetchLOVDataByCustomerName}"
+										process="@this,clientId" dynamic="true" async="true"
+										onstart="return hasMinAlphaNumericCharacters($('#clientId'));"
+										update=":custLovForm:CUSTOMER_GRID"
+										disabled="#{!quoteRequestAddEditBean.hasPermission() or !quoteRequestAddEditBean.isClientEditable() or quoteRequestAddEditBean.started}">
+										<f:param name="CUSTOMER_LOV_INPUT" value="clientId" />
+										<f:param name="INCLUDE_CLOSED_ACCOUNTS" value="Y" />
+									</p:commandButton>
+								</h:panelGroup>
+							</p:column>
+							<p:column>
+								<f:validateBean disabled="true">
+									<h:outputLabel id="accountNameOut"
+										value="#{quoteRequestAddEditBean.selectedExternalAccount.accountName}"
+										styleClass="ui-label" />
+									<h:inputHidden id="accountCode"
+										value="#{quoteRequestAddEditBean.selectedExternalAccount.externalAccountPK.accountCode}" />
+									<h:inputHidden id="accountName"
+										value="#{quoteRequestAddEditBean.selectedExternalAccount.accountName}" />
+									<h:inputHidden id="accountType"
+										value="#{quoteRequestAddEditBean.selectedExternalAccount.externalAccountPK.accountType}" />
+									<h:inputHidden id="accountCid"
+										value="#{quoteRequestAddEditBean.selectedExternalAccount.externalAccountPK.cId}" />
+								</f:validateBean>
+							</p:column>
+							<p:column>
+								<p:commandButton id="startBtnId" value="Start" action="#{quoteRequestAddEditBean.start}" ajax="false" widgetVar="startBtn" 
+									rendered = "#{!quoteRequestAddEditBean.started}" disabled = "#{quoteRequestAddEditBean.startButtonDisabled}" />
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<h:outputLabel for="requestId" value="Request Id:" styleClass="ui-label" rendered="#{quoteRequestAddEditBean.started}"/>
+							</p:column>
+							<p:column>
+								<h:outputText id="requestId" value="#{quoteRequestAddEditBean.quoteRequest.quoteRequest.qrqId}" 
+								    rendered="#{quoteRequestAddEditBean.started}"/>							
+							</p:column>							
+							<p:column>
+								<h:outputLabel value="Request Status:" styleClass="ui-label" rendered="#{quoteRequestAddEditBean.started}"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="Not Saved" 
+									rendered="#{quoteRequestAddEditBean.started and quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestStatus.name ==null}"/>
+								<h:outputText value="#{quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestStatus.name}" 
+									rendered="#{quoteRequestAddEditBean.started and quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestStatus.name !=null}"/>
+							</p:column>
+							<p:column>
+								<h:outputLabel for="assignedId" value="Assigned To:" styleClass="ui-label" rendered="#{quoteRequestAddEditBean.started}"/>
+							</p:column>
+							<p:column>
+								<h:outputText id="assignedId" value="#{quoteRequestAddEditBean.assignedWillowUser}" 
+									rendered="#{quoteRequestAddEditBean.started}"/>							
+							</p:column>						
+						</p:row>
+					</p:panelGrid>
+				</p:panel>
+
+			    <p:accordionPanel id="accordionPanel"  activeIndex="0,1,2,3,4" multiple="true" rendered="#{quoteRequestAddEditBean.started}">
+					<p:tab title="Client Details">
+						<p:panel id="vrfClientDetailsPanelMain" styleClass="ui-layout">
+							<p:panelGrid>
+								<p:row>
+									<p:column colspan="3">
+								    		<p:panel id="creditPositionPanel" style="height:130px">
+								    			<p:panelGrid>
+								    				<p:row>
+								    					<p:column styleClass="vertAlign">
+															<p:outputLabel for="creditStatusId"  value="Credit Status:" style="font-weight:bold"/>
+														</p:column>
+														<p:column>
+								    						<p:outputLabel id="creditStatusId" value="#{quoteRequestAddEditBean.quoteRequest.clientCreditLimits.creditStatus}"/>
+								    					</p:column>
+								    				</p:row>
+								    				<p:row>
+								    					<p:column>
+															<p:spacer width="20"/>
+														</p:column>
+								    					<p:column style="text-align:right">
+								    						<p:outputLabel value="Ceiling Limit" style="font-weight:bold"/>
+								    					</p:column>
+								    					<p:column style="text-align:right">
+								    						<p:outputLabel value="Current Position" style="font-weight:bold"/>
+								    					</p:column>
+								    				</p:row>
+								    				<p:row>
+								    					<p:column style="font-weight:bold">
+															<p:outputLabel value="No of Units:"/>
+														</p:column>
+									    				<p:column style="text-align:right">
+									    					<p:outputLabel value="#{quoteRequestAddEditBean.quoteRequest.clientCreditLimits.unitCeilLimit}">
+									    						<f:convertNumber type="number" pattern="#,##0" />
+									    					</p:outputLabel>
+									    				</p:column>
+									    				<p:column style="text-align:right">
+									    					<p:outputLabel value="#{quoteRequestAddEditBean.quoteRequest.clientCreditLimits.unitCurrentLimit}">
+									    						<f:convertNumber type="number" pattern="#,##0" />
+									    					</p:outputLabel>
+									    				</p:column>
+								    				</p:row>
+								    				<p:row>
+								    					<p:column styleClass="vertAlign">
+															<p:outputLabel value="Quotation Capital:" style="font-weight:bold"/>
+														</p:column>
+									    				<p:column style="text-align:right">
+									    					<p:outputLabel value="#{quoteRequestAddEditBean.quoteRequest.clientCreditLimits.capitalCeilLimit}">
+									    						<f:converter converterId="malDollarValueConverter"/>
+									    					</p:outputLabel>
+									    				</p:column>
+									    				<p:column style="text-align:right">
+									    					<p:outputLabel value="#{quoteRequestAddEditBean.quoteRequest.clientCreditLimits.capitalCurrentLimit}">
+									    						<f:converter converterId="malDollarValueConverter" />
+									    					</p:outputLabel>
+									    				</p:column>
+								    				</p:row>
+								    				<p:row>
+								    					<p:column styleClass="vertAlign">
+															<p:outputLabel value="Account Balance:" style="font-weight:bold"/>
+														</p:column>
+														<p:column style="text-align:right">
+									    					<p:outputLabel value="#{quoteRequestAddEditBean.quoteRequest.clientCreditLimits.balanceCeilLimit}">
+									    						<f:converter converterId="malDollarValueConverter" />
+									    					</p:outputLabel>
+									    				</p:column>
+									    				<p:column style="text-align:right">
+									    					<p:outputLabel value="#{quoteRequestAddEditBean.quoteRequest.clientCreditLimits.balanceCurrentLimit}">
+									    						<f:converter converterId="malDollarValueConverter" />
+									    					</p:outputLabel>
+									    				</p:column>
+								    				</p:row>
+								    			</p:panelGrid>
+								    		</p:panel>
+										</p:column>
+									<p:column style="vertical-align: top;" styleClass="vertAlign">
+										<p:panelGrid>
+											<p:row>
+												<p:column>
+													<h:outputText id="relatedAccountsId" value="Related Accounts" />
+													<p:commandLink id="relatedAccountsInfoLink"
+														title="View Related Accounts Info" immediate="true"
+														update="relatedAccountsDialogId"
+														oncomplete="showDialog('relatedAccountsWidget');">
+														<p:graphicImage value="/images/custins.png"
+															style="border-style: none" rendered="#{quoteRequestAddEditBean.quoteRequest.childAccounts.size() > 0 ? true : false}"/>
+													</p:commandLink>
+												</p:column>
+												<p:spacer width="50" height="1"/>
+												<p:column width="200px">
+													<h:outputText id="clientPOCId" value="Contacts" />
+														<p:commandLink id="clientPOCInfoLink"
+															title="View All Client POC Info" immediate="true"
+															update="clientPocDialogId"
+															oncomplete="showDialog('clientPocWidget');">
+															<p:graphicImage value="/images/custins.png"
+																style="border-style: none" rendered="#{quoteRequestAddEditBean.quoteRequest.contacts.size() > 0 ? true : false}"/>
+														</p:commandLink>
+												</p:column>
+											</p:row>
+											<p:row>
+												<p:column styleClass="vertAlign">
+													<h:outputText id="clientConfigId" value="Client Applications" />
+													<p:commandLink id="clientConfigInfoLink"
+														oncomplete="showDialog('clientConfigWidget');"
+														title="View client application info" immediate="true"
+														update="clientConfigDialogId">
+														<p:graphicImage value="/images/custins.png"
+															style="border-style: none" rendered="#{quoteRequestAddEditBean.quoteRequest.clientConfigurations.size() > 0 ? true : false}"/>
+													</p:commandLink>
+												</p:column>
+												<p:column styleClass="vertAlign">
+													<h:outputText id="prefVendorId" value="Preferred Vendor/Suppliers" />
+													<p:commandLink id="prefVendorInfoLink"
+														oncomplete="showDialog('prefVendorWidget');"
+														update="prefVendorDialogId"
+														title="View Preferred Vendor/Supplier Info" immediate="true">
+														<p:graphicImage value="/images/custins.png"
+															style="border-style: none" rendered="#{quoteRequestAddEditBean.quoteRequest.clientPrefSuppliers.size() > 0 ? true : false}"/>
+													</p:commandLink>
+												</p:column>
+											</p:row>
+											<p:row>
+												<p:column styleClass="vertAlign">
+													<h:outputText id="servicesId" value="Services" />
+													<p:commandLink id="servicesInfoLink"
+														title="View Services Info" immediate="true"
+														update="servicesDialogId"
+														oncomplete="showDialog('servicesWidget');">
+														<p:graphicImage value="/images/custins.png"
+															style="border-style: none" rendered="#{quoteRequestAddEditBean.quoteRequest.clientServiceElements.size() > 0 ? true : false}"/>
+													</p:commandLink>
+												</p:column>
+												<p:column styleClass="vertAlign">
+													<h:outputText id="gradeGroupsId" value="Grade Groups" />
+													<p:commandLink id="gradeGroupsInfoLink"
+														title="View Grade Group Info" immediate="true"
+														update="gradeGroupsDialogId"
+														oncomplete="showDialog('gradeGroupsWidget');">
+														<p:graphicImage value="/images/custins.png"
+															style="border-style: none" rendered="#{quoteRequestAddEditBean.quoteRequest.driverGradeGroups.size() > 0 ? true : false}"/>
+													</p:commandLink>
+												</p:column>
+											</p:row>
+											<p:row>
+												<p:column styleClass="vertAlign">
+													<h:outputText id="finFanId" value="Fleet Codes" />
+													<p:commandLink id="finFanInfoLink"
+														title="View Fleet Code Info" immediate="true"
+														update="finFanDialogId"
+														oncomplete="showDialog('finFanWidget');">
+														<p:graphicImage value="/images/custins.png"
+															style="border-style: none" rendered="#{quoteRequestAddEditBean.quoteRequest.clientFleetCodes.size() > 0 ? true : false}"/>
+													</p:commandLink>
+												</p:column>
+												<p:column styleClass="vertAlign">
+													<h:outputText id="effectiveProfilesId" value="Active Profiles" />
+													<p:commandLink id="effectiveProfilesInfoLink"
+														title="View Effective Profiles Info" immediate="true"
+														update="effectiveProfilesDialogId"
+														oncomplete="showDialog('effectiveProfilesWidget');">
+														<p:graphicImage value="/images/custins.png"
+															style="border-style: none" rendered="#{quoteRequestAddEditBean.quoteRequest.clientProfiles.size() > 0 ? true : false}"/>
+													</p:commandLink>
+												</p:column>
+											</p:row>
+											<p:row>
+												<p:column styleClass="vertAlign">
+													<h:outputText id="assignedConsultantsId" value="Assigned Consultants" />
+													<p:commandLink id="assignedConsultantsInfoLink"
+														title="View Assigned Consultants Info" immediate="true"
+														update="assignedConsultantsDialogId"
+														oncomplete="showDialog('assignedConsultantsWidget');">
+														<p:graphicImage value="/images/custins.png"
+															style="border-style: none" rendered="#{quoteRequestAddEditBean.quoteRequest.clientConsultants.size() > 0 ? true : false}"/>
+													</p:commandLink>
+												</p:column>
+											</p:row>
+										</p:panelGrid>
+									</p:column>
+								</p:row>
+							</p:panelGrid>
+							<p:panel>
+								<p:panelGrid>
+									<p:row>
+										<p:column>
+											<p:outputLabel value="Contact:"  styleClass="ui-label" />										
+										</p:column>
+										<p:column>
+											<p:outputLabel for="clientContactDriverId" value="Use Driver as contact:"/>										
+										</p:column>
+										<p:column>
+											<h:selectBooleanCheckbox id="clientContactDriverId" styleClass="trackDirtyCheckbox"
+												value="#{quoteRequestAddEditBean.clientContactDriver}" 
+												disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress or quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestType.code == 'UPFIT_ASSESSMENT'}" />
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column />
+																			
+									
+										<p:column>
+											<p:commandButton id="selectContactBtn" value="Select Contact"  
+													update="clientContactNameId clientContactPhoneId clientContactEmailId"
+													oncomplete="showContactsLov();" immediate="true"
+													actionListener="#{contactsLovBean.fetchContacts}"
+													process="@this" dynamic="true" async="true"
+													disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}">
+												<f:param name="CLIENT_CID_LOV_INPUT" value="#{quoteRequestAddEditBean.selectedExternalAccount.externalAccountPK.cId}"/>
+												<f:param name="CLIENT_TYPE_LOV_INPUT" value="#{quoteRequestAddEditBean.selectedExternalAccount.externalAccountPK.accountType}"/>
+												<f:param name="CLIENT_ACCOUNT_LOV_INPUT" value="#{quoteRequestAddEditBean.selectedExternalAccount.externalAccountPK.accountCode}"/>
+											</p:commandButton>
+										</p:column>
+										<p:column>
+											<p:outputLabel for="clientContactNameId" value="Name:"  styleClass="ui-label" />
+										</p:column>
+										<p:column>
+											<p:inputText id="clientContactNameId" value="#{quoteRequestAddEditBean.clientContactName}" size="30" maxlength="80" 
+												disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}"/>
+										</p:column>
+										<p:column>
+											<p:outputLabel for="clientContactPhoneId" value="Phone:"  styleClass="ui-label" />										
+										</p:column>
+										<p:column>
+											<p:inputText id="clientContactPhoneId" value="#{quoteRequestAddEditBean.clientContactPhone}" size="25" maxlength="100"
+												disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}"/>
+										</p:column>
+										<p:column>
+											<p:outputLabel for="clientContactEmailId" value="Email:"  styleClass="ui-label" />										
+										</p:column>
+										<p:column>
+											<p:inputText id="clientContactEmailId" value="#{quoteRequestAddEditBean.clientContactEmail}" size="30" maxlength="80"
+												disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}"
+												rendered="#{!quoteRequestAddEditBean.isQuoteRequestInProgress or quoteRequestAddEditBean.clientContactEmail == null}" />	
+											<h:outputLink onclick="loadClientEmail('#{quoteRequestAddEditBean.clientContactEmail}'); return false;" 
+												rendered="#{quoteRequestAddEditBean.isQuoteRequestInProgress and quoteRequestAddEditBean.clientContactEmail != null}" >
+    											<h:outputText value="#{quoteRequestAddEditBean.clientContactEmail}" />
+											</h:outputLink>
+											
+										</p:column>
+									</p:row>
+
+
+
+								</p:panelGrid>
+							</p:panel>
+						</p:panel>
+			
+					</p:tab>
+		
+					<p:tab title="Driver Details" rendered="#{quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestType.code == 'UPFIT_ASSESSMENT' ? 'false' : 'true'}">
+					   	<p:panel id="driverSectionPanel"  style="border: none">
+					   	<p:panel style="margin: -.5em -1em">
+					   	
+					   	
+							
+							<p:panelGrid>
+								<p:row>
+									<p:column>
+										<p:outputLabel for="driverName" value="Driver: "  styleClass="ui-label" />
+									</p:column>
+								   		
+								   	<p:column colspan="1">
+									   	<h:panelGroup style="white-space:nowrap;">	
+												<p:inputText id="driverName" title="Driver" styleClass="trackDirtyValue"
+															value="#{quoteRequestAddEditBean.driverNameInput}" 
+															onkeydown="setTargetKeyCode(event);"
+															onkeyup="clearGradeGroup();"
+															onchange="clearOutputText(['accordionPanel:drvAddress', 'accordionPanel:drvPhone', 'accordionPanel:unitAllocated', 'accordionPanel:eolDate', 'accordionPanel:quoteProfileDesc', 'accordionPanel:productType', 'accordionPanel:term']); clearInputText(['accordionPanel:drvDrvId', 'accordionPanel:drvFmsId', 'accordionPanel:projReplId', 'accordionPanel:gradeGroupId']); driverPanelHide();"
+															disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}">
+												</p:inputText>
+											<p:commandButton id='driverInfoLOVId' icon="icon-lov" title="lov"
+												oncomplete="clearDriver();showDriverWithUnitInfoLov();" immediate="true"
+												actionListener="#{driversWithUnitInfoLovBean.fetchLOVDataByDriverName}"
+												process="@this,driverName" dynamic="true" async="true"
+												disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}"
+												onstart="return hasMinAlphaNumericCharacters($('input[name=\'accordionPanel:driverName\']'));"
+												update=":drvUnitInfoLovForm:DRIVER_UNIT_INFO_GRID">
+												<f:param name="DRIVER_NAME_INPUT" value="accordionPanel:driverName"/>	
+												<f:param name="CLIENT_ACC_CODE" value="#{quoteRequestAddEditBean.selectedExternalAccount.externalAccountPK.accountCode}"/>
+												<f:param name="CLIENT_ACC_TYPE" value="#{quoteRequestAddEditBean.selectedExternalAccount.externalAccountPK.accountType}"/>
+												<f:param name="CLIENT_ACC_C_ID" value="#{quoteRequestAddEditBean.selectedExternalAccount.externalAccountPK.cId}"/>
+											</p:commandButton>
+											<h:inputHidden id="drvDrvId" value="#{quoteRequestAddEditBean.selectedDriver.drvId}" />
+											<h:inputHidden id="drvFmsId" value="#{quoteRequestAddEditBean.selectedDriver.fmsId}" />
+										</h:panelGroup>
+						
+								   	</p:column>
+							   		<p:column>
+										<p:outputLabel value="OR"  styleClass="ui-label" style="text-align: center;" />
+									</p:column>
+							   		<p:column>
+							   			<p:commandButton id="addDriverId" title="Must save first to enable button"  value="Add Driver" style="float:right" 						
+							   				ajax="false" onclick="lockScreen();" actionListener="#{quoteRequestAddEditBean.navigateToAddEditDriver}"
+							   				disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress or quoteRequestAddEditBean.quoteRequest.quoteRequest.qrqId eq null}"/>
+							   		</p:column>
+							   		
+							   		<p:column>
+										<p:outputLabel value="OR"  styleClass="ui-label" style="text-align: center;" />
+									</p:column>
+									
+									<p:column>
+										<p:outputLabel for="zipCodeId" value="Delivery Zip Code:" style="font-weight:bold"/>
+									</p:column>
+									<p:column>
+										<p:inputText id="zipCodeId" value="#{quoteRequestAddEditBean.driverZipCode}" maxlength="25" size="20" widgetVar="deliveryZipVar" styleClass="trackDirtyValue"
+											disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}"/>
+									</p:column>
+								</p:row>
+							</p:panelGrid>
+						</p:panel>
+						<p:panel id="driverDetailsPanelId" style="margin: -.5em -1em" rendered="#{quoteRequestAddEditBean.displayDriverPanel}">
+							<p:panelGrid>	
+						   		<p:row>
+						   			<p:column>
+										<p:outputLabel for="drvAddress" value="Driver Address:" style="font-weight:bold"/>
+									</p:column>
+									<p:column rowspan="3" colspan="2">
+										<h:outputText id="drvAddress" escape="false" value="#{quoteRequestAddEditBean.selectedDriver.fullDeliveryAddress}" />
+									</p:column>
+									
+									<p:column>
+									</p:column>
+									
+									<p:column>
+										<p:outputLabel for="deliveryAddress" value="Delivery Address:" style="font-weight:bold"/><br/>
+										<p:outputLabel for="deliveryAddress" value="(If different from driver address)" style="font-size:smaller;font-style: italic"/>
+									</p:column>
+									<p:column colspan="3" rowspan="4">
+										<p:inputTextarea id="deliveryAddress" rows="4" cols="28" autoResize="false" maxlength="200"
+												value="#{quoteRequestAddEditBean.driverDeliveryAddress}" styleClass="trackDirtyValue"
+												disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}"/>
+									</p:column>
+						   		</p:row>
+						   		
+						   		<p:row>
+						   			<p:column>
+									</p:column>
+						   		</p:row>
+						   		<p:row>
+						   			<p:column>
+									</p:column>
+						   		</p:row>
+						   		
+						   		<p:row>
+						   			<p:column>
+										<p:outputLabel for="drvPhone" value="Driver Phone:" style="font-weight:bold"/>
+									</p:column>
+									<p:column>
+										<h:outputText id="drvPhone" value="#{quoteRequestAddEditBean.selectedDriver.driverPhone}" />
+									</p:column>
+						   		</p:row>
+						   		
+						   		<p:row>
+						   			<p:column>
+										<p:outputLabel for="unitAllocated" value="Allocated Unit:" style="font-weight:bold" />
+									</p:column>
+									<p:column>
+										<h:outputText id="unitAllocated" value="#{quoteRequestAddEditBean.selectedDriver.allocatedUnit}"  />
+										<p:commandLink id="equipInfoLink" 
+			                                actionListener="#{quoteRequestAddEditBean.populateDriverUnitEquipments()}"	process="@this" 
+			                                rendered="#{not empty quoteRequestAddEditBean.selectedDriver.allocatedUnit}"
+	                              			oncomplete="PF('drvUnitEquipDialogWidget').show();"					                              
+			                                update=":drvUnitEquipDialog" 
+			                                title="View Equipment" immediate="true">
+										<p:graphicImage value="/images/custins.png" style="border-style:none" />	
+								</p:commandLink>
+									</p:column>
+						   			
+						   			<p:column>
+										<p:outputLabel for="eolDate" value="EOL Date:" style="font-weight:bold" />
+									</p:column>
+									<p:column>
+										<h:outputText id="eolDate" value="#{quoteRequestAddEditBean.selectedDriver.eolDate}"  >
+											<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+										</h:outputText>
+									</p:column>
+									
+									<p:column>
+										<p:outputLabel for="returningUnit" value="Returning Unit:" style="font-weight:bold" />
+									</p:column>
+									<p:column>
+										<h:selectBooleanCheckbox id="returningUnit" styleClass="trackDirtyCheckbox"
+											value="#{quoteRequestAddEditBean.selectedDriver.returningUnit}" 
+											disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress or quoteRequestAddEditBean.selectedDriver.fmsId == null}" />
+									</p:column>
+									
+						   		</p:row>
+						   		
+						   		<p:row>
+						   			<p:column>
+										<p:outputLabel for="quoteProfileDesc" value="Quote Profile Description:" style="font-weight:bold" />
+									</p:column>
+									<p:column>
+										<h:outputText id="quoteProfileDesc" value="#{quoteRequestAddEditBean.selectedDriver.quoteProfileDesc}" />
+									</p:column>
+						   		
+						   			<p:column>
+										<p:outputLabel for="productType" value="Product Type:" style="font-weight:bold" />
+									</p:column>
+									<p:column>
+										<h:outputText id="productType" value="#{quoteRequestAddEditBean.selectedDriver.productType}" />
+									</p:column>
+									
+									<p:column>
+										<p:outputLabel for="term" value="Term:" style="font-weight:bold" />
+									</p:column>
+									<p:column>
+										<h:outputText id="term" value="#{quoteRequestAddEditBean.selectedDriver.term}" />
+									</p:column>
+						   		</p:row>
+							</p:panelGrid>
+					   	</p:panel>
+					   	</p:panel>
+		
+					</p:tab>
+						
+					<p:tab title="Vehicle Details" id="vehicleTabId" rendered="#{quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestType.code == 'UPFIT_ASSESSMENT' ? 'false' : 'true'}" >
+						<p:panel id="VehicleSectionId" style="border: none">					
+						<p:panel id="vehicleSectionStockPanel" style="margin: -.5em -1em" 
+							rendered="#{quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestType.code == 'IMM_NEED_STOCK'
+										or quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestType.code == 'IMM_NEED_UPFIT_STOCK'}">
+							<p:commandButton id="selectStockBtn" value="Select from Stock"  
+								update="accordionPanel:unitInfoId"
+								oncomplete="showStockUnitsLov();" immediate="true"
+								actionListener="#{stockUnitsLovBean.fetchStockUnits}"
+								process="@this" dynamic="true" async="true"
+								disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}" />
+								
+								
+							
+							<br /><br />
+							
+							<p:panelGrid id="unitInfoId">
+						   		<p:row>
+									<p:column styleClass="vertAlign"> 
+						   				<p:outputLabel for="unitNoId" value="Unit No:" style="font-weight:bold"/>
+						   			</p:column>
+						   			<p:column styleClass="vertAlign">
+						   				<h:outputText id="unitNoId" value="#{quoteRequestAddEditBean.stockUnit.fleetMaster.unitNo}" />
+									</p:column>
+						   			<p:column>
+						   				<p:spacer width="5" />
+									</p:column>
+									<p:column styleClass="vertAlign"> 
+						   				<p:outputLabel for="vehicleDescriptionId" value="Description:" style="font-weight:bold"/>
+						   			</p:column>
+						   			<p:column styleClass="vertAlign">
+						   				<h:outputText id="vehicleDescriptionId" value="#{quoteRequestAddEditBean.stockUnit.fleetMaster.model.modelDescription}" />
+									</p:column>
+						   			<p:column>
+						   				<p:spacer width="5" />
+									</p:column>
+									<p:column styleClass="vertAlign"> 
+						   				<p:outputLabel for="activeQuotesId" value="Active Quotes:" style="font-weight:bold"/>
+						   			</p:column>
+						   			<p:column styleClass="vertAlign">
+						   				<p:commandLink id="activeQuoteLinkId" 
+														title="View Active Quotes" immediate="true"
+														update="activeQuotesDialogId" 
+														oncomplete="showDialog('activeQuotesWidget');"  
+														rendered="#{quoteRequestAddEditBean.stockUnit != null}" >
+						   				<h:outputText id="activeQuotesId" value="#{quoteRequestAddEditBean.stockUnit.activeQuoteList.size()}" />
+										</p:commandLink>
+									</p:column>
+								</p:row>					
+						   		<p:row>
+									<p:column styleClass="vertAlign"> 
+						   				<p:outputLabel for="etaDateId" value="ETA:" style="font-weight:bold"/>
+						   			</p:column>
+						   			<p:column styleClass="vertAlign">
+						   				<h:outputText id="etaDateId" value="#{quoteRequestAddEditBean.stockUnit.etaDate}">
+											<f:convertDateTime pattern="MM/dd/yyyy" />
+										</h:outputText>
+									</p:column>
+						   			<p:column>
+						   				<p:spacer width="5" />
+									</p:column>
+									<p:column styleClass="vertAlign"> 
+						   				<p:outputLabel for="exteriorColorId" value="Exterior Color:" style="font-weight:bold"/>
+						   			</p:column>
+						   			<p:column styleClass="vertAlign">
+						   				<h:outputText id="exteriorColorId" value="#{quoteRequestAddEditBean.stockUnit.exteriorColor}" />
+									</p:column>
+						   			<p:column>
+						   				<p:spacer width="5" />
+									</p:column>
+									<p:column styleClass="vertAlign"> 
+						   				<p:outputLabel value="Accessories" style="font-weight:bold"/>
+						   				<p:commandLink id="equipmentInfoLink" 
+                              				actionListener="#{quoteRequestAddEditBean.populateStockUnitEquipment}"		
+                              				oncomplete="PF('equipmentInfoWidget').show();"					                              
+		                                	update=":equipmentInfoDialog" 
+		                                	title="View Equipment" immediate="true">
+											<p:graphicImage value="/images/custins.png" style="border-style:none" 
+												rendered="#{quoteRequestAddEditBean.stockUnit != null}"/>	
+										</p:commandLink>
+						   			</p:column>
+								</p:row>					
+						   		<p:row>
+									<p:column styleClass="vertAlign"> 
+						   				<p:outputLabel for="receivedDateId" value="Received:" style="font-weight:bold"/>
+						   			</p:column>
+						   			<p:column styleClass="vertAlign">
+						   				<h:outputText id="receivedDateId" value="#{quoteRequestAddEditBean.stockUnit.receivedDate}">
+						   					<f:convertDateTime pattern="MM/dd/yyyy" />
+						   				</h:outputText>
+									</p:column>
+						   			<p:column>
+						   				<p:spacer width="5" />
+									</p:column>
+									<p:column styleClass="vertAlign"> 
+						   				<p:outputLabel for="interiorColorId" value="Interior Color:" style="font-weight:bold"/>
+						   			</p:column>
+						   			<p:column styleClass="vertAlign">
+						   				<h:outputText id="interiorColorId" value="#{quoteRequestAddEditBean.stockUnit.interiorColor}" />
+									</p:column>
+								</p:row>					
+						   		<p:row>
+									<p:column styleClass="vertAlign"> 
+						   				<p:outputLabel for="currentOdoId" value="Current Odo:" style="font-weight:bold"/>
+						   			</p:column>
+						   			<p:column styleClass="vertAlign">
+						   				<h:outputText id="currentOdoId" value="#{quoteRequestAddEditBean.stockUnit.odoReading}" >
+						   					<f:convertNumber type="number" pattern="#,##0" />
+						   				</h:outputText>
+									</p:column>
+						   			<p:column>
+						   				<p:spacer width="5" />
+									</p:column>
+									<p:column styleClass="vertAlign"> 
+						   				<p:outputLabel for="fleetCodeId" value="Fleet Code:" style="font-weight:bold"/>
+						   			</p:column>
+						   			<p:column styleClass="vertAlign">
+						   				<h:outputText id="fleetCodeId" value="#{quoteRequestAddEditBean.stockUnit.fleetCode}" />
+						   			</p:column>
+								</p:row>					
+							</p:panelGrid> 
+						</p:panel>
+	
+						<p:panel id="vehicleSectionLocatePanel" style="margin: -.5em -1em" 
+							rendered="#{quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestType.code == 'IMM_NEED_LOCATE' 
+										or quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestType.code == 'IMM_NEED_CLIENT'
+										or quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestType.code == 'IMM_NEED_UPFIT_CLIENT_LOCATE'
+										or quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestType.code == 'IMM_NEED_UPFIT_MAFS_LOCATE'}"> 
+
+					   		<p:panelGrid>
+					   		
+					   		
+					   		<p:row >
+					   			<p:column styleClass="vertAlign"> 
+					   				<p:outputLabel for="vehicleDescId" value="Vehicle Description:" style="font-weight:bold"/>
+					   			</p:column>
+					   			<p:column colspan="5">
+					   				<h:panelGroup style="white-space:nowrap;">							
+										<p:inputText id="vehicleDescId" title="Vehicle Description" value="#{quoteRequestAddEditBean.quoteRequestVehicle.vehicleDescription}" 
+											size="63" styleClass="trackDirtyValue"
+											disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}">
+										</p:inputText>
+										<p:commandButton id='vehDescLOVID' icon="icon-lov" title="Vehicle Description lov" 
+											oncomplete="showVehicleDescLov();" immediate="true"
+											onstart="return hasMinAlphaNumericCharacters($('input[name=\'accordionPanel:vehicleDescId\']'));"
+											actionListener="#{vehicleDescriptionLovBean.fetchLOVData}"
+											process="@this,vehicleDescId" dynamic="true" async="true"
+											update=":VEH_DESC_USER_GRID"
+											disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}">
+											<f:param name="VEH_DESC_INPUT" value="accordionPanel:vehicleDescId" />
+											<f:param name="VEH_DESC_LOV_NAME" value="vehicleDescriptionLOV" />
+											<f:param name="VEH_DESC_LOV_INPUT_HEADER" value="Select Vehicle Description" />
+										</p:commandButton>
+									</h:panelGroup>
+								</p:column>
+								
+								<p:column styleClass="vertAlign" style="width:10px" rendered="#{quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestType.code == 'IMM_NEED_LOCATE'}"> 
+					   				<p:outputLabel for="reqOptionAccessories" value="Required Options/Accessories:" style="font-weight:bold"/>
+					   			</p:column>
+					   			<p:column styleClass="vertAlign" rendered="#{quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestType.code == 'IMM_NEED_LOCATE'}">
+									<p:inputTextarea id="reqOptionAccessories" rows="4" cols="24" autoResize="false" maxlength="250" styleClass="trackDirtyValue"
+					                      	 value="#{quoteRequestAddEditBean.quoteRequestVehicle.requiredAccessories}"
+					                      	 disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}" />
+								</p:column>
+					   		</p:row>
+
+					   		<p:row rendered="#{quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestType.code == 'IMM_NEED_CLIENT'
+					   							or quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestType.code == 'IMM_NEED_UPFIT_CLIENT_LOCATE'}">
+					   			<p:column styleClass="vertAlign">
+									<p:outputLabel for="dealerCodeId"  value="Dealership:" style="font-weight:bold"/>
+								</p:column>
+								
+								<p:column styleClass="vertAlign">
+									<p:inputText id="dealerCodeId"  value="#{quoteRequestAddEditBean.quoteRequestVehicle.dealershipCode}" styleClass="trackDirtyValue"
+												disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}"
+												onkeydown="setTargetKeyCode(event);" 
+									 			onchange="clearDealerFields();">
+										<p:ajax event="change" partialSubmit="true" onstart="return proceedAjax();" 
+												listener="#{quoteRequestAddEditBean.decodeDealerByNameOrCode}"
+												process="@this, dealerCodeId " oncomplete="clearDealerFields();clearDealer();setFocusOnLOV('dealerCodeId', 'dealerLOV')"
+												update="accordionPanel:dealerCodeId, accordionPanel:dealerNameId, accordionPanel:contactNameId, accordionPanel:contactPhoneId" />
+									</p:inputText>	 
+									<p:commandButton id='dealerLOV' icon="icon-lov" title="lov"								       
+										oncomplete="showVendorLov();" immediate="true"
+										actionListener="#{supplierLovBean.fetchLOVData}" 
+										onstart="return hasMinAlphaNumericCharacters($('input[name=\'accordionPanel:dealerCodeId\']'));"
+										process="@this, dealerCodeId" partialSubmit="true" 
+										dynamic="true" async="true" update=":SUPPLIER_GRID, accordionPanel:dealerNameId, accordionPanel:contactNameId, accordionPanel:contactPhoneId" 
+										disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}">
+										<f:param name="VENDOR_INPUT" value="accordionPanel:dealerCodeId" />
+										<f:param name="VENDOR_WORKSHOP_INPUT" value="DELIVERING" />
+										<f:param name="ORDER_TYPE" value="LOCATE" />
+									</p:commandButton>	
+												 
+								</p:column>
+
+					   			<p:column styleClass="vertAlign">
+									<p:outputLabel for="dealerNameId"  value="Dealer Name:" style="font-weight:bold"/>
+								</p:column>
+
+								<p:column styleClass="vertAlign">
+									<p:inputText id="dealerNameId" value="#{quoteRequestAddEditBean.quoteRequestVehicle.dealershipName}" onclick="clearDealer()"
+											maxlength="80" size="80" styleClass="trackDirtyValue" onchange="$('[id$=dealerCodeId]').val('');"
+											disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress or (quoteRequestAddEditBean.quoteRequestVehicle.dealershipCode !=null and quoteRequestAddEditBean.quoteRequestVehicle.dealershipCode ne '')}"/>
+								</p:column>
+					   		</p:row>
+
+					   		<p:row rendered="#{quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestType.code == 'IMM_NEED_CLIENT'
+					   						or quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestType.code == 'IMM_NEED_UPFIT_CLIENT_LOCATE'}">
+
+					   			
+					   			<p:column styleClass="vertAlign">
+									<p:outputLabel for="contactNameId"  value="Contact:" style="font-weight:bold"/>
+								</p:column>
+								<p:column styleClass="vertAlign">
+									<p:inputText id="contactNameId" value="#{quoteRequestAddEditBean.quoteRequestVehicle.dealershipContact}" 
+											maxlength="30" size="30"  styleClass="trackDirtyValue"
+											disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}"/>
+								</p:column>
+					   			
+					   			<p:column styleClass="vertAlign">
+											<p:outputLabel for="contactPhoneId"  value="Phone Number:" style="font-weight:bold"/>
+								</p:column>
+								<p:column styleClass="vertAlign">
+									<p:inputText id="contactPhoneId" value="#{quoteRequestAddEditBean.quoteRequestVehicle.dealershipContactPhone}" 
+											maxlength="25" size="20" styleClass="trackDirtyValue"
+											disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}"/>
+								</p:column>
+					   			
+					   		</p:row>
+					   		
+					   		<p:row rendered="#{quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestType.code == 'IMM_NEED_LOCATE'
+					   							or quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestType.code == 'IMM_NEED_UPFIT_MAFS_LOCATE'}">
+								<p:column>
+									<p:commandLink id="colorPreferenceLink" styleClass="ui-icon ui-icon-triangle-1-e" style="float:left; color: green; "
+										onclick="return onColorPreferenceClick()" />				
+									<h:outputLabel styleClass="ui-label" onclick="onColorPreferenceClick();" style="cursor:pointer;" value="Color Preference:" />
+								</p:column>
+							</p:row>
+							
+							<p:row rendered="#{quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestType.code == 'IMM_NEED_LOCATE'
+												or quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestType.code == 'IMM_NEED_UPFIT_MAFS_LOCATE'}">
+								<p:column colspan="8">
+									<p:panel id="colorPreference" toggleable="true" collapsed="false"
+											visible="false" widgetVar="colorPreferencePanel"
+											style="border-color: green">
+								    	<p:panelGrid>
+								    		<p:row>
+								    			<p:column>
+													<p:spacer width="20"/>
+												</p:column>
+								    			<p:column>
+								    				<p:outputLabel for="firstExteriorColorId" value="Exterior Color" style="font-weight:bold"/>
+								    			</p:column>
+								    			<p:column>
+													<p:spacer width="20"/>
+												</p:column>
+								    			<p:column>
+								    				<p:outputLabel value="Interior Color" style="font-weight:bold"/>
+								    			</p:column>
+								    		</p:row>
+								    		<p:row>
+								    			<p:column style="font-weight:bold; text-align: right;">
+													<p:outputLabel for="firstExteriorColorId" value="1"/>
+												</p:column>
+									    		<p:column>
+									    			<p:inputText id="firstExteriorColorId" value="#{quoteRequestAddEditBean.quoteRequestVehicle.firstExteriorColor}" size="35" 
+									    				styleClass="trackDirtyValue"
+									    				disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}" maxlength="80"/>
+									    		</p:column>
+									    		<p:column style="font-weight:bold; text-align: right;">
+													<p:outputLabel value="1" style="text-align: right;"/>
+												</p:column>
+									    		<p:column>
+									    			<p:inputText id="firstInteriorColorId" value="#{quoteRequestAddEditBean.quoteRequestVehicle.firstInteriorColor}" size="35" 
+									    				styleClass="trackDirtyValue"
+									    				disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}" maxlength="80"/>
+									    		</p:column>
+								    		</p:row>
+								    		<p:row>
+								    			<p:column style="font-weight:bold; text-align: right;">
+													<p:outputLabel value="2"/>
+												</p:column>
+									    		<p:column>
+									    			<p:inputText id="secondExteriorColorId" value="#{quoteRequestAddEditBean.quoteRequestVehicle.secondExteriorColor}" size="35" 
+									    				styleClass="trackDirtyValue"
+									    				disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}" maxlength="80"/>
+									    		</p:column>
+									    		<p:column style="font-weight:bold; text-align: right;">
+													<p:outputLabel value="2" style="text-align: right;"/>
+												</p:column>
+									    		<p:column>
+									    			<p:inputText id="secondInteriorColorId" value="#{quoteRequestAddEditBean.quoteRequestVehicle.secondInteriorColor}" size="35" 
+									    				styleClass="trackDirtyValue" disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}" maxlength="80"/>
+									    		</p:column>
+								    		</p:row>
+								    		<p:row>
+								    			<p:column style="font-weight:bold; text-align: right;">
+													<p:outputLabel value="3"/>
+												</p:column>
+									    		<p:column>
+									    			<p:inputText id="thirdExteriorColorId" value="#{quoteRequestAddEditBean.quoteRequestVehicle.thirdExteriorColor}" size="35" 
+									    				styleClass="trackDirtyValue"
+									    				disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}" maxlength="80"/>
+									    		</p:column>
+									    		<p:column style="font-weight:bold; text-align: right;">
+													<p:outputLabel value="3"/>
+												</p:column>
+									    		<p:column>
+									    			<p:inputText id="thirdInteriorColorId" value="#{quoteRequestAddEditBean.quoteRequestVehicle.thirdInteriorColor}" size="35" 
+									    				styleClass="trackDirtyValue"
+									    				disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}" maxlength="80"/>
+									    		</p:column>
+								    		</p:row>
+								    		<p:row>
+								    			<p:column>
+								    				<p:outputLabel for="refusedColorId" value="Colors Client Will Refuse:" style="font-weight:bold"/>
+								    			</p:column>
+								    			<p:column colspan="6">
+								    				<p:inputText id="refusedColorId" value="#{quoteRequestAddEditBean.quoteRequestVehicle.refusedColorDescription}" size="85"
+								    					styleClass="trackDirtyValue"
+								    					disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}" maxlength="2000"/>
+								    			</p:column>
+								    		</p:row>
+								    	</p:panelGrid>
+									</p:panel>
+								</p:column>
+							</p:row>
+					   		</p:panelGrid>
+					   	</p:panel>
+
+						<p:panel id="vehicleSectionCommonPanel" style="margin: -.5em -1em">
+					   		<p:panelGrid>
+					   		    <p:row>
+					   			    <p:column>
+									    <p:outputLabel for="uploadedFilesId"  value="Documents:" style="font-weight:bold"/>
+								    </p:column> 					   		
+								    <p:column colspan="7">				
+								        <p:selectOneMenu id="uploadedFilesId" converter="${documentFileVOConverter}" value="#{quoteRequestAddEditBean.selectedDocumentFileVO}" 
+									            style="width:275px; vertical-align:bottom;" disabled="#{quoteRequestAddEditBean.documentFileVOs.size() eq 0}">
+									        <f:selectItem itemValue="" itemLabel="" />
+									   	    <f:selectItems var="docFileVO" value="#{quoteRequestAddEditBean.documentFileVOs}" itemLabel="#{docFileVO.fileName}" itemValue="#{docFileVO}" />
+										    <p:ajax process="@this" event="change" update="viewDocumentId" />									   	
+									    </p:selectOneMenu>
+									    <p:spacer width="5" />									
+									    <p:commandButton id='viewDocumentId' value="View" ajax="false" process="@form" actionListener="#{quoteRequestAddEditBean.viewDocumentListener}" disabled="#{quoteRequestAddEditBean.selectedDocumentFileVO eq null}">
+							     		    <p:fileDownload value="#{quoteRequestAddEditBean.selectedDocumentToView}"/>									
+									    </p:commandButton>									
+									    <p:spacer width="10" />								
+                                        <p:commandButton id="uploadDocumentId" widgetVar="uploadWidgetVar" value="Upload" title="Attach Documents" process="@this" onclick="showDialog('uploadDialogWidget')" disabled="#{!quoteRequestAddEditBean.isUploadButtonEnabled()}" />                                      
+								    </p:column>					   		    
+					   		    </p:row>	
+					   		    								 				   		
+								<p:row>
+						   			<p:column styleClass="vertAlign">
+										<p:outputLabel for="deliveryChargeId" value="Delivery Charge:" style="font-weight:bold"/>
+									</p:column>
+									<p:column styleClass="vertAlign">
+										<p:selectOneMenu id="deliveryChargeId" converter="${vehicleDeliveryChargeTypeConverter}" value="#{quoteRequestAddEditBean.quoteRequestVehicle.vehicleDeliveryChargeType}" 
+											 styleClass = "trackDirtySelect" style="width:120px"
+											 disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}">
+									   		<f:selectItem itemValue="" itemLabel="" />
+									   		<f:selectItems var="deliveryCharge" value="#{quoteRequestAddEditBean.vehicleDeliveryChargeTypeList}" itemLabel="#{deliveryCharge.name}" itemValue="#{deliveryCharge}" />
+										</p:selectOneMenu>
+									</p:column>
+									<p:column>
+											<p:spacer width="10"/>
+									</p:column>
+									<p:column styleClass="vertAlign">
+										<p:outputLabel for="plateTypeId"  value="Plate Type:" style="font-weight:bold"/>
+									</p:column>
+									<p:column styleClass="vertAlign">
+										<p:selectOneMenu id="plateTypeId" converter="${plateTypeCodeConverter}" value="#{quoteRequestAddEditBean.quoteRequestVehicle.plateTypeCode}" 
+											styleClass = "trackDirtySelect" style="width:180px"
+											disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}">
+											<f:selectItem itemValue="" itemLabel="" />
+									   		<f:selectItems var="plateType" value="#{quoteRequestAddEditBean.plateTypeCodeList}" 
+									   						itemLabel="#{plateType.plateTypeCode} - #{plateType.description}" 
+									   						itemValue="#{plateType}" />
+										</p:selectOneMenu>
+									</p:column>
+									<p:column>
+										<p:spacer width="10"/>
+									</p:column>
+									<p:column styleClass="vertAlign">
+										<p:outputLabel for="mip"  value="Mfr. Incentive Program:" style="font-weight:bold"/>
+									</p:column>
+									<p:column>
+										<h:selectBooleanCheckbox id="mip" styleClass="trackDirtyCheckbox"
+											value="#{quoteRequestAddEditBean.mfrIncentive}" 
+											disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}" />
+									</p:column>
+									<p:column>
+										<p:spacer width="10"/>
+									</p:column>
+						   			<p:column styleClass="vertAlign">
+											<p:outputLabel for="fleetRefNum"  value="Fleet Ref #:" style="font-weight:bold"/>
+									</p:column>
+									<p:column styleClass="vertAlign">
+										<p:inputText id="fleetRefNum" value="#{quoteRequestAddEditBean.quoteRequestVehicle.fleetReferenceNumber}" 
+											maxlength="25" size="20" styleClass="trackDirtyValue"
+											disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}"/>
+									</p:column>																										
+						   		</p:row>
+
+					   		</p:panelGrid>
+						
+						</p:panel>
+						</p:panel>
+					</p:tab>
+
+					<p:tab title="Upfit Details"
+							rendered="#{quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestType.code == 'UPFIT_ASSESSMENT'
+										or quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestType.code == 'IMM_NEED_UPFIT_CLIENT_LOCATE'
+										or quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestType.code == 'IMM_NEED_UPFIT_MAFS_LOCATE'
+										or quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestType.code == 'IMM_NEED_UPFIT_STOCK'}">
+						<p:panel style="border: none;vertical-align: top;">
+							<p:panel id="upfitDetailSectionPanel" style="margin: -.5em -1em">
+								<p:panelGrid id="upfitDetailGrid">
+									<p:row  style="vertical-align: top;">
+										<p:column  style="vertical-align: top;">
+											<p:outputLabel id="applicationLabelId" value="Applications: " style="font-weight:bold;"/>
+											<p:outputLabel value=" (Must save first to enable links)" rendered="#{quoteRequestAddEditBean.quoteRequest.quoteRequest.qrqId eq null}" />
+										    <p:scrollPanel id="upfitDetailConfigsId" mode="native"  style="height:130px; width:500px" >
+												
+											    <p:dataList value="#{quoteRequestAddEditBean.vehicleConfigs}" var="config" type="unordered" itemType="none" 
+											    	emptyMessage="No applications exist for this client.">
+													<h:selectBooleanCheckbox id="configCheckboxId" styleClass="trackDirtyCheckbox"
+														value="#{config.selected}" 
+														disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}" />
+													<p:spacer width="4"/>
+											    	<p:commandLink actionListener="#{quoteRequestAddEditBean.navigateToAddEditConfiguration(config.vehicleConfiguration.vcfId)}" 
+											    		  ajax="false" disabled="#{quoteRequestAddEditBean.quoteRequest.quoteRequest.qrqId eq null}"  >
+				        								<h:outputText value="#{config.vehicleConfiguration.description}" />
+				    								</p:commandLink>
+											    </p:dataList>
+											    <p:spacer width="10" />
+											    <p:commandButton value="Add Application" onclick="showDialog('addConfigDialogWidgetVar')" 
+											    	disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}" />				    
+												<br /><br />
+											</p:scrollPanel>
+										</p:column>
+										<p:column  style="vertical-align: top;" >
+										    <p:outputLabel value="Comment:" for="upfitNote" style="font-weight:bold;"/>
+										    <p:panel style="height:127px;">
+											    <p:inputTextarea 
+						                                id="upfitNote"
+						                                rows="5" 
+						                                cols="85" 
+						                                value="#{quoteRequestAddEditBean.quoteRequest.quoteRequest.upfitNote}" 
+						                                counter="upfitNoteCounter" 
+						                                maxlength="200" 
+						                                counterTemplate="{0} characters remaining" autoResize="false"
+						                                disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}"
+						                                style="white-space: normal;"/>
+						                        <br />
+												<h:outputText id="upfitNoteCounter" />
+											</p:panel>
+										</p:column>
+
+
+									</p:row>
+								</p:panelGrid>
+							</p:panel>
+						</p:panel>
+					</p:tab>
+				
+
+					<p:tab title="Quote Details" rendered="#{quoteRequestAddEditBean.quoteRequest.quoteRequest.quoteRequestType.code == 'UPFIT_ASSESSMENT' ? 'false' : 'true'}">
+						<p:panel style="border: none">
+							<p:panel id="quoteSectionPanel" style="margin: -.5em -1em">
+								<p:panelGrid>
+									<p:row>
+										<p:column>
+											
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<p:outputLabel for="quoteProfileId" value="Quote Profile:" style="font-weight:bold" styleClass="ui-label"/>
+										</p:column>
+										<p:column colspan="2">
+											<p:selectOneMenu id="quoteProfileId" converter="#{quotationProfileConverter}" value="#{quoteRequestAddEditBean.quoteRequestQuote.quotationProfile}"
+													style="width:480px" styleClass = "trackDirtySelect"
+													disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}">
+												<f:selectItem itemLabel="" itemValue=""/>
+												<f:selectItems var="profile" value="#{quoteRequestAddEditBean.quotationProfiles}" itemLabel="#{profile.profileCode} - #{profile.description}" itemValue="#{profile}"/>
+												<p:ajax event="change" listener="#{quoteRequestAddEditBean.onQuoteProfileChange}" update="accordionPanel:quoteSectionPanel"/>
+											</p:selectOneMenu>
+										</p:column>
+										
+										<p:column colspan="2">
+											<h:panelGroup id="willowQuoteGroup">
+												<p:outputLabel for="quoteNumberId" value="Willow Quote: " style="font-weight:bold;vertical-align: middle" 
+													styleClass="ui-label"/>
+												<p:spacer width="10" />
+												<p:inputText id="quoteNumberId" value="#{quoteRequestAddEditBean.quoteRequestQuote.quoId}" 
+													disabled="true" styleClass="trackDirtyValue"/>
+												<p:spacer width="4" />
+												<p:commandLink id="selectWillowLinkId" title="Select Willow Quote"
+														disabled="#{!quoteRequestAddEditBean.isAttachWillowQuoteButtonEnabled()}"										
+														update="quoteModelDialogId"
+														actionListener="#{quoteRequestAddEditBean.populateQuoteModels}"
+														oncomplete="showDialog('quoteModelDialogWidget')" >
+											 		<p:graphicImage value="/images/action_edit.png" style="border-style: none"/>
+							            		</p:commandLink>
+												<p:spacer width="4" />
+												<p:commandLink id="deleteWillowQuoteLinkId" title="Remove Willow Quote"
+														disabled="#{!quoteRequestAddEditBean.isWillowQuoteButtonEnabled()}"
+														rendered="#{quoteRequestAddEditBean.quoteRequestQuote.quoId != null}"
+														oncomplete="showDialog('confirmWillowQuoteWidgetVar');">
+												    <p:graphicImage value="/images/action_delete.png" style="border-style: none"/>
+												</p:commandLink>
+											</h:panelGroup>																					
+										</p:column>
+									</p:row>
+									
+									<p:row>
+										<p:column>
+											<p:outputLabel for="gradeGroupId" value="Grade Group: " style="font-weight:bold" styleClass="ui-label"/>
+										</p:column>
+										<p:column>
+											<p:selectOneMenu id="gradeGroupId" converter="#{driverGradeGroupConverter}" styleClass = "trackDirtySelect"
+														value="#{quoteRequestAddEditBean.quoteRequestQuote.driverGradeGroupCode}" style="width:180px"
+														disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}">
+												<f:selectItem itemLabel="" itemValue=""/>
+												<f:selectItems value="#{quoteRequestAddEditBean.driverGradeGroups}" var="gradeGroup"
+															itemLabel="#{gradeGroup.driverGradeGroup} - #{gradeGroup.description}" itemValue="#{gradeGroup}"/>
+												<p:ajax event="change"/>
+											</p:selectOneMenu>
+										</p:column>
+										
+										<p:column>
+											<p:outputLabel for="leaseTermId" value="Months:" style="font-weight:bold" styleClass="ui-label"/>
+										</p:column>
+										<p:column>
+											<p:inputText id="leaseTermId" value="#{quoteRequestAddEditBean.quoteRequestQuote.leaseTerm}" styleClass="trackDirtyValue"
+												disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}" style="width:80px">
+												<p:keyFilter regEx="/[0-9]/i" preventPaste="false"/>
+												<p:ajax event="change" update="projReplId"/>
+											</p:inputText>
+											
+											<p:spacer width="5"/>
+											<p:commandButton id="editStepsBtn" value="Edit Steps" oncomplete="PF('stepDialogVar').show();"
+												rendered="#{quoteRequestAddEditBean.quoteRequestQuote.quotationProfile.prdProductCode.substring(0, 2) eq 'OE' ? 'true' : 'false'}"
+												actionListener="#{quoteRequestAddEditBean.onEditStepsDefinition}"
+												onstart="return validateField($('input[name=\'accordionPanel:leaseTermId\']'));"
+												update="stepDialog"
+												disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}"/>
+										</p:column>
+										
+										<p:column style="padding-left:20px">
+											<p:outputLabel id="leaseMileLbl" for="leaseMileId" value="Miles: " style="font-weight:bold" styleClass="ui-label"/>
+											<p:spacer width="5"/>
+											<p:inputText id="leaseMileId" value="#{quoteRequestAddEditBean.quoteRequestQuote.leaseMiles}" styleClass="trackDirtyValue"
+													disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}">
+												<p:keyFilter regEx="/[0-9]/i" preventPaste="false"/>
+											</p:inputText>
+										</p:column>
+									</p:row>
+									<p:row rendered="#{quoteRequestAddEditBean.quoteRequestQuote.quotationProfile.prdProductCode.substring(0, 2) eq 'OE' ? 'true' : 'false'}">
+										<p:column>
+											<p:outputLabel id="projReplLbl" for="projReplId" value="Proj. Repl. Month: " style="font-weight:bold" styleClass="ui-label"
+												rendered="#{quoteRequestAddEditBean.quoteRequestQuote.quotationProfile.prdProductCode.substring(0, 2) eq 'OE' ? 'true' : 'false'}"/>
+										</p:column>
+										  <p:column>
+										    <p:inputText id="projReplId" value="#{quoteRequestAddEditBean.quoteRequestQuote.projectedReplaceMonth}" styleClass="trackDirtyValue"
+										      disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}"
+										      rendered="#{quoteRequestAddEditBean.quoteRequestQuote.quotationProfile.prdProductCode.substring(0, 2) eq 'OE' ? 'true' : 'false'}"
+										      validatorMessage="Proj. Repl. Month must be greater than 0" maxlength="12">
+										      <p:keyFilter regEx="/[0-9]/i" preventPaste="false"/>
+										      <f:validateDoubleRange minimum="1"/>
+										    </p:inputText>
+										  </p:column>
+										
+										<p:column>
+											<p:outputLabel id="deprMethodLbl" for="deprMethodId" value="Depreciation Method: " style="font-weight:bold" styleClass="ui-label"
+												rendered="#{quoteRequestAddEditBean.quoteRequestQuote.quotationProfile.prdProductCode.substring(0, 2) eq 'OE' ? 'true' : 'false'}"/>
+										</p:column>
+										<p:column>
+											<p:selectOneMenu id="deprMethodId" converter="#{depreciationMethodConverter}" styleClass = "trackDirtySelect"
+														value="#{quoteRequestAddEditBean.quoteRequestQuote.quoteRequestDepreciationMethod}" style="width:158px"
+														rendered="#{quoteRequestAddEditBean.quoteRequestQuote.quotationProfile.prdProductCode.substring(0, 2) eq 'OE' ? 'true' : 'false'}"
+														disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}">
+												<f:selectItem itemLabel="" itemValue=""/>
+												<f:selectItems value="#{quoteRequestAddEditBean.depreciationMethods}" var="depMethod"
+															itemLabel="#{depMethod.name}" itemValue="#{depMethod}"/>
+												<p:ajax update=":quoteRequestAddEditForm:accordionPanel:depMethodValuePanelId"/>
+											</p:selectOneMenu>
+										</p:column>
+										
+										<p:column colspan="2">
+											<p:panelGrid id="depMethodValuePanelId">
+												<p:column>
+													<p:outputLabel id="deprValueLbl" for="deprValueId" value="#{quoteRequestAddEditBean.quoteRequestQuote.quoteRequestDepreciationMethod.description}" style="font-weight:bold;width:30px" styleClass="ui-label"
+														rendered="#{(quoteRequestAddEditBean.quoteRequestQuote.quoteRequestDepreciationMethod.code ne 'FULL_DEPRECIATION'
+																	and quoteRequestAddEditBean.quoteRequestQuote.quoteRequestDepreciationMethod.code.length() > 0 and quoteRequestAddEditBean.quoteRequestQuote.quotationProfile.prdProductCode.substring(0, 2) eq 'OE') ? 'true' : 'false'}"/>
+													<p:outputLabel value=":" style="font-weight:bold" styleClass="ui-label"
+														rendered="#{(quoteRequestAddEditBean.quoteRequestQuote.quoteRequestDepreciationMethod.code ne 'FULL_DEPRECIATION'
+																	and quoteRequestAddEditBean.quoteRequestQuote.quoteRequestDepreciationMethod.code.length() > 0 and quoteRequestAddEditBean.quoteRequestQuote.quotationProfile.prdProductCode.substring(0, 2) eq 'OE') ? 'true' : 'false'}"/>
+												</p:column>
+												<p:column>
+													<p:spacer style="width:15px" rendered="#{(quoteRequestAddEditBean.quoteRequestQuote.quoteRequestDepreciationMethod.code eq 'MATCH'
+																	and quoteRequestAddEditBean.quoteRequestQuote.quoteRequestDepreciationMethod.code.length() > 0 
+																	and quoteRequestAddEditBean.quoteRequestQuote.quotationProfile.prdProductCode.substring(0, 2) eq 'OE') ? 'false' : 'true'}"/>
+													<p:inputNumber id="deprValueId" value="#{quoteRequestAddEditBean.quoteRequestQuote.depreciationMethodValue}" styleClass="trackDirtyChildValues"
+															rendered="#{(quoteRequestAddEditBean.quoteRequestQuote.quoteRequestDepreciationMethod.code ne 'FULL_DEPRECIATION'
+																	and quoteRequestAddEditBean.quoteRequestQuote.quoteRequestDepreciationMethod.code.length() > 0 and quoteRequestAddEditBean.quoteRequestQuote.quotationProfile.prdProductCode.substring(0, 2) eq 'OE') ? 'true' : 'false'}"
+															disabled="#{!quoteRequestAddEditBean.hasPermission() or quoteRequestAddEditBean.isQuoteRequestInProgress}" minValue="0" thousandSeparator=""
+																maxValue="#{quoteRequestAddEditBean.quoteRequestQuote.quoteRequestDepreciationMethod.code eq 'PCT_OF_CAPITAL_COST' ? '100' : '999999999999'}">
+														
+													</p:inputNumber>
+												</p:column>
+												<p:column>
+													<p:outputLabel value="Mi/Year" style="font-weight:bold" styleClass="ui-label"
+														rendered="#{(quoteRequestAddEditBean.quoteRequestQuote.quoteRequestDepreciationMethod.code eq 'MATCH'
+																	and quoteRequestAddEditBean.quoteRequestQuote.quoteRequestDepreciationMethod.code.length() > 0 
+																	and quoteRequestAddEditBean.quoteRequestQuote.quotationProfile.prdProductCode.substring(0, 2) eq 'OE') ? 'true' : 'false'}"/>
+												</p:column>
+											</p:panelGrid>
+										</p:column>
+									</p:row>
+								</p:panelGrid>
+							</p:panel>
+						</p:panel>
+					</p:tab>
+				
+				</p:accordionPanel>
+				
+				<p:panel id="btnPanel" rendered="#{quoteRequestAddEditBean.started}">
+				    <p:commandButton id="saveBtn" value="Save"
+				        widgetVar="saveBtnWidgetVar"
+					    action="#{quoteRequestAddEditBean.save}" 
+					    update="@form"
+					    process="@form"
+					    onstart="PF('saveBtnWidgetVar').disable()"
+					    oncomplete="PF('saveBtnWidgetVar').enable()"
+					    onclick="lockScreen();"
+					    ajax="false"
+					    disabled="#{!quoteRequestAddEditBean.isSaveButtonEnabled()}" />	
+					    		
+				    <p:spacer width="10" />
+				    
+				    <p:commandButton id="submitBtn" value="Submit"
+				        widgetVar="submitBtnWidgetVar"
+					    action="#{quoteRequestAddEditBean.submit}" 
+					    update="@form"
+					    process="@form"
+					    onstart="PF('submitBtnWidgetVar').disable()"
+					    oncomplete="PF('submitBtnWidgetVar').enable()"
+					    onclick="lockScreen();"
+					    ajax="false"
+					    disabled="#{!quoteRequestAddEditBean.isSubmitButtonEnabled()}" />				    
+
+				    <p:spacer width="10" />
+				    
+				    <p:commandButton id="assignToBtn" value="Assign Request"
+				        widgetVar="assignToBtnWidgetVar"
+				        title="Assign Quote Request"
+				        onstart="return hasDirtyData();"
+					    process="@form"
+					    oncomplete="showDialog('assignToDialogWidget')"
+					    disabled="#{!quoteRequestAddEditBean.isAssignToButtonEnabled()}" />				    
+
+				    <p:spacer width="10" />
+				    
+				    <p:commandButton id="closeBtn" value="Close Request"
+				        widgetVar="closeBtnWidgetVar"
+					    process="@form"
+					    onclick="showDialog('closeDialogWidget')"
+					    disabled="#{!quoteRequestAddEditBean.isCloseButtonEnabled()}" />				    
+
+				    <p:spacer width="10" />
+				    
+				    <p:commandButton id="reworkRequestBtn" value="Request Rework"
+				        widgetVar="reworkRequestBtnWidgetVar" 
+					    process="@form"
+					    oncomplete="showDialog('reworkRequestDlgWidgetVar');"
+					    disabled="#{!quoteRequestAddEditBean.isReworkButtonEnabled()}"/>				    
+
+				    <p:spacer width="10" />	
+
+				    <p:commandButton id="copyRequestBtn" value="Copy Quote Request"
+				        widgetVar="copyRequestBtnWidgetVar"
+					    actionListener="#{quoteRequestAddEditBean.copyQuoteRequest}" 
+					    update="@form"
+					    process="@form"
+					    onclick="lockScreen();"
+					    ajax="false"
+					    disabled="#{!quoteRequestAddEditBean.isCopyQuoteButtonEnabled()}"/>				    
+
+				    <p:spacer width="10" />				    			                				    			                			    
+				    
+				    <p:commandButton id="deleteBtn" value="Delete Request"
+				        widgetVar="deleteBtnWidgetVar"
+					    process="@form"
+					    onclick="showDialog('deleteRequestDialogWidgetVar')" 
+					    disabled="#{!quoteRequestAddEditBean.isDeleteButtonEnabled()}" />				    
+
+				    <p:spacer width="10" />
+				    
+			        <p:commandButton id="notesBtn" 
+			                widgetVar="notesBtnWidgetVar" 
+			                value="Notes (#{quoteRequestAddEditBean.notesCount()})" 
+			                title="Notes" 
+			                disabled="#{!quoteRequestAddEditBean.isNoteButtonEnabled()}" 
+			                oncomplete="showLogBook();"  />	
+			                
+				    <p:spacer width="10" />
+				    
+
+				    				    				    					    				
+					<p:commandButton id="mainCancelBtn" value="Cancel" widgetVar="doneWidgetVar" action="#{quoteRequestAddEditBean.cancel}" 
+						ajax="false" immediate="true" onclick="lockScreen();" />
+					
+					<p:commandButton id="finishCloseHiddenBtn" widgetVar="doneWidgetVar" action="#{quoteRequestAddEditBean.finishClose}" 
+						ajax="false" immediate="true" onclick="lockScreen();" style="display:none" />											
+				</p:panel>
+				
+            </h:form>
+            
+	        <p:dialog id="reworkRequestDlg" widgetVar="reworkRequestDlgWidgetVar" modal="true" dynamic="true"
+                header="Rework Quote Request" resizable="false" appendTo="@(body)" height="auto" width="625"
+                closeOnEscape="true">
+                
+				<p:messages id="reworkRequestMessages" severity="info,error,fatal" showSummary="true" showDetail="false" autoUpdate="true" />
+			                    
+	            <h:form id="reworkRequestForm" prependId="false">
+	            
+	                <p:focus context="reworkRequestReasonTA" />	 
+	                           
+					<p:panel id="reworkRequestPnl">  
+					    <p:panelGrid cellpadding="5" style="white-space:nowrap;">	
+				    		<p:row>
+				    			<p:column colspan="4">
+								    <p:outputLabel for="reworkRequestReasonTA" value="Reason:*" styleClass="ui-label" />				    			
+				    			</p:column>				    		
+				    		</p:row>
+				    		<p:row>
+                                <p:column colspan="4">
+			                        <p:inputTextarea 
+			                                id="reworkRequestReasonTA"
+			                                rows="4" 
+			                                cols="85" 
+			                                value="#{quoteRequestAddEditBean.reworkReason}" 
+			                                counter="reworkReasoncounter" 
+			                                maxlength="183" 
+			                                counterTemplate="{0} characters remaining" autoResize="false"
+			                                style="white-space: normal;"/>
+			                                <br />
+			                            <h:outputText id="reworkReasoncounter" /> <br /><br />	
+                                 </p:column>  				    							        				    							        
+					        </p:row> 					                   					
+		                </p:panelGrid>		               
+	                </p:panel>  	  
+	                <p:panel>
+	                    <p:commandButton id="reworkRequestSaveBtn" value="Save" actionListener="#{quoteRequestAddEditBean.rework}"  />
+	                    <p:spacer width="5" />
+	                    <p:commandButton id="reworkCancelBtn" value="Cancel" onclick="hideDialog('reworkRequestDlg');" />					                                                 	                
+	                </p:panel>               					              
+	            </h:form>
+	        </p:dialog> 	
+	                    
+            
+			<p:dialog id="uploadDialog" header="Upload Documents" widgetVar="uploadDialogWidget"   
+				  modal="true" resizable="false" appendTo="@(body)" style="min-width: 650px; max-width: 650px;">
+				
+				<p:hotkey immediate="true" bind="esc" handler="hideDialog('uploadDialogWidget');"/>				  
+				  
+				<p:messages id="uploadDialogErrorMsgId" severity="error,fatal" showDetail="false" autoUpdate="true" showSummary="true" globalOnly="false"/>
+				
+                <h:form prependId="false">
+                
+				    <h:panelGrid columns="2" width="600px">
+				        <p:outputLabel id="uploadDocumentsLabelId" value="" styleClass="ui-label" />
+					    <p:fileUpload fileUploadListener="#{quoteRequestAddEditBean.fileUploadListener}" 
+						        mode="advanced"  
+						        skinSimple="true"	
+						        auto="true"	
+						        process="@form"	
+						        update="@form"	          
+						        sizeLimit="50000000" multiple="true" 
+   						        label="Upload"/>
+						
+					    <h:outputText value="" style="vertical-align: top;"/>
+					    <h:panelGroup>
+					        <p:panel style="min-height:200px; max-height:200px;overflow: auto;">
+						        <h:panelGrid >										
+							        <ui:repeat value="#{quoteRequestAddEditBean.documentFileVOs}" var="file">	
+								        <h:outputText value="#{file.fileName}" style="vertical-align: top;"/>
+									    <p:spacer width="10"/>
+									    <p:commandLink  rendered="#{!file.uploadDoc}"  style="vertical-align: top"
+						                        actionListener="#{quoteRequestAddEditBean.deleteUploadedDocument(file)}"
+				                                process="@this" update="@form"
+						                        title="Delete Document">   
+						                    <p:graphicImage value="/images/action_delete.png" styleClass="ui-border-none" />                                
+						                </p:commandLink>
+			                            <p:spacer width="20"/>
+									    <br />
+								    </ui:repeat>									    
+							    </h:panelGrid>
+					        </p:panel>
+				        </h:panelGroup>						
+				     </h:panelGrid>
+							                
+                     <p:panel>
+                         <p:commandButton id="uploadDialogCancelBtn" value="Done" type="button" onclick="hideDialog('uploadDialogWidget'); updateVehicleDetailsCommon();"/>                        
+                     </p:panel>                
+                </h:form>				
+				
+								  
+		    </p:dialog>            
+
+		    <p:dialog id="quoteModelDialogId" widgetVar="quoteModelDialogWidget" closeOnEscape="true" modal="true"
+		    onShow="setFocus('quoteModelSelectButton');setFirstPageQuoteModelDataTableWidget();"
+		    			header="Quotation Info - #{quoteRequestAddEditBean.selectedExternalAccount.accountName}" resizable="true" appendTo="@(body)"
+		    			width="60%" height="80%">
+		    	<h:form id="quoteModelFormId" prependId="false" onkeydown="body_onkeydown(event,'quoteModelSelectButton','quoteModelDialogWidget');">
+		    		<p:panel id="quoteModelPanel" >
+		    			<p:dataTable id="quoteModelTblId" widgetVar="quoteModelTblWidget" var="quote"
+		    						value="#{quoteRequestAddEditBean.quoteRequestQuoteModels}"
+		    						resizableColumns="true"
+		    						scrollable="true" scrollHeight="280" paginator="true" paginatorPosition="bottom"
+		    						rows="#{willowUserLovBean.rowsPerPage}"
+		    						selection="#{quoteRequestAddEditBean.selectedQuoteRequestQuoteModel}" selectionMode="single"
+		    						rowKey="#{quote.quoId}/#{quote.quoteNo}/#{quote.revisionNo}">
+		    						
+		    				<p:ajax event="page" oncomplete="clearDataTableSelection('quoteModelTblWidget'); setScrollDivAtTop();" />
+							
+							<p:ajax event="rowDblselect" 
+							        listener="#{quoteRequestAddEditBean.onRowSelect}"
+								    oncomplete="hideDialog('quoteModelDialogWidget');" 
+								    update="accordionPanel:willowQuoteGroup"/>				
+							
+		    				<p:column width="15%" resizable="true">
+		    					<f:facet name="header">
+		    						<h:outputText value="Quote No"/>
+		    					</f:facet>
+		    					<h:outputText value="#{quote.quoId}/#{quote.quoteNo}/#{quote.revisionNo}"/>
+		    				</p:column>
+		    				<p:column headerText="" width="40%" resizable="true" style="white-space: nowrap; text-overflow: ellipsis;">
+		    					<f:facet name="header">
+		    						<h:outputText value="Vehicle Desc."/>
+		    					</f:facet>
+		    					<h:outputText value="#{quote.modelDesc}" title="#{quote.modelDesc}"/>
+		    				</p:column>
+		    				<p:column width="40%" resizable="true" style="white-space: nowrap; text-overflow: ellipsis;">
+		    					<f:facet name="header">
+		    						<h:outputText value="Driver"/>
+		    					</f:facet>
+		    					<h:outputText value="#{quote.driverName}" title="#{quote.driverName}"/>
+		    				</p:column>
+		    				<p:column width="15%" resizable="true">
+		    					<f:facet name="header">
+		    						<h:outputText value="Term"/>
+		    					</f:facet>
+		    					<h:outputText value="#{quote.contractPeriod}/#{quote.contractDistance}"/>
+		    				</p:column>
+		    				
+		    				<p:column width="20%" resizable="true">
+		    					<f:facet name="header">
+		    						<h:outputText value="Quote Status"/>
+		    					</f:facet>
+		    					<h:outputText value="#{quote.quoteStatus}"/>
+		    				</p:column>
+		    			</p:dataTable>
+		    		</p:panel>
+					<br/>
+					<div style="text-align: center;">
+						<h:outputText style="font-weight:bold;" value="Record Count: #{quoteRequestAddEditBean.quoteRequestQuoteModels.size()}"/>
+					 	<p:commandButton style="float:right;" value="Select"
+							id="quoteModelSelectButton" name="quoteModelSelectButton" widgetVar="quoteModelSelectButtonWidgetVar"
+							actionListener="#{quoteRequestAddEditBean.onRowSelect}"
+							oncomplete="hideDialog('quoteModelDialogWidget');" 
+							update="accordionPanel:willowQuoteGroup"
+							disabled="#{quoteRequestAddEditBean.quoteRequestQuoteModels.size() eq 0}">
+						</p:commandButton>
+					</div>
+		    	</h:form>
+		    </p:dialog>
+		    
+		    <p:dialog id="stepDialog" header=" Step  Definition" widgetVar="stepDialogVar"   onShow="updateTotalStep" modal="true"
+					appendTo="@(body)" resizable="false" style="min-width: 180px; max-width: 180px;"> 
+				<p:ajax event="close" listener="#{quoteRequestAddEditBean.cancelStepsDefinition}"/>
+				<p:hotkey immediate="true" bind="esc" handler="PF('stepDialogVar').hide();"/>	
+				
+			  	<h:form id="stepForm" prependId="false" >   	
+					<p:messages id="dialogErrorMsgID" showDetail="false" autoUpdate="true" showSummary="true" globalOnly="false"/>	
+					<p:panel id="stepPanel" style="min-width: 150px; max-width: 150px;border: none;">
+						<p:focus  context="stepPanel"/>
+						<p:dataList id="stepDialogDataTableId" value="#{quoteRequestAddEditBean.definitionSteps}" var="step"  rowIndexVar="stepIndex"  type="definition">  
+							<p:column>
+								<p:spacer width="8" height="1"> </p:spacer>
+								<h:outputText  value="   Step #{step.stepCount}:"  style="vertical-align: center;font-weight: bold;" />
+								<p:spacer width="8" height="1"> </p:spacer>
+		   						<p:inputText id="step#{stepIndex}"  onchange="updateTotalStep();" styleClass="stepDefinitionRowArray"	size="3" value="#{step.netPeriod}" disabled="#{!quoteRequestAddEditBean.hasPermission()}" > 
+		   							<p:spacer width="5" height="1"> </p:spacer>
+		   							<p:keyFilter regEx="/[\d]/"/>
+			   					</p:inputText> 	
+			   				</p:column>
+						</p:dataList>
+						<p:spacer width="15" height="1"> </p:spacer>
+						<h:outputText  value="Total: "  styleClass="ui-label" />
+						<p:spacer width="20" height="1"> </p:spacer>
+						<h:outputText id="tatalStepValue" value="#{quoteRequestAddEditBean.quoteRequestQuote.leaseTerm}"  />
+					</p:panel>	
+					
+					<p:spacer width="15" height="1"> </p:spacer>
+					<p:commandButton id="stepDialogSave" value="Ok" process="@form" ajax="true"
+							actionListener="#{quoteRequestAddEditBean.onEditStepsDone}"
+							oncomplete="PF('stepDialogVar').hide();" disabled="#{!quoteRequestAddEditBean.hasPermission()}" />
+					<p:spacer width="20" height="1"> </p:spacer>
+					<p:commandButton id="stepDialogSaveCancel" value="Cancel" oncomplete="PF('stepDialogVar').hide();" 
+							process="@none"	immediate="true" actionListener="#{quoteRequestAddEditBean.cancelStepsDefinition}"  />
+				    	
+				</h:form>		
+			</p:dialog>
+            
+			<p:dialog id="clientPocDialogId" widgetVar="clientPocWidget" closeOnEscape="true" modal="true" onShow="setFocus('clientPocDialogDoneBtn');"
+		    			header="Contacts Info - #{quoteRequestAddEditBean.selectedExternalAccount.accountName}" resizable="false" appendTo="@(body)"
+		    			width="60%" height="50%">
+		    	<h:form id="clientPocFormId" prependId="false">
+		    		<p:panel id="clientPocPanel">
+		    			<p:dataTable id="clientPocTblId" widgetVar="clientPocTblWidget" var="contact"
+		    						value="#{quoteRequestAddEditBean.quoteRequest.contacts}"
+		    						scrollable="true" scrollHeight="150">
+		    				<p:column headerText="Name" width="30%">
+		    					<p:outputLabel value="#{contact.lastName}"/>
+		    					<p:outputLabel value=", " rendered="#{(not empty contact.lastName) and (not empty contact.firstName)}"/>
+		    					<p:outputLabel value="#{contact.firstName}"/>
+		    				</p:column>
+		    				<p:column headerText="Job Title" width="22%">
+		    					<p:outputLabel value="#{contact.jobTitle}"/>
+		    				</p:column>
+		    				<p:column headerText="Contact Type" width="20%">
+		    					<p:outputLabel value="#{contact.contactType}"/>
+		    				</p:column>
+		    				<p:column headerText="E-Mail" width="28%">
+		    					<h:outputLink onclick="loadClientEmail('#{contact.email}'); return false;">#{contact.email}</h:outputLink>
+		    				</p:column>
+		    			</p:dataTable>
+		    		</p:panel>
+					<br/>
+				 	<p:commandButton id="clientPocDialogDoneBtn" value="Done" onclick="hideDialog('clientPocWidget')" />
+		    	</h:form>
+		    </p:dialog>
+
+			<p:dialog id="clientConfigDialogId" widgetVar="clientConfigWidget" closeOnEscape="true" modal="true" onShow="setFocus('clientConfigDialogDoneBtn');"
+		    			header="Client Application Info - #{quoteRequestAddEditBean.selectedExternalAccount.accountName}" resizable="false" appendTo="@(body)"
+		    			style="min-width: 750px; max-width: 750px;">
+		    	<h:form id="clientConfigFormId" prependId="false">
+		    		<p:panel id="clientConfigPanelId">
+		    			<p:dataTable id="clientConfigTblId" var="clientConfig" value="#{quoteRequestAddEditBean.quoteRequest.clientConfigurations}"
+		    				scrollable="true" scrollHeight="150">
+		    				<p:column headerText="Application Name">
+		    					<p:outputLabel value="#{clientConfig}"/>
+		    				</p:column>
+		    			</p:dataTable>
+		    		</p:panel>
+		    		<br/>
+				 	<p:commandButton id="clientConfigDialogDoneBtn" value="Done" onclick="hideDialog('clientConfigWidget')" />
+		    	</h:form>
+		    </p:dialog> 						
+			
+		    <p:dialog id="servicesDialogId" widgetVar="servicesWidget" closeOnEscape="true" modal="true" onShow="setFocus('servicesDialogDoneBtn');"
+		    			header="Services Info - #{quoteRequestAddEditBean.selectedExternalAccount.accountName}" resizable="false" appendTo="@(body)"
+		    			width="50%" height="50%">
+		    	<h:form id="servicesFormId" prependId="false">
+		    		<p:panel id="servicesPanel">
+		    			<p:dataTable id="servicesTblId" widgetVar="servicesTblWidget" var="service"
+		    				value="#{quoteRequestAddEditBean.quoteRequest.clientServiceElements}"
+		    				scrollable="true" scrollHeight="150">
+		    				<p:column headerText="Service Element" width="50%">
+		    					<p:outputLabel value="#{service.elementName}"/>
+		    				</p:column>
+		    				<p:column headerText="Product Exclusions" width="20%">
+		    					<p:outputLabel value="#{service.productExclusions}"/>
+		    				</p:column>
+		    				<p:column headerText="Grade Group Exclusions" width="20%">
+		    					<p:outputLabel value="#{service.gradeGroupExclusions}"/>
+		    				</p:column>
+		    			</p:dataTable>
+		    		</p:panel>
+		    		<br/>
+				 	<p:commandButton id="servicesDialogDoneBtn" value="Done" onclick="hideDialog('servicesWidget')" />
+		    	</h:form>
+		    </p:dialog>
+		    
+		    <p:dialog id="gradeGroupsDialogId" widgetVar="gradeGroupsWidget" closeOnEscape="true" modal="true" onShow="setFocus('gradeGroupsDialogDoneBtn');"
+		    			header="Grade Groups Info - #{quoteRequestAddEditBean.selectedExternalAccount.accountName}" resizable="false" appendTo="@(body)"
+		    			width="50%" height="60%">
+		    	<h:form id="gradeGroupsFormId" prependId="false">
+		    		<p:panel id="gradeGroupsPanel">
+		    			<p:dataTable id="gradeGroupsTblId" widgetVar="gradeGroupsTblWidget" var="gradeGroups" value="#{quoteRequestAddEditBean.quoteRequest.driverGradeGroups}"
+		    				scrollable="true" scrollHeight="150">
+		    				<p:column headerText="Grade Group" width="20%">
+		    					<p:outputLabel value="#{gradeGroups.gradeCode}"/>
+		    				</p:column>
+		    				<p:column headerText="Description" width="60%">
+		    					<p:outputLabel value="#{gradeGroups.gradeDesc}"/>
+		    				</p:column>
+		    			</p:dataTable>
+		    		</p:panel>
+		    		<br/>
+				 	<p:commandButton id="gradeGroupsDialogDoneBtn" value="Done" onclick="hideDialog('gradeGroupsWidget')" />
+		    	</h:form>
+		    </p:dialog>
+		    
+		    <p:dialog id="finFanDialogId" widgetVar="finFanWidget" closeOnEscape="true" modal="true" onShow="setFocus('finFanDialogDoneBtn');"
+		    			header="Fleet Code Info - #{quoteRequestAddEditBean.selectedExternalAccount.accountName}" resizable="false" appendTo="@(body)"
+		    			width="50%" height="50%">
+		    	<h:form id="finFanFormId" prependId="false">
+		    		<p:panel id="finFanPanel">
+		    			<p:dataTable id="finFanTblId" widgetVar="finFanTblWidget" var="finFan"
+		    			value="#{quoteRequestAddEditBean.quoteRequest.clientFleetCodes}"
+		    			scrollable="true" scrollHeight="150">
+		    				<p:column headerText="Manufacturer" width="50%">
+		    					<p:outputLabel value="#{finFan.manufacturer}"/>
+		    				</p:column>
+		    				<p:column headerText="Fleet Code" width="30%">
+		    					<p:outputLabel value="#{finFan.fleetCode}"/>
+		    				</p:column>
+		    			</p:dataTable>
+		    		</p:panel>
+		    		<br/>
+				 	<p:commandButton id="finFanDialogDoneBtn" value="Done" onclick="hideDialog('finFanWidget')" />
+		    	</h:form>
+		    </p:dialog>
+		    
+		    <p:dialog id="prefVendorDialogId" widgetVar="prefVendorWidget" closeOnEscape="true" modal="true" onShow="setFocus('prefVendorDialogDoneBtn');"
+		    			header="Preferred Vendor/Supplier Info - #{quoteRequestAddEditBean.selectedExternalAccount.accountName}" resizable="false" appendTo="@(body)"
+		    			width="50%" height="50%">
+		    	<h:form id="prefVendorFormId" prependId="false">
+		    		<p:panel id="prefVendorPanel">
+		    			<p:dataTable id="prefVendorTblId" widgetVar="prefVendorTblWidget" var="ven"
+		    						value="#{quoteRequestAddEditBean.quoteRequest.clientPrefSuppliers}"
+		    						scrollable="true" scrollHeight="150">
+		    				<p:column headerText="Vendor/Supplier" width="20%">
+		    					<p:outputLabel value="#{ven.prefSupplierCode}"/>
+		    				</p:column>
+		    				<p:column headerText="Vendor Name" width="70%">
+		    					<p:outputLabel value="#{ven.prefSupplierName}"/>
+		    				</p:column>
+		    			</p:dataTable>
+		    		</p:panel>
+		    		<br/>
+				 	<p:commandButton id="prefVendorDialogDoneBtn" value="Done" onclick="hideDialog('prefVendorWidget')" />
+		    	</h:form>
+		    </p:dialog>
+		    
+			<p:dialog id="effectiveProfilesDialogId" widgetVar="effectiveProfilesWidget" closeOnEscape="true" modal="true" onShow="setFocus('effectiveProfilesDialogDoneBtn');"
+		    			header="Active Profiles Info - #{quoteRequestAddEditBean.selectedExternalAccount.accountName}" resizable="false" appendTo="@(body)"
+		    			width="70%" height="50%">
+		    	<h:form id="effectiveProfilesFormId" prependId="false">
+		    		<p:panel id="effectiveProfilesPanel">
+		    			<p:dataTable id="effectiveProfilesTblId" widgetVar="effectiveProfilesTblWidget" var="profile"
+		    						value="#{quoteRequestAddEditBean.quoteRequest.clientProfiles}"
+		    						scrollable="true" scrollHeight="150">
+		    					<p:column headerText="Quote Profile" width="35%">
+		    						<h:outputText value="#{profile.profileCodeDescription}"/>
+		    					</p:column>
+		    					<p:column headerText="Interest Type" width="15%">
+		    						<h:outputText value="#{profile.interestType}"/>
+		    					</p:column>
+		    					<p:column headerText="Cost Treatment" width="15%">
+		    						<h:outputText value="#{profile.costTreatment}"/>
+		    					</p:column>
+		    					<p:column headerText="Product Type" width="13%">
+		    						<h:outputText value="#{profile.productType}"/>
+		    					</p:column>
+		    					<p:column headerText="Finance Parameters" width="20%">
+		    						<h:outputText value="#{profile.financeParams}"/>
+		    					</p:column>
+		    					<p:column headerText="Mileage Prorgram" width="20%">
+		    						<h:outputText value="#{profile.mileageProgram}"/>
+		    					</p:column>
+		    					<p:column headerText="Mileage Band" width="15%">
+		    						<h:outputText value="#{profile.mileageBand}"/>
+		    					</p:column>
+		    					<p:column headerText="Effective From" width="15%">
+		    						<h:outputText value="#{profile.effectiveFrom}">
+		    							<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+		    						</h:outputText>
+		    					</p:column>
+		    				
+		    			</p:dataTable>
+		    		</p:panel>
+		    		<br/>
+				 	<p:commandButton id="effectiveProfilesDialogDoneBtn" value="Done" onclick="hideDialog('effectiveProfilesWidget')" />
+		    	</h:form>
+		    </p:dialog>
+		    
+		    <p:dialog id="assignedConsultantsDialogId" widgetVar="assignedConsultantsWidget" closeOnEscape="true" modal="true" onShow="setFocus('assignedConsultantsDialogDoneBtn');"
+		    			header="Assigned Consultants Info - #{quoteRequestAddEditBean.selectedExternalAccount.accountName}" resizable="false" appendTo="@(body)"
+		    			width="50%" height="50%">
+		    	<h:form id="assignedConsultantsFormId" prependId="false">
+		    		<p:panel id="assignedConsultantsPanel">
+		    			<p:dataTable id="assignedConsultantsTblId" widgetVar="assignedConsultantsTblWidget" var="cons"
+		    						value="#{quoteRequestAddEditBean.quoteRequest.clientConsultants}"
+		    						scrollable="true" scrollHeight="150">
+		    					<p:column headerText="First Name" width="20%">
+		    						<h:outputText value="#{cons.firstName}"/>
+		    					</p:column>
+		    					<p:column headerText="Last Name" width="20%">
+		    						<h:outputText value="#{cons.lastName}"/>
+		    					</p:column>
+		    					<p:column headerText="Role" width="10%">
+		    						<h:outputText value="#{cons.roleType}"/>
+		    					</p:column>
+		    					<p:column headerText="Description" width="40%">
+		    						<h:outputText value="#{cons.roleDescription}"/>
+		    					</p:column>
+		    			</p:dataTable>
+		    		</p:panel>
+		    		<br/>
+				 	<p:commandButton id="assignedConsultantsDialogDoneBtn" value="Done" onclick="hideDialog('assignedConsultantsWidget')" />
+		    	</h:form>
+		    </p:dialog>
+		    
+		    <p:dialog id="relatedAccountsDialogId" widgetVar="relatedAccountsWidget" closeOnEscape="true" modal="true" onShow="setFocus('relatedAccountsDialogDoneBtn');"
+		    			header="Related Accounts Info - #{quoteRequestAddEditBean.selectedExternalAccount.accountName}" resizable="false" appendTo="@(body)"
+		    			width="50%" height="50%">
+		    	<h:form id="relatedAccountsFormId" prependId="false">
+		    		<p:panel id="relatedAccountsPanel">
+		    			<p:dataTable id="relatedAccountsTblId" widgetVar="relatedAccountsTblWidget" var="relAcc"
+		    						value="#{quoteRequestAddEditBean.quoteRequest.childAccounts}"
+		    						scrollable="true" scrollHeight="150">
+		    					<p:column headerText="Account Code" width="20%">
+		    						<h:outputText value="#{relAcc.externalAccountPK.accountCode}"/>
+		    					</p:column>
+		    					<p:column headerText="Account Name" width="70%">
+		    						<h:outputText value="#{relAcc.accountName}"/>
+		    					</p:column>
+		    			</p:dataTable>
+		    		</p:panel>
+		    		<br/>
+				 	<p:commandButton id="relatedAccountsDialogDoneBtn" value="Done" onclick="hideDialog('relatedAccountsWidget')" />
+		    	</h:form>
+		    </p:dialog>
+		    
+		    <p:dialog id="assignToDialog" 
+                    widgetVar="assignToDialogWidget" 
+                    header="Assign Quote Request" 
+                    modal="true" 
+                    height="auto" 
+                    width="550" 
+                    appendTo="@(body)"
+                    dynamic="true" onHide="clearAssignToInput()"
+                    closeOnEscape="true"
+                    onShow="clearAssignedToEmpNo(); setFocus('assignToDialogOkBtn');">
+                    
+				<p:messages id="assignToDialogMessages" severity="error,fatal" showSummary="true" showDetail="false" autoUpdate="true" /> 
+			                        
+                <h:form prependId="false">
+                
+                    <p:panel id="assignToDialogPanel" >  
+                        <p:panelGrid columns="2">
+                        	<p:column>
+								<p:outputLabel for="assignedToId" value="Assigned To:" styleClass="ui-label" />                        
+							</p:column>
+							
+							<p:column>
+								<p:inputText id="assignedToId" title="Assigned To"
+											onkeydown="setTargetKeyCode(event);" 
+											value="#{quoteRequestAddEditBean.assignedUser}" 
+											onchange="clearAssignedToEmpNo();" style="width:185px">
+									<p:ajax event="change" onstart="return proceedAjax();"
+												listener="#{quoteRequestAddEditBean.decodeAssignedToByName}"
+												process="@this"
+												oncomplete="setFocusOnLOV('assignedToId' , 'assignedToLOVId')"
+												update="assignedToEmpNo, assignedToId" />
+								
+								</p:inputText>
+								<p:commandButton id='assignedToLOVId' icon="icon-lov" title="lov"
+									oncomplete="showWillowUserLov();" immediate="true"
+									actionListener="#{willowUserLovBean.fetchLOVData}"
+									process="@this,assignedToId" dynamic="true" async="true"
+									update=":WILLOW_USER_GRID">
+									<f:param name="WILLOW_USER_LOV_NAME" value="quoteRequestAssignedToLOV" />
+									<f:param name="WILLOW_USER_LOV_INPUT_HEADER" value="Select Assigned To" />
+									<f:param name="WILLOW_USER_LOV_INPUT_NAME" value="assignedToId" />
+									<f:param name="WILLOW_USER_LOV_INPUT_NO" value="assignedToEmpNo" />
+								</p:commandButton>
+							</p:column>
+							
+							<h:inputHidden id ="assignedToEmpNo" name="assignedToEmpNo" value="#{quoteRequestAddEditBean.selectedAssignToEmployeeNo}"/>
+							<p:outputLabel value="" styleClass="ui-label" />							
+                        </p:panelGrid>         
+                    </p:panel>
+                    
+                    <p:panel>
+                        <p:commandButton id="assignToDialogOkBtn" value="Save" process="@form" actionListener="#{quoteRequestAddEditBean.assignQuoteRequest}" />
+                        <p:spacer width="5" />
+                        <p:commandButton id="assignToDialogCancelBtn" value="Cancel" type="button" onclick="hideDialog('assignToDialogWidget');" />                        
+                    </p:panel>
+                    
+                </h:form>
+            </p:dialog>
+		    
+            <p:dialog id="closeDialog" 
+                    widgetVar="closeDialogWidget" 
+                    header="Close Quote Request" 
+                    modal="true" 
+                    height="auto" 
+                    width="750" 
+                    appendTo="@(body)"
+                    dynamic="true"
+                    closeOnEscape="true"
+                    onShow="setFocus('closeDialogOkBtn');">
+                    
+				<p:messages id="closeDialogMessages" severity="error,fatal" showSummary="true" showDetail="false" autoUpdate="true" /> 
+			                        
+                <h:form prependId="false">
+                
+                    <p:panel id="closeDialogPanel" >  
+                        <p:panelGrid columns="2">
+							<p:outputLabel for="closeReasonMnu" value="Reason:*" styleClass="ui-label" />                        
+						    <p:selectOneMenu id="closeReasonMnu" converter="#{quoteRequestCloseReasonConverter}"
+							        value="#{quoteRequestAddEditBean.selectedQuoteRequestCloseReason}" style="width:158px">
+								<f:selectItem itemLabel="" itemValue=""/>
+								<f:selectItems value="#{quoteRequestAddEditBean.quoteRequestCloseReasons}" var="closeReason"
+								    itemLabel="#{closeReason.name}" itemValue="#{closeReason}"/>
+							</p:selectOneMenu> 
+
+							<p:outputLabel value="" styleClass="ui-label" />							
+							<h:panelGroup>
+			                    <p:inputTextarea id="closeReasonNoteTA"
+			                            rows="4" 
+			                            cols="90" 
+			                            value="#{quoteRequestAddEditBean.selectedQuoteRequestCloseReasonNote}" 
+			                            counter="counter" 
+			                            maxlength="200" 
+			                            counterTemplate="{0} characters remaining" autoResize="false"/>
+			                    <br />
+			                    <h:outputText id="counter" /> <br /><br />
+			                </h:panelGroup>
+                        </p:panelGrid>         
+                    </p:panel>
+                    
+                    <p:panel>
+                        <p:commandButton id="closeDialogOkBtn" widgetVar="closeDialogOkBtnWidgetVar" value="Ok" process="@form" actionListener="#{quoteRequestAddEditBean.close}" onstart="disableCloseQRButtons();" oncomplete="enableCloseQRButtons();" />
+                        <p:spacer width="5" />
+                        <p:commandButton id="closeDialogCancelBtn" widgetVar="closeDialogCancelBtnWidgetVar" value="Cancel" type="button" onclick="hideDialog('closeDialogWidget');" />                        
+                    </p:panel>
+                    
+                </h:form>
+            </p:dialog>		    
+
+		    <p:dialog id="activeQuotesDialogId" widgetVar="activeQuotesWidget" closeOnEscape="true" modal="true" onShow="setFocus('activeQuotesDialogDoneBtn');"
+		    			header="Active Quotes" resizable="false" appendTo="@(body)"
+		    			width="45%" height="50%">
+		    	<h:form id="activeQuotesFormId" prependId="false">
+		    		<p:panel id="activeQuotesPanel">
+		    			<p:dataTable id="activeQuotesTblId" widgetVar="activeQuotesTblWidget" var="activeQuote"
+		    			value="#{quoteRequestAddEditBean.stockUnit.activeQuoteList}"
+		    			scrollable="true" scrollHeight="150">
+		    				<p:column headerText="Quote No." width="18%">
+		    					<h:outputText value="#{activeQuote.quoteDesc}"/>
+		    				</p:column>
+		    				<p:column headerText="Creator" width="30%">
+		    					<h:outputText value="#{activeQuote.originator}"/>
+		    				</p:column>
+		    				<p:column headerText="Quote Date" width="25%">
+		    					<h:outputText value="#{activeQuote.quoteDate}">
+		    						<f:convertDateTime pattern="MM/dd/yyyy" />
+		    					</h:outputText>
+		    				</p:column>
+		    				<p:column headerText="Status" width="27%">
+		    					<h:outputText value="#{activeQuote.status}"/>
+		    				</p:column>
+		    			</p:dataTable>
+		    		</p:panel>
+		    		<br/>
+				 	<p:commandButton id="activeQuotesDialogDoneBtn" value="Done" onclick="hideDialog('activeQuotesWidget')" />
+		    	</h:form>
+		    </p:dialog>
+
+			<p:dialog id="equipmentInfoDialog" widgetVar="equipmentInfoWidget" modal="true"
+                header="Accessories" resizable="false" appendTo="@(body)" style="min-width:450px; max-width:800px;"
+                closeOnEscape="true" onShow="setFocus('equipmentInfoDialogDoneBtn');">
+	            <h:form id="equipmentForm" prependId="false">
+					<p:panel id="equipmentPanel" style="max-height:500px;overflow:auto;" >
+						<h:panelGroup >						     
+						    <h:outputText styleClass="ui-label" value="Standard" />
+						    <br/>
+						    <ui:repeat value="#{quoteRequestAddEditBean.standardEquipment}" var="standardEquipment">	
+							     <h:outputText value="#{standardEquipment}" /><br/>						     
+						    </ui:repeat>
+						    <h:outputText value="None" rendered="#{quoteRequestAddEditBean.standardEquipment.size() eq 0}"  /><br/>
+						    <h:outputText styleClass="ui-label" value="Model" />
+						    <br/>
+						    <ui:repeat value="#{quoteRequestAddEditBean.modelEquipment}" var="modelEquipment">	
+							     <h:outputText value="#{modelEquipment}" /><br/>						     
+						    </ui:repeat>
+							<h:outputText value="None" rendered="#{quoteRequestAddEditBean.modelEquipment.size() eq 0}"  /><br/>
+						    <h:outputText styleClass="ui-label" value="Dealer" />
+						    <br/>
+						    <ui:repeat value="#{quoteRequestAddEditBean.dealerEquipment}" var="dealerEquipment">	
+							     <h:outputText value="#{dealerEquipment}" /><br/>						     
+						    </ui:repeat>
+							<h:outputText value="None" rendered="#{quoteRequestAddEditBean.dealerEquipment.size() eq 0}"  />
+					    </h:panelGroup>
+	                </p:panel>
+		    	  	<br/>
+				 	<p:commandButton id="equipmentInfoDialogDoneBtn" value="Done" onclick="PF('equipmentInfoWidget').hide();" />               
+	            </h:form>
+	        </p:dialog>
+
+
+
+			<p:confirmDialog id="validationDialog"
+				message="Please Enter Months to proceed." header="Alert"
+				widgetVar="validationWidgetVar"
+				appendTo="@(body)">
+				<p:focus context="validationDialog" />
+		
+				<h:form prependId="false">
+					<p:hotkey immediate="true" bind="esc"
+						handler="PF('validationWidgetVar').hide(); focusSourceElement()" />
+					<p:commandButton id="alertOk" value="Ok"
+						onclick="PF('validationWidgetVar').hide(); focusSourceElement()" />
+				</h:form>
+			</p:confirmDialog>
+			
+			<p:dialog id="drvUnitEquipDialog" widgetVar="drvUnitEquipDialogWidget" modal="true"
+		                header="Accessories" resizable="false" appendTo="@(body)" style="min-width:450px; max-width:800px;"
+		                closeOnEscape="true" onShow="setFocus('equipInfoDlgDoneBtn');">
+			            <h:form id="drvUnitEquipForm" prependId="false">
+							<p:panel id="drvUnitEquipPanel" style="max-height:300px;overflow:auto;" >
+								<h:panelGroup>						     
+								    <h:outputText styleClass="ui-label" value="Standard Equipment" />
+								    <br/>
+								    <ui:repeat value="#{quoteRequestAddEditBean.drvUnitStandardEquipments}" var="standEquipment">	
+									     <h:outputText value="#{standEquipment}" /><br/>						     
+								    </ui:repeat>
+								    <h:outputText value="None" rendered="#{quoteRequestAddEditBean.drvUnitStandardEquipments.size() eq 0}" /><br/>
+								    
+								    <h:outputText styleClass="ui-label" value="Factory Options " /><br/>
+								    <h:outputText value="#{quoteRequestAddEditBean.drvUnitFactoryOptionalEquipments}" style="white-space:pre;" />
+								    <h:outputText value="None" rendered="#{empty quoteRequestAddEditBean.drvUnitFactoryOptionalEquipments}" /><br/>
+								    
+								    <h:outputText styleClass="ui-label" value="Dealer Accessories" />
+								    <br/>
+								    <ui:repeat value="#{quoteRequestAddEditBean.drvUnitDealerAccessories}" var="dlrAccessories">	
+									     <h:outputText value="#{dlrAccessories}" /><br/>						     
+								    </ui:repeat>
+								    <h:outputText value="None" rendered="#{quoteRequestAddEditBean.drvUnitDealerAccessories.size() eq 0}" /><br/>
+							    </h:panelGroup>
+			                </p:panel>
+						 	<p:commandButton id="equipInfoDlgDoneBtn" value="Done" onclick="PF('drvUnitEquipDialogWidget').hide();" />               
+			            </h:form>
+			 </p:dialog>
+  
+  
+ 			<p:confirmDialog id="deleteRequestDialog"
+				message="Are you sure you want to delete the request?" header="Alert"
+				widgetVar="deleteRequestDialogWidgetVar"
+				appendTo="@(body)">
+				<p:focus context="deleteRequestDialog" />
+		
+				<h:form prependId="false">
+					<p:hotkey immediate="true" bind="esc"
+						handler="PF('deleteRequestDialogWidgetVar').hide(); focusSourceElement()" />
+					<p:commandButton id="deleteAlertOk" value="Ok" ajax="false" onmousedown="setDirtyData(false);"
+						action="#{quoteRequestAddEditBean.deleteRequestOnConfirmAction}"
+						onclick="PF('deleteRequestDialogWidgetVar').hide();  saveDataForDirtyDetection()"/> 
+					<p:commandButton  value="Cancel"  id="deleteAlertCancel" onclick="PF('deleteRequestDialogWidgetVar').hide(); focusSourceElement()"/>
+				</h:form>
+			</p:confirmDialog> 
+
+
+ 			<p:confirmDialog id="confirmDeleteWillowQuoteId"  
+ 				message="Are you sure you want to delete the Willow quote selection?" header="Alert"
+ 				widgetVar="confirmWillowQuoteWidgetVar" 
+ 				appendTo="@(body)" >
+ 				<p:focus context="confirmDeleteWillowQuoteId" />
+ 				
+		         <h:form id ="deleteConfirmWillowQuoteForm" prependId = "false">	
+					<p:hotkey immediate="true" bind="esc"
+						handler="PF('confirmWillowQuoteWidgetVar').hide()" />
+
+   					<p:commandButton id = "yesDelAuthNo" value="Ok" actionListener="#{quoteRequestAddEditBean.deleteWillowQuote}" 
+   						onclick="PF('confirmWillowQuoteWidgetVar').hide()" update="accordionPanel:willowQuoteGroup" />  
+	       			<p:commandButton value="Cancel" onclick="PF('confirmWillowQuoteWidgetVar').hide()"/>  
+	        	</h:form>
+		    </p:confirmDialog>		    
+ 
+ 			<p:dialog id="addConfigDialogId" appendTo="@(body)" modal="true" header="Add New Application" onShow="setFocus('yesDelAuthNo')" 
+ 				widgetVar="addConfigDialogWidgetVar" resizable="false" width="600" height="auto" closeOnEscape="true">    
+ 				
+ 				<p:messages id="addConfigDialogMessages" severity="error,fatal" showSummary="true" showDetail="false" autoUpdate="true" />
+ 				
+		        <h:form id ="addConfigDialogForm" prependId = "false">
+		        	<p:outputLabel value="Application:" styleClass="ui-label" />
+   					<p:inputText id="applicationNameId" value="#{quoteRequestAddEditBean.applicationName}" size="80" maxlength="100" /> 
+   					<br /><br />
+   					<p:commandButton value="Save" actionListener="#{quoteRequestAddEditBean.addConfig}" process="@form"
+   						update="accordionPanel:upfitDetailConfigsId clientConfigDialogId applicationNameId" />  
+	       			<p:spacer width="6"/>
+	       			<p:commandButton value="Cancel" onclick="PF('addConfigDialogWidgetVar').hide();clearInputText(['applicationNameId']);"/>  
+	        	</h:form>
+		    </p:dialog>		    
+ 
+ 
+	  		<div id="CUSTOMER_LOV_DIV">
+				<ui:include src="../lov/customers.xhtml" />
+			</div>
+			
+			<div id="WILLOW_USER_LOV_DIV">
+				<ui:include src="../lov/willowUsers.xhtml" />
+			</div>
+			
+			<div id="VEH_DESC_LOV_DIV">
+				<ui:include src="../lov/vehicleDescription.xhtml" />
+			</div>
+			
+			<div id="STOCK_UNIT_LOV_DIV">
+				<ui:include src="../lov/stockUnits.xhtml" />
+			</div>
+			
+			<div id="DRIVER_UNIT_INFO_LOV_DIV">
+				<ui:include src="../lov/driversWithUnitInfo.xhtml" />
+			</div>
+
+			<div id="inputFieldChecks">
+				<ui:include src="../alert/inputFieldChecks.xhtml" />
+			</div>
+			<div id="SUPPLIER_LOV_DIV" >
+				<ui:include src="../lov/suppliers.xhtml"/>
+			</div>
+			<div id="dirtyDetectCheck">
+				<ui:include src="../alert/dirtyDetectCheck.xhtml" />
+			</div>
+	  		<div id="CONTACT_LOV_DIV">
+				<ui:include src="../lov/contacts.xhtml" />
+			</div>
+			
+			
+			<SCRIPT type="text/javascript">
+			
+			var isColorPreferenceCollapsed = true;
+			var sourceElement;
+			var isDocumentPanelCollapsed = true;
+			var isNewDriverAdded =  #{quoteRequestAddEditBean.newDriverAdded};
+			
+			function validateField(o, str){
+				var displayAlert = false;
+		
+				if(typeof str == 'undefined'){
+					if((o.val().length &lt; 1) || (!o.val().match(/[A-z0-9]/g))){
+						displayAlert = true;
+		    	    }
+				} else {
+			    	if((str.length &lt; 1) || (!str.match(/[A-z0-9]/g))){
+			    		displayAlert = true;
+			    	}
+				}
+				
+				if(displayAlert){
+					sourceElement = o;
+	    	        showDialog('validationWidgetVar');	
+	    	        setFocus('alertOk');
+	    	        return false;				
+				}
+				
+		    	return true;
+			}
+			
+			function focusSourceElement(){
+				if(typeof sourceElement != 'undefined'){		
+					sourceElement.focus();
+				}
+			}
+			
+			function resetDriverSelection(){
+				jQuery("div").scrollTop(0);
+				jQuery("div").scrollLeft(0);
+				disableDriverSelectBtn();
+			}
+			function onColorPreferenceClick() {
+				if (!isColorPreferenceCollapsed) {
+					$('[id$=colorPreference]').hide();
+					$('[id$=colorPreferenceLink]').attr("class", "ui-commandlink ui-icon ui-icon-triangle-1-e");
+					isColorPreferenceCollapsed = true;
+				} else {
+					$('[id$=colorPreference]').show();
+					$('[id$=colorPreferenceLink]').attr("class", "ui-commandlink ui-icon ui-icon-triangle-1-s");
+					isColorPreferenceCollapsed = false;
+				}
+				return false;
+			}
+			
+			function updateTotalStep()	{
+				var dataRows = $('.stepDefinitionRowArray');    
+				var total = 0;
+				for (var i=0; i &lt; 5; i++){
+					if(dataRows[i]) {
+						z = dataRows[i].id;
+						var value = document.getElementById(z).value;
+						if( parseInt(value) > 0)
+						total = total + parseInt(value);
+					}
+				}
+			 $('#tatalStepValue').text(total);
+			}
+			
+			function disableDriverSelectBtn() {
+				PF('driverInfoSelectBtnWidget').disable();
+			}
+			
+			function enableDriverSelectBtn() {
+				PF('driverInfoSelectBtnWidget').enable();
+			}
+			function setSelectedDriverValues(){
+				var lastName =  $('[id$=selectedDriverLastNameId]').val();
+				var firstName =  $('[id$=selectedDriverFirstNameId]').val();
+				document.getElementById('accordionPanel:driverName').value = lastName + ', ' + firstName;
+			}
+			
+			function setSelection(lovName, nameArray, valueArray) {
+				if(lovName == 'vehicleDescriptionLOV'){
+					for(var i=0; i  &lt; nameArray.length ; i++){
+						if(nameArray[i] == 'VEH_DESC'){
+							document.getElementById('accordionPanel:vehicleDescId').value = valueArray[i];
+						}
+					}
+					setFocusPF('accordionPanel:vehicleDescId');
+					$('input[name=\'accordionPanel:vehicleDescId\']').get(0).setSelectionRange(0,0);
+				}
+				else if(lovName == 'customerLOV'){
+					for(var i=0; i  &lt; nameArray.length ; i++){
+						if(nameArray[i] == 'CUSTOMER_NAME'){
+							document.getElementById('accountName').value = valueArray[i];
+							$("#accountNameOut").html(valueArray[i]);
+						}
+						if(nameArray[i] == "CUSTOMER_CODE") {
+	 					    document.getElementById('accountCode').value = valueArray[i];	
+	 					    document.getElementById('clientId').value = valueArray[i];
+						}
+						if(nameArray[i] == "CUSTOMER_TYPE") {
+	 					    document.getElementById('accountType').value = valueArray[i];	
+						}
+						if(nameArray[i] == "CUSTOMER_CID") {
+	 					    document.getElementById('accountCid').value = valueArray[i];	
+						}
+					}
+					setFocus('clientId');
+					updateDetailsForSelectedClient();
+					PF('startBtn').enable();
+				}
+				else if(lovName == 'stockUnitsLOV'){
+					for(var i=0; i  &lt; nameArray.length ; i++){
+						if(nameArray[i] == 'STOCK_UNIT_FMS_ID'){
+							document.getElementById('stockUnitFmsId').value = valueArray[i];
+						}
+					}
+					setFocusPF('accordionPanel:deliveryChargeId');
+					updateStockUnitDetails();
+				}
+				else if(lovName == 'driverInfoLOV'){
+					for(var i=0; i  &lt; nameArray.length ; i++){
+						if(nameArray[i] == 'DRIVER_ID'){
+							document.getElementById('accordionPanel:drvDrvId').value = valueArray[i];
+						}
+						if(nameArray[i] == 'FMS_ID'){
+							document.getElementById('accordionPanel:drvFmsId').value = valueArray[i];
+						}
+					}
+					setFocus('driverName');
+					updateDriverDetails();
+					driverPanelShow();
+				} else if(lovName == 'quoteRequestAssignedToLOV'){
+					for(var i=0; i  &lt; nameArray.length ; i++){
+						if(nameArray[i] == 'EMPLOYEE_NO'){
+							document.getElementById('assignedToEmpNo').value = valueArray[i];
+						}
+						
+						if(nameArray[i] == 'EMPLOYEE_NAME'){
+							document.getElementById('assignedToId').value = valueArray[i];
+						}
+					}
+					setFocus('assignedToId');
+				} else if(lovName == 'vendorLOV'){
+					for(var i=0; i  &lt; nameArray.length ; i++){
+						if(nameArray[i] == 'VENDOR_CODE'){
+							document.getElementById('accordionPanel:dealerCodeId').value = valueArray[i];
+						}
+					
+						if(nameArray[i] == 'VENDOR_NAME'){
+							document.getElementById('accordionPanel:dealerNameId').value = valueArray[i];
+						}
+					}
+					setDealerValues();
+					setFocus('dealerCodeId');
+				} else if(lovName == 'contactsLOV'){
+					for(var i=0; i  &lt; nameArray.length ; i++){
+						if(nameArray[i] == 'CONTACT_ID'){
+							document.getElementById('clientContactId').value = valueArray[i];
+						}
+					}
+					setFocusPF('accordionPanel:clientContactNameId');
+					updateClientContactDetails();
+				}
+			
+			}
+			
+			function updateQuoteSection() {
+				updateQuoteDetails();
+			}
+					
+			function resetUIState() {
+	        	setScrollDivAtTop();
+	        }
+			
+			function setFirstPageQuoteModelDataTableWidget(){
+				PF('quoteModelTblWidget').unselectAllRows();
+				setDataTableToFirstPage('quoteModelTblWidget');
+				setDataTableToFirstRow('quoteModelTblWidget');
+			}
+			
+			function clearAssignedToEmpNo(){
+				document.getElementById('assignedToEmpNo').value = '';
+			}
+
+			function clearAssignToInput(){
+				$('[id$=assignedToId]').val("");
+			}
+
+			
+			function initializeDirtyDetection() {
+				registerIgnoreButton("saveBtn");
+				registerIgnoreButton("submitBtn"); 
+				registerIgnoreButton("closeBtn");
+				registerIgnoreButton("deleteBtn");
+				registerIgnoreButton("deleteAlertOk");
+				registerIgnoreButton("reworkRequestBtn");				
+				registerIgnoreButton("startBtnId");
+				registerIgnoreButton("selectStockBtn"); 
+				registerIgnoreButton("accordionPanel:viewDocumentId");
+				saveDataForDirtyDetection();
+			}
+			
+			$(window).load(function(){
+	     		initializeDirtyDetection();
+	     		if(isNewDriverAdded == true){
+	     			setDirtyData(true);
+       			}
+	     		var drvId = document.getElementById('accordionPanel:drvDrvId').value;
+	     		if(drvId == undefined || drvId=='') {
+		     		$('[id$=driverDetailsPanelId]').hide();	     			
+	     		} else {
+	     			$('[id$=addDriverId]').prop("disabled",true).css("cursor", "default");
+	     			$('[id$=zipCodeId]').prop("disabled",true);
+	     		}
+	     		var exteriorColor1 = document.getElementById('accordionPanel:firstExteriorColorId').value;
+	     		var refusedColor = document.getElementById('accordionPanel:refusedColorId').value;
+	     		if(!(exteriorColor1 == undefined || exteriorColor1=='') || !(refusedColor == undefined || refusedColor =='')){
+		     		onColorPreferenceClick();
+	     		}
+			});			
+			
+			
+			function logBookCallback(){
+				updateNotesButton();
+			}
+			
+			function postClose(xhr, status, args){ 
+				hideDialog('closeDialogWidget');
+				//Resaving data for dirty detect because the dialog has saved changes.
+				saveDataForDirtyDetection();
+				$('[id$=finishCloseHiddenBtn]').click();				
+			}
+			
+			function postAssign(xhr, status, args){ 
+				hideDialog('assignToDialogWidget');
+				$('[id$=mainCancelBtn]').click();				
+			}
+			
+			function postRework(xhr, status, args){ 
+				hideDialog('reworkRequestDlgWidgetVar');			
+				updateForPostRework();
+			}			
+
+			function postAddConfig(xhr, status, args){ 
+				hideDialog('addConfigDialogWidgetVar');				
+			}
+
+			
+			function driverPanelHide() {
+				$('[id$=driverDetailsPanelId]').hide();
+				$('[id$=addDriverId]').prop("disabled",false);
+				$('[id$=zipCodeId]').prop("disabled",false);
+			}
+
+			function driverPanelShow() {
+				$('[id$=driverDetailsPanelId]').show();
+				$('[id$=addDriverId]').prop("disabled",true);
+				$('[id$=zipCodeId]').prop("disabled",true);
+				$('[id$=zipCodeId]').val("");
+			}
+
+			
+			
+			function onDocumentClick() {
+				if (!isDocumentPanelCollapsed) {
+					$('[id$=documentPanelId]').hide();
+					$('[id$=documentPanelLinkId]').attr("class", "ui-commandlink ui-icon ui-icon-triangle-1-e");
+					isDocumentPanelCollapsed = true;
+				} else {
+					$('[id$=documentPanelId]').show();
+					$('[id$=documentPanelLinkId]').attr("class", "ui-commandlink ui-icon ui-icon-triangle-1-s");
+					isDocumentPanelCollapsed = false;
+				}
+				return false;
+			}
+
+			function clearDriver() {
+				clearSelectedDriver();
+			}
+
+			function clearDealer() {
+				clearSelectedDealer();
+			}
+			
+			function clearGradeGroup() {
+				if (document.getElementById('accordionPanel:driverName').value == "") {
+					updateQuoteDetails();
+				}
+			}
+
+			
+			function clearDealerFields() {
+				$('[id$=dealerNameId]').val("");
+				$('[id$=dealerNameId]').prop("disabled",false);;
+				$('[id$=contactNameId]').val("");
+				$('[id$=contactPhoneId]').val("");
+			}
+			
+			function enableCloseQRButtons(){
+				PF('closeDialogOkBtnWidgetVar').enable();
+				PF('closeDialogCancelBtnWidgetVar').enable(); 													
+			}
+			
+			function disableCloseQRButtons(){
+				PF('closeDialogOkBtnWidgetVar').disable();
+				PF('closeDialogCancelBtnWidgetVar').disable(); 													
+			}			
+			
+			</SCRIPT>
+		
+  			<style type="text/css">
+				.dateTimeField input {
+					width: 75px;
+				}
+				
+				.ui-datatable thead th {
+					white-space: normal;
+					text-align: center;
+				}
+				
+				.textWrap {
+					white-space: normal;
+				}
+				
+			</style>  
+	</ui:define>
+	
+</ui:composition>

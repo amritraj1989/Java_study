@@ -1,0 +1,734 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	template="../../templates/ui.xhtml">
+	
+	<ui:define name="content">
+		
+			<h:form id="quoteOverviewOEBreadCrumbForm" prependId="false">
+			<h:inputHidden id = "invalidAccessPath"  name = "invalidAccessPath" value = "#{quoteOverviewOEBean.invalidAccessPath}"/>
+				<p:breadCrumb style ="min-width:1300px;max-width:100%;width:auto" model="#{quoteOverviewOEBean.breadCrumbTrail}" ajax="false" immediate="true" styleClass="ui-layout"/>
+			</h:form>
+			
+			<p:growl id="growl" for="warnings" severity="warn" escape="false" redisplay="true" showDetail="true" sticky="true" /> 
+			
+			<!-- Error message display -->
+			<p:scrollPanel style="min-width:1300px;max-width:100%;width:auto;height:50px;" mode="native" styleClass="ui-layout">
+				<p:messages id="messages" severity="info,error,fatal" showSummary="false" showDetail="true"	autoUpdate="true" />
+				<h:outputText id = "splMsgforStep" value= "#{quoteOverviewOEBean.splMsgforStep}" rendered="#{empty quoteOverviewOEBean.splMsgforStep ? 'false' : 'true'}" styleClass="ui-messages-info" style="margin-left : 25px"/>
+			</p:scrollPanel>			
+			
+		 	<h:form id="quoteOverviewFormOE" prependId="false" rendered="#{!quoteOverviewOEBean.invalidAccessPath}">
+				<h:inputHidden id="dirtyData" value="#{quoteOverviewOEBean.dirtyData}"/>	
+				<h:inputHidden id="indexRateHidden" value="#{quoteOverviewOEBean.quoteOverviewOEVO.interestBaseRate}"/>	 	
+				<p:panel id="quoteOverviewOEInformationPanel" style ="min-width:1300px;max-width:100%;width:auto">
+					<h:panelGrid columns="13" cellspacing="10">
+
+							<h:outputLabel value="Client:"  styleClass="ui-label"/> 
+							<h:outputText value="#{quoteOverviewOEBean.quoteOverviewOEVO.accountCode}"/>
+							<h:outputText value="#{quoteOverviewOEBean.quoteOverviewOEVO.accountName}"/>
+							<p:spacer width="20" height="1"/>
+							<h:outputLabel value="Quote Profile:" styleClass="ui-label"/>
+							<h:outputText  value="#{quoteOverviewOEBean.quoteOverviewOEVO.quoteProfileDesc}"/>
+							<p:spacer width="20" height="1"/>
+							<h:outputLabel value="Cost Treatment:"  styleClass="ui-label"/> 
+							<h:outputText value="#{quoteOverviewOEBean.quoteOverviewOEVO.costTreatment}"/>
+
+							<h:outputLabel value=" "/>
+							<h:outputLabel value=" "/>
+							<h:outputLabel value=" "/>
+							<h:outputLabel value=" "/>
+
+							<h:outputLabel value="Quote:"  styleClass="ui-label"/> 
+							<h:outputText value="#{quoteOverviewOEBean.quoteOverviewOEVO.quote}"/>
+							<h:outputText value="#{quoteOverviewOEBean.quoteOverviewOEVO.productName}"/>
+							<p:spacer width="20" height="1"/>
+							<h:outputLabel value="Replacement for:"  styleClass="ui-label"/> 
+							<h:outputText value="#{quoteOverviewOEBean.quoteOverviewOEVO.unitNoReplacement}"/>
+							<p:spacer width="20" height="1"/>
+							<h:outputLabel value="Interest Treatment:"  styleClass="ui-label"/> 
+							<h:outputText value="#{quoteOverviewOEBean.quoteOverviewOEVO.interestTreatment}"/>
+
+							<h:outputLabel value=" "/>
+							<h:outputLabel value=" "/>
+							<h:outputLabel value=" "/>
+							<h:outputLabel value=" "/>
+
+							<h:outputLabel value="Unit:"  styleClass="ui-label"/> 
+							<h:outputText value="#{quoteOverviewOEBean.quoteOverviewOEVO.unitNo != null ? quoteOverviewOEBean.quoteOverviewOEVO.unitNo : quoteOverviewOEBean.quoteOverviewOEVO.accountCode != null ? 'N/A' : null}"/>
+							<h:outputText value="#{quoteOverviewOEBean.quoteOverviewOEVO.unitDesc}"/>
+							<p:spacer width="20" height="1"/>
+							<h:outputLabel value="Grade Group:" style="white-space:nowrap;"  styleClass="ui-label"/> 
+							<h:outputText value="#{quoteOverviewOEBean.quoteOverviewOEVO.gradeGroupDescription}"/>
+							<p:spacer width="20" height="1"/>
+							<h:outputLabel value="Float/Non-Float:"  styleClass="ui-label"/> 
+							<h:outputText value="#{quoteOverviewOEBean.quoteOverviewOEVO.floatType} #{quoteOverviewOEBean.quoteOverviewOEVO.floatFrequency}"/>
+
+							<h:outputLabel value=" "/>
+							<h:outputLabel value=" "/>
+							<h:outputLabel value=" "/>
+							<h:outputLabel value=" "/>
+							
+							<h:outputLabel value="Order Type:"  styleClass="ui-label"/> 
+							<h:outputText value="#{quoteOverviewOEBean.quoteOverviewOEVO.orderType}"/>
+							<p:spacer width="20" height="1"/> <p:spacer width="20" height="1"/>
+							<h:outputLabel value="Plate Code:" style="white-space:nowrap;" styleClass="ui-label"/> 
+							<h:outputText  value="#{quoteOverviewOEBean.quoteOverviewOEVO.plateTypeCodeDescription}"/>
+							<p:spacer width="20" height="1"/>
+							<h:outputLabel value="Interest Index:"  styleClass="ui-label"/> 
+							<h:outputText value="#{quoteOverviewOEBean.quoteOverviewOEVO.interestIndex}"/>
+
+					</h:panelGrid>
+			</p:panel>	
+
+			<p:panel header="" id="quoteOverviewOEStaticPanel" style ="min-width:1300px;max-width:100%;width:auto">
+			
+				<h:panelGrid columns="13" cellspacing="5">
+					<h:outputLabel value="Total Cost To Place Into Service - Mike Albert:"  styleClass="ui-label"/> 
+
+					<p:commandLink action="#{quoteOverviewOEBean.viewCapitalCostsOverview}" immediate="true" ajax="false" onclick="lockScreen()">
+						<h:outputText value="#{quoteOverviewOEBean.quoteOverviewOEVO.dealCost}" title="View Capital Costs" >
+		 					<f:converter converterId="malDollarValueConverter" />
+	   					 </h:outputText>
+					</p:commandLink>
+					<p:spacer width="20" height="1"/>
+					<h:outputLabel value="Client:"   styleClass="ui-label"/>
+					<h:panelGroup layout="block">
+					<p:commandLink action="#{quoteOverviewOEBean.viewCapitalCostsOverview}" immediate="true" ajax="false" onclick="lockScreen()">
+						<h:outputText value="#{quoteOverviewOEBean.quoteOverviewOEVO.customerCost}" title="View Capital Costs" >
+		 					<f:converter converterId="malDollarValueConverter" />
+	   					 </h:outputText>
+					</p:commandLink>
+					<p:spacer width="4" height="1"/>
+					<p:commandLink disabled="#{quoteOverviewOEBean.disableCalculateAndSave}"
+					action="#{quoteOverviewOEBean.editCapitalCostsOverview}" ajax="false"
+					onclick="lockScreen();" immediate="true">
+						<p:graphicImage style="text-align:right;align:right;border-style:none;" 
+												rendered="#{!quoteOverviewOEBean.disableCalculateAndSave}"
+												value="/images/action_edit.png" id="permissionSetDesc"
+												title="Edit Capital Costs" />
+					</p:commandLink>
+					
+					</h:panelGroup>					
+					<p:spacer  width="50" height="1"/> 
+					<p:outputLabel value="Capital Contribution:"  styleClass="ui-label" for = "capitalContribution"  />						
+					<p:inputNumber	id="capitalContribution" style="text-align:right" maxlength="12" size="12" 
+									disabled="#{quoteOverviewOEBean.disableCalculateAndSave}"
+									decimalPlaces="2"  thousandSeparator="," symbol= "$" symbolPosition= "p" 
+                					minValue="00.00" maxValue="999999999.99"
+									value="#{quoteOverviewOEBean.quoteOverviewOEVO.capitalContribution}"
+									styleClass="trackDirtyChildValues  ui-text-align-right-dev"
+									onchange="disable('save');recalculateflag(0);"> 
+	   				</p:inputNumber> 	
+	   				
+	   				
+					<p:spacer  width="10" height="1"/> 
+					<p:outputLabel id="grdDelRcAmtLabel" value="Delivery Recharge Amt:"  styleClass="ui-label" for = "grdDelRcAmt"  />						
+					<p:inplace id="deliveryInplaceId" editor="true"  rendered="true"  widgetVar="deliveryInplaceVar" toggleable="false" 
+					 			label="#{quoteOverviewOEBean.grdDeliveryRechargeAmountLabel}" disabled="#{quoteOverviewOEBean.disableCalculateAndSave}" >
+					 
+					 	<h:inputHidden id="deliveryRechargeId" value="#{quoteOverviewOEBean.grdDeliveryRechargeAmount}"/>	
+					 	
+					 	<p:ajax event="cancel" listener="#{quoteOverviewOEBean.cancelSaveGrdDelRecharge}" 
+					 						   oncomplete="resetDeliveryRechargeAmount();showIcon('deliveryReImageId');setFocusOnInterestAdj();" 
+					 						   update="deliveryInplaceId,grdDelRcAmtLabel" />
+						<p:ajax event="save" listener="#{quoteOverviewOEBean.saveGrdDelRecharge}"  
+											 oncomplete="handleSaveDeliveryRechargeRequest(xhr, status, args);setFocusOnInterestAdj();recalculateflag(0);"
+											 process="deliveryRechargeId,grdDelRcAmt"	
+											 update="deliveryInplaceId,grdDelRcAmtLabel"/>     
+						
+							 <p:inputText id="grdDelRcAmt" maxlength="9" size="13"	value="#{quoteOverviewOEBean.grdDeliveryRechargeAmountLabel}" 
+							 	onchange="formatRechargeAmount();" > 
+							 	 <p:keyFilter regEx="/[\d\-\.]/"/>
+							 </p:inputText> 
+										
+						</p:inplace>   
+						<p:commandLink style="cursor: pointer;border:none"  styleClass="#{quoteOverviewOEBean.quoteOverviewOEVO.disableGrdDelRecharge == true ? 'disabledTextButton' : 'enabledTextButton'}"
+								       disabled="#{quoteOverviewOEBean.quoteOverviewOEVO.disableGrdDelRecharge or quoteOverviewOEBean.disableCalculateAndSave}" >
+							<p:graphicImage id="deliveryReImageId" style="cursor: pointer;border:none"  onclick="PF('deliveryInplaceVar').show();hideIcon('deliveryReImageId');formatRechargeAmount();"
+												value="/images/action_edit.png"  title="Add/Edit Delivery Recharge Amt." rendered="#{!quoteOverviewOEBean.quoteOverviewOEVO.disableGrdDelRecharge and !quoteOverviewOEBean.disableCalculateAndSave}"/>
+						</p:commandLink>
+				</h:panelGrid>
+			</p:panel>	
+
+			<p:panel header="" id="quoteOverviewOEMainPanel" style ="min-width:1300px;max-width:100%;width:auto">
+				
+				<h:panelGrid columns="5" cellspacing="5">
+
+					<p:panel header="Details" id="detailsPanel" style ="max-width:100%;width:260px;height:225px;">
+						<p:focus  context="detailsPanel"/>
+						<f:facet name="header" >
+								<h:outputLabel value="Details" />
+							    <p:spacer height="15px;"/>
+						</f:facet>
+						<h:panelGrid columns="2" cellspacing="5" >
+							<h:outputLabel value="Term:"  styleClass="ui-label"/> 
+							<h:outputText value="#{quoteOverviewOEBean.quoteOverviewOEVO.term}" styleClass="alignmentRight"/>
+							<h:outputLabel value="Proj. Repl. Months:"   styleClass="ui-label"/> 
+							<h:outputText value="#{quoteOverviewOEBean.quoteOverviewOEVO.projectedReplacementMonths}" styleClass="alignmentRight"/>
+							<h:outputLabel value="Expected Miles:"  styleClass="ui-label"/> 
+							<h:outputText value="#{quoteOverviewOEBean.quoteOverviewOEVO.distance}" styleClass="alignmentRight" >
+								<f:convertNumber type="number" pattern="#,##0" />
+							</h:outputText>
+							<h:outputLabel value="Index Rate:"   styleClass="ui-label"/> 
+							<h:outputText value="#{quoteOverviewOEBean.quoteOverviewOEVO.interestBaseRate}%" styleClass="alignmentRight"/>
+							<p:outputLabel value="Interest Adj:" for = "interestAdj"  styleClass="ui-label"/> 
+							<p:inputNumber  id="interestAdj" style="text-align: right" 
+	   					 				value="#{quoteOverviewOEBean.quoteOverviewOEVO.interestAdjustment}" size="9"
+	   					 				disabled="#{quoteOverviewOEBean.quoteOverviewOEVO.disableInterestAdjustment}" maxlength="6"
+                						decimalPlaces="3"  thousandSeparator="," symbol= "%" symbolPosition= "s"
+                						minValue="-999.999"
+                						maxValue="999.999" 
+                                     	emptyValue="empty" onchange="updateTotalInterestRate();disable('save');recalculateflag(0);"
+                                     	styleClass="trackDirtyChildValues ui-text-align-right-dev">
+                           </p:inputNumber>
+							<p:outputLabel value="Interest Rate:"  styleClass="ui-label"/> 
+							<h:outputText id = "interestTotalRate" value="#{quoteOverviewOEBean.quoteOverviewOEVO.interestTotalRate}%" styleClass="alignmentRight"/>
+						</h:panelGrid>
+					</p:panel>		
+					<p:panel header="Adjustments" id="adjustmentsPanel" style ="max-width:100%;width:220px;height:225px;">
+						<f:facet name="header" >
+								<p:outputLabel value="Adjustments" />
+							    <p:spacer height="15px;"/>
+						</f:facet>
+						<h:panelGrid columns="2" cellspacing="5" >
+							<p:outputLabel value="Invoice Adj:"  for = "invoiceAdj"  styleClass="ui-label"/> 
+							<p:inputNumber  id="invoiceAdj" style="text-align:right" 
+	   					 				value="#{quoteOverviewOEBean.quoteOverviewOEVO.invoiceAdjustment}" size="10"
+	   					 				disabled="#{quoteOverviewOEBean.quoteOverviewOEVO.disableInvoiceAdjustment}"
+                						decimalPlaces="2"  thousandSeparator="," symbol= "$" symbolPosition= "p"
+                						minValue="-999999.99"
+                						maxValue="999999.99" 
+                                     	emptyValue="empty" onchange="disable('save');recalculateflag(0);"
+                                     	styleClass="trackDirtyChildValues ui-text-align-right-dev"/>
+							<h:panelGroup>
+								<p:spacer width="15"/>
+								<p:outputLabel value="Hide Inv Adj:"  for = "hideInvoiceAdjustment" styleClass="ui-label-smallfont" title="Hide the adjustment on documents seen by the client"/>
+							</h:panelGroup>
+							<h:selectBooleanCheckbox id="hideInvoiceAdjustment" value="#{quoteOverviewOEBean.hideInvoiceAdjustment}" 
+										title="Hide the adjustment on documents seen by the client" disabled="#{quoteOverviewOEBean.disableCalculateAndSave}"
+										styleClass = "trackDirtyCheckbox" />
+							<p:outputLabel value="Admin Factor:"  for = "adminFactor" styleClass="ui-label"/> 
+							<p:inputNumber  id="adminFactor" style="text-align:right" 
+	   					 				value="#{quoteOverviewOEBean.quoteOverviewOEVO.adminFactor}" size="10"
+	   					 				disabled="#{quoteOverviewOEBean.quoteOverviewOEVO.disableAdminFactor}" maxlength="5"
+                						decimalPlaces="2"  
+                						maxValue="99.99" 
+                                     	emptyValue="empty" onchange="disable('save');recalculateflag(0);"
+                                     	styleClass="trackDirtyChildValues ui-text-align-right-dev"/>
+							<p:outputLabel value="Depr Factor:" for = "deprFactor" styleClass="ui-label"/>
+							<p:inputNumber  id="deprFactor" style="text-align:right" 
+										disabled="#{quoteOverviewOEBean.disableCalculateAndSave}"
+	   					 				value="#{quoteOverviewOEBean.quoteOverviewOEVO.depreciationFactor}" size="10"
+	   					 				 maxlength="12"
+                						decimalPlaces="7"  thousandSeparator="," symbol= "%" symbolPosition= "s"
+                						maxValue="999999.9999999"
+                						minValue="-99.9999999" 
+                                     	emptyValue="empty" onkeyup="return restrictUserInput('deprFactor',event);" onchange="disable('save');recalculateflag(0);"
+                                     	styleClass="trackDirtyChildValues ui-text-align-right-dev">
+                               </p:inputNumber>      	
+							<p:outputLabel value="Final NBV:" for = "finalNBV"  styleClass="ui-label"/> 
+							<p:inputNumber  id="finalNBV" style="text-align:right" 
+	   					 				value="#{quoteOverviewOEBean.quoteOverviewOEVO.finalNBV}" size="10"
+	   					 				disabled="#{quoteOverviewOEBean.disableCalculateAndSave}"
+                						decimalPlaces="2"  thousandSeparator="," symbol= "$" symbolPosition= "p"
+                						maxValue="999999.99999" 
+                						minValue="-99999999.99999" 
+                                     	emptyValue="empty" onkeyup="return restrictUserInput('finalNBV',event);" onchange="disable('save');recalculateflag(0);" 
+                                     	styleClass="trackDirtyChildValues ui-text-align-right-dev">
+                                     	
+                                     	</p:inputNumber>
+						</h:panelGrid>
+					</p:panel>		
+					<p:panel header="Profitability" id="profitabilityPanel" style ="max-width:100%;width:225px;height:225px;">
+					<f:facet name="header" >
+						<h:outputLabel value="Profitability" />
+							    <p:spacer height="15px;"/>
+						</f:facet>
+						<h:panelGrid columns="2" cellspacing="5" >
+							<h:outputLabel id="minIrrLabel" value="Minimum IRR:"     styleClass="ui-label"/> 
+							<h:panelGroup styleClass="alignmentRight">
+								<h:outputLabel  id = "minIrrValue" value="#{quoteOverviewOEBean.quoteOverviewOEVO.minimumIrr}" >
+									<f:convertNumber maxFractionDigits="5" minFractionDigits="5" />
+								</h:outputLabel>
+								<p:outputLabel value="%" />					
+							</h:panelGroup>
+
+							<h:outputLabel value="IRR:"  styleClass="ui-label"/> 
+							<h:panelGroup styleClass="alignmentRight">
+								<h:outputLabel value="#{quoteOverviewOEBean.quoteOverviewOEVO.actualIrrValue}" >
+									<f:convertNumber maxFractionDigits="5" minFractionDigits="5" />
+								</h:outputLabel>
+								<p:outputLabel value="%" />					
+							</h:panelGroup>
+
+                            <p:spacer height="10"/>
+                            <p:spacer height="10"/>         		
+							<p:outputLabel id= "appMinIrrLabelId" value="Appr. Min. IRR:"  for = "appMinIrrTxtId"   styleClass="ui-label"/>
+						
+							<h:panelGroup styleClass="alignmentRight">
+								
+								<p:inplace id="appMinIrrInplaceId" editor="true" rendered="true" widgetVar="appIrrMinInplaceVar" toggleable="false"
+		   					 			    label="#{quoteOverviewOEBean.quoteOverviewOEVO.irrApprovedLimit}" disabled="#{quoteOverviewOEBean.disableCalculateAndSave}">
+		   					 				   					 		
+				   					 		<p:ajax event="cancel" listener="#{quoteOverviewOEBean.cancelSaveAppIrrMin}" 
+										 						   oncomplete="resetAppIrrMinAmt();showIcon('appIrrMinReImageId');setFocusOnInterestAdj();" 
+										 						   success="appMinIrrTxtId"
+										 						   update="appMinIrrInplaceId,appMinIrrLabelId,appMinIrrUserInfoPanelId"
+										 						   
+										 						  />
+											<p:ajax event="save" listener="#{quoteOverviewOEBean.saveAppIrrMin}"  
+															 	 oncomplete="handleSaveAppIrrMinRequest(xhr, status, args);setFocusOnInterestAdj();recalculateflag(0);"
+															 	 success="appMinIrrTxtId"	
+															 	 update="appMinIrrInplaceId,appMinIrrLabelId,appMinIrrUserInfoPanelId"
+															    
+															 	 />     
+											
+												 <p:inputText	id="appMinIrrTxtId" style="text-align:right" maxlength="10" size="10" 
+													  	value="#{quoteOverviewOEBean.quoteOverviewOEVO.irrApprovedLimit}" 
+													  	onblur="formatPercentValue('appMinIrrTxtId','Approved Minimum IRR')"
+													  	disabled="#{!quoteOverviewOEBean.disableCalculateAndSave ? quoteOverviewOEBean.quoteOverviewOEVO.disableApprovedMinIrr ? 'true':'false' :'true' }"
+														> 
+												 		 <p:keyFilter regEx="/[\d\-\.]/"/>
+				   					 			</p:inputText>
+		   					 		</p:inplace>
+								<p:commandLink style="cursor: pointer;border:none"  styleClass="#{quoteOverviewOEBean.quoteOverviewOEVO.disableApprovedMinIrr == true ? 'disabledTextButton' : 'enabledTextButton'}"
+										       disabled="#{quoteOverviewOEBean.quoteOverviewOEVO.disableApprovedMinIrr or quoteOverviewOEBean.disableCalculateAndSave}" >
+									<p:graphicImage id="appIrrMinReImageId" style="cursor: pointer;border:none"  onclick="PF('appIrrMinInplaceVar').show();hideIcon('appIrrMinReImageId');"
+														value="/images/action_edit.png"  title="Add/Edit Approved Minimum IRR" rendered="#{!quoteOverviewOEBean.quoteOverviewOEVO.disableApprovedMinIrr and !quoteOverviewOEBean.disableCalculateAndSave}"/>
+								</p:commandLink>
+								
+							</h:panelGroup> 
+	   					 	
+						</h:panelGrid>
+						 <h:panelGrid id="appMinIrrUserInfoPanelId" columns="1"  cellspacing="0"  >	
+ 							<h:panelGroup >
+	 							<p:spacer width="7" height="0"/>
+	 							
+	 							<h:outputLabel styleClass="ui-label-smallfont" rendered="#{quoteOverviewOEBean.quoteOverviewOEVO.irrApprovedUser != null}" value="(Appr. by: #{quoteOverviewOEBean.quoteOverviewOEVO.irrApprovedUser} ," />
+	 							<h:outputText styleClass="ui-label-smallfont" rendered="#{quoteOverviewOEBean.quoteOverviewOEVO.irrApprovedUser != null}" value="#{quoteOverviewOEBean.quoteOverviewOEVO.irrApprovedDate})">
+	 								<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+	 							</h:outputText>
+	 							
+	 							
+							</h:panelGroup>
+	 					</h:panelGrid>
+						
+	 					
+						
+					</p:panel>		
+					<p:panel header="Payment" id="paymentPanel" style ="max-width:100%;width:220px;height:225px;">
+						<f:facet name="header" >
+						<h:outputLabel value="Payment" />
+							    <p:spacer height="15px;"/>
+						</f:facet>
+						<h:panelGrid columns="2" cellspacing="5" >
+							<h:outputLabel value="Lease Rate:"  styleClass="ui-label"/> 
+							<h:outputText value="#{quoteOverviewOEBean.quoteOverviewOEVO.actualLeaseRate}" styleClass="alignmentRight" >
+								<f:converter converterId="malDollarValueConverter" />
+							</h:outputText>
+							<h:outputLabel value="Service Elements:" styleClass="ui-label"/> 
+							<p:commandLink action="#{quoteOverviewOEBean.viewServiceElements}"  immediate="true" ajax="false" rendered="#{quoteOverviewOEBean.newQuote == false}" style="text-align : right;float: right;"> 
+								<h:outputText  value="#{quoteOverviewOEBean.quoteOverviewOEVO.serviceElementRate}"  rendered="#{quoteOverviewOEBean.newQuote == false}" title="View Service Element Details">
+			 						<f:converter converterId="malDollarValueConverter" />
+	   						 	</h:outputText>
+							</p:commandLink>
+							<h:outputText  value="#{quoteOverviewOEBean.quoteOverviewOEVO.serviceElementRate}"  rendered="#{quoteOverviewOEBean.newQuote}"
+								styleClass="alignmentRight">
+			 						<f:converter converterId="malDollarValueConverter" />
+	   						 </h:outputText>
+							<h:outputLabel value=""/>
+							<hr class="ui-hr"  />
+							<h:outputLabel value="Monthly Payment:" styleClass="ui-label"/> 
+							<h:outputText value="#{quoteOverviewOEBean.quoteOverviewOEVO.monthlyPayment}" styleClass="alignmentRight" >
+								<f:converter converterId="malDollarValueConverter" />
+							</h:outputText>
+						</h:panelGrid>
+					</p:panel>		
+					<p:panel  id="paymentDetailsPanel" style ="max-width:100%;width:340px;height:225px;">
+
+						<f:facet name="header" >
+								<h:outputLabel value="Payment Details" />
+							    <p:commandLink  id="editStepsId"    title="Edit Steps" 
+							    	styleClass="#{quoteOverviewOEBean.disableCalculateAndSave == true ? 'disabledTextButton' : 'enabledTextButton'}" 
+							    	actionListener="#{quoteOverviewOEBean.onEditStepsDefinition}" update=":stepForm:stepPanel"
+							    	oncomplete=" if(document.getElementById('recalculatedOnUI').value == 'true'||hasReCalculated == 1) PF('stepDialogVar').show();" 
+							    	disabled="#{quoteOverviewOEBean.disableCalculateAndSave}" onclick="CheckRecalculated();">	
+							    	
+							         <h:outputLabel  style="padding-left: 8px;padding-right: 5px;"  value="Edit Steps"  /> 							         	            							            
+							    </p:commandLink>
+							    <p:spacer height="15px;"/>
+							    <p:spacer height="15px;"/>
+							  
+						</f:facet>
+					
+						<p:dataTable var="step" value="#{quoteOverviewOEBean.quoteSteps}" styleClass="ui-noBorder">
+            				<p:column width="45" >
+            					<f:facet name="header"  >  
+         							<h:outputText value="Step"  style ="font-weight:bold"/>  
+         						</f:facet>
+							<h:outputText value="#{step.fromPeriod}-#{step.toPeriod}"  styleClass="alignmentRight"/>
+            					
+            				</p:column>
+            				<p:column  >
+            					<f:facet name="header"  >  
+         							<h:outputText value="Rate"  style ="font-weight:bold"/>  
+         						</f:facet>  
+	           					<h:outputText value="#{step.leaseRate}" styleClass="alignmentRight">
+	            					<f:converter converterId="malDollarValueConverter"/>  
+	   							</h:outputText>
+            				</p:column>
+            				<p:column  >
+            					<f:facet name="header"  >  
+         							<h:outputText value="NBV"  style ="font-weight:bold"/>  
+         						</f:facet> 
+	           					<h:outputText value="#{step.netBookValue}" styleClass="alignmentRight">
+	            					<f:converter converterId="malDollarValueConverter" />  
+	   							</h:outputText>
+   							</p:column>
+   							<p:column  >
+   								<f:facet name="header"  >  
+         							<h:outputText value="Lease Factor"  style ="font-weight:bold;white-space:pre-line;"/>  
+         						</f:facet> 
+	           					<h:outputText value="#{step.leaseFactor}" > 
+	           						<f:convertNumber type="number" pattern="0.0000" />
+	           					</h:outputText>  
+           					</p:column>
+						</p:dataTable>	
+						
+					</p:panel>		
+
+				</h:panelGrid>
+			</p:panel>	
+
+  <h:inputHidden id="recalculatedOnUI" value="#{quoteOverviewOEBean.recalculatedOnUI}"/>
+			<p:panel id="controlPanel" styleClass="ui-layout" style ="min-width:1300px;max-width:100%;width:auto">
+				<p:commandButton id="calc"  value="Recalculate" process="@form"  
+					action="#{quoteOverviewOEBean.calc}" ajax="false"
+					disabled="#{quoteOverviewOEBean.disableCalculateAndSave}"
+					onclick="lockScreen();recalculateflag(1);" />
+				<p:spacer width="10" />	
+				
+				<p:commandButton id="save" value="Save" process="@form"  
+					action="#{quoteOverviewOEBean.save}"  ajax="false"
+					disabled="#{quoteOverviewOEBean.disableCalculateAndSave || quoteOverviewOEBean.newQuoteCalculated == 'false'|| quoteOverviewOEBean.quoteCalculated =='false'}"
+					onclick="lockScreen();"  />
+					
+				
+				<p:spacer width="10" />
+				<p:commandButton value="Cancel" rendered="#{quoteOverviewOEBean.forwaredPage == false}"
+					 onclick="window.close();" />
+					 				
+				<p:commandButton  value="Cancel"  rendered="#{quoteOverviewOEBean.forwaredPage == true}"
+					action="#{quoteOverviewOEBean.cancel}" ajax="false" immediate="true" />
+								
+			</p:panel>
+
+			<p:tooltip  id="hoverPanel" for="minIrrValue" showEffect="blind"  >  
+        		<h:panelGrid columns="2"  cellspacing="10"  >	
+					<h:outputLabel styleClass="ui-label" value="Global Rate:" />
+	 				<h:outputText  value="#{quoteOverviewOEBean.quoteOverviewOEVO.baseIrr}%"  styleClass="alignmentRight" />
+	 				<h:outputLabel styleClass="ui-label" value="Client Adjustment:"  />
+	 				<h:outputText  value="#{quoteOverviewOEBean.quoteOverviewOEVO.profitAdj}%" styleClass="alignmentRight" />				
+ 				</h:panelGrid>
+    		</p:tooltip > 
+    		
+		</h:form>
+		
+		<p:dialog id="stepDialog" header=" Step  Definition" widgetVar="stepDialogVar"   onShow="updateTotalStep" modal="true"
+					appendTo="@(body)" resizable="false" style="min-width: 180px; max-width: 180px;"> 
+					  
+				<p:ajax event="close" listener="#{quoteOverviewOEBean.cancelStepsDefinition}"/>
+				<p:hotkey immediate="true" bind="esc" handler="PF('stepDialogVar').hide();"/>	
+				
+					
+			  	<h:form id="stepForm" prependId="false" >   	
+			  						  
+				<p:messages id="dialogErrorMsgID" showDetail="false" autoUpdate="true" showSummary="true" globalOnly="false"/>	
+				<p:panel id="stepPanel" style="min-width: 150px; max-width: 150px;border: none;">
+				<p:focus  context="stepPanel"/>
+				<p:dataList id="stepDialogDataTableId" value="#{quoteOverviewOEBean.definitionSteps}" var="step"  rowIndexVar="stepIndex"  type="definition">  
+				
+					<p:column> 
+					 	 <p:spacer width="8" height="1"> </p:spacer>
+						 <h:outputText  value="   Step #{step.stepCount}:"  style="vertical-align: center;font-weight: bold;" />
+						 <p:spacer width="8" height="1"> </p:spacer>
+   						 <p:inputText id="step#{stepIndex}"  onchange="updateTotalStep();" styleClass="stepDefinitionRowArray"	size="3" value="#{step.netPeriod}" > 
+   						 <p:spacer width="5" height="1"> </p:spacer>
+   						  <p:keyFilter regEx="/[\d]/"/>
+	   					</p:inputText> 	
+	   				</p:column>
+				</p:dataList>
+				<p:spacer width="15" height="1"> </p:spacer>
+				<h:outputText  value="Total: "  styleClass="ui-label" />
+				<p:spacer width="20" height="1"> </p:spacer>
+				<h:outputText id="tatalStepValue" value="#{quoteOverviewOEBean.quoteOverviewOEVO.term}"  />
+				</p:panel>	
+				<p:spacer width="15" height="1"> </p:spacer>
+				<p:commandButton id="stepDialogSave" value="Ok" process="@form" ajax="true"
+								actionListener="#{quoteOverviewOEBean.updateStepsAndRecalculateQuote}" oncomplete="handlePopupDoneRequest(xhr, status, args);" 
+							 	update=":splMsgforStep,:quoteOverviewFormOE:paymentDetailsPanel , :quoteOverviewFormOE:paymentPanel,:quoteOverviewFormOE:controlPanel" />
+				<p:spacer width="20" height="1"> </p:spacer>
+				<p:commandButton id="stepDialogSaveCancel" value="Cancel" oncomplete="PF('stepDialogVar').hide();" 
+								process="@none"	immediate="true" actionListener="#{quoteOverviewOEBean.cancelStepsDefinition}"  />
+				    	
+			</h:form>		
+		  </p:dialog> 
+		  
+		  
+		<p:dialog id="depFnbvDialog"  widgetVar="depFnbvDialogVar" closable="false" severity="alert" dynamic="false" width="400"  height="100"  modal="true"  header="Invalid Action" resizable="false" appendTo="@(body)">
+			<h:form id = "depFnbvDialogForm" prependId="false">
+				
+							<h:panelGroup  style="display:block; text-align:center">			  
+		        			<h:outputText value="Only one change is allowed at a time. Depreciation Factor or Final NBV"/>
+        					</h:panelGroup>
+				
+							<br/>
+							<p/>
+	               			<h:panelGroup  style="display:block; text-align:center">			  
+		        			<p:commandButton id = "alertDepFnbvDialogOk" value="Ok" onclick="hideDepFnbvDialogDialog()"/>
+        					</h:panelGroup>
+			</h:form>
+	
+	   			</p:dialog> 
+	   		<!-- Begin Fix Bug 16476  -->	
+	   	<p:dialog id="editStepsDialog"  widgetVar="editStepsDialogVar" closable="false" severity="alert" dynamic="false" width="400"  height="100"  modal="true"  header="Invalid Action" resizable="false" appendTo="@(body)">
+			<h:form id = "editStepsDialogForm" prependId="false">
+				
+							<h:panelGroup  style="display:block; text-align:center">			  
+		        			<h:outputText value="Please Recalculate before performing Edit Steps."/>
+        					</h:panelGroup>
+				
+							<br/>
+							<p/>
+	               			<h:panelGroup  style="display:block; text-align:center">			  
+		        			<p:commandButton id = "alertEditStepsDialogOk" value="Ok" onclick="hideEditStepsDialogDialog()"/>
+        					</h:panelGroup>
+			</h:form>
+	
+	   			</p:dialog> 
+      <!--  End Fix Bug 16476-->
+		<div id="inputTypePercent">
+			<ui:include src="../alert/inputTypePercent.xhtml" />
+		</div>	
+		
+			<script>	
+			var	origionalDepeciationFactor;
+			var origionalFinalNBV;
+			var hasReCalculated = 1;
+			
+			function setOriginalValues(){
+				origionalDepeciationFactor = document.getElementById('deprFactor_input').value;
+				origionalFinalNBV  = document.getElementById('finalNBV_input').value;
+			}
+			// Used the below functions in onChange events of editable items on quoteoverviewoe screen for Bug 16476
+			// this is to prevent using Edit Steps without performing Recalculate.
+			// From now on if there is any change on the Quoteoverview oe screen , we must recalculate first before doing Edit Steps.
+		// Begin Fix Bug 16476	
+			function recalculateflag(value){
+			 document.getElementById('recalculatedOnUI').value = false;
+				hasReCalculated = value;
+			}
+			
+			function CheckRecalculated(){
+				if( hasReCalculated == 1 ){
+					if( "#{quoteOverviewOEBean.quotationModel.reCalcNeeded}" == 'Y'){				    
+						hasReCalculated = 0;
+					}		
+				}
+				if( hasReCalculated == 0 || "#{quoteOverviewOEBean.quotationModel.reCalcNeeded}" == 'Y'){
+				     if(document.getElementById('recalculatedOnUI').value == 'false'){
+						showEditStepsRestrictDialog();
+					}
+				}
+			}
+			function hideEditStepsDialogDialog(){
+				hideDialog('editStepsDialogVar');				
+			}
+			
+			function showEditStepsRestrictDialog(){
+				showDialog('editStepsDialogVar');
+				setElementFocus('alertEditStepsDialogOk');				
+			}
+			// End Fix Bug 16476
+			function disable(id){			
+				document.getElementById(id).disabled = true;
+			}
+			
+			function restrictUserInput(fieldName,event){
+				var keyCode = event.keyCode;
+				//allow non numeric/non alpha/non operators keys to act as they should be
+			
+				if(keyCode &lt;48){
+					if( keyCode != 46 	&#38;&#38; keyCode != 8){//delete key
+						return true;
+					}
+				}
+				if(keyCode &gt; 111){
+					if(keyCode &lt; 184){
+						return true;
+					}
+				}
+				if('deprFactor' == fieldName){
+					var currentVal = document.getElementById('finalNBV_input').value;
+					
+					if(origionalFinalNBV != currentVal){
+						document.getElementById('deprFactor_input').value = origionalDepeciationFactor;	
+						event.returnValue = false;
+						
+						setTimeout('showRestrictDialog()',50);
+						return false;
+						
+					}
+				}else if('finalNBV' == fieldName){
+					var currentVal = document.getElementById('deprFactor_input').value;
+					if(origionalDepeciationFactor != currentVal){
+						document.getElementById('finalNBV_input').value = origionalFinalNBV;	
+						event.returnValue = false;	
+						
+						setTimeout('showRestrictDialog()',50);
+						return false;	
+					}
+				}else{
+					return true;
+				}
+			}
+			
+			function hideDepFnbvDialogDialog(){
+				hideDialog('depFnbvDialogVar');
+				setElementFocus('deprFactor_input');
+			}
+			
+			function showRestrictDialog(){
+				showDialog('depFnbvDialogVar');
+				setElementFocus('alertDepFnbvDialogOk');				
+			}	
+			
+			
+			
+			function updateTotalStep()	{
+				
+				var dataRows = $('.stepDefinitionRowArray');    
+				var total = 0;
+				
+				for (var i=0; i &lt; 5; i++){
+					if(dataRows[i]) {
+						z = dataRows[i].id;
+						var value = document.getElementById(z).value;
+						if( parseInt(value) > 0)
+						total = total + parseInt(value);
+				}
+				
+				}
+				
+			 $('#tatalStepValue').text(total);
+			
+				
+			}
+			function handlePopupDoneRequest(xhr, status, args) { 
+                    if(!args.failure) { 
+                    	setDirtyData(true);
+                    	PF('stepDialogVar').hide();                                
+                    }
+				}
+
+			function initializeDirtyDetection() {
+				registerIgnoreButton("save");
+				registerIgnoreButton("calc");
+				setDirtyDataById('dirtyData');
+				saveDataForDirtyDetection();
+			}
+
+
+			function updateTotalInterestRate() {
+				
+				var indexRate = Number(document.getElementById('indexRateHidden').value);			
+				var interestAdj = Number(document.getElementById('interestAdj_hinput').value);
+
+				if(isNaN(indexRate)) {
+					equipVal = 0;
+				}
+				if(isNaN(interestAdj)) {
+					baseVal = 0;
+				}
+				var total = indexRate + interestAdj;
+				var totalFormatted =  total.toFixed(3).replace(/(\d)(?=(\d{3})+\.)/g, "%1,") + '%' ;
+
+				document.getElementById('interestTotalRate').value = total;
+				document.getElementById('interestTotalRate').innerHTML = totalFormatted;
+			}
+			
+			function handleSaveDeliveryRechargeRequest(xhr, status, args) { 
+                    if(!args.failure) { 
+                     	PF('deliveryInplaceVar').hide();  
+                    	showIcon('deliveryReImageId');
+                    }else{
+                    	PF('deliveryInplaceVar').show();  
+                    	hideIcon('deliveryReImageId');
+                    	setFocusOnInterestAdj();
+                    }
+			}
+				
+			function handleSaveAppIrrMinRequest(xhr, status, args) { 
+                if(!args.failure) {                 	
+                	PF('appIrrMinInplaceVar').hide();  
+                	showIcon('appIrrMinReImageId');
+                	
+                }else{
+                	PF('appIrrMinInplaceVar').show();  
+                	hideIcon('appIrrMinReImageId');
+                	setFocusOnInterestAdj();
+                }
+		}
+			
+			function formatRechargeAmount(){			
+				var inputV  = document.getElementById('grdDelRcAmt').value;
+				if($.trim(inputV).length == 0){
+				   document.getElementById('deliveryRechargeId').value =  '';	
+				  return;
+				}
+					
+				var outPut  ;
+				try{					
+					outPut = Number(inputV);				
+			   		if(isNaN(outPut))
+			   		    throw new Error("Not a number");
+			   	}catch(err) {			   		
+					outPut = parseFloat(inputV.replace(/[^0-9-.]/g, ''));
+				}			  
+			 
+			  var formattedInput =  '$' +  outPut.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,")  ;
+			  document.getElementById('grdDelRcAmt').value = formattedInput;
+		
+			}
+			
+			function setFocusOnInterestAdj(){	
+				$(function(){PrimeFaces.focus('interestAdj');});
+			}
+			
+			function showIcon(id){	
+				document.getElementById(id).style.display = "block";	
+			}
+			
+			function hideIcon(id){	
+				document.getElementById(id).style.display = "none";
+			}
+			function resetDeliveryRechargeAmount(){
+				$('#grdDelRcAmtLabel').removeClass('ui-state-error');
+			}
+			function resetAppIrrMinAmt(){
+				$('#appMinIrrLabel').removeClass('ui-state-error');
+			}
+	     	$(window).load(function(){
+	     		if(document.getElementById('invalidAccessPath').value == 'true')return false;
+	     		setOriginalValues();
+	     		initializeDirtyDetection();
+			});				
+			
+			</script>
+	</ui:define>
+
+</ui:composition>

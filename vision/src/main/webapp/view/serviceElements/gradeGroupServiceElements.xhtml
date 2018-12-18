@@ -1,0 +1,189 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"    
+    template="../../templates/ui.xhtml" >
+
+    <ui:define name="content"> 
+		<h:form id="clientLevelFeesBreadCrumbForm" prependId="false">
+ 			<p:breadCrumb model="#{gradeGroupServiceElementsBean.breadCrumbTrail}"
+				ajax="false" immediate="true" />
+   		</h:form>    
+    	<!-- Message display -->
+		<p:scrollPanel style="height:50px;" mode="native">
+			<p:messages id="messages" severity="info,error,fatal" showSummary="false" showDetail="true" autoUpdate="true" />
+		</p:scrollPanel>
+   		
+   		<!-- Per SS-557, may be implemented at a later date -->
+		<comp:billingOptionDialog id="billingOption" radioOptionsValue="#{gradeGroupServiceElementsBean.selectedBillingOption}" saveBillingOptionAction="#{gradeGroupServiceElementsBean.addGradeGroupServiceElements(gradeGroupServiceElementsBean.fromProp)}" />
+   		   		
+   		<h:form id="gradeGroupServElementsForm" prependId="false"> 
+			<p:panel id="gradeGroupServElementsPanel" header="Grade Group Service Elements for Client: #{gradeGroupServiceElementsBean.clientAccount.externalAccountPK.accountCode} - #{gradeGroupServiceElementsBean.clientAccount.accountName}">
+				<p:panel id="ggClientServElePanel" header="Maintain Active Service Elements on Grade Groups"> 
+					<p:panelGrid id="ggClientServElePanelGrid">
+						<p:row>
+							<p:column> 
+								<p:outputLabel styleClass="ui-label"
+									value="Active Service Elements:" />	
+									<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>							       		
+	        				</p:column>	
+	        				<p:spacer width="10"/>
+							<p:column> 
+								<p:outputLabel styleClass="ui-label"
+									value="Grade Groups:" />	
+									<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>							       		
+	        				</p:column>	
+	        				<p:column>
+	        					<p:outputLabel styleClass="ui-label" 
+	        						value="Product Level Override:"/>
+        					</p:column>	
+	       				</p:row> 
+	       				<p:row>
+       						<p:column style="vertical-align:top;">	
+								<p:selectManyMenu id="clientServElements" tabindex="10" style="width: 430px;"
+									value="#{gradeGroupServiceElementsBean.selectedClientServiceElementString}">								
+									<f:selectItem itemLabel="All" itemValue="ALL" />
+									<f:selectItems
+										value="#{gradeGroupServiceElementsBean.clientServiceElementsList}"
+										var="clientServiceElements" itemLabel="#{clientServiceElements.clientContractServiceElement.leaseElement.elementName} - #{clientServiceElements.clientContractServiceElement.leaseElement.description}"
+										itemValue="#{clientServiceElements.clientServiceElementId}" />
+								</p:selectManyMenu>
+							</p:column>
+							<p:spacer width="10"/>
+							<p:column style="vertical-align:top;">
+								<p:selectManyMenu id="gradeGroups" tabindex="20" style="width: 350px;" value="#{gradeGroupServiceElementsBean.selectedGradeGroupsListString}">
+									<f:selectItem itemLabel="All" itemValue="ALL" />
+									<f:selectItems
+										value="#{gradeGroupServiceElementsBean.gradeGroupsList}"
+										var="gradeGroups" itemLabel="#{gradeGroups.gradeCode} - #{gradeGroups.gradeDesc}"
+										itemValue="#{gradeGroups.gradeCode}" />
+								</p:selectManyMenu>									
+							</p:column>
+							<p:column style="vertical-align:top;">
+								<p:selectOneMenu id="prodLevelOverride1"  tabindex="25" value="#{gradeGroupServiceElementsBean.selectedProduct}">
+								<f:selectItem itemLabel=" -------------------------------------------- " itemValue="" />
+								<f:selectItems
+									value="#{gradeGroupServiceElementsBean.activeClientProductList}"
+									var="prodList" itemLabel="#{prodList.productCode} - #{prodList.productName}"
+									itemValue="#{prodList.productCode}" />															
+								</p:selectOneMenu>
+							</p:column>								
+						</p:row>
+						<p:row>
+							<p:column>
+ 				  		        <p:remoteCommand name="removeClientServiceElement" actionListener="#{gradeGroupServiceElementsBean.removeGradeGroupServiceElements(1)}" update=":gradeGroupServElementsForm"/>
+								<p:commandButton id="addServiceElements" value="Add" tabindex="30" action="#{gradeGroupServiceElementsBean.addServiceElementsButtonClick(1)}" disabled="#{!gradeGroupServiceElementsBean.hasPermission()}"/>
+								<p:spacer width="10"/>
+								<p:commandButton id="removeElements" value="Remove" tabindex="40" oncomplete="handleRemoveServiceElementConfirmDialog(xhr, status, args, 1);"
+								  action="#{gradeGroupServiceElementsBean.removeServiceElementsButtonClick(1)}"
+								  actionListener="#{gradeGroupServiceElementsBean.showHideRemoveServiceElementConfirmDialog(1)}"
+								  update=":gradeGroupServElementsForm :removeServiceElementConfirmDialogId" process="@form" disabled="#{!gradeGroupServiceElementsBean.hasPermission()}"/>
+							</p:column> 
+						</p:row>
+	   				</p:panelGrid>
+   				</p:panel>
+		   					
+				<p:panel id="ggContractedServElePanel" header="Maintain Contracted Service Elements on Grade Groups">
+					<p:panelGrid id="sggContractedServElePanelGrid">
+						<p:row>
+	        				<p:column> 
+								<p:outputLabel styleClass="ui-label"
+									value="Additional Contracted Service Elements:" />
+									<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>								       		
+	        				</p:column>	
+	        				<p:column> 
+								<p:outputLabel styleClass="ui-label"
+									value="Grade Groups:" />
+									<h:outputText style="color:red;" value="*"  styleClass="ui-label"/>								       		
+	        				</p:column>	
+       						<p:column>
+	        					<p:outputLabel styleClass="ui-label" 
+	        						value="Product Level Override:"/>
+        					</p:column>		        						        				
+	       				</p:row>
+	       				<p:row>
+							<p:column style="vertical-align:top;">
+								<p:selectManyMenu id="contractedServiceElements" tabindex="50" style="width: 430px;"
+									value="#{gradeGroupServiceElementsBean.selectedClientContractServiceElementString}">
+									<f:selectItem itemLabel="All" itemValue="ALL" />
+									<f:selectItems
+										value="#{gradeGroupServiceElementsBean.clientContractServiceElementList}"
+										var="contractedElements" itemLabel="#{contractedElements.leaseElement.elementName} - #{contractedElements.leaseElement.description}"
+										itemValue="#{contractedElements.clientContractServiceElementId}" />
+								</p:selectManyMenu>
+							</p:column> 
+							<p:spacer width="10"/>      				
+							<p:column style="vertical-align:top;"> 
+								<p:selectManyMenu id="gradeGroups2" tabindex="60" style="width: 350px;" value="#{gradeGroupServiceElementsBean.selectedGradeGroupsListString2}">
+									<f:selectItem itemLabel="All" itemValue="ALL" />
+									<f:selectItems
+										value="#{gradeGroupServiceElementsBean.gradeGroupsList}"
+										var="gradeGroups2" itemLabel="#{gradeGroups2.gradeCode} - #{gradeGroups2.gradeDesc}"
+										itemValue="#{gradeGroups2.gradeCode}" />
+								</p:selectManyMenu>	
+							</p:column>
+							<p:column style="vertical-align:top;">
+								<p:selectOneMenu id="prodLevelOverride2"  tabindex="25" value="#{gradeGroupServiceElementsBean.selectedProduct2}">
+								<f:selectItem itemLabel=" -------------------------------------------- " itemValue="" />
+								<f:selectItems
+									value="#{gradeGroupServiceElementsBean.activeClientProductList}"
+									var="prodList" itemLabel="#{prodList.productCode} - #{prodList.productName}"
+									itemValue="#{prodList.productCode}" />																
+								</p:selectOneMenu>
+							</p:column>								
+						</p:row>
+						<p:row>
+							<p:column>
+ 				  		        <p:remoteCommand name="removeClientServiceElement2" actionListener="#{gradeGroupServiceElementsBean.removeGradeGroupServiceElements(2)}" update=":gradeGroupServElementsForm"/>
+								<p:commandButton id="addServiceElements2" value="Add" tabindex="70" action="#{gradeGroupServiceElementsBean.addServiceElementsButtonClick(2)}" disabled="#{!gradeGroupServiceElementsBean.hasPermission()}"/>
+								<p:spacer width="10"/>
+								<p:commandButton id="removeElements2" value="Remove" tabindex="80" oncomplete="handleRemoveServiceElementConfirmDialog(xhr, status, args, 2);"
+								  action="#{gradeGroupServiceElementsBean.removeServiceElementsButtonClick(2)}"
+								  actionListener="#{gradeGroupServiceElementsBean.showHideRemoveServiceElementConfirmDialog(2)}"
+								  update=":gradeGroupServElementsForm :removeServiceElementConfirmDialogId" process="@form" disabled="#{!gradeGroupServiceElementsBean.hasPermission()}"/>
+							</p:column>							
+						</p:row>
+					</p:panelGrid>
+				</p:panel>
+			</p:panel> 
+ 	  		<p:panel id="commandPanel" style="min-width:980px;max-width:100%;width:auto;">
+	  			<p:commandButton id="doneBtn" value="Done" action="#{gradeGroupServiceElementsBean.done}" ajax="false" immediate="true" tabindex="90"/>	
+			</p:panel>
+   		</h:form>	
+   		
+
+		<p:dialog id="removeServiceElementConfirmDialogId" header="Remove Element(s) Confirmation" 
+			onShow="setTimeout('setFocus(\'yesComplete\')',300)" widgetVar="removeServiceElementWidgetVar" modal="true" appendTo="@(body)" dynamic="true" width="650" height="120" closeOnEscape="true" resizable="false">
+	        <h:outputText value="&#160;"/><br/> 
+          		<h:outputFormat  value="#{msgs.remove_service_element_confirmation}" style="font-weight:bold;"/>
+	         <h:form id ="removeServiceElementConfirmDialogForm" prependId = "false">	
+           		<h:outputText value="&#160;"/><br/><br/>	           		
+           		<h:panelGroup> 
+   					<p:commandButton style="width:6em;" id = "yesComplete" value="Yes" action="#{gradeGroupServiceElementsBean.removeGradeGroupServiceElements(gradeGroupServiceElementsBean.fromProp)}" ajax="false" process="@(form)" onclick="PF('removeServiceElementWidgetVar').hide();" />  
+	       			<p:spacer width="6"/>
+	       			<p:commandButton style="width:6em;" value="No" onclick="PF('removeServiceElementWidgetVar').hide();"/>  
+	       		</h:panelGroup>
+        	</h:form>
+	    </p:dialog>			
+	
+		<script type="text/javascript"> 
+		
+		function handleRemoveServiceElementConfirmDialog(xhr, status, args, from) {
+			if(args.failure) {
+				showDialog('removeServiceElementWidgetVar');
+			} else if(from == 1){
+				removeClientServiceElement();
+			} else {
+				removeClientServiceElement2();
+			}
+		}	
+		
+     	$(window).load(function(){
+     		setFocus('addServiceElements');
+		});			
+		
+		</script> 
+	</ui:define>
+</ui:composition>    

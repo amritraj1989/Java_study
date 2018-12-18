@@ -1,0 +1,21 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Allocate Driver</title>
+    <body>
+    	<h1>Allocate Driver</h1>
+    	<h2>Acceptance Tests (Automated)</h2>
+    		<ul concordion:execute="#result = testValidateDeallocationAllocation(#unitNo,#driverName,#odo)"><li>When allocating a unit <b><span concordion:set="#unitNo">00932451</span></b> to the following driver "<b><span concordion:set="#driverName">Desilva 1,Deane</span></b>" and an odometer value of <b><span concordion:set="#odo">300000</span></b><span concordion:assertTrue="#result"> the result will be an error. Error occurs because I cannot allocate a driver from an unrelated client.</span></li></ul>
+    		<ul concordion:execute="#result = testValidateDeallocationAllocation(#unitNo,#driverName,#odo)"><li>When allocating a unit <b><span concordion:set="#unitNo">00962644</span></b> to the following driver "<b><span concordion:set="#driverName">Lienberger, Tammy</span></b>" and an empty odometer value <b><span concordion:set="#odo"></span></b><span concordion:assertTrue="#result"> the result will be an error. Error occurs because odometer reading needs to be entered.</span></li></ul>
+    		<ul concordion:execute="#result = testValidateAllocationDates(#unitNo,#driverName,#year,#month,#day)"><li>When allocating a unit <b><span concordion:set="#unitNo">00962644</span></b> to the following driver "<b><span concordion:set="#driverName">Lienberger, Tammy</span></b>" and an allocation back-date of <b><span concordion:set="#month">1</span></b>-<b><span concordion:set="#day">20</span></b>-<b><span concordion:set="#year">2013</span></b><span concordion:assertTrue="#result"> the result will be an error. Allocation cannot be back-dated .</span></li></ul>
+    		<ul concordion:execute="#result = testValidateAllocationDates(#unitNo,#driverName,#year,#month,#day)"><li>When allocating a unit <b><span concordion:set="#unitNo">00962644</span></b> to the following driver "<b><span concordion:set="#driverName">Lienberger, Tammy</span></b>" and an allocation forward-date of <b><span concordion:set="#month">1</span></b>-<b><span concordion:set="#day">20</span></b>-<b><span concordion:set="#year">2099</span></b><span concordion:assertTrue="#result"> the result will be an error. Allocation cannot be forward-dated .</span></li></ul>
+    		<ul concordion:execute="#result = testValidateDeallocationDates(#unitNo,#driverName,#year,#month,#day)"><li>When allocating a unit <b><span concordion:set="#unitNo">00962644</span></b> to the following driver "<b><span concordion:set="#driverName">Lienberger, Tammy</span></b>" and a deallocation back-date of <b><span concordion:set="#month">1</span></b>-<b><span concordion:set="#day">20</span></b>-<b><span concordion:set="#year">1901</span></b><span concordion:assertTrue="#result"> the result will be an error. The current driver's deallocation date has to be greater than the allocation date.</span></li></ul>
+    	<h2>Manual Tests</h2>
+    		<ul><li>UOM is defaulted to MILES or KM, depending on the unit of measure found on the unit's odometer table value.</li></ul>
+    		<ul><li>The From Date of the new driver must be the day after the To Date of the old driver.</li></ul>
+    		<ul><li>A success test case. Allocating and deallocating a unit for a valid allocate/deallocate. </li></ul>
+    		
+    	<h2>Untested (Out of Scope)</h2>
+    		<ul><li>Driver Allocation Change (This functionality was moved to Drivers By Unit page for users with workclass 'SALES/CUST ADM')</li></ul>
+    		
+    </body>
+</html>

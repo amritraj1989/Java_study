@@ -1,0 +1,320 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:composite="http://java.sun.com/jsf/composite">
+	
+	  <composite:interface> 
+	    <composite:attribute name="entity" required="false" type="java.lang.Object" />
+	    <composite:attribute name="entities" required="false" type="java.util.List" />	    	  
+	    <composite:attribute name="logBookTypes" required="true" type="java.util.List" />	    
+	    <composite:attribute name="update" required="false" default="none" type="java.lang.String" />
+	    <composite:attribute name="addNoteOnComplete" required="false" default="" type="java.lang.String" />
+	    <composite:attribute name="enableFollowUpDate" required="false" default="false" type="java.lang.String" />
+	    <composite:attribute name="enableAddAndClose" required="false" default="true" type="java.lang.String" />
+	    <composite:attribute name="onClose" required="false" default="" type="java.lang.String" />
+	    <composite:attribute name="resource" required="false" default="" type="java.lang.String" />
+	    <composite:attribute name="combineLogBooks" required="false" default="false" type="java.lang.String" />	 
+	    <composite:attribute name="showRelatedUnitLogEntry" required="false" default="false" type="java.lang.String" />	    	    	 	    	    	    			            
+	  </composite:interface>
+	
+	  <composite:implementation>
+	    <h:form id="logBookHiddenForm" prependId="false">  
+	    	<h:inputHidden id="dirtyData" value="#{logBookBean.dirtyData}"/>         
+            <p:commandButton id="initializeBeanHiddenButton" 
+                    style="display:none"
+                    actionListener="#{logBookBean.init()}" 
+                    oncomplete="PF('logBookDialogWidget').show();" 
+                    update="#{':'.concat(cc.clientId).concat(':logBookDialog')}" />
+		</h:form>
+		        	  	
+	  	<div id="#{cc.clientId}">
+			<p:dialog id="logBookDialog" 
+			        modal="true" 
+			        onShow="setRequiredFocus()" 
+			        onHide="saveChanges();"
+			        widgetVar="logBookDialogWidget" 
+			        dynamic="true" 
+			        resizable="false" 
+			        width="#{logBookBean.dialogWidth()}" height="#{logBookBean.dialogHeight()}"
+			        closeOnEscape="true" 
+			        appendTo="@(body)">
+			        
+			        <f:facet name="header">
+			        	<h:outputText value="#{logBookBean.windowTitle}" escape="false" />
+			        </f:facet>
+		        
+			    <h:form prependId="false">   
+
+                    <p:remoteCommand name="saveChanges" actionListener="#{logBookBean.onHideListener()}" />
+                    
+			        <p:tabView id="logsTabView" widgetVar="logsTabViewWidget" dynamic="true" cache="false"  value="#{logBookBean.logBookVOs}" var="olb" activeIndex="#{logBookBean.tabIndex}" >                                              	
+                                           		        			           
+			            <p:tab id="activityLogsTab" title="#{logBookBean.getLogBookLabel(olb)}" >
+			            
+			                <p:panelGrid style="width:100%;">    
+							    <p:row rendered="#{logBookBean.isEntryDisabled()}">							    
+								    <p:column>
+                                        <p:panelGrid>
+                                            <p:row>
+                                                <p:column rowspan="2">
+			                                        <p:inputTextarea 
+			                                            id="entryDetailTextArea"
+			                                            rows="4" 
+			                                            cols="90" 
+			                                            value="#{olb.detail}" 
+			                                            counter="counter" 
+			                                            disabled="#{!logBookBean.hasPermission()}"
+			                                            maxlength="200" 
+			                                            onchange="setLogBookDirty(true);"
+			                                            counterTemplate="{0} characters remaining" autoResize="false"/>
+			                                        <br />
+			                                        <h:outputText id="counter" /> <br /><br />	
+                                                </p:column>
+                                                <p:column rendered="#{logBookBean.enableFollowUpDate}" style="vertical-align: middle;">
+									                <p:outputLabel for="followUpDate" value="Follow Up Date:" styleClass="ui-label"/>
+									                <p:spacer width="10" />							        
+							                        <p:calendar id="followUpDate" 
+							                                size="10"
+								                            value="#{olb.followUpDate}"
+								                            pattern="MM/dd/yyyy" 
+								                            style="width:20px" 
+								                            showOn="button" 
+								                            disabled="#{not logBookBean.hasPermission()}"
+								                            onchange="formatDate(this);setLogBookDirty(true);">
+													    <f:convertDateTime pattern="MM/dd/yyyy" />		    									
+												    </p:calendar>
+												    <br /> <br />												                                 
+                                                    <p:outputLabel rendered="#{logBookBean.multiEntity}" value="#{msgs.logbook_clear_existing_follow_up_dates}" />												                     
+                                                </p:column>                                                
+                                            </p:row>
+                                            <p:row>
+                                                <p:column>
+						                            <p:commandButton id="addNote" 
+						                                    rendered="#{!logBookBean.multiEntity}"
+						                                    actionListener="#{logBookBean.addEntry()}" 
+						                                    style="float:right"  
+						                                    value="Add Note"
+                                                            disabled="#{!logBookBean.hasPermission()}"						                 
+						                                    update="logEntries @form @(#{cc.attrs.update})" 
+						                                    process="@form"
+						                                    oncomplete="#{cc.attrs.addNoteOnComplete}; setFocus('entryDetailTextArea'); setFocus('entryDetailTextArea')"/>                                                
+                                                </p:column>                                                 
+                                            </p:row>
+                                        </p:panelGrid>								        
+								    </p:column>								    
+								</p:row>								
+
+								<p:row rendered="#{!logBookBean.isObsoleteNote() and !logBookBean.isEntryDisabled() and !logBookBean.multiEntity}">
+								    <p:column >								
+								        <p:separator />
+								    </p:column> 
+								</p:row>
+								
+								<p:row rendered="#{logBookBean.isObsoleteNote()}">
+                                    <p:column >	
+							            <p:panelGrid columns="2"> 
+                                            <p:outputLabel for="sortSelection" value="Sort By: " styleClass="ui-label" style="vertical-align:-17px"/>                                   							 	                                   							
+								            <p:selectOneButton id="sortSelection"  value="#{logBookBean.obsoleteListSortOrder}" >  
+								                <p:ajax listener="#{logBookBean.sortObsoleteList()}" update="@form"/>
+                                                <f:selectItem itemLabel="Newest" itemValue="DESC" />  
+                                                <f:selectItem itemLabel="Oldest" itemValue="ASC" />    
+                                            </p:selectOneButton> 
+                                        </p:panelGrid> 
+                                    </p:column>									                                   								
+								</p:row>
+								
+                                <p:row rendered="#{!logBookBean.multiEntity}">
+                                    <p:column styleClass="ui-datatable-partition-dev ui-datatable-resizing-dev">                                                                   
+					                    <p:dataTable id="logEntries" 
+					                            widgetVar="activityLogBooksWidget"  
+					 	                        value="#{olb.entries}" 
+					 	                        var="entry" 
+						                        rowKey="#{entry.lbeId}"
+						                        scrollable="true" rowIndexVar="rowIndex" 
+						                        scrollHeight="#{logBookBean.hasPermission() ? 250 : 350}"
+						                        
+						                        resizableColumns="true">
+						                    
+						                    <p:column width="*" style="word-wrap: break-word">
+									            <f:facet name="header">
+										            <h:outputText value="Detail" style="font-weight:bold" />
+									            </f:facet>					            
+							                    <h:outputText id="detail"  value="#{entry.detail}" style="white-space: normal; cursor:text" />  
+						                    </p:column>	
+						                    
+						                    <p:column width="80" style="word-wrap: break-word" rendered="#{logBookBean.displayEntrySource}">
+									            <f:facet name="header">
+										            <h:outputText value="Source" style="font-weight:bold" />
+									            </f:facet>					            
+							                    <h:outputText id="sourceTxt"  value="#{entry.objectLogBook.logBook.name}" style="white-space: normal; cursor:text" />  
+						                    </p:column>							                    
+						                    						                    						            						            
+						                    <p:column width="150" rendered="#{!logBookBean.isObsoleteNote()}" sortBy="#{entry.entryDate}">
+									            <f:facet name="header">
+										            <h:outputText value="Last Updated By" style="font-weight:bold" />
+									            </f:facet>			
+							                    <h:outputText id="addedBy"  value="#{entry.entryUser}" style="white-space: normal; cursor:text" />	
+							                    <br />								            		            
+							                    <h:outputText id="addedDate" value="#{entry.entryDate}" style="white-space: normal; cursor:text" >
+							                        <f:convertDateTime pattern="MM/dd/yyyy hh:mm a" />
+							                    </h:outputText>  
+						                    </p:column>	
+						                    
+						                    <p:column width="150" sortBy="#{entry.followUpDate}" rendered="#{logBookBean.enableFollowUpDate}" >
+									            <f:facet name="header">
+										            <h:outputText value="Follow Up Date" style="font-weight:bold" />
+									            </f:facet>					            
+						                        <p:calendar id="entryFollowUpDateCal" 
+						                                size="10"
+							                            value="#{entry.followUpDate}"
+							                            pattern="MM/dd/yyyy" 
+							                            style="width:20px" 
+							                            showOn="button" 
+							                            disabled="#{not logBookBean.hasPermission(entry)}"
+							                            onchange="showSaveIcon(#{rowIndex}); formatDate(this);setLogBookDirty(true); ">
+												    <f:convertDateTime pattern="MM/dd/yyyy" />	 
+												     <p:ajax event="dateSelect" onstart="showSaveIcon(#{rowIndex});" oncomplete="setLogBookDirty(true);" global="false" />                                                 												    	    									
+											    </p:calendar>  
+							                    <p:spacer width="5"/>							                 
+                                                <p:commandLink id="updateFollowUpDateLink"  
+                                                        actionListener="#{logBookBean.updateFollowUpDate(entry)}"                                
+                                                        update="logEntries" 
+                                                        oncomplete="setLogBookDirty(false);"
+                                                        title="Update Follow Up Date">	
+							                        <p:graphicImage id="updateFollowUpDateimg" value="/images/action_check.png" 
+							                        	  rendered="#{logBookBean.hasPermission(entry)}" styleClass="dispalyNone" style="border-style: none"/>
+							                  	
+							                    </p:commandLink>									    							                     
+						                    </p:column>							                    						            						            		
+						            			
+					                    </p:dataTable>                                      
+                                    </p:column>
+                                </p:row>
+								
+								<p:row>
+								    <p:column >								
+								        <p:separator />
+								    </p:column> 
+								</p:row>                                
+                                
+                                <p:row>
+                                    <p:column >
+						                <p:commandButton id="addNoteBottom" 
+						                        rendered="#{logBookBean.multiEntity}"
+						                        actionListener="#{logBookBean.addEntry()}"  
+						                        value="Save"
+                                                disabled="#{!logBookBean.hasPermission()}"						                 
+						                        update="logEntries @form @(#{cc.attrs.update})" 
+						                        process="@form"
+						                        oncomplete="#{cc.attrs.addNoteOnComplete}; setFocus('entryDetailTextArea'); setFocus('entryDetailTextArea')" />                                    
+						                <p:spacer width="5px" rendered="#{logBookBean.multiEntity}" />                                    
+					                    <p:commandButton id="done" 
+					                            value="#{logBookBean.doneButtonLabel()}"
+					                            onclick="doneBtnHandler()"
+						                        title="Close dialog" />                                                 						                                                           
+                                    </p:column>
+                                </p:row>
+                                
+			                </p:panelGrid>			                		                		         
+			            </p:tab>			                        			            
+			        </p:tabView>		
+			    </h:form>							        
+			</p:dialog>
+	  	</div>
+	  	
+	  	 <p:dialog id="dirtyCheckDialog" modal="true" header="Save Changes" onShow="setFocus('dirtyCheckDialogOkBtn')" dynamic="true"
+			        widgetVar="dirtyCheckDialogVar" resizable="false" width="520" height="auto" closeOnEscape="true" appendTo="@(body)">
+			    <br />
+			    <h:outputFormat value="Are you sure want to navigate away from this dialog?" />
+			    <br /> <br />
+			    <h:outputFormat value="You have unsaved data and will lose it" />
+			    <br /> <br />			    
+			    <h:outputFormat value="Press OK to continue, or Cancel to stay on the current page." />			    
+			    <h:form id="dirtyCheckDialogForm" prependId="false">
+				    <br />
+				    <br />
+				    <p:commandButton id="dirtyCheckDialogOkBtn" value="Ok" onclick="dirtyCheckDialogOkBtnHandler();"/>
+				    <h:outputText value="&#160;"/>
+				    <p:commandButton id="dirtyCheckDialogCancelBtn" value="Cancel" onclick="PF('dirtyCheckDialogVar').hide();" />
+			    </h:form>
+		    </p:dialog>    
+		
+		<style type="text/css">
+			
+			.ui-datatable-partition-dev .ui-datatable tbody td{
+				border-bottom-style: solid !important;
+				border-right-style: solid !important;				
+			}
+			.ui-datatable-resizing-dev .ui-datatable-resizable {
+				max-height:340px;
+			}			
+		</style>
+		
+	  	<script type="text/javascript">
+	  	    var logBookDirty = false;
+	  	    
+	  	    /**
+	  	    * Clicks a hidden button to intialize the bean, then
+	  	    * shows the dialog.
+	  	    */
+			function showLogBook(){			
+				$('[id$=initializeBeanHiddenButton]').click();
+			}			
+			
+			function initializeDirtyDetection() {
+		    	registerIgnoreButton("addNote");
+		    	registerIgnoreButton("addNoteBottom");		    	
+		    	setDirtyDataById("dirtyData");
+			}
+			
+		 	function doneBtnHandler(){
+				if(isLogBookDirty() == true) {
+					PF('dirtyCheckDialogVar').show();
+					return false;
+				}
+				
+				setLogBookDirty(false);
+				PF('logBookDialogWidget').hide();
+				
+				return true;
+		    }
+			
+		 	function dirtyCheckDialogOkBtnHandler(){
+		 		setLogBookDirty(false); 
+		    	PF('dirtyCheckDialogVar').hide(); 
+		    	PF('logBookDialogWidget').hide();			    	
+		    }
+		 	
+		 	function setRequiredFocus() {
+		 		var fieldId = 'entryDetailTextArea';
+		 		var ctrl = $('[id$='+ fieldId +']');
+				
+				if (canSetFocus(fieldId)){				
+					ctrl.focus();
+				} else {
+					setTimeout(function(){setFocus('done');}, 500);
+				}
+		 	}
+		 	
+		 	function setLogBookDirty(isDirty) {
+		 		this.logBookDirty = isDirty;
+		 	}
+		 	
+		 	function isLogBookDirty() {
+		 		return logBookDirty;
+		 	}	
+		 
+		 	function showSaveIcon(index){ 
+		 		var row = $('.dispalyNone');
+		 		
+		 		if(row[index]){
+					row[index].style.display = "inline-block";
+					
+				}
+		 	}
+		</script>
+	  	
+	  </composite:implementation>
+</html>

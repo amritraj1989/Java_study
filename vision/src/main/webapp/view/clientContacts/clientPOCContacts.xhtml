@@ -1,0 +1,372 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"   
+	xmlns:pe="http://primefaces.org/ui/extensions" 
+    template="../../templates/ui.xhtml" >
+	
+    <ui:define name="content">
+   
+    	<h:form id="clientPOCContactsBreadCrumbForm" prependId="false">
+   				<p:breadCrumb model="#{clientPOCContactsBean.breadCrumbTrail}" ajax="false" immediate="true" style="min-width:980px;max-width:100%;width:auto;"/>
+   		</h:form>
+   		
+        <h:form id="hiddenInputForm" prependId="false">
+        
+        </h:form>   		
+    		
+    	<!-- Message display -->
+		<p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:980px;max-width:100%;width:auto;">
+			<p:messages id="messages" showSummary="false" showDetail="true" autoUpdate="true" />
+		</p:scrollPanel>
+				 
+   		<h:form id="clientPOCContactsForm" prependId="false">
+   			<h:inputHidden id="dirtyData" value="#{clientPOCContactsBean.dirtyData}"/>
+   		
+			<p:panel id="selectObjectInfoPanel" header="Account: #{clientPOCContactsBean.clientAccount.externalAccountPK.accountCode} - #{clientPOCContactsBean.clientAccount.accountName}">  
+			    <p:panelGrid style="border: 1px solid black">
+			        <f:facet name="header">
+			            <p:row>
+			                <p:column>Rules</p:column>
+			                <p:column>POC Name</p:column>
+			                <p:column>POC Description</p:column>
+			                <p:column>Send To Driver</p:column>
+			                <p:column>Last Updated</p:column>			                			                			                			                
+			            </p:row>
+			        </f:facet>
+			            <p:row >
+			                <p:column style="text-align:center">
+                                <p:commandLink id="pocRulesInfoLink"
+                                        oncomplete="PF('pocRulesInformationDialogWidget').show();"
+                                        update=":pocRulesInformationDialog" 
+                                        title="View POC Rules Information" immediate="true">
+                                    <p:graphicImage value="/images/custins.png" style="border-style: none" />
+                                </p:commandLink>                                  
+                            </p:column>			            
+			                <p:column>
+                                <p:outputLabel value="#{clientPOCContactsBean.clientPoint.name}" />
+                            </p:column>
+                            
+			                <p:column>
+                                <p:outputLabel value="#{clientPOCContactsBean.clientPoint.description}" />
+                            </p:column>
+                            
+			                <p:column style="align:center">
+			                    <p:selectBooleanCheckbox id="pocDriverCheckBoxInd" styleClass="trackDirtyCheckbox"
+			                                             value="#{clientPOCContactsBean.driverMarkAssignedToPOC}" 
+			                                             disabled="#{clientPOCContactsBean.disableDriverAssignment()}"
+			                                             rendered="#{clientPOCContactsBean.displayPOCDriverCheckBox()}">
+					                <p:ajax listener="#{clientPOCContactsBean.toggleDriverAssignment}" oncomplete="handleAutoCompleteRequest(xhr, status, args);" update="@(:input) "/>
+					                			                    
+			                    </p:selectBooleanCheckbox> 	
+			                    		           
+					            <p:outputLabel id="pocDriverLabelInd" rendered="#{!clientPOCContactsBean.displayPOCDriverCheckBox()}" 
+					                    value="#{clientPOCContactsBean.driverAssignedToPOC ? 'Yes' : 'No'}"/>			                    		                    			                    
+			                </p:column>
+			                
+			                <p:column>
+			                    <h:outputLabel value="#{clientPOCContactsBean.pointOfCommunicationVO.clientPOC.lastClientContactUpdate}">
+			                        <f:convertDateTime pattern="MM/dd/yyyy" />
+			                    </h:outputLabel>
+			                </p:column>			                			                			                			                
+			            </p:row>			        
+			    </p:panelGrid>
+			</p:panel>		
+			
+			<p:panel id="selectedCostCenterInfoPanel" header="Cost Center" rendered="#{clientPOCContactsBean.displayCostCenterInfoPanel()}">  
+			    <p:panelGrid style="border: 1px solid black">
+			        <f:facet name="header">
+			            <p:row>
+			                <p:column>Cost Center Code</p:column>
+			                <p:column>Cost Center Description</p:column>
+			                <p:column>Send To Driver</p:column>	                			                			                			                
+			            </p:row>
+			        </f:facet>
+			            <p:row >
+			            
+			                <p:column>
+                                <p:outputLabel value="#{clientPOCContactsBean.costCenter.costCentreCodesPK.costCentreCode}" />
+                            </p:column>
+                            
+			                <p:column>
+                                <p:outputLabel value="#{clientPOCContactsBean.costCenter.description}"></p:outputLabel>
+                            </p:column>
+                            
+			                <p:column>
+			                    <p:selectBooleanCheckbox id="costCenterDriverInd" styleClass="trackDirtyCheckbox"
+			                                             value="#{clientPOCContactsBean.driverMarkAssignedToCostCenter}" 
+			                                             rendered="#{clientPOCContactsBean.displayCostCenterDriverCheckBox()}">
+					                <p:ajax listener="#{clientPOCContactsBean.toggleCostCenterDriverAssignment}" oncomplete="handleAutoCompleteRequest(xhr, status, args);" update="@(:input) "/>			                    
+			                    </p:selectBooleanCheckbox> 	
+			                    
+					            <p:outputLabel id="costCenterDriverLabelInd" rendered="#{!clientPOCContactsBean.displayCostCenterDriverCheckBox()}" 
+					                    value="#{clientPOCContactsBean.driverAssignedToCostCenter ? 'Yes' : 'No'}"/>				                    		                    			                    
+			                </p:column>
+			                		                			                			                			                
+			            </p:row>			        
+			    </p:panelGrid>
+			</p:panel>				
+			          	   		     				  		  	        
+	        <p:panel id="contactsPanel" header="Client Contacts:">	            
+			    <p:dataTable id="contactsDT" 
+			        var="contact" 
+			        widgetVar="contactsWidget"
+			        value="#{clientPOCContactsBean.lazyClientContactVOs}"
+					scrollable="true" 	
+					scrollHeight="#{clientPOCContactsBean.dataTable.height}"
+					resizableColumns="true"
+					rowKey="#{contact.contactId}"
+					rowIndexVar="contactRowIndex"
+					lazy="true"
+					rows="#{clientPOCContactsBean.resultPerPage}"
+					selection="#{clientPOCContactsBean.assignedClientContactVO}"
+					paginator="true" 
+					paginatorPosition="bottom" 
+					styleClass="table-no-select-all">
+					
+					<p:ajax event="sort" listener="#{clientPOCContactsBean.onSortOperation}" oncomplete="handleAutoCompleteRequest(xhr, status, args);" />
+					<p:ajax event="page" listener="#{clientPOCContactsBean.onPageChange}" oncomplete="handleAutoCompleteRequest(xhr, status, args);" />
+					
+ 					<p:column width="#{clientPOCContactsBean.dataTable.col1}" style="text-align:center" >				        								
+					    <p:selectBooleanCheckbox id="assignInd" value="#{contact.markAssigned}" styleClass="trackDirtyCheckbox" disabled="#{clientPOCContactsBean.disableContactAssignment(contact)}">
+					    	<p:ajax listener="#{clientPOCContactsBean.toggleContactAssignment(contact)}" 
+					                oncomplete="handleAutoCompleteRequest(xhr, status, args);" update="@(:input) :clientPOCContactsForm:selectedCostCenterInfoPanel :clientPOCContactsForm:selectObjectInfoPanel ">
+					         </p:ajax>       
+					    </p:selectBooleanCheckbox>
+					</p:column>	                    
+                                        															
+				    <p:column width="#{clientPOCContactsBean.dataTable.col2}" style="text-align:center">								
+                        <p:commandLink id="contactInfoLink"
+                                actionListener="#{clientPOCContactsBean.contactInfoRequestListener(contact)}"
+                                oncomplete="PF('contactInformationDialogWidget').show();"
+                                update=":contactInformationDialog" 
+                                title="View Contact Information" immediate="true">
+                             <p:graphicImage value="/images/custins.png" style="border-style: none" />
+                         </p:commandLink>     
+					</p:column>	
+															
+				    <p:column headerText="Contact Name" sortBy="#{contact.NAME}" width="#{clientPOCContactsBean.dataTable.col3}">								
+					    <p:outputLabel id="contactName" value="#{contact.lastName}, #{contact.firstName} " />
+					</p:column>	
+					
+				    <p:column headerText="Job Title" width="#{clientPOCContactsBean.dataTable.col4}">								
+					    <p:outputLabel id="contactJobTitle" value="#{contact.jobTitle}" />
+					</p:column>	
+					
+				    <p:column headerText="Type" width="#{clientPOCContactsBean.dataTable.col5}">								
+					    <p:outputLabel id="contactType" value="#{contact.contactType}" />
+					</p:column>						
+					
+				    <p:column headerText="Cost Center" width="#{clientPOCContactsBean.dataTable.col6}">								
+					    <p:outputLabel id="costCenterCode" value="#{contact.costCenterCode}" />
+					</p:column>	
+										
+				    <p:column headerText="Default" width="#{clientPOCContactsBean.dataTable.col7}">								
+					    <p:outputLabel id="contactDefault" value="#{contact.defaultIndicator ? 'Yes' : 'No'}" />
+					</p:column>	
+									
+				    <p:column headerText="Parent Acct" sortBy="#{contact.PARENT_ACCOUNT}" width="#{clientPOCContactsBean.dataTable.col8}">	
+				        <p:outputLabel value="#{contact.parentAccountContact ? 'Yes' : 'No'}"/>											    
+					</p:column>	
+															
+				    <p:column headerText="Mail" width="#{clientPOCContactsBean.dataTable.col9}" styleClass="trackDirtyCheckbox">								
+					    <p:selectBooleanCheckbox id="mailInd" value="#{contact.contactMethodMailMarked}" disabled="#{clientPOCContactsBean.disableMailDeliveryMethod(contact)}">
+					        <p:ajax listener="#{clientPOCContactsBean.toggleClientContactMethod(contact)}" oncomplete="setDirtyDataById('dirtyData');"/>					        
+					    </p:selectBooleanCheckbox>
+					</p:column>
+					
+				    <p:column headerText="Phone" width="#{clientPOCContactsBean.dataTable.col10}" styleClass="trackDirtyCheckbox">								
+					    <p:selectBooleanCheckbox id="workNumberInd" value="#{contact.contactMethodPhoneMarked}" disabled="#{clientPOCContactsBean.disablePhoneDeliveryMethod(contact)}">
+					        <p:ajax listener="#{clientPOCContactsBean.toggleClientContactMethod(contact)}" oncomplete="setDirtyDataById('dirtyData');"/>					    
+					    </p:selectBooleanCheckbox>
+					</p:column>										
+					
+				    <p:column headerText="Email" width="#{clientPOCContactsBean.dataTable.col11}" styleClass="trackDirtyCheckbox">								
+					    <p:selectBooleanCheckbox id="emailInd" value="#{contact.contactMethodEmailMarked}" disabled="#{clientPOCContactsBean.disableEmailDeliveryMethod(contact)}">
+					        <p:ajax listener="#{clientPOCContactsBean.toggleClientContactMethod(contact)}" oncomplete="setDirtyDataById('dirtyData');"/>					    
+					    </p:selectBooleanCheckbox>
+					</p:column>	
+					
+				    <p:column headerText="" width="#{clientPOCContactsBean.dataTable.col12}">
+					    <p:outputLabel id="contactMessage" value="#{contact.message}" />
+					    <p:outputLabel id="contactMessage1" value="#{(!clientPOCContactsBean.pointOfCommunicationVO.poBoxAllowed and contact.poBoxAvailable) ? (contact.message.length() >= 1 ? ', Contains PO or BOX'  : ' Contains PO or BOX') : ''}" />				    								
+					</p:column>																																								
+					
+			        <f:facet name="footer">
+					    Record Count: <h:outputText value="#{clientPOCContactsBean.lazyClientContactVOs.rowCount}"/>
+				    </f:facet>					
+				</p:dataTable>	            
+	        </p:panel>	        
+	        
+	        <p:panel>
+	        	<p:commandButton id="save" value="Save" action="#{clientPOCContactsBean.saveUpdateContactsDriverAssignmentClose}" ajax="false" onclick="lockScreen();" tabindex="155"/>
+	        	<p:spacer width="10" />
+	        	<p:commandButton id="deSelectAll" value="Deselect All" action="#{clientPOCContactsBean.deSelectAllContacts}" update="@(:input)" oncomplete="setDirtyDataById('dirtyData');" tabindex="156"/>
+	        	<p:spacer width="10" />
+				<p:commandButton id="cancel" value="Cancel" action="#{clientPOCContactsBean.cancel}" ajax="false" immediate="true" onclick="lockScreen();" tabindex="158"/>
+	        </p:panel>	        
+        </h:form>  
+        
+        <p:dialog id="contactInformationDialog" 
+                widgetVar="contactInformationDialogWidget" 
+                header="Contact Information" 
+                resizable="true" appendTo="@(body)" style="min-width: 600px; max-width: 800px;"
+                closeOnEscape="true" onShow="setFocus('contactInformationDialogDoneBtn');">
+            <h:form id="contactInformationForm" prependId="false">
+				<p:panel id="contactInformationHeaderPanel2">  
+				    <h:panelGrid  columns="4" cellpadding="5" style="white-space:nowrap;">			    
+				    		
+								<p:column>	
+				    				<p:outputLabel value="Contact Name: " styleClass="ui-label" style="white-space:nowrap;"/>
+				    			</p:column>
+				    			<p:column>	 
+			                      	<p:outputLabel value="#{clientPOCContactsBean.selectedContactVO.formattedName()}" />
+			                    </p:column>
+			                    <p:column>	
+			                      	<p:outputLabel/>
+			                    </p:column>
+			                    <p:column>	
+			                      	<p:outputLabel/>		                 
+              					</p:column>              					
+              					
+			                	<p:outputLabel value="Post Address: " styleClass="ui-label" style="vertical-align:20px !important;"/>           
+                       			<p:outputLabel value="#{clientPOCContactsBean.postInfo.addressDisplay}" escape="false" style="vertical-align:top;" />                       	
+                       			<p:outputLabel value="Garaged Address: " styleClass="ui-label" style="vertical-align:20px !important;"/>           
+                       			<p:outputLabel value="#{clientPOCContactsBean.garagedInfo.addressDisplay}" escape="false" style="vertical-align:top;" />
+                       			
+                       			<p:outputLabel value="Work Phone: " styleClass="ui-label" style="white-space:nowrap;"/>                           
+                       			<p:outputLabel value="#{clientPOCContactsBean.postInfo.phoneWorkDisplay}" escape="false" /> 
+								<p:outputLabel value="Work Phone: " styleClass="ui-label" style="white-space:nowrap;"/>                           
+                       			<p:outputLabel value="#{clientPOCContactsBean.garagedInfo.phoneWorkDisplay}" escape="false" />
+                       			
+                       			<p:outputLabel value="Cell Phone: " styleClass="ui-label" style="white-space:nowrap;"/>                              
+                       			<p:outputLabel value="#{clientPOCContactsBean.postInfo.phoneCellDisplay}" escape="false" />
+        						<p:outputLabel value="Cell Phone: " styleClass="ui-label" style="white-space:nowrap;"/>                              
+                       			<p:outputLabel value="#{clientPOCContactsBean.garagedInfo.phoneCellDisplay}" escape="false" />
+                       			
+                       			<p:outputLabel value="Email: " styleClass="ui-label" style="white-space:nowrap;"/>
+                     			<p:outputLabel value="#{clientPOCContactsBean.selectedContactVO.email}" escape="false" />
+                     			<p:outputLabel/>
+                     			<p:outputLabel/>	
+			               
+	                </h:panelGrid>
+	           
+                </p:panel>
+                
+	    	    <p:panel>
+					<p:commandButton id="contactInformationDialogDoneBtn" value="Done" type="button" onclick="PF('contactInformationDialogWidget').hide();" />               
+				</p:panel>	                
+            </h:form>
+        </p:dialog> 
+        
+        
+        <p:dialog id="pocRulesInformationDialog" 
+                widgetVar="pocRulesInformationDialogWidget" 
+                header="Point of Communication Rules" 
+                modal="true" 
+                height="auto" 
+                width="auto" 
+                appendTo="@(body)"
+                dynamic="true" 
+                closeOnEscape="true">
+            <h:form>            
+		        <p:panel>
+	                <p:dataTable id="pocRulesDT"
+                        	value="#{clientPOCContactsBean.pointOfCommunicationVO.clientPOC.clientPoint.clientPointRules}"
+	                        var="pocRule">	
+    	                <p:column headerText="Rule" width="80%">
+        	                <h:outputLabel value="#{pocRule.clientRule.description}" />
+            	        </p:column> 
+                	    <p:column headerText="Value" width="20%">
+                    	    <h:outputLabel value="#{pocRule.ruleInd}" />
+                    	</p:column>                                          
+	                </p:dataTable>      
+				</p:panel>						
+                  
+	    	    <p:panel>
+					<p:commandButton id="pocRulesInformationDialogDoneBtn" value="Done" type="button" onclick="PF('pocRulesInformationDialogWidget').hide();" />               
+				</p:panel>						
+            </h:form>                                
+        </p:dialog>                             
+        
+        <p:dialog id="multSelectionInformationDialog" widgetVar="multSelectionInformationDialogWidget" header="Multiple selection not available" onShow="setFocus('multSelectionInformationDialogDoneBtn')" 
+        			resizable="false" modal="true" height="100" width="400" closeOnEscape="true" appendTo="@(body)">
+                <br/>
+                <h:outputFormat value="This point of communication does not allow for multiple recipients. Please choose only one recipient." style="font-weight:bold;" />
+                <h:form id="multSelectionInformationDialogForm" prependId="false">
+             		<br/><br/>
+                    <p:commandButton id="multSelectionInformationDialogDoneBtn" value="OK" onclick="PF('multSelectionInformationDialogWidget').hide();"/>
+                </h:form>
+        </p:dialog>   
+        
+		<p:dialog id="poBoxAlertDialogId" modal="true" header="PO Box not allowed Alert" onShow="setFocus('okPoBoxBtn')"
+			widgetVar="poBoxAlertWidgetVar" resizable="false" width="520" height="100" closeOnEscape="true" appendTo="@(body)">
+			<br />
+			<h:outputFormat value="This point of communication cannot be sent to a PO Box. Please review and update the selected contact's address." style="font-weight:bold;" />
+			<h:form id="poBoxAlertDialogForm" prependId="false">
+				<br />
+				<br />
+				<p:commandButton id="okPoBoxBtn" value="OK" onclick="PF('poBoxAlertWidgetVar').hide();" />
+			</h:form>
+		</p:dialog>
+		
+		<p:dialog id="dirtyCheckAlertDialogId" modal="true" header="Save Changes" onShow="setFocus('yesDirtySaveBtn')"
+			widgetVar="dirtyCheckAlertWidgetVar" resizable="false" width="520" height="100" closeOnEscape="true" appendTo="@(body)" >
+			<br />
+			<h:outputFormat value="Do you wish to save the changes made to this point of contact?" style="font-weight:bold;" />
+			<h:form id="dirtyCheckAlertDialogForm" prependId="false">
+				<br />
+				<br />
+				<p:commandButton id="yesDirtySaveBtn" value="Save" action="#{clientPOCContactsBean.handleDirtyDialogAction('Y')}" update=":selectObjectInfoPanel :selectedCostCenterInfoPanel :contactsDT :dirtyData" oncomplete="handleAutoCompleteRequest(xhr, status, args);" onclick="PF('dirtyCheckAlertWidgetVar').hide();" />
+				<h:outputText value="&#160;"/>
+				<p:commandButton id="noDirtySaveBtn" value="Cancel" action="#{clientPOCContactsBean.handleDirtyDialogAction('N')}" update=":selectObjectInfoPanel :selectedCostCenterInfoPanel :contactsDT :dirtyData" oncomplete="handleAutoCompleteRequest(xhr, status, args);" onclick="PF('dirtyCheckAlertWidgetVar').hide();" />
+			</h:form>
+		</p:dialog>
+	
+		<p:dialog id="contactRequiredDialogId" widgetVar="contactRequiredDialogWidget" header="Contact Required" onShow="setFocus('contactRequiredDialogDoneBtn')" 
+        			resizable="false" modal="true" height="100" width="400" closeOnEscape="true" appendTo="@(body)" >
+                <br/>
+                <h:outputFormat value="This point of communication requires a contact. Please select one." style="font-weight:bold;" />
+                <h:form id="contactRequiredDialogForm" prependId="false">
+             		<br/><br/>
+                    <p:commandButton id="contactRequiredDialogDoneBtn" value="OK" onclick="PF('contactRequiredDialogWidget').hide();"/>
+                </h:form>
+        </p:dialog>
+	
+        <style type="text/css">
+   
+        </style>			
+        
+		<script type="text/javascript">
+		//<![CDATA[
+		           
+		    function handleAutoCompleteRequest(xhr, status, args) {
+		    	setDirtyDataById('dirtyData');
+				if(args.showSingleSelDlg) {
+					showDialog('multSelectionInformationDialogWidget');
+				} else if(args.showPOWarnDlg){
+					showDialog('poBoxAlertWidgetVar');
+				} else if(args.dirtyDataFound){
+					showDialog('dirtyCheckAlertWidgetVar');
+				} else if(args.showContactReqDlg){
+					showDialog('contactRequiredDialogWidget');
+				} 
+			} 
+		    
+		    function initializeDirtyDetection() {
+		    	registerIgnoreButton("save");
+		    	registerIgnoreButton("deSelectAll");
+			}
+		    
+		// ]]>
+		
+     	$(window).load(function(){
+     		initializeDirtyDetection();
+		});			
+		</script>	
+	</ui:define>
+	
+	
+</ui:composition>

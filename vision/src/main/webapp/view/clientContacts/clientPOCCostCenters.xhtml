@@ -1,0 +1,134 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"   
+	xmlns:pe="http://primefaces.org/ui/extensions" 
+    template="../../templates/ui.xhtml" >
+	
+    <ui:define name="content">
+     
+    	<h:form id="pocCostCentersBreadCrumbForm" prependId="false">
+   				<p:breadCrumb model="#{clientPOCCostCentersBean.breadCrumbTrail}" ajax="false" immediate="true" style="min-width:980px;max-width:100%;width:auto;"/>
+   		</h:form>
+   		
+        <h:form id="hiddenInputForm" prependId="false">
+        
+        </h:form>   		
+    		
+    	<!-- Message display -->
+		<p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:980px;max-width:100%;width:auto;">
+			<p:messages id="messages" showSummary="false" showDetail="true" autoUpdate="false" />
+		</p:scrollPanel>
+				 
+   		<h:form id="pocCostCenterForm" prependId="false">   
+			<p:panel id="selectObjectInfoPanel" header="Account: #{clientPOCCostCentersBean.clientAccount.externalAccountPK.accountCode} - #{clientPOCCostCentersBean.clientAccount.accountName}">  
+			    <p:panelGrid style="border: 1px solid black">
+			        <f:facet name="header">
+			            <p:row>
+			                <p:column>POC Name</p:column>
+			                <p:column>POC Description</p:column>
+			                <p:column>Send To Driver</p:column>
+			                <p:column>Last Updated</p:column>			                			                			                			                
+			            </p:row>
+			        </f:facet>
+			            <p:row >
+			                <p:column>
+                                <p:outputLabel value="#{clientPOCCostCentersBean.clientPoint.name}"></p:outputLabel>
+                            </p:column>
+                            
+			                <p:column>
+                                <p:outputLabel value="#{clientPOCCostCentersBean.clientPoint.description}"></p:outputLabel>
+                            </p:column>
+                            
+			                <p:column>			                    
+					            <p:outputLabel id="pocDriverLabelInd" value="#{clientPOCCostCentersBean.driverAssignedToPOC ? 'Yes' : 'No'}"/>				                     			                    			                    
+			                </p:column>
+			                
+			                <p:column>
+			                    <h:outputLabel value="#{clientPOCCostCentersBean.poc.lastClientContactUpdate}">
+			                        <f:convertDateTime pattern="MM/dd/yyyy" />
+			                    </h:outputLabel>
+			                </p:column>	
+			                		                			                			                			                
+			            </p:row>			        
+			    </p:panelGrid>
+			</p:panel>
+				        
+	        <p:panel id="pocCostCentersTreePanel" header="Point of Communication Cost Centers:" rendered="true">	
+	            <p:treeTable value="#{clientPOCCostCentersBean.root}" 
+	                    var="costCenterVO" 
+	                    resizableColumns="true"
+	                    scrollHeight="#{clientPOCCostCentersBean.dataTable.height}" 
+	                    scrollable="true" 
+	                    styleClass="ui-tree-datatable-sortable-dev ">
+	                    
+	                <p:column headerText="Cost Center Code" sortBy="#{costCenterVO.code}" style="width:30%">
+	                    <p:outputLabel value="#{costCenterVO.code}" />
+	                </p:column>
+	                
+				    <p:column headerText=" Cost Center Description" style="width:40%;white-space:normal;" >								
+					    <p:outputLabel value="#{costCenterVO.description} " />
+					</p:column>	
+					
+				    <p:column headerText="Contact(s)" style="width:20%">								  					    
+                        <p:dataTable var="cc" id="first"
+                                value="#{clientPOCCostCentersBean.assignedContacts(costCenterVO)}" 
+                                rendered="#{clientPOCCostCentersBean.displayCostCenterContactsTable(costCenterVO)}" 
+                                scrollable="true" 
+                                scrollHeight="70" 
+                                scrollWidth="85%" 
+                                style="width:95%" 
+                                styleClass="hide-column-header">
+				            <p:column width="10">	                        
+                                #{cc.contact.lastName}, #{cc.contact.firstName} 
+                            </p:column>                             
+                        </p:dataTable>
+                                                                    				    
+					</p:column>	
+					
+					<p:column headerText="Send To Driver" style="width:10%">	
+					    <p:outputLabel id="costCenterDriverInd" value="#{costCenterVO.isDriverAssigned() ? 'Yes' : 'No'}"/>					
+					</p:column>
+										
+				    <p:column headerText="" style="width:5%">								
+					    <p:commandLink id="editLnk2"
+					        action="#{clientPOCCostCentersBean.assignContacts(costCenterVO)}"					     
+							ajax="false"
+					        onclick="lockScreen();"
+							title="Assign Contact(s) to POC Cost Center" >				    
+							<p:graphicImage value="/images/action_edit.png" style="border-style: none"/>
+					    </p:commandLink>				    
+					</p:column>															
+						 
+			        <f:facet name="footer">
+					    Record Count: <h:outputText value="#{clientPOCCostCentersBean.lazyPOCCostCenterVOs.rowCount}"/>
+				    </f:facet>							                
+	            </p:treeTable>
+	        </p:panel>	        
+	        						
+	        <p:panel>
+				<p:commandButton id="done" 
+				    value="Done"
+					action="#{clientPOCCostCentersBean.cancel}" 
+					ajax="false" 
+					immediate="true"
+					onclick="lockScreen();" 
+					tabindex="155"/>	        
+	        </p:panel>			
+			      
+        </h:form>              	
+			
+		<style type="text/css">              
+        
+        </style>
+		
+		<script type="text/javascript"> 
+			
+		</script>
+
+	</ui:define>
+	
+	
+</ui:composition>

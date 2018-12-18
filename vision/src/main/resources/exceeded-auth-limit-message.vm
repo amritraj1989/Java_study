@@ -1,0 +1,7 @@
+Please Contact : <br/> 
+#foreach( $contact in $contacts )
+#if($contact.firstName) $contact.firstName #end #if($contact.lastName) $contact.lastName #end <br/> #if($contact.workNumber) ($contact.workAreaCode) $contact.workNumber #end #if($contact.workExtension) Ext. $contact.workExtension #end<br/>
+#if($contact.email) <a onclick=" showExceededAuthLimitEmail($contact.contactId); " href="javascript:void(0);">$contact.email</a> #end
+<p/>
+#end
+

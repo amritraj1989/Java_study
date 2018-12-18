@@ -1,0 +1,328 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:pe="http://primefaces.org/ui/extensions" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:comp="http://java.sun.com/jsf/composite/view/component" 
+    template="../../templates/ui.xhtml" >
+	
+    <ui:define name="content">
+    	<h:form id="maintenanceServiceHistoryBreadCrumbForm" prependId="false">
+   				<p:breadCrumb model="#{maintenanceServiceHistoryBean.breadCrumbTrail}" ajax="false" immediate="true" style="min-width:980px;max-width:100%;width:auto;"/>
+   		</h:form>
+    	<!-- Message display -->
+		<p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:980px;max-width:100%;width:auto;">
+			
+			<p:messages id="messages" severity="info,error,fatal" showSummary="false" showDetail="true" 
+				autoUpdate="true" />
+		</p:scrollPanel>
+		
+		<comp:logBook id="logBook" entity="#{maintenanceServiceHistoryBean.getSelectedMRQ()}" logBookTypes="#{maintenanceServiceHistoryBean.logBookTypes}" showRelatedUnitLogEntry="true"/>
+				
+        <h:form id="hiddenMaintenanceProfileLinkForm" prependId="false">
+			<p:commandLink id="maintenanceProfileLink" style="display:none"
+						   update=":maintenanceProfileForm"
+						   action="#{maintenanceProfileBean.initDialog(maintenanceServiceHistoryBean.fmsId)}"
+						   process="@this"
+						   oncomplete="PF('maintenanceProfileDialogWidget').show();" >
+			</p:commandLink>         
+        </h:form>		
+		
+		<h:form id="hiddenDriverLinkForm" prependId="false">
+            <h:inputHidden id="driverLinkDrvId"
+                value="#{maintenanceServiceHistoryBean.driverId}"/>
+            
+            <p:commandLink id="driverLink" style="display:none" ajax="false"
+                action="#{maintenanceServiceHistoryBean.editViewDriver}"/>
+        </h:form>
+		
+   		<h:form id="maintenanceServiceHistoryForm" prependId="false">
+   			<p:panel id="vehicleInformation" header="Vehicle Information" style="max-width:100%;width:auto;" >   		
+   			<p:focus context="maintenanceServiceHistoryForm"/>
+   			<div id="vehicleDisplayPanel">
+   				<comp:vehicleDisplay fmsId="#{maintenanceServiceHistoryBean.fmsId}" parentBean="#{maintenanceServiceHistoryBean}"/>
+            </div>
+            </p:panel>
+   			<p:panel id="maintenanceServiceHistoryDatatablePanel" header="Maintenance Service History" >
+   				
+   				<h:inputHidden id="clickIndex" name ="clickIndex" value = "#{maintenanceServiceHistoryBean.selectionIndex}"/>
+   				<h:inputHidden id="returnedFromNextPage" name ="returnedFromNextPage" value = "#{maintenanceServiceHistoryBean.returnedFromNextPage}"/>
+   				<h:inputHidden id="locatorURL" name ="locatorURL" value = "#{maintenanceServiceHistoryBean.locatorURL}"/>   				
+   				
+   				<p:toolbar id="searchToolbar">  
+				    <p:toolbarGroup align="left">  
+				    		<p:separator></p:separator>
+							<p:outputLabel for="provider" value="Service Provider : " />								
+							<p:inputText id="provider" title="Service Provider"  value="#{maintenanceServiceHistoryBean.providerFilter}" onkeypress="return doKeypressFilter(event)" tabindex="10"/>
+							<p:outputLabel for="category" value=" Category : "   />								
+							<p:inputText id="category" title="Category"  value="#{maintenanceServiceHistoryBean.maintCategoryFilter}" onkeypress="return doKeypressFilter(event)" tabindex="20"/>
+							<p:outputLabel for="maintCodeDesc" value=" Maintenance Code Desc : "   />                              
+                            <p:inputText id="maintCodeDesc" title="Maintenance Code Description"  value="#{maintenanceServiceHistoryBean.maintCodeDescFilter}" onkeypress="return doKeypressFilter(event)" tabindex="20"/>
+							<p:separator></p:separator>
+							<p:commandButton  value="Search" id="filter" title="filter" process="@this, provider, category, maintCodeDesc" update="maintenanceServiceHistoryDataTable, logNotes" actionListener="#{maintenanceServiceHistoryBean.performFilter}" tabindex="30"/> 
+				    </p:toolbarGroup>  
+				</p:toolbar>  
+   				
+   				<p:dataTable id="maintenanceServiceHistoryDataTable" var="purchaseOrder" 
+   						widgetVar="maintenanceServiceHistoryDataTableWidget"
+	                	value="#{maintenanceServiceHistoryBean.purchaseOrdersLazyList}"   
+	                	scrollable="true"  
+	                	scrollHeight="#{maintenanceServiceHistoryBean.dataTable.height}"
+	                	paginator="true" paginatorPosition="bottom" lazy="true"
+	                	rows="#{maintenanceServiceHistoryBean.resultPerPage}"
+	                	resizableColumns="true"
+	                	selectionMode="single"
+	                	selection = "#{maintenanceServiceHistoryBean.selectedMaintenanceServiceHistoryVO}"
+	                	emptyMessage = "#{maintenanceServiceHistoryBean.dataTableMessage}">
+	                	
+                        <p:ajax event="rowSelect" onstart="return !getGoToNextPage();" update=":maintenanceServiceHistoryForm:clickIndex, :maintenanceServiceHistoryForm:commandPanel"></p:ajax>
+	                	<p:ajax event="page" onstart="clearDataTableSelection('maintenanceServiceHistoryDataTableWidget');"  oncomplete="setScrollDivAtTop();" />
+	                	
+						<p:column headerText="PO Number" width="11%"> 
+			                <p:commandLink action="#{maintenanceServiceHistoryBean.viewPurchaseOrder(purchaseOrder)}" id="poNumber" ajax="false" onclick="setGoToNextPage();lockScreen();">
+			                	<h:outputText  value="#{purchaseOrder.poNumber}" style="font-weight:bold"/>
+			                </p:commandLink>
+			            </p:column>
+			            <p:column headerText="Service Provider" width="19%"> 
+			                <h:outputText id="serviceProvider" value="#{purchaseOrder.serviceProviderName} &lt;br /&gt; No: #{purchaseOrder.serviceProviderNumber}" title="#{purchaseOrder.serviceProviderDetails}" escape="false" style="white-space: normal"/>
+			                <p:tooltip for="serviceProvider">
+                                <h:outputText value="#{purchaseOrder.maintReqServiceProviderDetail}" escape="false"/>
+			                </p:tooltip>
+			            </p:column>
+			            <p:column headerText="Categories" width="11%"> 
+                            <h:outputText id="concatCategories" value="#{purchaseOrder.concatCategoryDescriptions}" style="white-space: normal"/>
+                            <p:tooltip for="concatCategories">
+                                <p:dataTable   value="#{purchaseOrder.listMaintenanceCodes}" var="maintenanceCodes">
+                                    <p:column headerText="Code">
+	                                   <h:outputText value="#{maintenanceCodes.code}"/>
+                                    </p:column>
+                                    <p:column headerText="Description">
+                                        <h:outputText value="#{maintenanceCodes.description}"/>
+                                    </p:column>
+                                </p:dataTable>
+			                </p:tooltip>
+			            </p:column>
+			            <p:column sortBy="#{purchaseOrder.actualStartDate}" headerText="Start Date" width="9%"> 
+			                <h:outputText  value="#{purchaseOrder.actualStartDate}" >
+			                	<f:convertDateTime pattern="MM/dd/yyyy"/>
+							</h:outputText>
+			            </p:column>
+			            <p:column sortBy="#{purchaseOrder.odo}" headerText="Odo" width="6%"> 
+			                <h:outputText  value="#{purchaseOrder.odo}" style="float:right"/>
+			            </p:column>
+			            <p:column sortBy="#{purchaseOrder.maintRequestStatus}" headerText="PO Status" width="8%"> 
+			                <h:outputText  value="#{purchaseOrder.maintRequestStatus}" />
+			            </p:column>
+			            <p:column headerText="PO Total" width="7%"> 
+			                <h:outputText  value="#{purchaseOrder.totalCost}" style="float:right">
+			                	<f:convertNumber type="currency" currencySymbol="$" />
+			                </h:outputText>
+			            </p:column>
+			            <p:column headerText="Rech. Total" width="8%"> 
+			                <h:outputText  value="#{purchaseOrder.actualCustCharge != null ? purchaseOrder.actualCustCharge : purchaseOrder.rechargeTotal}" style="float:right">
+			                	<f:convertNumber type="currency" currencySymbol="$" />
+			                </h:outputText>
+			            </p:column>
+			            <p:column headerText="Actual Invoice" width="10%"> 
+			                <h:outputText  value="#{purchaseOrder.actualInvoice}" style="float:right">
+			                	<f:convertNumber type="currency" currencySymbol="$" />
+			                </h:outputText>
+			            </p:column>
+			            <p:column headerText="Payee Inv." width="10%"> 
+			                <h:outputText  value="#{purchaseOrder.payeeInvoiceNumber}" /><br></br>
+			                <h:outputText  value="#{purchaseOrder.payeeInvoiceDate}" >
+			                	<f:convertDateTime pattern="MM/dd/yyyy"/>
+							</h:outputText>
+			            </p:column>
+			            <p:column headerText="MAFS Inv." width="9%"> 
+			                <h:outputText  value="#{purchaseOrder.mafsInvoiceNumber}" /><br></br>
+			                <h:outputText  value="#{purchaseOrder.mafsInvoiceDate}" >
+			                	<f:convertDateTime pattern="MM/dd/yyyy"/>
+							</h:outputText>
+			            </p:column>
+						<p:column headerText="Credit" width="5%">
+							<p:commandLink id="creditLink" style="text-decoration:none; cursor:pointer;vertical-align:top"
+								update=":maintenanceInvoiceCreditForm"
+						        action="#{maintenanceInvoiceCreditBean.initDialog(purchaseOrder.mrqId)}"
+						        process="@this"
+						        rendered="#{purchaseOrder.creditFlag == 'true'}"
+						        title="Credit exists for this PO"
+						        oncomplete="PF('creditDialogWidget').show();">						   
+						            <p:graphicImage style="border-style: none;" value="/images/creditIcon.png" />						            							            
+						    </p:commandLink>   							
+ 						</p:column>	
+ 						<f:facet name="footer">
+							Record Count: <h:outputText value="#{maintenanceServiceHistoryBean.purchaseOrdersLazyList.rowCount}"/>
+						</f:facet>	            
+				</p:dataTable>
+   			</p:panel>
+
+   			<p:panel id="commandPanel" style="min-width:980px;max-width:100%;width:auto;">
+   				<p:commandButton id="viewPO" 
+   				    ajax="false"  
+   				    value="View Purchase Order" 
+   				    onclick="lockScreen();" 
+   				    action="#{maintenanceServiceHistoryBean.viewPurchaseOrder(null)}" 
+   				    immediate="true" 
+   				    tabindex="40"/>
+   				<p:spacer width="10" />
+   				<p:commandButton ajax="false" id="createPurchaseOrder"
+   				 tabindex="50" value="Create Purchase Order" 
+   				 onclick="lockScreen();" 
+   				 actionListener="#{maintenanceServiceHistoryBean.createPurchaseOrder}" 
+   				 disabled="#{!maintenanceServiceHistoryBean.hasPermission()}" />
+				<p:spacer height="0" width="10px"/>
+   				<p:commandButton id="createGoodwillPO" 
+   				    ajax="false" value="Create Goodwill Purchase Order" 
+   				    onclick="lockScreen();" 
+   				    action="#{maintenanceServiceHistoryBean.createGoodwillPurchaseOrder()}" 
+   				    immediate="true" 
+   				    oncomplete="alert('Copy PO and open it');" 
+   				    disabled="#{maintenanceServiceHistoryBean.isGoodwillButton() or !maintenanceServiceHistoryBean.hasPermission()}"
+   				    tabindex="60"/>
+   				<p:spacer width="10" /> 				    
+				<p:commandButton id="logNotes" 
+				    styleClass="#{maintenanceServiceHistoryBean.notesLogStyleClass()}"
+				    tabindex="220" 
+				    value="Notes Log" 
+				    immediate="true" 
+				    process="@this" 
+				    disabled="#{maintenanceServiceHistoryBean.isLogNotesDisabled()}" 
+				    oncomplete="showLogBook();" 
+				    title="Log for Fleet Maintenance Unit" />
+				 <p:spacer width="10" /> 
+				 	<p:commandButton id="preVehSchBtn" value="View Schedule" oncomplete="showVehMaintSchedule(xhr, status, args)" update=":vehicleMaintenanceSchedule"
+								action="#{viewVehicleMaintenanceScheduleBean.fetchScheduleMaintList}" ajax="true"
+						 tabindex="59" >
+						 <f:param name="UNIT_NUMBER"  value="#{maintenanceServiceHistoryBean.fleetMaster.unitNo}"/>
+					</p:commandButton>
+								   				    
+   				
+   				
+   				<p:spacer width="10" /> 
+				 	<p:commandButton id="rePriVehSchBtn" value="Reprint Schedule"  
+					 oncomplete="showDialog('reprintScheduleVar');"
+					  disabled="#{!maintenanceServiceHistoryBean.hasPermission()}"
+					ajax="true" 
+					tabindex="60">	 
+				</p:commandButton>
+   				<p:spacer width="10" /> 
+			 	<p:commandButton id="locatorBtn" value="Locator"  
+				 	oncomplete="openLocator()"
+					tabindex="65" >	 
+				</p:commandButton>
+								   				    
+   				<p:spacer width="10" />   				
+				<p:commandButton id="cancelPage" 
+				    ajax="false"  
+				    value="Cancel" 
+				    onclick="lockScreen();" 
+				    action="#{maintenanceServiceHistoryBean.cancel}" 
+				    immediate="true" 
+				    tabindex="70"/>
+				    
+			</p:panel>
+   		</h:form>
+   		<p:confirmDialog id="reprintScheduleDialog" message="" header="Alert" widgetVar="reprintScheduleVar" appendTo="@(body)">
+		<f:facet name="message">
+			<h:outputText value="Vehicle maintenance schedule will be reprinted and delivered to client." />
+			<br /><br />
+			<h:outputText value="The client will be charged a replacement fee for this service." />
+		</f:facet>
+		<p:focus context="reprintScheduleDialog" />
+		<h:form prependId="false">
+			<p:hotkey immediate="true" bind="esc"
+				handler="PF('reprintScheduleVar').hide(); focusSourceElement()" />
+			<p:commandButton id="rePriVehSchAlertBtn" value="Ok"  
+					action="#{maintenanceServiceHistoryBean.rePrintSchedule}" 
+					ajax="true" 
+					onclick="hideDialog('reprintScheduleVar');" >	 
+			</p:commandButton>
+			<p:commandButton id="cancelReprintAlert" value="Cancel"
+				onclick="PF('reprintScheduleVar').hide(); focusSourceElement()"
+				type="button" />
+		</h:form>
+	</p:confirmDialog>
+		
+		<div id="maintenanceProfileInclude">
+			<ui:include src="../../resources/view/component/maintenanceProfile.xhtml" />
+		</div> 
+		
+		<div id="maintenanceInvoiceCreditInclude">
+			<ui:include src="../../resources/view/component/maintenanceInvoiceCredit.xhtml" />
+		</div>
+		<div id="VEH_MAINT_SCH">
+				<ui:include src="../lov/vehicleMaintenanceSchedule.xhtml" />
+			</div>
+		
+		<style type="text/css">
+			.ui-tooltip{
+				max-width: 350px;
+			}
+		</style> 		
+			
+		<script type="text/javascript">
+		/* <![CDATA[ */  
+				
+		function setDefaultMaintenanceServiceHistoryRowSelection(){
+			var retFromNextPage = document.getElementById('returnedFromNextPage').value;
+			if(retFromNextPage == 'true'){
+				var clickIndex = parseInt(document.getElementById('clickIndex').value);
+				PF('maintenanceServiceHistoryDataTableWidget').selectRow(clickIndex,false);	
+            	setScrollDivAtTop();
+			}else{
+				clearDataTableSelection('maintenanceServiceHistoryDataTableWidget');
+			}
+		}
+		
+		var goToNextPage = "false";
+		function setGoToNextPage(){
+			goToNextPage = "true";
+		}
+		
+		function getGoToNextPage(){
+			if(goToNextPage=='true'){
+				return true;
+			}else{
+				return false;
+			}
+		}
+		
+		function clickViewPOButton(){
+			var clickButton = document.getElementById('viewPO');
+			clickButton.click();
+		}
+		
+		/**
+		* Detects the Enter key and programatically clicks
+		* the filter button. The search button event handler
+		* will perform the min. alphanumeric check.
+		*/
+		function doKeypressFilter(event){
+			if (event.keyCode == 13) {
+				source = event.srcElement.id;
+			   $('#filter').click();
+			   return false;
+			}
+			return true;	
+		}
+		
+     	$(window).load(function(){
+     		setDefaultMaintenanceServiceHistoryRowSelection();
+		});			
+		
+     	function openLocator(){
+     	   var title = '_blank';
+     	   var specs = 'menubar=no, toolbar=no, resizable=yes, scrollbars=yes, width=1020,height=575';
+     	   var url = document.getElementById('locatorURL').value;
+     	   window.open(url, title, specs);     
+     	  }
+     	
+		/* ]]> */	
+			
+		</script>
+	</ui:define>
+	
+	
+</ui:composition>

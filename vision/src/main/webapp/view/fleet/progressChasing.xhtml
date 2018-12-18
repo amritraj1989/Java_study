@@ -1,0 +1,379 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"
+	template="../../templates/ui.xhtml">
+
+	<ui:define name="content">
+		<h:form id="progressChasingBreadCrumbForm" prependId="false">
+			<p:breadCrumb model="#{progressChasingBean.breadCrumbTrail}"
+				ajax="false" immediate="true"
+				style="min-width:980px;max-width:100%;width:auto;" />
+		</h:form>
+		<!-- Message display -->
+		<p:scrollPanel mode="native" styleClass="ui-layout"
+			style="height:50px;min-width:980px;max-width:100%;width:auto;">
+			<p:messages id="messages" showSummary="false" showDetail="true"
+				autoUpdate="false" />
+		</p:scrollPanel>
+		
+		<comp:logBook id="logBook" entity="#{progressChasingBean.getSelectedMRQ()}" logBookTypes="#{progressChasingBean.logBookTypes}" 
+					  update="#progressChasingDataTable"  showRelatedUnitLogEntry="true" />
+				
+   		<h:form id="progressChasingForm" prependId="false"> 
+			<p:panel id="progressChasingLaunchPanel" header="PO Status/Count" style="min-width:980px;max-width:100%;width:auto;"> 
+   			<p:panelGrid id="progressChasingLaunchPanelGrid">
+				<p:row>
+					<p:column>
+						<h:outputText value="#{progressChasingBean.dataList[0].maintRequestStatusDescription}:" style="font-weight:bold"/>	
+					</p:column>
+					<p:column style="text-align:right">
+						<p:commandLink id="dataList0Link"  
+							action="#{progressChasingBean.performSearch(progressChasingBean.dataList[0])}"
+							style="cursor:pointer;"
+							update="progressChasingDataTablePanel, logNotes"
+							oncomplete="setFocusToFilter()">					
+						<h:outputText value="#{progressChasingBean.dataList[0].poStatusCount}"/>
+						</p:commandLink>						
+					</p:column>
+					<p:column> 
+					</p:column>
+					<p:column>
+						<h:outputText value="#{progressChasingBean.dataList[1].maintRequestStatusDescription}:" style="font-weight:bold"/>
+					</p:column>
+					<p:column style="text-align:right">
+						<p:commandLink id="dataList1Link"  
+							action="#{progressChasingBean.performSearch(progressChasingBean.dataList[1])}"
+							style="cursor:pointer;"
+							update="progressChasingDataTablePanel, logNotes"
+							oncomplete="setFocusToFilter()">					
+						<h:outputText value="#{progressChasingBean.dataList[1].poStatusCount}"/>
+						</p:commandLink>						
+					</p:column>	
+					<p:column> 
+					</p:column>
+					<p:column>
+						<h:outputText value="#{progressChasingBean.dataList[2].maintRequestStatusDescription}:" style="font-weight:bold"/>	
+					</p:column>
+					<p:column style="text-align:right">
+						<p:commandLink id="dataList2Link"  
+							action="#{progressChasingBean.performSearch(progressChasingBean.dataList[2])}"
+							style="cursor:pointer;"
+							update="progressChasingDataTablePanel, logNotes"
+							oncomplete="setFocusToFilter()">						
+						<h:outputText value="#{progressChasingBean.dataList[2].poStatusCount}"/>
+						</p:commandLink>						
+					</p:column>	
+					<p:column> 
+					</p:column>
+					<p:column>
+						<h:outputText value="#{progressChasingBean.dataList[3].maintRequestStatusDescription}:" style="font-weight:bold"/>
+					</p:column>
+					<p:column style="text-align:right">
+						<p:commandLink id="dataList3Link"  
+							action="#{progressChasingBean.performSearch(progressChasingBean.dataList[3])}"
+							style="cursor:pointer;"
+							update="progressChasingDataTablePanel, logNotes"
+							oncomplete="setFocusToFilter()">					
+						<h:outputText value="#{progressChasingBean.dataList[3].poStatusCount}"/>
+						</p:commandLink>						
+					</p:column>										
+				</p:row>
+				<p:row>
+					<p:column>
+						<h:outputText value="#{progressChasingBean.dataList[4].maintRequestStatusDescription}:" style="font-weight:bold"/>	
+					</p:column>
+					<p:column style="text-align:right">
+						<p:commandLink id="dataList4Link"  
+							action="#{progressChasingBean.performSearch(progressChasingBean.dataList[4])}"
+							style="cursor:pointer;"
+							update="progressChasingDataTablePanel, logNotes"
+							oncomplete="setFocusToFilter()">						
+						<h:outputText value="#{progressChasingBean.dataList[4].poStatusCount}"/>
+						</p:commandLink>						
+					</p:column>	
+					<p:column>
+					</p:column>	
+					<p:column>
+						<h:outputText value="#{progressChasingBean.dataList[5].maintRequestStatusDescription}:" style="font-weight:bold"/>	
+					</p:column>
+					<p:column style="text-align:right">
+						<p:commandLink id="dataList5Link"  
+							action="#{progressChasingBean.performSearch(progressChasingBean.dataList[5])}"	
+							style="cursor:pointer;"
+							update="progressChasingDataTablePanel, logNotes"
+							oncomplete="setFocusToFilter()">					
+						<h:outputText value="#{progressChasingBean.dataList[5].poStatusCount}"/>
+						</p:commandLink>						
+					</p:column>	
+					<p:column>
+					</p:column>	
+					<p:column>
+						<h:outputText value="#{progressChasingBean.dataList[6].maintRequestStatusDescription}:" style="font-weight:bold"/>	
+					</p:column>
+					<p:column style="text-align:right">
+						<p:commandLink id="dataList6Link"  
+							action="#{progressChasingBean.performSearch(progressChasingBean.dataList[6])}"
+							style="cursor:pointer;"
+							update="progressChasingDataTablePanel, logNotes"
+							oncomplete="setFocusToFilter()">					
+						<h:outputText value="#{progressChasingBean.dataList[6].poStatusCount}"/>
+						</p:commandLink>						
+					</p:column>						
+					<!-- HPS-1460 new progress chasing queue for PO status as Hold -->
+                    <p:column>
+					</p:column>						
+					<p:column>
+						<h:outputText value="#{progressChasingBean.dataList[7].maintRequestStatusDescription}:" style="font-weight:bold"/>	
+					</p:column>
+					<p:column style="text-align:right">
+						<p:commandLink id="dataList8Link"  
+							action="#{progressChasingBean.performSearch(progressChasingBean.dataList[7])}"
+							style="cursor:pointer;"
+							update="progressChasingDataTablePanel, logNotes"
+							oncomplete="setFocusToFilter()">					
+						<h:outputText value="#{progressChasingBean.dataList[7].poStatusCount}"/>
+						</p:commandLink>						
+					</p:column>		
+					<p:column>
+						<p:commandLink value="Completed No Vendor Invoice" style="font-weight:bold;" 
+							action="#{progressChasingBean.performSearch(progressChasingBean.completedNoVendorVO)}"
+							update="progressChasingDataTablePanel, logNotes"
+							oncomplete="setFocusToFilter()"/>	
+					</p:column>					                    													
+				</p:row>
+			</p:panelGrid>
+			</p:panel>
+
+			<p:panel id="progressChasingDataTablePanel" header="Queue : #{progressChasingBean.selectedPoStatusDescription}">
+
+   				<h:inputHidden id="clickIndex" name ="clickIndex" value = "#{progressChasingBean.selectionIndex}"/>
+   				<h:inputHidden id="returnedFromNextPage" name ="returnedFromNextPage" value = "#{progressChasingBean.returnedFromNextPage}"/>
+			
+   				<p:toolbar id="searchToolbar">  
+				    <p:toolbarGroup align="left">  
+				    		<p:separator></p:separator>
+							<p:outputLabel for="lastUpdatedBy" value="PO Last Updated By : " />								
+							<p:inputText id="lastUpdatedBy" title="PO Last Updated By" value="#{progressChasingBean.lastUpdatedByFilter}" onkeypress="return doKeypressFilter(event)" tabindex="10"/>
+							<p:separator></p:separator>
+							<p:commandButton  value="Search" id="filter" title="filter" process="@this, lastUpdatedBy" update="progressChasingDataTable, logNotes" actionListener="#{progressChasingBean.performSearch(progressChasingBean.getSelectedProgressChasingQueueVO())}" tabindex="20" disabled="#{progressChasingBean.getSelectedProgressChasingQueueVO() == null}"/> 
+				    </p:toolbarGroup>  
+				</p:toolbar> 
+							
+	 			<p:dataTable id="progressChasingDataTable" widgetVar="progressChasingDataTableVar"
+	 						 value="#{progressChasingBean.progressChasingLazyList}" 
+	 						 var="poStatus"
+	 						 lazy="true"
+	 						 scrollable="true" 
+	 						 scrollHeight="#{progressChasingBean.dataTable.height}"
+	 						 emptyMessage = "#{progressChasingBean.dataTableMessage}"
+	 						 rows="#{progressChasingBean.resultsPerPage}"
+	 						 selection = "#{progressChasingBean.selectedProgressChasingVO}"
+	 						 paginator="true" 
+	 						 paginatorPosition="bottom" 
+							 selectionMode="single"
+							 sortBy="#{poStatus.actualStartDate}"
+							 sortOrder="ascending"
+							 resizableColumns="true"> 	
+							 
+					<p:ajax event="sort"
+						oncomplete="setDefaultProgressChasingRowSelection();" />
+					<p:ajax event="rowSelect"
+						onstart="return !getGoToNextPage();"
+						update=":progressChasingForm:clickIndex, :progressChasingForm:commandPanel"></p:ajax>
+					<p:ajax event="page"
+					 	onstart="clearDataTableSelection('progressChasingDataTableVar');"
+						oncomplete="setDataTableToFirstRow('progressChasingDataTableVar');setScrollDivAtTop();" />
+
+		        	<p:column headerText="PO Number" width="8%" sortBy="#{poStatus.poNumber}">
+			            <p:commandLink id="poNumberLink" 
+			            			   action="#{progressChasingBean.viewPurchaseOrder(poStatus)}" 
+			            			   ajax="false" 
+			            			   onclick="setGoToNextPage();lockScreen();">
+		        			<h:outputText value="#{poStatus.poNumber}" style="font-weight:bold"/>
+	        			</p:commandLink>
+	        		</p:column>	
+	        		<p:column headerText="Unit No" width="7%" sortBy="#{poStatus.unitNo}">
+		        		<h:outputText value="#{poStatus.unitNo}" style="white-space: normal"/>
+	        		</p:column>	
+	        		<p:column headerText="Client" width="11%" sortBy="#{poStatus.clientAccountNumber}">
+		        		<h:outputText value="#{poStatus.clientAccountNumber} - #{poStatus.clientAccountName}" /> 
+	        		</p:column>	
+		        	<p:column headerText="Service Provider" width="12%" sortBy="#{poStatus.serviceProviderName}">
+			        	<h:outputText id="serviceProvider" value="#{poStatus.serviceProviderName} &lt;br /&gt; No: #{poStatus.serviceProviderNumber}" title="#{poStatus.serviceProviderDetails}" escape="false" style="white-space: normal"/>
+			        	<p:tooltip for="serviceProvider">
+			        	    <h:outputText value="#{poStatus.maintReqServiceProviderDetail}" escape="false"/>
+			        	</p:tooltip>
+	        		</p:column>	 
+	        		<p:column headerText="Categories" width="8%">
+		        		<h:outputText value="#{poStatus.concatCategoryDescriptions}" style="white-space: normal"/>
+	        		</p:column>	
+	        		<p:column headerText="Start Date" width="8%" sortBy="#{poStatus.actualStartDate}">
+		        		<h:outputText value="#{poStatus.actualStartDate}">
+		        			<f:convertDateTime pattern="MM/dd/yyyy"/>
+	        			</h:outputText>
+	        		</p:column>	  
+	        		<p:column headerText="PO Status" width="8%">
+		        		<h:outputText value="#{poStatus.maintRequestStatusDescription}" />
+	        		</p:column>	 
+	        		<p:column headerText="PO Total" width="8%">
+		        		<h:outputText value="#{poStatus.taskTotalCost}" style="float:right">
+		        			<f:convertNumber type="currency" currencySymbol="$" />
+	        			</h:outputText>
+	        		</p:column>	 
+	        		<p:column headerText="Rech. Total" width="8%">
+		        		<h:outputText value="#{poStatus.rechargeTotal}" style="float:right">
+		        			<f:convertNumber type="currency" currencySymbol="$" />
+	        			</h:outputText>
+	        		</p:column>	
+	        		<p:column headerText="PO Last &lt;br/&gt; Updated By" width="8%">
+	                    <h:outputText id="lastUpdatedBy"
+	                        value="#{poStatus.lastChangedBy} "/>
+	                    <h:outputText value="#{poStatus.lastChangedDate}">
+	                        <f:convertDateTime pattern="MM/dd/yyyy hh:mm a" />
+	                    </h:outputText>	        		
+	        		</p:column>
+	        		<p:column headerText="Activity Notes &lt;br/&gt; Last Updated By" width="9%">
+	        			<h:outputText id="activityNotesLastUpdatedBy"
+	        				value="#{poStatus.activityNotesLastUpdatedBy} " />
+	        			<h:outputText value="#{poStatus.activityNotesLastUpdatedDate}">
+	        				<f:convertDateTime pattern="MM/dd/yyyy hh:mm a" />
+						</h:outputText>	        				
+	        		</p:column>
+					<p:columnGroup type="footer">
+						<p:row>
+							<p:column footerText="" width="#{progressChasingBean.dataTable.col1}"/>
+							<p:column footerText="" width="#{progressChasingBean.dataTable.col2}"/>
+							<p:column footerText="" width="#{progressChasingBean.dataTable.col3}"/>
+							<p:column footerText="" width="#{progressChasingBean.dataTable.col4}"/>
+							<p:column footerText="" width="#{progressChasingBean.dataTable.col5}"/>
+							<p:column footerText="" width="#{progressChasingBean.dataTable.col6}"/>
+							<p:column footerText="" width="#{progressChasingBean.dataTable.col7}"/>
+							<p:column footerText="" width="#{progressChasingBean.dataTable.col8}"/>
+							<p:column style="text-align:right" width="#{progressChasingBean.dataTable.col9}">										
+								<f:facet name="footer">
+									<h:outputText id="totalTasksSum" value="#{progressChasingBean.getPoTotalSum()}">
+										<f:convertNumber type="currency" currencySymbol="$" />
+									</h:outputText>
+								</f:facet>
+							</p:column>
+							<p:column style="text-align:right" width="#{progressChasingBean.dataTable.col10}">										
+								<f:facet name="footer">
+									<h:outputText id="rechargeTotalSum" value="#{progressChasingBean.getRechargeTotalSum()}">
+										<f:convertNumber type="currency" currencySymbol="$" />
+									</h:outputText>
+								</f:facet>
+							</p:column>
+							<p:column footerText="" width="#{progressChasingBean.dataTable.col11}"/>
+							<p:column footerText="" width="#{progressChasingBean.dataTable.col12}"/>
+						</p:row>
+					</p:columnGroup>	        		
+	        		
+					<f:facet name="footer">
+						Record Count: <h:outputText value="#{progressChasingBean.progressChasingLazyList.rowCount}"/>
+					</f:facet>
+	        	</p:dataTable>
+	       	</p:panel>
+	       	
+   			<p:panel id="commandPanel" style="min-width:980px;max-width:100%;width:auto;">
+   				<p:commandButton id="viewPO" 
+   				    ajax="false"  
+   				    value="View Purchase Order" 
+   				    onclick="lockScreen();" 
+   				    action="#{progressChasingBean.viewPurchaseOrder(poStatus)}" 
+   				    immediate="true" 
+   				    tabindex="30"
+   				    widgetVar="poBtnVar"
+   				    disabled="#{progressChasingBean.selectedProgressChasingVO == null}"/>
+   				<p:spacer width="10" /> 				    
+				<p:commandButton id="logNotes" 
+				    styleClass="#{progressChasingBean.notesLogStyleClass()}"
+				    tabindex="40" 
+				    value="Notes Log" 
+				    immediate="true" 
+				    process="@this" 
+				    disabled="#{progressChasingBean.isLogNotesDisabled()}" 
+				    oncomplete="showLogBook();" 
+				    title="Log for Fleet Maintenance Unit" 
+				    widgetVar="logBtnVar"/>   				    
+   				<p:spacer width="10" />
+				<p:commandButton id="cancelPage" 
+				    ajax="false"  
+				    value="Cancel" 
+				    onclick="lockScreen();" 
+				    action="#{progressChasingBean.cancel}" 
+				    oncomplete="setDefaultSearchRowSelection();"
+				    immediate="true" 
+				    tabindex="50"/>
+			</p:panel>	       	
+       	</h:form>
+
+		<script type="text/javascript">
+		
+		var goToNextPage = "false";
+		function setGoToNextPage(){
+			goToNextPage = "true";
+		}
+		
+		function getGoToNextPage(){
+			if(goToNextPage=='true'){
+				return true;
+			}else{
+				return false;
+			}
+		}
+		
+		function setFocusToFilter(){
+			resetTable();
+			var field = document.getElementById('lastUpdatedBy');
+			field.select();
+			field.focus();
+		}
+		
+		function setDefaultProgressChasingRowSelection(){
+			var retFromNextPage = document.getElementById('returnedFromNextPage').value;
+			if(retFromNextPage == 'true'){
+				var clickIndex = parseInt(document.getElementById('clickIndex').value);
+				PF('progressChasingDataTableVar').selectRow(clickIndex,false);	
+            	setScrollDivAtTop();
+			}
+		}	
+		
+		function clickViewPOButton(){
+			var clickButton = document.getElementById('viewPO');
+			clickButton.click();
+		}
+		
+		/**
+		* Detects the Enter key and programatically clicks
+		* the filter button. The search button event handler
+		* will perform the min. alphanumeric check.
+		*/
+		function doKeypressFilter(event){
+			if (event.keyCode == 13) {
+				source = event.srcElement.id;
+			   $('#filter').click();
+			   return false;
+			}
+			return true;	
+		}		
+
+		function resetTable() {
+			setScrollDivAtTop();
+			PF('progressChasingDataTableVar').unselectAllRows();
+			PF('poBtnVar').disable();
+			PF('logBtnVar').disable();
+//			$('tr.ui-state-highlight').find('input').prop('checked',true);			
+		}
+		
+     	$(window).load(function(){
+     		setDefaultProgressChasingRowSelection();
+     		setFocus('dataList0Link');		
+		});	
+		</script>
+
+	</ui:define>
+
+</ui:composition>

@@ -1,0 +1,130 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">                          
+	
+	<h:form id="modelLovForm" name ="modelLovForm" prependId = "false">
+	    <p:dialog header="Select Model" widgetVar="modelLOV" id="MODEL_GRID" dynamic="true" resizable="true" appendTo="@(body)"
+		        width="720" height="365"  modal="true" onShow="setFirstPageModelDataTableWidget(); setFocus('modelSelectButton');">
+		
+		    <p:hotkey immediate="true" bind="esc" handler="PF('modelLOV').hide()"/>
+				        
+			<h:inputHidden id="clickModelLovIndex" name ="clickModelLovIndex" value = "#{modelLOVBean.selectionIndex}"/>
+			
+			<h:inputHidden id="selectionIndex" name ="selectionIndex" value = "#{modelLOVBean.selectedModelRange.mrgId}"/>
+			
+            <h:form id="modelLovDataTblForm" onkeydown="body_onkeydown(event,'modelLovDataTblForm:modelSelectButton','modelLOV');">
+			    <p:dataTable id="modelDataTable" 
+			            var="model"
+			            widgetVar="modelDataTableWidget"
+				        value="#{modelLOVBean.modelRanges}"			             
+			            lazy="true"  
+			            scrollable="true" 
+			            scrollHeight="270" 
+			            resizableColumns="true" 
+				        rows="#{modelLOVBean.rowsPerPage}" 
+				        paginator="true" 
+				        paginatorPosition="bottom"  
+						selection = "#{modelLOVBean.selectedModelRange}" 
+						selectionMode="single">
+						
+						    <p:ajax event="rowDblselect" listener="#{modelLOVBean.onRowSelect}" 
+						            oncomplete="hideModelLOV();setModelValues();" update=":modelLovForm:lovModelDescription :modelLovForm:lovModelCode :modelLovForm:lovMrgId" />	
+						            
+							<p:ajax event="rowSelect" listener="#{modelLOVBean.onRowSelect}" 
+							        update=":modelLovForm:selectionIndex" />	
+							        
+							<p:ajax event="page" onstart="clearDataTableSelection('modelDataTableWidget');" oncomplete="setScrollDivAtTop();"/>							        					            					            				
+							
+					
+					<p:column width="50">
+					    <f:facet name="header">
+						    <h:outputText value="Make Model Range Code" style ="font-weight:bold"/>
+						</f:facet>
+						
+						<h:outputText value="#{model.code}" />
+					</p:column>						
+												
+					<p:column width="175">
+					    <f:facet name="header">
+						    <h:outputText value="Model Description" style ="font-weight:bold"/>
+						</f:facet>
+						
+						<h:outputText value="#{model.description}" />
+					</p:column>
+					
+					<p:column headerText="Model Type" width="25" rendered="#{modelLOVBean.showModelType}">
+						<h:outputText value="#{model.modelType}" />
+					</p:column>
+																   
+				</p:dataTable>
+						
+				<div style="text-align:center;">								
+				    <h:outputText style="font-weight:bold;" 
+					        value="Record Count: #{modelLOVBean.modelRanges.rowCount}">
+					</h:outputText>	
+					<p:commandButton style="float:right;"  value="Select" id = "modelSelectButton" name ="modelSelectButton"
+					        update=":modelLovForm:lovModelDescription :modelLovForm:lovModelCode :modelLovForm:lovMrgId" oncomplete="hideModelLOV();setModelValues();"
+							>
+					</p:commandButton>
+									
+             	</div>
+            </h:form>	 
+		</p:dialog>	
+					
+		<h:inputHidden id="targetInputName" value="modelLOV" />
+		<h:inputHidden id="lovMrgId" value="#{modelLOVBean.selectedModelRange.mrgId}" />
+		<h:inputHidden id="lovModelDescription" value="#{modelLOVBean.selectedModelRange.description}" />
+		<h:inputHidden id="lovModelCode" value="#{modelLOVBean.selectedModelRange.code}" />		
+		<h:inputHidden id="lovRecordsPerPageModel" value="#{modelLOVBean.lovRecordsPerPage}" />
+			        
+	</h:form>
+	
+	<script type="text/javascript">	
+	
+	    /**
+	    * COPIED
+	    */	    
+		function setModelValues(){
+			var lovNameArray = new Array();
+			var lovValueArray = new Array();
+			
+			lovNameArray[0]='MODEL_DESCRIPTION';
+			lovValueArray[0]=document.getElementById('lovModelDescription').value;
+			
+			lovNameArray[1]='MODEL_CODE';
+			lovValueArray[1]=document.getElementById('lovModelCode').value;	
+			
+			lovNameArray[2]='MRG_ID';
+			lovValueArray[2]=document.getElementById('lovMrgId').value;	
+			
+			<!-- This method need to implement in parent page to populate LOV seletion-->
+			setSelection(document.getElementById('targetInputName').value,lovNameArray,lovValueArray);
+		}
+		
+	    /**
+		* COPIED
+		*/	 	    
+		function showModelLOV(){
+			showDialog('modelLOV');
+		}	
+		
+	    /**
+		* COPIED
+		*/	 	    
+		function hideModelLOV(){
+			hideDialog('modelLOV');
+		}
+		
+	    /**
+		* COPIED
+		*/	 	    
+		function setFirstPageModelDataTableWidget(){
+			setDataTableToFirstPage('modelDataTableWidget');
+			// also select the first row, but only if we have data
+			setDataTableToFirstRow('modelDataTableWidget');
+		}
+				
+    </script>
+</ui:composition>

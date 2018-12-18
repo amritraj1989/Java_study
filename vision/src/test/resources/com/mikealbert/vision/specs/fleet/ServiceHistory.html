@@ -1,0 +1,82 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Fleet Maintenance / FM-30 Service History</title>
+    <body>
+    	<h1>Fleet Maintenance / FM-30 Service History</h1>
+    	<h2>Acceptance Tests (Automated)</h2>
+		
+			<ul concordion:execute="#result = testServiceHistoryForGivenPo(#unitNo,#poNumber)">
+ 				<li>When searching for unit number <b><span concordion:set="#unitNo">00950540</span></b> and viewing results for po number <b><span concordion:set="#poNumber">J00298724</span></b>
+ 					the PO Number should be <span concordion:assertEquals="#result.poNumber">J00298724</span>
+  					and the Service Provider Name should be <span concordion:assertEquals="#result.serviceProviderName">Nwrk - Sears</span>
+ 					and the Service Provider Number should be <span concordion:assertEquals="#result.serviceProviderNumber">CSC34</span>
+					and the Categories should be <span concordion:assertEquals="#result.concatCategoryDescriptions">MISC_MAINT, OIL_CHANGE, TIRE_SVCS</span> 					
+ 					and the Start Date should be <span concordion:assertEquals="#result.actualStartDate">2012-07-18 00:00:00.0</span>
+ 					and the Odometer should be <span concordion:assertEquals="#result.odo">51987</span>
+ 					and the PO Status should be <span concordion:assertEquals="#result.maintRequestStatus">Completed</span>
+ 					and the PO Total should be <span concordion:assertEquals="#result.doclTotalCost">107.08</span>
+ 					and the Recharge Total should be <span concordion:assertEquals="#result.rechargeTotal">107.08</span>
+ 					and the Payee Invoice should be <span concordion:assertEquals="#result.payeeInvoiceNumber">507029R</span> 
+ 					and the Payee Invoice Date should be <span concordion:assertEquals="#result.payeeInvoiceDate">2012-08-03 00:00:00.0</span>
+ 					and the MAFS Invoice should be <span concordion:assertEquals="#result.mafsInvoiceNumber">INV00424306</span>
+				</li>
+ 			</ul>	
+ 			
+			<ul concordion:execute="#result = testServiceHistoryForGivenPo(#unitNo,#poNumber)">
+ 				<li>When searching for unit number <b><span concordion:set="#unitNo">00947568</span></b> and viewing results for po number <b><span concordion:set="#poNumber">J00226613</span></b>
+ 				    the PO Number should be <span concordion:assertEquals="#result.poNumber">J00226613</span>
+  				    and the Service Provider Name should be <span concordion:assertEquals="#result.serviceProviderName">Valvoline Instant Oil Change</span>
+ 				    and the Service Provider Number should be <span concordion:assertEquals="#result.serviceProviderNumber">040004</span>
+				    and the Categories should be <span concordion:assertEquals="#result.concatCategoryDescriptions">OIL_CHANGE, TIRE_SVCS</span> 					
+ 					and the Start Date should be <span concordion:assertEquals="#result.actualStartDate">2011-02-18 00:00:00.0</span>
+ 					and the Odometer should be <span concordion:assertEquals="#result.odo">14481</span>
+ 					and the PO Status should be <span concordion:assertEquals="#result.maintRequestStatus">Completed</span>
+ 					and the PO Total should be <span concordion:assertEquals="#result.doclTotalCost">71.57</span>
+ 					and the Recharge Total should be <span concordion:assertEquals="#result.rechargeTotal">71.57</span>
+ 					and the Payee Invoice should be <span concordion:assertEquals="#result.payeeInvoiceNumber">36362A</span> 
+ 					and the Payee Invoice Date should be <span concordion:assertEquals="#result.payeeInvoiceDate">2011-02-18 00:00:00.0</span>
+ 					and the MAFS Invoice should be <span concordion:assertEquals="#result.mafsInvoiceNumber">INV00303333</span>
+ 					and the Credit checkbox should be <span concordion:assertEquals="#result.creditFlag">false</span> 					
+				</li>
+ 			</ul>
+ 			
+			<ul concordion:execute="#result = testServiceHistoryForGivenPo(#unitNo,#poNumber)">
+ 				<li>When searching for unit number <b><span concordion:set="#unitNo">00949710</span></b> and viewing results for po number <b><span concordion:set="#poNumber">J00281895</span></b>
+ 				    the PO Number should be <span concordion:assertEquals="#result.poNumber">J00281895</span>
+  				    and the Service Provider Name should be <span concordion:assertEquals="#result.serviceProviderName">Nwrk - Jiffy Lube</span>
+ 					and the Service Provider Number should be <span concordion:assertEquals="#result.serviceProviderNumber">CSC15</span>
+					and the Categories should be <span concordion:assertEquals="#result.concatCategoryDescriptions">MISC_SVCS, OIL_CHANGE</span> 					
+ 					and the Start Date should be <span concordion:assertEquals="#result.actualStartDate">2012-03-23 00:00:00.0</span>
+ 					and the Odometer should be <span concordion:assertEquals="#result.odo">59410</span>
+ 					and the PO Status should be <span concordion:assertEquals="#result.maintRequestStatus">Completed</span>
+ 					and the PO Total should be <span concordion:assertEquals="#result.doclTotalCost">39.99</span>
+ 					and the Recharge Total should be <span concordion:assertEquals="#result.rechargeTotal">39.99</span>
+ 					and the Payee Invoice should be <span concordion:assertEquals="#result.payeeInvoiceNumber">018469</span> 
+ 					and the Payee Invoice Date should be <span concordion:assertEquals="#result.payeeInvoiceDate">2012-04-03 00:00:00.0</span>
+ 					and the MAFS Invoice should be <span concordion:assertEquals="#result.mafsInvoiceNumber">INV00393396</span>
+ 					and the Credit checkbox should be <span concordion:assertEquals="#result.creditFlag">true</span> 					
+				</li>
+ 			</ul>
+ 			
+ 			<ul concordion:execute="#result = testServiceHistoryMaintCodeFilter(#unitNo,#maintCodeDesc)">
+                <li>Search on <span concordion:set="#unitNo">00963955</span> and click on Service History button and filter on Maintenance Code description = <span concordion:set="#maintCodeDesc">Tire disposal fee</span>
+                <span concordion:assertTrue="#result">maintenance history screen to show only the maintenance purchase order/s which contains the Maintenance Code description=Tire disposal fee</span>
+                </li>
+            </ul>
+            
+            <ul concordion:execute="#result = testServiceHistoryMaintCodeFilter(#unitNo,#maintCodeDesc)">
+                <li>Search on <span concordion:set="#unitNo">00963955</span> and click on Service History button and filter on Maintenance Code description = <span concordion:set="#maintCodeDesc">195/65R15 - Radar - 45K pro</span>
+                <span concordion:assertTrue="#result">maintenance history screen to show only the maintenance purchase order/s which contains the Maintenance Code description=195/65R15 - Radar - 45K pro</span>
+                </li>
+            </ul>
+ 			
+			
+    	<h2>Manual Tests</h2>
+    	    <ul type = "circle"><b>
+    	       <li>TODO: After entering information in search criteria field: test clicking Enter in search field, test clicking Search, test clicking the LOV</li>
+    	    </b></ul>
+
+    	<h2>Untested (Out of Scope)</h2>
+    		<ul><li>TODO:</li></ul>
+    </body>
+</html>

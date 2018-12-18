@@ -1,0 +1,659 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+xmlns:f="http://java.sun.com/jsf/core" 
+xmlns:h="http://java.sun.com/jsf/html" 
+xmlns:p="http://primefaces.org/ui" 
+xmlns:ui="http://java.sun.com/jsf/facelets" 
+xmlns:pe="http://primefaces.org/ui/extensions"
+xmlns:comp="http://java.sun.com/jsf/composite/view/component"
+template="../../templates/ui.xhtml">
+
+  
+	<ui:define name="content">
+		   <comp:logBook id="logBook" 
+		    		entity="#{vehicleConfigurationAddEditBean.vehicleConfiguration}" 
+		            logBookTypes="#{vehicleConfigurationAddEditBean.logBookType}"  
+		            enableAddAndClose="false"
+		            onClose="logBookCallback()" />
+		            	
+			<h:form id="vehicleConfigurationAddEditBreadCrumbForm" prependId="false">
+				<p:breadCrumb model="#{vehicleConfigurationAddEditBean.breadCrumbTrail}" ajax="false" immediate="true" styleClass="ui-layout" />
+			</h:form>
+			<h:form id="vehicleConfigurationForm" prependId="false">
+			
+				<p:remoteCommand name="updateNotesButton" update=":vehicleConfigurationForm:vehConfigNotesBtn" />
+							
+				<h:inputHidden id="dirtyData" value="#{vehicleConfigurationAddEditBean.dirtyData}"/>
+				<!-- Error message display -->
+				<p:scrollPanel style="height:50px;" mode="native" styleClass="ui-layout">
+					<p:messages id="messages" showSummary="false" severity="info,error,fatal" showDetail="true" autoUpdate="true" />
+				</p:scrollPanel>
+				<p:panel id="vehicleConfigurationPanelMain" header="Configuration" styleClass="ui-layout">
+					<p:focus context="vehicleConfigurationPanelMain" />
+					<p:panelGrid columns="#{vehicleConfigurationAddEditBean.viewMode eq 'Add' ? '4' : '6'}" cellpadding="5">
+						<p:outputLabel id="customerAccountLabel" for="customerAccount" value="Client:*" styleClass="ui-label" />
+						<p:autoComplete id="customerAccount" title="Client" rendered="#{vehicleConfigurationAddEditBean.viewMode eq 'Add' ? 'true' : 'false'}"
+							widgetVar="customerAccountWidgetVar" 
+							value="#{vehicleConfigurationAddEditBean.vehicleConfiguration.externalAccount}" 
+							var="client" 
+							completeMethod="#{vehicleConfigurationAddEditBean.autoCompleteClientListener}"
+							itemLabel="#{client.accountName.concat(' - ').concat(client.externalAccountPK.accountCode)}" 
+							itemValue="#{client}" 
+							converter="#{customerAccountConverter}"
+							forceSelection="true" 
+							size="40" 
+							maxlength="100" 
+							autocomplete="off" 
+							scrollHeight="100" >
+						  <p:ajax event="query" process="@this" />
+						</p:autoComplete>
+						<h:outputText id="customerAccountViewModeLabel" value="#{vehicleConfigurationAddEditBean.clientAccount.accountName}" 
+							rendered="#{vehicleConfigurationAddEditBean.viewMode eq 'Add'? false : true}" size="40" />
+						
+						<p:outputLabel id="applicationNameLabel" for="applicationName" value="Application:*" styleClass="ui-label" />
+						<p:inputText id="applicationName" title="Application" autocomplete="off" value="#{vehicleConfigurationAddEditBean.vehicleConfiguration.description}" maxlength="100" size="80" rendered="#{vehicleConfigurationAddEditBean.viewMode eq 'Add' ? 'true' : 'false'}"/>
+						<h:outputText id="applicationText" value="#{vehicleConfigurationAddEditBean.vehicleConfiguration.description}" size="80" rendered="#{vehicleConfigurationAddEditBean.viewMode eq 'Add' ? 'false' : 'true'}"/>
+						
+						<h:outputLabel id="hdnlbl1" rendered="#{vehicleConfigurationAddEditBean.viewMode eq 'Edit' ? 'true' : 'false'}"></h:outputLabel>
+						<h:outputLabel id="hdnlbl2" rendered="#{vehicleConfigurationAddEditBean.viewMode eq 'Edit' ? 'true' : 'false'}"></h:outputLabel>
+						
+						<p:outputLabel for="locateFlag" value="Locate:" styleClass="ui-label" />
+						<h:selectBooleanCheckbox id="locateFlag" value="#{vehicleConfigurationAddEditBean.locateFlag}"
+							onchange="setDirtyData(true);" 
+							disabled="#{!vehicleConfigurationAddEditBean.hasManageVehConfigPermission}">
+							<p:ajax update="@form, intExtColor" process="@form intExtColor" listener="#{vehicleConfigurationAddEditBean.updateIntExtColor}" oncomplete="setFocusPF('locateFlag');"/>
+						</h:selectBooleanCheckbox>
+						
+						<p:outputLabel for="intExtColor" value="Requested Interior/Exterior Color:" styleClass="ui-label" />
+						<p:inputText id="intExtColor" title="Requested Interior/Exterior Color" onchange="setDirtyData(true);" value="#{vehicleConfigurationAddEditBean.vehicleConfiguration.color}" size="40" maxlength="80" disabled="#{!vehicleConfigurationAddEditBean.enableIntExtColorFlag}"/>
+						
+						<p:outputLabel value="Date Added:" styleClass="ui-label" rendered="#{vehicleConfigurationAddEditBean.viewMode eq 'Edit' ? 'true' : 'false'}" />
+						<h:outputText value="#{vehicleConfigurationAddEditBean.vehicleConfiguration.enteredDate}" rendered="#{vehicleConfigurationAddEditBean.viewMode eq 'Edit' ? 'true' : 'false'}">
+							<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+						</h:outputText>
+						
+						<p:outputLabel value="Status:" styleClass="ui-label" rendered="#{vehicleConfigurationAddEditBean.viewMode == 'Add' ? 'false' : 'true'}"/>
+						<p:columnGroup rendered="#{vehicleConfigurationAddEditBean.viewMode == 'Add' ? 'false' : 'true'}">
+							<p:outputLabel id="configStatus" value="#{vehicleConfigurationAddEditBean.vehConfigToggleStatus}" />
+							<p:spacer width="5"/>
+							<p:commandLink id="configStatusLink" 
+                                	onsuccess="setDirtyData(true);"
+                                	actionListener="#{vehicleConfigurationAddEditBean.toggleVehicleConfigStatus}"
+                               		process="@this" update="@form, configStatus"
+                                	disabled="#{!vehicleConfigurationAddEditBean.hasManageVehConfigPermission}"
+                           		title="Toggle Status">   
+                               	<p:graphicImage value="/images/action_toggle.png" styleClass="ui-border-none" />                                
+                            </p:commandLink>
+						</p:columnGroup>
+													
+					</p:panelGrid>
+				</p:panel>	
+				
+				<p:panel id="configurationVehTypePanel" header="Vehicle Types">					
+					<p:dataTable id="configurationTrimList" widgetVar="configurationTrimListVar" 
+						var="configVehType"
+						rowKey="#{configVehType.rowKey}"
+						resizableColumns="true"
+						value="#{vehicleConfigurationAddEditBean.getVehicleConfigModelVOForDisplay()}"
+						rowIndexVar="configVehTypeRowIndex" scrollHeight="#{vehicleConfigurationAddEditBean.getDtHeight(1)}" scrollable="true"
+						selection="#{vehicleConfigurationAddEditBean.selectedVehicleConfigModelVO}"
+						selectionMode="single">
+						
+						<f:facet name="header">
+							<p:commandLink id="expandCollapseTrim" style="float:left;vertical-align:5px;cursor:pointer;font-weight: bold;"
+								process="@this" update="@this, :vehicleConfigurationForm:configurationTrimList"
+								actionListener="#{vehicleConfigurationAddEditBean.toggleShowVehicleTypeRecords}"
+								rendered="#{vehicleConfigurationAddEditBean.viewMode eq 'Add' ? 'false' : 'true'}"
+				        		title="Show All/Active">
+				            	<h:outputLabel value="#{vehicleConfigurationAddEditBean.vehTypeToggleLabel}" />
+				    		</p:commandLink>
+				    		
+		                    <h:outputLabel  style="vertical-align:15px" value="Vehicle Types" />
+						   	<p:commandLink id="addConfigVehTypeLnk"  disabled="#{!vehicleConfigurationAddEditBean.hasManageVehConfigPermission}"
+						            style="float:right; border:thin solid gray; text-decoration:none; cursor:pointer;"
+						            actionListener="#{vehicleConfigurationAddEditBean.addVehicleTypeListener}"
+						            oncomplete="PF('configVehicleTypeDialogWidget').show();"
+						            update=":configVehicleTypeDialog"
+						            title="Add Vehicle Type">						   
+						        <p:graphicImage style="border-style: none;" value="/images/action_add.png" />
+						        <h:outputLabel  style="vertical-align:5px" value="Add &#160;"  /> 						            							            
+							</p:commandLink>
+						    <p:spacer height="15px;"/>			                    
+		                </f:facet>
+						
+						<p:column headerText="Mfg. Code" width="7%">
+							<h:outputText value="#{configVehType.mfgCode}" />
+						</p:column>
+						
+						<p:column headerText="Make" width="10%">
+							<h:outputText value="#{configVehType.make}" escape="false" />
+						</p:column>
+	
+						<p:column headerText="Model" width="12%">
+							<h:outputText value="#{configVehType.model}" escape="false" />
+						</p:column>
+						
+						<p:column headerText="Year" width="7%">
+							<h:outputText value="#{configVehType.year}" />
+						</p:column>
+						
+						<p:column headerText="Trim" width="49%">
+							<h:outputText value="#{configVehType.trim}" escape="false" />
+						</p:column>
+			
+						<p:column headerText="Status" width="10%">
+							<h:outputText value="#{configVehType.status eq 'Obsolete' ? configVehType.status : ''}" />
+						</p:column>
+						
+						<p:column width="5%">
+	                         <p:commandLink id="configModelDelLink" rendered="#{empty configVehType.vcmId ? 'true' : 'false'}"  
+	                         	actionListener="#{vehicleConfigurationAddEditBean.deleteVehicleType(configVehType)}"
+                               	process="@this" update=":vehicleConfigurationForm:configurationTrimList"
+	                         	title="Delete Trim">   
+	                         	<p:graphicImage value="/images/action_delete.png" styleClass="ui-border-none" />                                
+	                         </p:commandLink>
+	                         <p:spacer width="10"/>
+                                <p:commandLink id="configModelStatusLink" rendered="#{empty configVehType.vcmId ? 'false' : 'true'}"
+                                	actionListener="#{vehicleConfigurationAddEditBean.toggleVehicleTypeStatus(configVehType)}"
+                                	process="@this" update=":vehicleConfigurationForm:configurationTrimList" onsuccess="setDirtyData(true);"
+                                	disabled="#{!vehicleConfigurationAddEditBean.hasManageVehConfigPermission}"
+                           		title="Toggle Status">   
+                               	<p:graphicImage value="/images/action_toggle.png" styleClass="ui-border-none" />                                
+                               </p:commandLink>
+						</p:column>
+					</p:dataTable>
+				</p:panel>
+				
+				<p:panel id="confgurationVQNPanel" header="Vendor Quotes">
+					<p:dataTable id="confgurationVQNList" widgetVar="confgurationVQNListVar" 
+						var="configVendorQuote"
+						resizableColumns="true"
+						value="#{vehicleConfigurationAddEditBean.getVehicleConfigVendorQuoteVOsForDisplay()}"
+						rowIndexVar="configVQNRowIndex"
+						rowKey="#{configVendorQuote.rowKey}" scrollHeight="#{vehicleConfigurationAddEditBean.getDtHeight(2)}" scrollable="true"
+						selection="#{vehicleConfigurationAddEditBean.selectedVehicleConfigVendorQuoteVO}"
+						selectionMode="single">
+						
+						<f:facet name="header">
+							<p:commandLink id="expandCollapseVQN" style="float:left;vertical-align:5px;cursor:pointer;font-weight: bold;"
+								process="@this" update="@this, :vehicleConfigurationForm:confgurationVQNList"
+								actionListener="#{vehicleConfigurationAddEditBean.toggleShowVendorQuoteRecords}"
+								rendered="#{vehicleConfigurationAddEditBean.viewMode eq 'Add' ? 'false' : 'true'}"
+				        		title="Show All/Active">
+				            	<h:outputLabel value="#{vehicleConfigurationAddEditBean.vendorQuoteToggleLabel}" />
+				    		</p:commandLink>
+		                    <h:outputLabel  style="vertical-align:15px" value="Vendor Quotes" />
+						   	<p:commandLink id="addConfigVQNLnk"  disabled="#{!vehicleConfigurationAddEditBean.hasManageVehConfigPermission}"
+						            style="float:right; border:thin solid gray; text-decoration:none; cursor:pointer;"
+						            actionListener="#{vehicleConfigurationAddEditBean.addVendorQuoteListener}"
+						            update=":vendorQuoteDialog"
+						            oncomplete="PF('vendorQuoteDialogWidget').show();"
+						            title="Add Vendor Quote">						   
+						        <p:graphicImage style="border-style: none;" value="/images/action_add.png" />
+						        <h:outputLabel  style="vertical-align:5px" value="Add &#160;"  /> 						            							            
+							</p:commandLink>
+						    <p:spacer height="15px;"/>			                    
+		                </f:facet>
+		                
+						<p:column headerText="Vendor" width="25%">
+							<h:outputText value="#{configVendorQuote.vendorName} - #{configVendorQuote.vendorCode}"/>
+						</p:column>
+
+						<p:column headerText="Vendor Quote Number" width="15%">
+							<h:outputText value="#{configVendorQuote.quoteNumber}" title="#{configVendorQuote.quoteDescription}" />
+						</p:column>
+						
+						<p:column headerText="Document #{confgurationVQNListVar.getDocuments().size()}" width="20%">
+						
+							<ui:repeat value="#{configVendorQuote.getDocuments()}" var="vendorQuoteDoc">											      
+							     <p:commandButton value="#{vendorQuoteDoc.fileName}" ajax="false"  actionListener="#{vehicleConfigurationAddEditBean.previewDocuments(vendorQuoteDoc)}" 
+							        style="width:55px;height:25px;"
+							     	rendered="#{vendorQuoteDoc.uploadDoc}"
+							     	disabled="#{!vehicleConfigurationAddEditBean.hasManageVehConfigPermission}" > 
+							     		<p:fileDownload value="#{vehicleConfigurationAddEditBean.previewfile}"/>
+								</p:commandButton>
+								<p:spacer width="10"/>
+						    </ui:repeat>
+						    
+						</p:column>
+
+						<p:column headerText="Quote Date" width="10%">
+							<h:outputText value="#{configVendorQuote.quoteDate}" >
+								<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+							</h:outputText>
+						</p:column>
+
+						<p:column headerText="Expiration Date" width="10%">
+							<h:outputText value="#{configVendorQuote.quoteExpDate}" >
+								<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+							</h:outputText>
+						</p:column>
+						
+						<p:column headerText="Status" width="10%">
+							<h:outputText value="#{configVendorQuote.status eq 'Obsolete' ? configVendorQuote.status : ''}" />
+						</p:column>
+						
+						<p:column width="10%" >
+							<p:commandLink id="configVQNEditLink"
+								actionListener="#{vehicleConfigurationAddEditBean.editVendorQuoteListener(configVendorQuote)}"
+								process="@this" update=":vendorQuoteDialog" disabled="#{!vehicleConfigurationAddEditBean.hasManageVehConfigPermission}"
+								oncomplete="selectCurrentRow('confgurationVQNListVar',#{configVQNRowIndex});PF('vendorQuoteDialogWidget').show();"
+                           		title="Edit Vendor Quote">   
+                               	<p:graphicImage value="/images/action_edit.png" styleClass="ui-border-none" />                                
+                               </p:commandLink>
+                               <p:spacer width="10"/>
+                               <p:commandLink id="configVQNDelLink" rendered="#{empty configVendorQuote.vuqId ? 'true' : 'false'}"
+                               	actionListener="#{vehicleConfigurationAddEditBean.deleteVendorQuote(configVendorQuote)}"
+                               	process="@this" update=":vehicleConfigurationForm:confgurationVQNList" 
+                           		title="Delete Vendor Quote">   
+                               	<p:graphicImage value="/images/action_delete.png" styleClass="ui-border-none" />                                
+                               </p:commandLink>
+                               <p:spacer width="10"/>
+                                <p:commandLink id="configVQNStatusLink" rendered="#{empty configVendorQuote.vuqId ? 'false' : 'true'}"
+                                	actionListener="#{vehicleConfigurationAddEditBean.toggleVendorQuoteStatus(configVendorQuote)}"
+                                	process="@this" update=":vehicleConfigurationForm:confgurationVQNList" onsuccess="setDirtyData(true);"
+                                	disabled="#{!vehicleConfigurationAddEditBean.hasManageVehConfigPermission}"
+                           		title="Toggle Status">   
+                               	<p:graphicImage value="/images/action_toggle.png" styleClass="ui-border-none" />                                
+                               </p:commandLink>	
+		                </p:column>	
+		               
+					</p:dataTable>					
+				</p:panel>
+					
+					<br/>					
+				
+				<p:panel id="vehConfigCommandPanel" style="min-width:980px;max-width:100%;width:auto;">
+					<p:commandButton id="submit" value="Save" action="#{vehicleConfigurationAddEditBean.save}" ajax="false" onclick="lockScreen();" disabled="#{!vehicleConfigurationAddEditBean.hasManageVehConfigPermission}" />
+					
+				    <p:spacer width="10" />
+				    
+			        <p:commandButton id="vehConfigNotesBtn" 
+			                widgetVar="vehConfigNotesBtnWidgetVar" 
+			                value="Notes (#{vehicleConfigurationAddEditBean.notesCount()})" 
+			                title="Notes"  
+			                disabled="#{!vehicleConfigurationAddEditBean.isNoteButtonEnabled()}"			                
+			                oncomplete="showLogBook();"  />	
+			                					
+					<p:spacer width="10" />
+					
+					<p:commandButton id="vehConfigUpfitAssessmentBtn" 
+			                widgetVar="vehConfigUpfitAssessmentBtnWidgetVar" 
+			                value="#{vehicleConfigurationAddEditBean.upfitAssesmentBtnLabel}" 
+			                title="Upfit Assessment"  
+			                action="#{vehicleConfigurationAddEditBean.navigateToUpfitAssessment}"
+			                ajax="false" 
+			                disabled="#{!vehicleConfigurationAddEditBean.isUpfitAssessmentButtonEnabled()}"
+			                onclick="lockScreen();" immediate="true"/>	
+			                					
+					<p:spacer width="10" />
+					
+					<p:commandButton id="cancel" value="Cancel" action="#{vehicleConfigurationAddEditBean.cancel}" ajax="false" onclick="lockScreen();" immediate="true" />
+				</p:panel>
+			</h:form>
+						
+			<p:dialog header="Add Vehicle Types" widgetVar="configVehicleTypeDialogWidget" id="configVehicleTypeDialog" 
+				modal="true" dynamic="true" resizable="true" appendTo="@(body)" width="1050" height="400" closeOnEscape="true" onShow="disableAutoCompleteConfigVehTypeDialog();">
+				<p:scrollPanel mode="native" styleClass="ui-layout" style="height:45px;min-width:100%;max-width:100%;width:auto;">
+					<p:messages id="vehicleTypeDialogErrorMsgId" style="height:45px;" showDetail="false" autoUpdate="true" showSummary="true" globalOnly="false"/>
+				</p:scrollPanel>   		
+				<h:form id="configVehicleTypeDialogForm" prependId="false">
+					<p:remoteCommand name="updateSearchCriteria" process="model,hiddenModelCode,hiddenMrgId" update="trimsAC" actionListener="#{vehicleConfigurationAddEditBean.updateSearchCriteria}" oncomplete="setFocusPF('modal');"/>
+					<p:panel id="selectPanel" header="Select Criteria" style="min-width:980px;max-width:100%;width:auto;">
+						<p:focus context="selectPanel" />
+						<h:panelGrid columns="8" cellspacing="5">
+							<h:outputLabel for="mfgCodeAC" value="Mfg. Code: " styleClass="ui-label" />
+							<h:panelGroup style="white-space:nowrap;">
+								<p:autoComplete id="mfgCodeAC" title="Mfg. Code"
+							            widgetVar="mfgCodeACWidgetVar"
+								        value="#{vehicleConfigurationAddEditBean.newVehicleConfigModelVO.mfgCode}"
+								        var="mfgCode" 
+								        completeMethod="#{vehicleConfigurationAddEditBean.autoCompleteMfgCodeListener}"
+								        itemLabel="#{mfgCode}"
+								        itemValue="#{mfgCode}"
+								        forceSelection="true" 
+								        size="20" 
+								        maxlength="20" 
+								        autocomplete="off" 
+								        scrollHeight="100">
+								    <p:ajax event="query" process="@this" />    
+									<p:ajax event="itemSelect" process="@this" listener="#{vehicleConfigurationAddEditBean.autoCompleteMfgCodeSelectListener}" oncomplete="setFocusPF('make');" update="make,year"/>
+									<p:ajax listener="#{vehicleConfigurationAddEditBean.autoCompleteMfgCodeChangeListener}" oncomplete="setFocusPF('make');" update="make,year" />	
+							    </p:autoComplete>
+							</h:panelGroup>
+		
+							<h:outputLabel for="make" value="Make: " styleClass="ui-label" />
+							<h:panelGroup style="white-space:nowrap;">
+								<p:selectOneMenu id="make" value="#{vehicleConfigurationAddEditBean.newVehicleConfigModelVO.make}" style="width:150px">
+									<f:selectItem itemLabel=" "/>
+									<f:selectItems var="make" value="#{vehicleConfigurationAddEditBean.makes}" itemLabel="#{make}" itemValue="#{make}" />
+									<p:ajax process="@parent"/>
+								</p:selectOneMenu>
+							</h:panelGroup>
+		
+							<h:outputLabel for="model" value="Model: " styleClass="ui-label" />
+							<h:panelGroup style="white-space:nowrap;">
+								<p:inputText id="model" title="Model" value="#{vehicleConfigurationAddEditBean.newVehicleConfigModelVO.model}" />
+								<p:commandButton id='modelLOV' icon="icon-lov" title="lov" oncomplete="showModelLOV();" immediate="true" actionListener="#{modelLOVBean.fetchLOVDataByModelDescription}" process="@parent" dynamic="true" async="true" onstart="return hasMinAlphaNumericCharacters($('#model'));"
+									update=":modelLovForm:MODEL_GRID">
+									<f:param name="MODEL_LOV_INPUT_MFG_CODE" value="mfgCodeAC_input" />
+									<f:param name="MODEL_LOV_INPUT_YEAR" value="year_input" />
+									<f:param name="MODEL_LOV_INPUT_MAKE" value="make_input" />
+									<f:param name="MODEL_LOV_INPUT_MODEL" value="model" />
+									<f:param name="MODEL_LOV_SHOW_TYPE" value="true" />
+								</p:commandButton>
+								<h:inputHidden id="hiddenModelCode" value="#{vehicleConfigurationAddEditBean.newVehicleConfigModelVO.modelCode}"/>
+								<h:inputHidden id="hiddenMrgId" value="#{vehicleConfigurationAddEditBean.newVehicleConfigModelVO.mrgId}"/>
+								
+							</h:panelGroup>
+							
+							<h:outputLabel for="year" value="Year: " styleClass="ui-label" />
+							<h:panelGroup style="white-space:nowrap;">
+								<p:selectOneMenu id="year" widgetVar="yearWidget" value="#{vehicleConfigurationAddEditBean.newVehicleConfigModelVO.year}" style="width:75px" >
+									<f:selectItem itemLabel=" " />
+									<f:selectItems value="#{vehicleConfigurationAddEditBean.years}" var="year" itemLabel="#{year}" itemValue="#{year}" />
+									<p:ajax process="@parent" listener="#{vehicleConfigurationAddEditBean.changeYear}" update="make"/>
+								</p:selectOneMenu>
+							</h:panelGroup>
+							
+							<h:outputLabel for="trimsAC" value="Trim: " styleClass="ui-label" />
+							<h:panelGroup style="white-space:nowrap;">
+								<p:autoComplete id="trimsAC" title="Trim"
+							            widgetVar="trimsACWidgetVar"
+								        value="#{vehicleConfigurationAddEditBean.selectedModel}"
+								        var="trim" 
+								        completeMethod="#{vehicleConfigurationAddEditBean.autoCompleteTrimsListener}"
+								        itemLabel="#{trim.trim}"
+								        itemValue="#{trim}"
+								        converter="#{modelSearchResultVOConverter}"
+								        forceSelection="true" 
+								        size="40" 
+								        maxlength="100" 
+								        autocomplete="off" 
+								        scrollHeight="100">
+								    <p:ajax event="query" process="@this" />    
+									<p:ajax event="itemSelect" process="@form" listener="#{vehicleConfigurationAddEditBean.autoCompleteTrimSelectListener}"/>	
+							    </p:autoComplete>
+							</h:panelGroup>
+		
+									
+							<h:outputLabel for="lbl2" value="" styleClass="ui-label" />
+							<h:panelGroup style="white-space:nowrap;">
+								<p:outputLabel id="lbl2" value=" " />
+							</h:panelGroup>		
+							
+							<h:outputLabel for="lbl1" value="" styleClass="ui-label" />
+							<h:panelGroup style="white-space:nowrap;">
+								<p:outputLabel id="lbl1" value="" />
+							</h:panelGroup>
+		
+							<h:outputLabel value="" />
+							<p:commandButton id="search" widgetVar="selectButtonWidgetVar" title="Select" onclick="PF('selectButtonWidgetVar').disable();" value="Select" style="float:right" 
+								actionListener="#{vehicleConfigurationAddEditBean.performSelect}" oncomplete="handleVehicleTypeSelectClickRequest(xhr, status, args);" update="selectPanel,resultsPanel" />
+						</h:panelGrid>
+					</p:panel>
+		
+					<p:scrollPanel id="resultsPanel" style="min-width:980px;max-width:100%;width:auto;" mode="native">
+						<p:dataTable id="searchResultDataTable" widgetVar="searchResultDataTableWidget" 
+							var="trim" 
+							value="#{vehicleConfigurationAddEditBean.dialogVehicleConfigModelVOs}" 
+							rowKey="#{trim.rowKey}" 
+							scrollable="true" 
+							resizableColumns="true"
+							scrollHeight="#{vehicleConfigurationAddEditBean.dataTable.height}"
+							selection="#{vehicleConfigurationAddEditBean.selectedVehicleConfigModelVO}" 
+							rowIndexVar="trimRowIndex">
+							
+							<f:facet name="header">
+			                    <h:outputLabel value="Vehicle Types" style="vertical-align:15px;"/>
+			                    <p:spacer height="15px;"/>	
+			                </f:facet>
+							
+							<p:column headerText="Mfg. Code" width="10%">
+								<h:outputText value="#{trim.mfgCode}" />
+							</p:column>
+							
+							<p:column headerText="Make" width="10%">
+								<h:outputText value="#{trim.make}" escape="false" />
+							</p:column>
+		
+							<p:column headerText="Model" width="11%">
+								<h:outputText value="#{trim.model}" escape="false" />
+							</p:column>
+							
+							<p:column headerText="Year" width="7%">
+								<h:outputText value="#{trim.year}" />
+							</p:column>
+							
+							<p:column headerText="Trim" width="56%">
+								<h:outputText value="#{trim.trim}" escape="false" />
+							</p:column>
+							
+							<p:column width="6%">
+		                         <p:commandLink id="configTrimDelLink" 
+		                         	process="@this" update=":configVehicleTypeDialogForm:searchResultDataTable" 
+		                         	actionListener="#{vehicleConfigurationAddEditBean.deleteVehicleTypeListener(trim)}"
+		                         	title="Delete Trim">   
+		                         	<p:graphicImage value="/images/action_delete.png" styleClass="ui-border-none" />                                
+		                         </p:commandLink>
+							</p:column>
+						</p:dataTable>
+					</p:scrollPanel>
+		
+					<p:panel id="commandPanel" style="min-width:800px;max-width:100%;width:auto;">
+						<p:commandButton id="modelAddBtn" action="#{vehicleConfigurationAddEditBean.addVehicleType}" value="Add"
+							update="@form, :vehicleConfigurationForm:configurationTrimList"
+							process="@form" onsuccess="setDirtyData(true);"
+							oncomplete="handleVehicleTypeAddBtnClickRequest(xhr, status, args);" />
+						<p:spacer width="10" />
+						<p:commandButton id="modelCancelBtn" value="Cancel" update="@form" oncomplete="PF('configVehicleTypeDialogWidget').hide();"/>
+					</p:panel>
+				</h:form>
+			</p:dialog>
+			
+			<p:dialog id="vendorQuoteDialog" header="#{vehicleConfigurationAddEditBean.vqnEditMode == true ?'Edit' : 'Add'} Vendor Quote" widgetVar="vendorQuoteDialogWidget"   
+				  modal="true" resizable="false" appendTo="@(body)" style="min-width: 600px; max-width: 600px;"> 
+				   			
+				<p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:100%;max-width:100%;width:auto;">
+					<p:messages id="vendorQuoteDialogErrorMsgId" style="height:50px;" showDetail="false" autoUpdate="true" showSummary="true" globalOnly="false"/>
+				</p:scrollPanel>   			
+				
+				<h:form id="vendorQuoteDetailForm" prependId="false">
+					<p:panel id="addVendorQuotePanel">
+						<p:focus context="addVendorQuotePanel" />
+					  	<h:panelGrid id="configVendorEntry" columns="2" cellpadding="5" onkeydown="onkeydownESC(event,'vendorQuoteDialogWidget');">	
+							<p:outputLabel for="vendorsAC" value="Vendor:* " styleClass="ui-label" />
+						    <p:autoComplete id="vendorsAC" title="Vendor" disabled="#{vehicleConfigurationAddEditBean.vqnEditMode}"
+						            widgetVar="vendorsACWidgetVar"
+							        value="#{vehicleConfigurationAddEditBean.configurationVendor}"
+							        var="vendor" 
+							        completeMethod="#{vehicleConfigurationAddEditBean.autoCompleteVendorsListener}"							      
+							        itemLabel="#{vendor.payeeAccountName.concat(' - ').concat(vendor.payeeAccountCode)}"
+							        itemValue="#{vendor}"
+							        forceSelection="true" 
+							        size="40" 
+							        maxlength="100" 
+							        autocomplete="off" 
+							        scrollHeight="100"
+							        converter="#{upfitterSearchResultVOConverter}">
+							    <p:ajax event="query" process="@this" />    
+								<p:ajax event="itemSelect" process="@this" listener="#{vehicleConfigurationAddEditBean.autoCompleteVendorSelectListener}"
+										update=":vendorQuoteDetailForm:addVendorQuotePanel"/>	
+							        									        		
+						    </p:autoComplete>
+							
+							<p:outputLabel for="vendorQuoteList" value="Vendor Quote Number:* " styleClass="ui-label" />
+						      <p:selectOneMenu id="vendorQuoteList" value="#{vehicleConfigurationAddEditBean.selectedVehicleConfigVendorQuoteVO.quoteNumber}" 
+						    				onchange="convertToUpperCase('#{p:component('vendorQuoteList')}');" style="width:150px" editable="true" disabled="#{vehicleConfigurationAddEditBean.vqnEditMode}">									
+									<f:selectItems var="upfitterQuote" value="#{vehicleConfigurationAddEditBean.upfitterQuoteList}" itemLabel="#{upfitterQuote.quoteNumber}" itemValue="#{upfitterQuote.quoteNumber}" />
+									<p:ajax event="change" process="@this" listener="#{vehicleConfigurationAddEditBean.onChangeVendorQuoteNo}" update=":vendorQuoteDetailForm:addVendorQuotePanel"
+									 oncomplete="setFocusPF('vendorQuoteList');"/>
+							</p:selectOneMenu>
+							
+				            <p:outputLabel for="quoteDescription" value="Quote Description:* " styleClass="ui-label" />
+						    <p:inputTextarea id="quoteDescription" title="Quotation Description" maxlength="250" rows="4" cols="40" autoResize="false" 
+						            value="#{vehicleConfigurationAddEditBean.selectedVehicleConfigVendorQuoteVO.quoteDescription}" 
+						            disabled="#{vehicleConfigurationAddEditBean.vqnEditMode ? true : vehicleConfigurationAddEditBean.selectedVehicleConfigVendorQuoteVO.readOnly}"/>
+						    
+							<p:outputLabel for="quoteDate" value="Quote Date:* " styleClass="ui-label" />
+							<p:calendar id="quoteDate" widgetVar="quoteDateWidget" size="10" autocomplete="off"
+								disabled="#{vehicleConfigurationAddEditBean.vqnEditMode ? true : vehicleConfigurationAddEditBean.selectedVehicleConfigVendorQuoteVO.readOnly}"
+								value="#{vehicleConfigurationAddEditBean.selectedVehicleConfigVendorQuoteVO.quoteDate}"
+								onchange="formatDate(this);" title="Quote Date" style="width:80px"
+	                      		pattern="MM/dd/yyyy" showOn="button" 
+								styleClass="dateTimeField">
+							</p:calendar>
+							
+							<p:outputLabel for="expirationDate" value="Expiration Date: " styleClass="ui-label" />
+							<p:calendar id="expirationDate" widgetVar="expirationDateWidget" size="10" autocomplete="off"
+								disabled="#{vehicleConfigurationAddEditBean.vqnEditMode ? true : vehicleConfigurationAddEditBean.selectedVehicleConfigVendorQuoteVO.readOnly}"
+								value="#{vehicleConfigurationAddEditBean.selectedVehicleConfigVendorQuoteVO.quoteExpDate}"
+								onchange="formatDate(this);" title="Expiration Date" 
+	                      		pattern="MM/dd/yyyy" showOn="button" 
+								styleClass="dateTimeField">
+							</p:calendar>
+							
+							<p:outputLabel id="uploadDocumentsLabelId" value="Upload Documents:* " styleClass="ui-label" />
+							<h:panelGroup style="white-space: nowrap">
+								<p:fileUpload fileUploadListener="#{vehicleConfigurationAddEditBean.handleVendorQuoteDocumentUpload}" 
+									disabled="#{vehicleConfigurationAddEditBean.selectedVehicleConfigVendorQuoteVO.status eq 'Obsolete' ? 'true' : 'false'}"
+						            mode="advanced"  skinSimple="true"	auto="true"	process="@form"		          
+						            sizeLimit="50000000" multiple="true" 
+						            label="Upload"
+						            update=":vendorQuoteDetailForm:addVendorQuotePanel"/>
+							</h:panelGroup>
+							
+						
+						 	<h:outputText value="" style="vertical-align: top;"/>
+							<h:panelGroup>
+								<p:panel rendered="#{vehicleConfigurationAddEditBean.getSelectedVehicleConfigVendorQuoteVO().getDocuments().size() > 0}" style="max-height:140px;overflow: auto;">
+									<h:panelGrid >										
+										<ui:repeat value="#{vehicleConfigurationAddEditBean.getSelectedVehicleConfigVendorQuoteVO().getDocuments()}" var="vendorQuoteDoc">	
+											<p:selectOneMenu id="docType" value="#{vendorQuoteDoc.fileType}" style="width:70px"
+												disabled="#{empty vendorQuoteDoc.fileId ? 'false' : 'true' }" >
+									            <f:selectItem itemLabel="Quote" itemValue="Quote" />
+									            <f:selectItem itemLabel="Visual" itemValue="Visual" />									            
+									       	</p:selectOneMenu>
+									       	<p:spacer width="10"/>
+									       	<h:outputText value="#{vendorQuoteDoc.fileName}" style="vertical-align: top;"/>
+									       	<p:spacer width="10"/>
+									       	<p:commandLink  rendered="#{!vendorQuoteDoc.uploadDoc}"  style="vertical-align: top"
+						                         	actionListener="#{vehicleConfigurationAddEditBean.deleteUploadedDocument(vendorQuoteDoc)}"
+				                                	process="@this" update=":vendorQuoteDetailForm:addVendorQuotePanel"
+						                         	title="Delete Document">   
+						                         	<p:graphicImage value="/images/action_delete.png" styleClass="ui-border-none" />                                
+						                    </p:commandLink>
+			                        		<p:spacer width="20"/>
+									        <p></p>
+									    </ui:repeat>									    
+								    </h:panelGrid>
+							    </p:panel>
+						    </h:panelGroup>
+						 </h:panelGrid>
+					</p:panel>
+				
+					<p:panel id="vendorButtonPanel">	
+						<p:commandButton id="dialogDoneButton" value="Add" onsuccess="setDirtyData(true);"
+							actionListener="#{vehicleConfigurationAddEditBean.addVendorQuote}"							
+							update="@form, :vehicleConfigurationForm:confgurationVQNPanel" process="@form"
+							oncomplete="handleVendorQuoteAddBtnClickRequest(xhr, status, args);"
+						/>
+						<p:spacer width="10"/>
+						<p:commandButton id="dialogCancelButton" value="Cancel" oncomplete="PF('vendorQuoteDialogWidget').hide();"
+							actionListener="#{vehicleConfigurationAddEditBean.cancelVendorQuote}"
+						/>
+					</p:panel>
+				</h:form>
+	    	</p:dialog>
+			
+			<div id="MODEL_LOV_DIV">
+				<ui:include src="../lov/model.xhtml" />
+			</div>
+		
+			<div id="inputFieldChecks">
+				<ui:include src="../alert/inputFieldChecks.xhtml" />
+			</div>
+			
+			<style type="text/css">
+		      	.ui-datatable thead th {
+		        	white-space: normal;
+		        	text-align: center;
+		     	}
+		     	
+		     	.ui-datatable th {
+				    vertical-align : top;
+				}
+				
+	      
+    		</style>  
+			
+			<script>
+				
+				function setDefaultRowSelectionOnPageEvent(){					
+					setScrollDivAtTop();	
+				}
+				
+				function setSelection( lovName, nameArray, valueArray){	
+					if(lovName == 'modelLOV'){
+						for(var i=0; i  &lt; nameArray.length ; i++){
+							if(nameArray[i] == 'MODEL_DESCRIPTION'){
+								document.getElementById('model').value = valueArray[i];
+							}
+							if(nameArray[i] == 'MODEL_CODE'){
+								document.getElementById('hiddenModelCode').value = valueArray[i];
+							}
+							if(nameArray[i] == 'MRG_ID'){
+								document.getElementById('hiddenMrgId').value = valueArray[i];
+							}
+						}
+						updateSearchCriteria();							
+					}				
+				}
+			    
+				function handleVendorQuoteAddBtnClickRequest(xhr, status, args) { 
+	                if(!args.failure) {    
+	                	PF('vendorQuoteDialogWidget').hide();
+	                }
+				}
+				
+				function handleVehicleTypeAddBtnClickRequest(xhr, status, args) {
+					if(!args.failure) {    
+						PF('configVehicleTypeDialogWidget').hide();
+	                }
+				}
+				
+				function handleVehicleTypeSelectClickRequest(xhr, status, args) { 
+	                if(!args.failure) {    
+	                	PF('selectButtonWidgetVar').enable();
+	                }
+				}
+				
+				function initializeDirtyDetection() {
+			    	registerIgnoreButton("submit");
+				}
+
+			 	function selectCurrentRow(table,index){
+	           	    PF(table).unselectAllRows();
+	              	PF(table).selectRow(index, true);     
+	            } 
+			 	
+			 	$('#vehicleConfigurationForm').attr('autocomplete', 'off');
+			 	function disableAutoCompleteConfigVehTypeDialog(){
+			 		$('#configVehicleTypeDialogForm').attr('autocomplete', 'off');
+			 	}
+			 	
+			 	function convertToUpperCase(id) {
+			 	    var valueObj = $(PrimeFaces.escapeClientId(id)).children(':text');
+			 	    valueObj.val(valueObj.val().toUpperCase());
+			 	}
+			 	
+				function logBookCallback(){
+					updateNotesButton();
+				}			 	
+			 	
+		     	$(window).load(function(){
+		     		initializeDirtyDetection();
+				});	
+			 	
+			</script>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,779 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.2.2.final using JasperReports Library version 6.2.2  -->
+<!-- 2017-11-15T05:25:29 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="clientOrderConfirmation" pageWidth="612" pageHeight="792" columnWidth="540" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="36" whenResourceMissingType="Empty" uuid="d65bbcf0-fa7f-44aa-8f0e-74c6c1675b75">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="REPORT_TITLE" class="java.lang.String">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA["Untitled Report"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="REPORT_IMAGE_DIR" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="driverCostCenter" class="java.lang.String">
+		<fieldDescription><![CDATA[driverCostCenter]]></fieldDescription>
+	</field>
+	<field name="dealerEquipments" class="java.lang.String">
+		<fieldDescription><![CDATA[dealerEquipments]]></fieldDescription>
+	</field>
+	<field name="driverName" class="java.lang.String">
+		<fieldDescription><![CDATA[driverName]]></fieldDescription>
+	</field>
+	<field name="factoryEquipments" class="java.lang.String">
+		<fieldDescription><![CDATA[factoryEquipments]]></fieldDescription>
+	</field>
+	<field name="fleetRefNo" class="java.lang.String">
+		<fieldDescription><![CDATA[fleetRefNo]]></fieldDescription>
+	</field>
+	<field name="mailToCompleteAddress" class="java.lang.String">
+		<fieldDescription><![CDATA[mailToCompleteAddress]]></fieldDescription>
+	</field>
+	<field name="orderDateStr" class="java.lang.String">
+		<fieldDescription><![CDATA[orderDateStr]]></fieldDescription>
+	</field>
+	<field name="requestDateStr" class="java.lang.String">
+		<fieldDescription><![CDATA[requestDateStr]]></fieldDescription>
+	</field>
+	<field name="standardEquipments" class="java.lang.String">
+		<fieldDescription><![CDATA[standardEquipments]]></fieldDescription>
+	</field>
+	<field name="trimDescription" class="java.lang.String">
+		<fieldDescription><![CDATA[trimDescription]]></fieldDescription>
+	</field>
+	<field name="unitNo" class="java.lang.String">
+		<fieldDescription><![CDATA[unitNo]]></fieldDescription>
+	</field>
+	<field name="mailToName" class="java.lang.String">
+		<fieldDescription><![CDATA[mailToName]]></fieldDescription>
+	</field>
+	<field name="deliveryName" class="java.lang.String">
+		<fieldDescription><![CDATA[deliveryName]]></fieldDescription>
+	</field>
+	<field name="deliveryCompleteAddress" class="java.lang.String">
+		<fieldDescription><![CDATA[deliveryCompleteAddress]]></fieldDescription>
+	</field>
+	<field name="etaDateStr" class="java.lang.String">
+		<fieldDescription><![CDATA[etaDateStr]]></fieldDescription>
+	</field>
+	<field name="leaseExpirationDateStr" class="java.lang.String">
+		<fieldDescription><![CDATA[leaseExpirationDateStr]]></fieldDescription>
+	</field>
+	<field name="clientAccountCode" class="java.lang.String">
+		<fieldDescription><![CDATA[clientAccountCode]]></fieldDescription>
+	</field>
+	<field name="clientAccountName" class="java.lang.String">
+		<fieldDescription><![CDATA[clientAccountName]]></fieldDescription>
+	</field>
+	<field name="replacesTrimDescription" class="java.lang.String">
+		<fieldDescription><![CDATA[replacesTrimDescription]]></fieldDescription>
+	</field>
+	<field name="replacesUnitNo" class="java.lang.String">
+		<fieldDescription><![CDATA[replacesUnitNo]]></fieldDescription>
+	</field>
+	<field name="orderConfirmDateStr" class="java.lang.String">
+		<fieldDescription><![CDATA[orderConfirmDateStr]]></fieldDescription>
+	</field>
+	<field name="driverCompleteAddress" class="java.lang.String">
+		<fieldDescription><![CDATA[driverCompleteAddress]]></fieldDescription>
+	</field>
+	<field name="driverPhoneNumber" class="java.lang.String">
+		<fieldDescription><![CDATA[driverPhoneNumber]]></fieldDescription>
+	</field>
+	<field name="exteriorColor" class="java.lang.String">
+		<fieldDescription><![CDATA[exteriorColor]]></fieldDescription>
+	</field>
+	<field name="interiorColor" class="java.lang.String">
+		<fieldDescription><![CDATA[interiorColor]]></fieldDescription>
+	</field>
+	<field name="logo" class="java.lang.String">
+		<fieldDescription><![CDATA[logo]]></fieldDescription>
+	</field>
+	<field name="headerText" class="java.lang.String">
+		<fieldDescription><![CDATA[headerText]]></fieldDescription>
+	</field>
+	<title>
+		<band height="153" splitType="Stretch">
+			<image hAlign="Center" evaluationTime="Report">
+				<reportElement x="-7" y="1" width="139" height="80" uuid="fd2236c9-9f4d-410f-965c-013f83b3d04e"/>
+				<imageExpression><![CDATA[$F{logo}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="1" y="55" width="538" height="20" uuid="79c87599-5399-4a1e-b7c2-d6abd6ec3205"/>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Client Order Confirmation]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="114" width="540" height="31" uuid="82e95d75-fc11-4052-9c52-0a00a9a2ae37"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<text><![CDATA[Please review the order details below for accuracy and verify that all necessary equipment is listed.  If any changes or corrections are necessary, please contact your Client Support Specialist at 800-886-5828.]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="1" y="84" width="538" height="26" uuid="43c926f1-d11f-44ea-b1ec-934957b8e2d9"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{headerText}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="78" splitType="Stretch">
+			<frame>
+				<reportElement x="0" y="11" width="538" height="49" uuid="eead0390-6f49-4600-8147-281667d93eeb">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+				<frame>
+					<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="178" height="49" uuid="2c959d5c-8627-453f-8d66-b239b05a70d7">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.2"/>
+						<leftPen lineWidth="0.2"/>
+						<bottomPen lineWidth="0.2"/>
+						<rightPen lineWidth="0.2"/>
+					</box>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement x="40" y="0" width="138" height="15" uuid="b785c618-3b1b-47be-87a2-f856058dff18">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5" rightPadding="5"/>
+						<textElement>
+							<font fontName="Calibri" size="11"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{clientAccountCode}]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement x="0" y="0" width="40" height="15" uuid="c34516f0-e874-4ee9-817c-ac066f0a7cad">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5" rightPadding="0"/>
+						<textElement>
+							<font fontName="Calibri" size="11" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Client:]]></text>
+					</staticText>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement positionType="Float" x="0" y="30" width="178" height="15" uuid="810ab01c-ab95-4cbe-a6a5-a93d391a10c2">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5" rightPadding="5"/>
+						<textElement markup="html">
+							<font fontName="Calibri" size="11"/>
+							<paragraph lineSpacingSize="0.5"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{mailToCompleteAddress}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement positionType="Float" x="0" y="15" width="178" height="15" uuid="03715740-8a52-4306-bd0f-ad57ec5fda4b">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5" rightPadding="5"/>
+						<textElement markup="html">
+							<font fontName="Calibri" size="11"/>
+							<paragraph lineSpacingSize="0.5"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{mailToName}]]></textFieldExpression>
+					</textField>
+				</frame>
+				<frame>
+					<reportElement stretchType="RelativeToTallestObject" x="178" y="0" width="180" height="49" uuid="95a6fafb-9dbc-4205-b6ec-3b0bdbb56868">
+						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.2"/>
+						<leftPen lineWidth="0.2"/>
+						<bottomPen lineWidth="0.2"/>
+						<rightPen lineWidth="0.2"/>
+					</box>
+					<staticText>
+						<reportElement x="0" y="0" width="39" height="15" uuid="ac3096a1-c5fc-4846-9fc6-b4740893a80b">
+							<property name="local_mesure_unitx" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+							<property name="local_mesure_unity" value="pixel"/>
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5" rightPadding="0"/>
+						<textElement>
+							<font fontName="Calibri" size="11" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Driver:]]></text>
+					</staticText>
+					<textField isBlankWhenNull="true">
+						<reportElement x="39" y="0" width="140" height="15" uuid="8a67495b-628a-4e34-a806-f555db6f52d8">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="local_mesure_unitx" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+							<property name="local_mesure_unity" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5" rightPadding="5"/>
+						<textElement>
+							<font fontName="Calibri" size="11"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{driverName}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement positionType="Float" x="0" y="15" width="179" height="15" uuid="e29b1749-295c-47b4-9670-ca4e66c42318">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="local_mesure_unity" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5" rightPadding="5"/>
+						<textElement markup="html">
+							<font fontName="Calibri" size="11"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{driverCompleteAddress}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement positionType="Float" x="0" y="30" width="179" height="15" uuid="03502f3e-234a-43cf-9d32-f28354f30025">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="local_mesure_unity" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5" rightPadding="5"/>
+						<textElement markup="html">
+							<font fontName="Calibri" size="11"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{driverPhoneNumber}]]></textFieldExpression>
+					</textField>
+				</frame>
+				<frame>
+					<reportElement stretchType="RelativeToTallestObject" x="358" y="0" width="179" height="49" uuid="8a454b32-1359-4254-8eeb-1169e91e49cc">
+						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.2"/>
+						<leftPen lineWidth="0.2"/>
+						<bottomPen lineWidth="0.2"/>
+						<rightPen lineWidth="0.2"/>
+					</box>
+					<staticText>
+						<reportElement x="0" y="0" width="100" height="15" uuid="7425608b-8106-45c9-ba6b-7a7a879b0737">
+							<property name="local_mesure_unitx" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+							<property name="local_mesure_unity" value="pixel"/>
+							<property name="local_mesure_unitheight" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5" rightPadding="0"/>
+						<textElement>
+							<font fontName="Calibri" size="10" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Delivery Location:]]></text>
+					</staticText>
+					<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+						<reportElement positionType="Float" x="0" y="30" width="178" height="15" uuid="62f36a1e-db89-417b-8868-0ac77ff75b56">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+							<property name="local_mesure_unitx" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5" rightPadding="5"/>
+						<textElement markup="html">
+							<font fontName="Calibri" size="11"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{deliveryCompleteAddress}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement positionType="Float" x="0" y="15" width="178" height="15" uuid="17b720bf-cf56-46a2-a200-6281b03e86be">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5" rightPadding="5"/>
+						<textElement markup="html">
+							<font fontName="Calibri" size="11"/>
+							<paragraph lineSpacingSize="0.5"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{deliveryName}]]></textFieldExpression>
+					</textField>
+				</frame>
+			</frame>
+		</band>
+		<band height="189" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+			<frame>
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="540" height="189" uuid="4bd12ead-cb8a-411a-905f-0afd8e948d89"/>
+				<staticText>
+					<reportElement x="0" y="0" width="150" height="15" uuid="63e80e17-3440-402d-b811-a5198a60fc35">
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Calibri" size="11" isBold="true" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[Vehicle Details]]></text>
+				</staticText>
+				<frame>
+					<reportElement positionType="Float" x="0" y="16" width="540" height="15" uuid="b6f4b9fd-2631-4e57-bf07-19b8745037d8"/>
+					<textField isBlankWhenNull="true">
+						<reportElement stretchType="RelativeToTallestObject" x="110" y="0" width="54" height="15" uuid="c98adae7-60d9-47d9-ac4d-bb97091c528c">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+							<property name="local_mesure_unitwidth" value="pixel"/>
+						</reportElement>
+						<textElement>
+							<font fontName="Calibri" size="11"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{unitNo}+':']]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="110" height="15" uuid="19f956b1-f8b1-4380-89fc-d23cd76696ef">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<textElement>
+							<font fontName="Calibri" size="11" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Unit #:]]></text>
+					</staticText>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement stretchType="RelativeToTallestObject" x="164" y="0" width="376" height="15" uuid="a30d9202-ad4c-4ca3-b432-f4bd296fe6c9"/>
+						<textElement>
+							<font fontName="Calibri" size="11"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{trimDescription}]]></textFieldExpression>
+					</textField>
+				</frame>
+				<frame>
+					<reportElement positionType="Float" x="0" y="31" width="540" height="15" uuid="7cc39b5e-430e-44ed-9102-53b959f9ff69"/>
+					<staticText>
+						<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="110" height="15" uuid="cf78b6fc-71ad-4b38-99b3-15fceb1adef9">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<textElement>
+							<font fontName="Calibri" size="11" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Exterior Color:]]></text>
+					</staticText>
+					<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+						<reportElement stretchType="RelativeToTallestObject" x="110" y="0" width="430" height="15" uuid="c5aab728-165c-4750-a5e9-c70156944652">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+							<property name="local_mesure_unitwidth" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						</reportElement>
+						<textElement>
+							<font fontName="Calibri" size="11"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{exteriorColor}]]></textFieldExpression>
+					</textField>
+				</frame>
+				<frame>
+					<reportElement positionType="Float" x="0" y="46" width="540" height="15" uuid="055a09cd-74e0-405f-91a0-35f9dab9e3ff"/>
+					<staticText>
+						<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="110" height="15" uuid="b9631170-d21b-49ae-abf8-52911ac4f14a">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<textElement>
+							<font fontName="Calibri" size="11" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Interior Color:]]></text>
+					</staticText>
+					<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+						<reportElement stretchType="RelativeToTallestObject" x="110" y="0" width="430" height="15" uuid="af22ba5f-3fb1-4184-b00c-7c645b3e41b1">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+							<property name="local_mesure_unitwidth" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						</reportElement>
+						<textElement>
+							<font fontName="Calibri" size="11"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{interiorColor}]]></textFieldExpression>
+					</textField>
+				</frame>
+				<frame>
+					<reportElement positionType="Float" x="0" y="61" width="540" height="15" uuid="110ef88e-23b2-4944-9edd-66c3d65a7a8b"/>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement stretchType="RelativeToTallestObject" x="110" y="0" width="430" height="15" uuid="ba88fa9f-6354-4b91-8e0a-7877f77531b5">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+							<property name="local_mesure_unitwidth" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						</reportElement>
+						<textElement>
+							<font fontName="Calibri" size="11"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{driverCostCenter}]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="110" height="15" uuid="d650b470-b74b-4f51-b72e-88c1e504f13a">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<textElement>
+							<font fontName="Calibri" size="11" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Cost Center:]]></text>
+					</staticText>
+				</frame>
+				<frame>
+					<reportElement positionType="Float" x="0" y="76" width="540" height="15" uuid="b17f8b2c-812d-44ec-a363-2209af9ff62f"/>
+					<textField isStretchWithOverflow="true" pattern="MM/dd/yyyy" isBlankWhenNull="true">
+						<reportElement stretchType="RelativeToTallestObject" x="110" y="0" width="430" height="15" uuid="d74308e9-9bbe-4a9a-98af-f1f25ccac09f">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<textElement>
+							<font fontName="Calibri" size="11"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{orderDateStr}]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="110" height="15" uuid="f576b500-942d-48e1-b2aa-4ee730c4a2d6">
+							<property name="local_mesure_unitheight" value="pixel"/>
+						</reportElement>
+						<textElement>
+							<font fontName="Calibri" size="11" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Order Placed:]]></text>
+					</staticText>
+				</frame>
+				<frame>
+					<reportElement positionType="Float" x="0" y="91" width="540" height="15" uuid="3ae5bc4b-d25a-4b6e-8099-0e60719398b8"/>
+					<textField isStretchWithOverflow="true" pattern="MM/dd/yyyy" isBlankWhenNull="true">
+						<reportElement stretchType="RelativeToTallestObject" x="110" y="0" width="430" height="15" uuid="5084bf21-ae42-4f9a-ba0a-28eb90eaf521">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<textElement>
+							<font fontName="Calibri" size="11"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{requestDateStr}]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="110" height="15" uuid="d48295b5-f043-438c-87e3-9912fa4fb7e0">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<textElement>
+							<font fontName="Calibri" size="11" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Requested Delivery:]]></text>
+					</staticText>
+				</frame>
+				<frame>
+					<reportElement positionType="Float" x="0" y="106" width="540" height="15" uuid="6727e68f-7346-4be1-8be6-3bd931403b2f"/>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement stretchType="RelativeToTallestObject" x="110" y="0" width="430" height="15" uuid="a9143995-9173-4b81-af81-137e4726c018">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<textElement>
+							<font fontName="Calibri" size="11"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{fleetRefNo}]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="110" height="15" uuid="fbc69a85-978f-4f71-aeca-4c67670d48f4">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<textElement>
+							<font fontName="Calibri" size="11" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Fleet Ref #:]]></text>
+					</staticText>
+				</frame>
+				<frame>
+					<reportElement positionType="Float" x="0" y="121" width="540" height="15" uuid="cd69b2ee-49f5-4a62-9972-10bcada264e5"/>
+					<textField isStretchWithOverflow="true" pattern="MM/dd/yyyy" isBlankWhenNull="true">
+						<reportElement stretchType="RelativeToTallestObject" x="110" y="0" width="430" height="15" uuid="a3a87ef3-834e-43c5-888c-d7e7525dc3b9">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<textElement>
+							<font fontName="Calibri" size="11"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{etaDateStr}]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="110" height="15" uuid="ab5ded06-75ff-4226-9ebc-cf8fdefa404b">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<textElement>
+							<font fontName="Calibri" size="11" isBold="true"/>
+						</textElement>
+						<text><![CDATA[ETA:]]></text>
+					</staticText>
+				</frame>
+				<frame>
+					<reportElement positionType="Float" x="0" y="147" width="540" height="15" uuid="34d6b55e-7054-47c7-8d80-8e352dafadd3"/>
+					<staticText>
+						<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="110" height="15" uuid="06801119-8efd-4637-8711-f6763216ed47">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<textElement>
+							<font fontName="Calibri" size="11" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Replaces Unit:]]></text>
+					</staticText>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement stretchType="RelativeToTallestObject" x="110" y="0" width="54" height="15" uuid="8e4f0241-b69d-44d1-8b3d-54d4e779d090">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+							<property name="local_mesure_unitwidth" value="pixel"/>
+							<printWhenExpression><![CDATA[$F{replacesUnitNo} != null]]></printWhenExpression>
+						</reportElement>
+						<textElement>
+							<font fontName="Calibri" size="11"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{replacesUnitNo}+ ':']]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement stretchType="RelativeToTallestObject" x="164" y="0" width="376" height="15" uuid="94e93e29-3530-48aa-ac9e-bfd71cf2a933">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<textElement>
+							<font fontName="Calibri" size="11"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{replacesTrimDescription}]]></textFieldExpression>
+					</textField>
+				</frame>
+				<frame>
+					<reportElement positionType="Float" x="0" y="162" width="540" height="15" uuid="cfacff22-d3fe-4972-949c-84ad4a4ae860"/>
+					<staticText>
+						<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="110" height="15" uuid="346ed818-072e-4b5a-9383-af2a580a48eb">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<textElement>
+							<font fontName="Calibri" size="11" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Lease Expiration:]]></text>
+					</staticText>
+					<textField isStretchWithOverflow="true" pattern="MM/dd/yyyy" isBlankWhenNull="true">
+						<reportElement stretchType="RelativeToTallestObject" x="110" y="0" width="430" height="15" uuid="afeffa17-fa05-4df1-a7fe-8e2d5d2258b3">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<textElement>
+							<font fontName="Calibri" size="11"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{leaseExpirationDateStr}]]></textFieldExpression>
+					</textField>
+				</frame>
+			</frame>
+		</band>
+		<band height="44" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+			<frame borderSplitType="DrawBorders">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="540" height="30" isPrintWhenDetailOverflows="true" uuid="5e61ef60-e461-4b3d-8086-d47d9f45d7af">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<frame>
+					<reportElement x="0" y="0" width="540" height="15" isPrintWhenDetailOverflows="true" uuid="81e1c8cb-52bc-41d0-a29e-004a0baf122b">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<staticText>
+						<reportElement x="0" y="0" width="270" height="15" uuid="6d43624c-3efc-4f1d-9459-09e8838af518">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.1"/>
+							<leftPen lineWidth="0.1"/>
+							<bottomPen lineWidth="0.1"/>
+							<rightPen lineWidth="0.1"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri" size="11" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Standard Equipment:]]></text>
+					</staticText>
+					<staticText>
+						<reportElement x="270" y="0" width="270" height="15" uuid="91945080-c85c-42d2-99b0-fefb9ef01fc1">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						</reportElement>
+						<box leftPadding="5">
+							<topPen lineWidth="0.1"/>
+							<leftPen lineWidth="0.1"/>
+							<bottomPen lineWidth="0.1"/>
+							<rightPen lineWidth="0.1"/>
+						</box>
+						<textElement>
+							<font fontName="Calibri" size="11" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Optional Factory Equipment:]]></text>
+					</staticText>
+				</frame>
+				<frame>
+					<reportElement x="0" y="15" width="540" height="15" uuid="6397f274-dad6-4667-80d1-f2ec17a52852">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.1"/>
+						<leftPen lineWidth="0.1"/>
+						<bottomPen lineWidth="0.1"/>
+						<rightPen lineWidth="0.1"/>
+					</box>
+					<frame borderSplitType="DrawBorders">
+						<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="270" height="15" uuid="027ecdf6-df13-455d-8860-da91ddfd75b6">
+							<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						</reportElement>
+						<box>
+							<topPen lineWidth="0.1" lineStyle="Solid" lineColor="#000000"/>
+							<leftPen lineWidth="0.1" lineStyle="Solid" lineColor="#000000"/>
+							<bottomPen lineWidth="0.1" lineStyle="Solid" lineColor="#000000"/>
+							<rightPen lineWidth="0.1" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+							<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="270" height="15" uuid="cea4ec54-b646-4adb-a782-7664110376fb">
+								<property name="local_mesure_unitheight" value="pixel"/>
+								<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								<property name="local_mesure_unitwidth" value="pixel"/>
+								<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+								<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+								<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+							</reportElement>
+							<box leftPadding="5" rightPadding="5"/>
+							<textElement markup="html">
+								<font fontName="Calibri" size="11"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{standardEquipments}]]></textFieldExpression>
+						</textField>
+					</frame>
+					<frame borderSplitType="DrawBorders">
+						<reportElement stretchType="RelativeToTallestObject" x="270" y="0" width="270" height="15" uuid="39d5df0b-cec4-400c-9b6c-93542c7be97d">
+							<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+						</reportElement>
+						<box>
+							<topPen lineWidth="0.1" lineStyle="Solid" lineColor="#000000"/>
+							<leftPen lineWidth="0.1" lineStyle="Solid" lineColor="#000000"/>
+							<bottomPen lineWidth="0.1" lineStyle="Solid" lineColor="#000000"/>
+							<rightPen lineWidth="0.1" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+							<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="270" height="15" uuid="d91cc087-7395-473e-a575-2aa074ee042e">
+								<property name="local_mesure_unitheight" value="pixel"/>
+								<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								<property name="local_mesure_unitwidth" value="pixel"/>
+								<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+								<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+							</reportElement>
+							<box leftPadding="5" rightPadding="5"/>
+							<textElement markup="html">
+								<font fontName="Calibri" size="11"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{factoryEquipments}]]></textFieldExpression>
+						</textField>
+					</frame>
+				</frame>
+			</frame>
+		</band>
+		<band height="30" splitType="Prevent">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<frame>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="270" height="15" isPrintWhenDetailOverflows="true" uuid="e4cb5516-fb25-4da0-ad4e-4eb9e42ec14e">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<staticText>
+					<reportElement x="0" y="0" width="270" height="15" isPrintWhenDetailOverflows="true" uuid="f42aebac-bb01-491f-be18-9704c8bcaac0">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<box leftPadding="5">
+						<topPen lineWidth="0.1"/>
+						<leftPen lineWidth="0.1"/>
+						<bottomPen lineWidth="0.1"/>
+						<rightPen lineWidth="0.1"/>
+					</box>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Aftermarket Equipment:]]></text>
+				</staticText>
+			</frame>
+			<frame borderSplitType="DrawBorders">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="15" width="270" height="15" uuid="c1fe8b72-3aaa-4b04-afcc-45476adcb6e4">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.1" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.1" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.1" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.1" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="270" height="15" isPrintWhenDetailOverflows="true" uuid="fd26761a-1d80-4c49-839f-c7883d14bcdb">
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="local_mesure_unitwidth" value="pixel"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement markup="html">
+						<font fontName="Calibri" size="11"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{dealerEquipments}]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</detail>
+</jasperReport>

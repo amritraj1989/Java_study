@@ -1,0 +1,123 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Fleet Maintenance / FM 81 Display PO Details</title>
+    <body>
+    	<h1>Fleet Maintenance / FM 81 Display PO Details</h1>
+    	<h2>Acceptance Tests (Automated)</h2>
+
+		    <ul concordion:execute="testViewPurchaseOrderDetail(#purchaseOrderNumber, #maintCategory)">
+            <li>Input PO Number <b><span concordion:set="#purchaseOrderNumber">J00267667</span></b>, click on Search, Click View Purchase Order:</li>
+            <style hidden="true">
+            <span concordion:set="#maintCategory">TIRE_SVCS</span>
+            </style>
+            <ul type = "circle">
+            <li><span concordion:assertEquals="poLineCount">8</span> line items should be returned</li>
+            <li>One line item returned should be Maint Category equal to <span concordion:assertTrue="existsMaintCategory">TIRE_SVCS</span></li>
+            <li>Same line should have Service Code equal to <span concordion:assertEquals="serviceCode">TK-00-298</span></li>
+            <li>Same line should have Maint Code equal to <span concordion:assertEquals="maintCode">800-322</span></li>
+            <li>Same line should have Maintenance Code Description equal to <span concordion:assertEquals="maintCodeDescription">Rotate tire(s)</span></li>
+            <li>Same line should have Recharge Indicator equal to <span concordion:assertEquals="rechargeIndicator">Y</span></li>
+            <li>Same line should have Recharge Reason equal to <span concordion:assertEquals="rechargeReason">Maintenance management rebill</span></li>
+            <li>Same line should have Discount Indicator equal to <span concordion:assertEquals="discountIndicator">Y</span></li>
+            <li>Same line should have Qty equal to <span concordion:assertEquals="quantity">4</span></li>
+            <li>Same line should have Unit Price equal to <span concordion:assertEquals="unitPrice">3.50</span></li>
+            <li>Same line should have Total Amount equal to <span concordion:assertEquals="totalAmount">14.00</span></li>
+            <li>The PO Total should be <span concordion:assertEquals="poTotal">120.65</span></li>
+            <li>The Mark up should be <span concordion:assertEquals="markUp">0</span></li>
+            <li>The Recharge Total should be <span concordion:assertEquals="rechargeTotal">120.65</span></li></ul></ul>
+            
+            <ul concordion:execute="testViewPurchaseOrderDetail(#purchaseOrderNumber, #maintCategory)">
+            <li>Input PO Number <b><span concordion:set="#purchaseOrderNumber">J00297697</span></b>, click on Search, Click View Purchase Order:</li>
+            <style hidden="true">
+            <span concordion:set="#maintCategory">EXHAUST</span>
+            </style>
+            <ul type = "circle">
+            <li><span concordion:assertEquals="poLineCount">6</span> line items should be returned</li>
+            <li>One line item returned should be Maint Category equal to <span concordion:assertTrue="existsMaintCategory">EXHAUST</span></li>
+            <li>Same line should have Service Code equal to <span concordion:assertEquals="serviceCode">null</span></li>
+            <li>Same line should have Maint Code equal to <span concordion:assertEquals="maintCode">600-315</span></li>
+            <li>Same line should have Maintenance Code Description equal to <span concordion:assertEquals="maintCodeDescription">Misc. exhaust labor</span></li>
+            <li>Same line should have Recharge Indicator equal to <span concordion:assertEquals="rechargeIndicator">Y</span></li>
+            <li>Same line should have Recharge Reason equal to <span concordion:assertEquals="rechargeReason">Maintenance management rebill</span></li>
+            <li>Same line should have Discount Indicator equal to <span concordion:assertEquals="discountIndicator">Y</span></li>
+            <li>Same line should have Qty equal to <span concordion:assertEquals="quantity">1</span></li>
+            <li>Same line should have Unit Price equal to <span concordion:assertEquals="unitPrice">0.00</span></li>
+            <li>Same line should have Total Amount equal to <span concordion:assertEquals="totalAmount">0.00</span></li>
+            <li>The PO Total should be <span concordion:assertEquals="poTotal">420.77</span></li>
+            <li>The Mark up should be <span concordion:assertEquals="markUp">35.00</span></li>
+            <li>The Recharge Total should be <span concordion:assertEquals="rechargeTotal">455.77</span></li></ul></ul>
+ 
+            <ul concordion:execute="testViewPurchaseOrderDetail(#purchaseOrderNumber, #maintCategory)">
+            <li>Input PO Number <b><span concordion:set="#purchaseOrderNumber">J00296098</span></b>, click on Search, Click View Purchase Order:</li>
+            <style hidden="true">
+            <span concordion:set="#maintCategory">TRUCK_TIRE</span>
+            </style>
+            <ul type = "circle">
+            <li><span concordion:assertEquals="poLineCount">6</span> line items should be returned</li>
+            <li>One line item returned should be Maint Category equal to <span concordion:assertTrue="existsMaintCategory">TRUCK_TIRE</span></li>
+            <li>Same line should have Service Code equal to <span concordion:assertEquals="serviceCode">null</span></li>
+            <li>Same line should have Maint Code equal to <span concordion:assertEquals="maintCode">930-100</span></li>
+            <li>Same line should have Maintenance Code Description equal to <span concordion:assertEquals="maintCodeDescription">Light truck tire(s)</span></li>
+            <li>Same line should have Recharge Indicator equal to <span concordion:assertEquals="rechargeIndicator">Y</span></li>
+            <li>Same line should have Recharge Reason equal to <span concordion:assertEquals="rechargeReason">Maintenance management rebill</span></li>
+            <li>Same line should have Discount Indicator equal to <span concordion:assertEquals="discountIndicator">Y</span></li>
+            <li>Same line should have Qty equal to <span concordion:assertEquals="quantity">4</span></li>
+            <li>Same line should have Unit Price equal to <span concordion:assertEquals="unitPrice">195.57</span></li>
+            <li>Same line should have Total Amount equal to <span concordion:assertEquals="totalAmount">782.28</span></li>
+            <li>The PO Total should be <span concordion:assertEquals="poTotal">931.98</span></li>
+            <li>The Mark up should be <span concordion:assertEquals="markUp">0</span></li>
+            <li>The Recharge Total should be <span concordion:assertEquals="rechargeTotal">931.98</span></li></ul></ul>
+            
+            <ul concordion:execute="testViewPurchaseOrderDetail(#purchaseOrderNumber, #maintCategory)">
+            <li>Input PO Number <b><span concordion:set="#purchaseOrderNumber">J00307465</span></b>, click on Search, Click View Purchase Order:</li>
+            <style hidden="true">
+            <span concordion:set="#maintCategory">TIRE_SVCS</span>
+            </style>
+            <ul type = "circle">
+            <li><span concordion:assertEquals="poLineCount">3</span> line items should be returned</li>
+            <li>One line item returned should be Maint Category equal to <span concordion:assertTrue="existsMaintCategory">TIRE_SVCS</span></li>
+            <li>Same line should have Service Code equal to <span concordion:assertEquals="serviceCode">null</span></li>
+            <li>Same line should have Maint Code equal to <span concordion:assertEquals="maintCode">800-322</span></li>
+            <li>Same line should have Maintenance Code Description equal to <span concordion:assertEquals="maintCodeDescription">Rotate tire(s)</span></li>
+            <li>Same line should have Recharge Indicator equal to <span concordion:assertEquals="rechargeIndicator">N</span></li>
+            <li>Same line should have Recharge Reason equal to <span concordion:assertEquals="rechargeReason">null</span></li>
+            <li>Same line should have Discount Indicator equal to <span concordion:assertEquals="discountIndicator">Y</span></li>
+            <li>Same line should have Qty equal to <span concordion:assertEquals="quantity">1</span></li>
+            <li>Same line should have Unit Price equal to <span concordion:assertEquals="unitPrice">19.95</span></li>
+            <li>Same line should have Total Amount equal to <span concordion:assertEquals="totalAmount">19.95</span></li>
+            <li>The PO Total should be <span concordion:assertEquals="poTotal">53.64</span></li>
+            <li>The Mark up should be <span concordion:assertEquals="markUp">0</span></li>
+            <li>The Recharge Total should be <span concordion:assertEquals="rechargeTotal">0</span></li></ul></ul>
+            
+            <ul concordion:execute="testViewPurchaseOrderDetail(#purchaseOrderNumber, #maintCategory)">
+            <li>Input PO Number <b><span concordion:set="#purchaseOrderNumber">J00275882</span></b>, click on Search, Click View Purchase Order:</li>
+            <style hidden="true">
+            <span concordion:set="#maintCategory">GLASS</span>
+            </style>
+            <ul type = "circle">
+            <li><span concordion:assertEquals="poLineCount">4</span> line items should be returned</li>
+            <li>One line item returned should be Maint Category equal to <span concordion:assertTrue="existsMaintCategory">GLASS</span></li>
+            <li>Same line should have Service Code equal to <span concordion:assertEquals="serviceCode">null</span></li>
+            <li>Same line should have Maint Code equal to <span concordion:assertEquals="maintCode">650-328</span></li>
+            <li>Same line should have Maintenance Code Description equal to <span concordion:assertEquals="maintCodeDescription">Windshield - Parts &amp; Labor</span></li>
+            <li>Same line should have Recharge Indicator equal to <span concordion:assertEquals="rechargeIndicator">Y</span></li>
+            <li>Same line should have Recharge Reason equal to <span concordion:assertEquals="rechargeReason">Maintenance management rebill</span></li>
+            <li>Same line should have Discount Indicator equal to <span concordion:assertEquals="discountIndicator">N</span></li>
+            <li>Same line should have Qty equal to <span concordion:assertEquals="quantity">1</span></li>
+            <li>Same line should have Unit Price equal to <span concordion:assertEquals="unitPrice">346.95</span></li>
+            <li>Same line should have Total Amount equal to <span concordion:assertEquals="totalAmount">346.95</span></li>
+            <li>The PO Total should be <span concordion:assertEquals="poTotal">504.40</span></li>
+            <li>The Mark up should be <span concordion:assertEquals="markUp">0</span></li>
+            <li>The Recharge Total should be <span concordion:assertEquals="rechargeTotal">504.40</span></li>
+             
+            </ul></ul>
+            
+    	<h2>Manual Tests</h2>
+    	    <ul type = "circle"><b>
+    	       <li>TODO: Verify the data in the Vehicle Information section of Create Maintenance Purchase Order screen based on the vehicle status.</li>
+    	    </b></ul>
+
+    	<h2>Untested (Out of Scope)</h2>
+    		<ul><li>TODO:</li></ul>
+    </body>
+</html>

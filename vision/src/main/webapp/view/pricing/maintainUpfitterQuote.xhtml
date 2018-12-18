@@ -1,0 +1,389 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:comp="http://java.sun.com/jsf/composite/view/component"   
+	xmlns:pe="http://primefaces.org/ui/extensions"	  
+    template="../../templates/ui.xhtml" >
+	
+    <ui:define name="content">
+    	    <h:form id="maintainUpfitterQuoteFormBreadCrumb" prependId="false">
+   			    <p:breadCrumb model="#{maintainUpfitterQuoteBean.breadCrumbTrail}" ajax="false" immediate="true" style="min-width:980px;max-width:100%;width:auto;"/>
+   		    </h:form>
+   		           		        
+    	    <!-- Message display -->
+		    <p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:980px;max-width:100%;width:auto;">
+			    <p:messages id="messages" severity="info,fatal,error" showSummary="true" showDetail="true" autoUpdate="true" />
+		    </p:scrollPanel>   	
+		    
+            <comp:addDealerAccessory id="ccAddDealerAccessory" 
+                    upfitter="#{maintainUpfitterQuoteBean.selectedUpfitterAcccount}" 
+                    onClose="addDealerAccessoryOnCloseListener(xhr, status, args)"
+                    trim="#{maintainUpfitterQuoteBean.model}"
+                    resource="maintainUpfitterQuote" />
+        		    
+		    <p:panel>
+		        <comp:modelDisplay id="modelDisplay" entities="#{maintainUpfitterQuoteBean.models}"/>		    	        
+            </p:panel>
+                                 
+            <h:form id="maintainUpfitterQuoteForm" prependId="false">
+	            <p:remoteCommand name="addDealerAccessories" actionListener="#{maintainUpfitterQuoteBean.addDealerAccessoryOnCloseListener}" update=":maintainUpfitterQuoteForm:dealerAccessoryDT"/>
+	            <p:remoteCommand name="clearAutoCompletesRC" process="@this" actionListener="#{maintainUpfitterQuoteBean.clearAutoCompletes}"  update="@form"/>	            
+	            
+                <f:validateBean disabled="true">
+	                <p:tabView id="maintainUpfitterQuoteTV" cache="false" dynamic="true" activeIndex="#{maintainUpfitterQuoteBean.tabIndex}">
+	                    
+	                    <p:ajax event="tabChange" 
+	                            onstart="clearAutoCompletes();"
+	                            listener="#{maintainUpfitterQuoteBean.tabChangeListener}" 
+	                            process="@parent"
+	                            update=":maintainUpfitterQuoteForm:dealerAccessorySearchTerm :maintainUpfitterQuoteForm:availableDealerAccessoriesDT :maintainUpfitterQuoteForm:dealerAccessoryDT "
+	                            oncomplete="setDirtyData(false);"/>                
+	                    	
+	                    <p:tab id="updateUpfitterQuoteTab" title="Maintain">
+	                        <p:focus for="trimUpfitterMnu" />	                    
+		                    <p:panelGrid columns="6">  
+							    <p:outputLabel for="trimUpfitterMnu" value="Vendor:*" styleClass="ui-label" />	                                      
+								<p:selectOneMenu id="trimUpfitterMnu" widgetVar="trimUpfitterMnuWidgetVar" value="#{maintainUpfitterQuoteBean.selectedUpfitter}" style= "width:275px" converter="#{upfitterSearchResultVOConverter}" >
+									<f:selectItem itemValue="" itemLabel="" />								
+								    <f:selectItems value="#{maintainUpfitterQuoteBean.avaialableUpfitters}" var="upfitter" itemLabel="#{upfitter.payeeAccountName.concat(' - ').concat(upfitter.payeeAccountCode)}" itemValue="#{upfitter}" itemDescription="hello world"/>
+	                                <p:ajax  process="@form" listener="#{maintainUpfitterQuoteBean.trimUpfitterChangeListener}" oncomplete="$('[id$=upfitterQuoteAC_input]').val('')" update="@form upfitterQuoteMnu trimUpfitterAddressLbl trimUpfitterPhoneNumberLbl :maintainUpfitterQuoteForm:dealerAccessoryDT" />							    
+								</p:selectOneMenu>																
+								
+							    <p:outputLabel for="upfitterQuoteAC" value="Vendor Quote Number:*" styleClass="ui-label" />	                                      
+								<p:selectOneMenu rendered="false" id="upfitterQuoteMnu" value="#{maintainUpfitterQuoteBean.selectedQuote}" style= "width:150px" converter="#{upfitterQuoteConverter}" >
+									<f:selectItem itemValue="" itemLabel="" />								
+								    <f:selectItems value="#{maintainUpfitterQuoteBean.availableQuotes}" var="upfitterQuote" itemLabel="#{upfitterQuote.quoteNumber}" itemValue="#{upfitterQuote}" itemDescription="hello world"/>
+	                                <p:ajax  process="@form" listener="#{maintainUpfitterQuoteBean.selectUpfitterQuoteListener}" update="@form :maintainUpfitterQuoteForm:dealerAccessoryDT" />							    
+								</p:selectOneMenu>
+								
+								<h:panelGroup>
+	                                <p:watermark for="upfitterQuoteAC" value="Search with a keyword" />								
+								    <p:autoComplete id="upfitterQuoteAC"
+									        value="#{maintainUpfitterQuoteBean.selectedQuote}"
+									        widgetVar="upfitterQuoteACWidgetVar"
+									        var="upfitterQuote" 
+									        completeMethod="#{maintainUpfitterQuoteBean.autoCompleteUpfitterQuoteListener}"
+									        itemLabel="#{upfitterQuote.quoteNumber}"
+									        itemValue="#{upfitterQuote}"
+									        forceSelection="false" 
+									        size="35" 
+									        maxlength="40" 
+									        scrollHeight="100"
+									        autocomplete="off" 
+									        converter="#{upfitterQuoteConverter}"
+									        style="text-transform: uppercase !important;"
+									        disabled="#{!maintainUpfitterQuoteBean.hasPermission()}">	
+									      
+		                                <p:ajax event="itemSelect"  
+		                                        process="@form" 
+		                                        listener="#{maintainUpfitterQuoteBean.selectUpfitterQuoteListener}" 
+		                                        update="@form :maintainUpfitterQuoteForm:dealerAccessoryDT :maintainUpfitterQuoteForm:availableDealerAccessoriesDT" />								        										        								        			                							                                                              
+								    </p:autoComplete>
+							    </h:panelGroup> 									
+								
+			                    <h:outputLabel value="Updated Quote Number:" styleClass="ui-label" />
+			                    <p:inputText id="updatedQuoteNumberTxt" value="#{maintainUpfitterQuoteBean.updatedQuoteNumber}" autocomplete="off" size="35" maxlength="40" onchange="setDirtyData(true);" style="text-transform: uppercase;" disabled="#{!maintainUpfitterQuoteBean.hasPermission() || maintainUpfitterQuoteBean.quoteBeenUsed}" />								
+								
+			                    <h:outputLabel for="trimUpfitterAddressLbl" value="Address:" styleClass="ui-label"/>
+			                    <h:outputLabel id="trimUpfitterAddressLbl" value="#{maintainUpfitterQuoteBean.formatSelectedUpfitterAddress()}" />	
+			                    
+			                    <h:outputLabel for="trimUpfitterPhoneNumberLbl" value="Phone:" styleClass="ui-label"/>
+			                    <h:outputLabel id="trimUpfitterPhoneNumberLbl" value="#{maintainUpfitterQuoteBean.selectedUpfitter.payeePhoneNumber}" />							
+															
+							</p:panelGrid>
+	                    </p:tab>
+	                    
+	                </p:tabView>   
+                </f:validateBean>                  
+                               
+                <p:panelGrid styleClass="ui-layout"> 
+                    <p:row>	 
+                        <p:column style="vertical-align: top !important;" styleClass="ui-datatable-partition-dev">
+			                <p:panel id="availableDealerAccessoriesPnl" style="width:500px;">
+                                <h:outputLabel for="dealerAccessorySearchTerm" value="Description:" styleClass="ui-label" />
+	                            <p:watermark for="dealerAccessorySearchTerm" value="Search with a keyword" />                                
+                                <p:inputText id="dealerAccessorySearchTerm" value="#{maintainUpfitterQuoteBean.dealerAccessorySearchTerm}" autocomplete="off" size="50" disabled="#{!maintainUpfitterQuoteBean.hasPermission()}" > <p:spacer width="10px" />
+                                    <p:ajax event="keyup" listener="#{maintainUpfitterQuoteBean.searchAvailableDealerAccessoriesListener()}" update="availableDealerAccessoriesDT"/>
+                                </p:inputText> 		
+                                	         
+                                <br />
+                                <br />
+                                       
+			                    <p:dataTable id="availableDealerAccessoriesDT"
+			                            widgetVar="availableDealerAccessoriesDTWidget"					                        
+			                            var="dlrAccessory" 
+			                            value="#{maintainUpfitterQuoteBean.availableDealerAccessoryCodes}"
+			                            selectionMode="single"
+			                            selection="#{maintainUpfitterQuoteBean.selectedAvailableDealerAccessoryCode}" 
+			                            rowKey="#{dlrAccessory.accessoryCode}"
+			                            scrollable="true" 
+			                            scrollHeight="300"
+			                            styleClass="ui-datatable-header-align-dev " >
+			                            
+									<p:ajax event="rowDblselect" process="@form" disabled="#{maintainUpfitterQuoteBean.quoteBeenUsed}"
+										listener="#{maintainUpfitterQuoteBean.addQuotedPriceListener}"
+                                        update="@form :maintainUpfitterQuoteForm:availableDealerAccessoriesDT :maintainUpfitterQuoteForm:dealerAccessoryDT" />
+														                        
+						            <f:facet name="header">
+	                                    <h:outputLabel value="Available Dealer Accessories" styleClass="ui-label" />
+	                                    <p:commandLink id="addDealerAccessoryLnk" 
+									            style="float:right; border:thin solid gray; text-decoration:none; cursor:pointer;"
+									            title="Add Dealer Accessory" 
+									            actionListener="#{maintainUpfitterQuoteBean.addNewDealerAccessoryListener()}"
+									            rendered="#{maintainUpfitterQuoteBean.hasPermission() and !maintainUpfitterQuoteBean.quoteBeenUsed}"
+									            process="@this :maintainUpfitterQuoteForm:maintainUpfitterQuoteTV:updatedQuoteNumberTxt :maintainUpfitterQuoteForm:dealerAccessoryDT" 
+									            immediate="true"
+									            update="@form" >						   
+									        <p:graphicImage style="border-style: none;" value="/images/action_add.png" />
+									        <h:outputLabel  style="vertical-align:5px" value="Add &#160;"  /> 						            							            
+									    </p:commandLink>
+									    <p:spacer height="15px;"/>	
+                                    </f:facet>
+
+								    <p:column width="25%" headerText="Code">
+			                            <h:outputText value="#{dlrAccessory.newAccessoryCode}" />
+			                        </p:column>	
+								    <p:column width="*" headerText="Description">
+			                            <h:outputText value="#{dlrAccessory.description}" />
+			                        </p:column>	
+			                        <p:column width="25%" headerText="Category">
+			                            <h:outputText value="#{empty dlrAccessory.optionAccessoryCategory.mafsDescription ? dlrAccessory.optionAccessoryCategory.description : dlrAccessory.optionAccessoryCategory.mafsDescription}" />
+			                        </p:column>			                        		                        
+			                    
+			                    </p:dataTable>
+			                </p:panel>                            
+                        </p:column> 
+                                                               
+	                    <p:column>
+								<p:commandButton id="addQuotedPrice" 
+								    icon="ui-icon-arrowthick-1-e" 
+								    title="Add" 
+								    actionListener="#{maintainUpfitterQuoteBean.addQuotedPriceListener}"
+								    update=":maintainUpfitterQuoteForm:availableDealerAccessoriesDT :maintainUpfitterQuoteForm:dealerAccessoryDT" 
+								    disabled="#{!maintainUpfitterQuoteBean.hasPermission() || maintainUpfitterQuoteBean.quoteBeenUsed}"
+								    onsuccess="setDirtyData(true);" />
+								<br />
+								<br />
+								<p:commandButton id="addQuotedPrices"
+									icon="ui-icon-arrowthickstop-1-e"
+									title="Add All" 									
+								    actionListener="#{maintainUpfitterQuoteBean.addQuotedPricesListener}" 
+								    update=":maintainUpfitterQuoteForm:availableDealerAccessoriesDT :maintainUpfitterQuoteForm:dealerAccessoryDT" 
+								    disabled="#{!maintainUpfitterQuoteBean.hasPermission() || maintainUpfitterQuoteBean.quoteBeenUsed}"
+								    onsuccess="setDirtyData(true);" />
+								<br />
+								<br />
+								<p:commandButton id="removeQuotedPrice"
+									icon="ui-icon-arrowthick-1-w"
+									title="Remove" 									
+								    actionListener="#{maintainUpfitterQuoteBean.removeQuotedPriceListener}" 
+								    update=":maintainUpfitterQuoteForm:availableDealerAccessoriesDT :maintainUpfitterQuoteForm:dealerAccessoryDT" 
+								    disabled="#{!maintainUpfitterQuoteBean.hasPermission() || maintainUpfitterQuoteBean.quoteBeenUsed}"
+								    onsuccess="setDirtyData(true);" />
+								<br />
+								<br />
+								<p:commandButton id="removeQuotedPrices"
+									icon="ui-icon-arrowthickstop-1-w"
+									title="Remove All" 									
+								    actionListener="#{maintainUpfitterQuoteBean.removeQuotedPricesListener}" 
+								    update=":maintainUpfitterQuoteForm:availableDealerAccessoriesDT :maintainUpfitterQuoteForm:dealerAccessoryDT" 
+								    disabled="#{!maintainUpfitterQuoteBean.hasPermission() || maintainUpfitterQuoteBean.quoteBeenUsed}"
+								    onsuccess="setDirtyData(true);" />
+								<br />
+								<br />
+	                    </p:column>
+	                    
+                        <p:column styleClass="ui-datatable-partition-dev">
+                            <p:panel>                                      	                     
+					            <p:dataTable id="dealerAccessoryDT" 
+					                    widgetVar="dealerAccessoryDTWidgetVar"
+					                    var="quotedPrice" 
+					                    value="#{maintainUpfitterQuoteBean.dealerAccessoryPrices}"
+			                            selectionMode="single"
+			                            selection="#{maintainUpfitterQuoteBean.selectedQuotedPrice}" 
+			                            rowKey="#{quotedPrice.dplId}"
+			                            rowIndexVar="dealerAccessoryDTRowIndexVar"
+			                            scrollable="true" 					                    
+					                    scrollHeight="300">
+					                    
+									<p:ajax event="rowDblselect" process="@form" disabled="#{maintainUpfitterQuoteBean.quoteBeenUsed}"
+										listener="#{maintainUpfitterQuoteBean.removeQuotedPriceListener}"
+                                        update=":maintainUpfitterQuoteForm:availableDealerAccessoriesDT :maintainUpfitterQuoteForm:dealerAccessoryDT" />					                    
+					                        
+					                <f:facet name="header">
+					                    <h:outputLabel  style="vertical-align:15px" value="Dealer Accessories" />		                    
+					                </f:facet> 
+						                		
+			                        <p:column headerText="Code" width="16%" style="white-space: nowrap; text-overflow: ellipsis;">
+			                            <h:outputText value="#{quotedPrice.dealerAccessory.dealerAccessoryCode.newAccessoryCode}" 
+			                            	title="#{quotedPrice.dealerAccessory.dealerAccessoryCode.newAccessoryCode}"/>		                        
+			                        </p:column>		
+			                        			                		                        
+			                        <p:column headerText="Description" width="27%">
+			                            <h:outputText value="#{quotedPrice.dealerAccessory.dealerAccessoryCode.description}" />		                        
+			                        </p:column>	
+			                        	        
+					                <p:column headerText="Price" width="20%"  style="text-align: center">
+				                        <p:inputNumber id="accessoryPriceTxt"
+				                        		symbol="$" symbolPosition="p" 
+				                        		styleClass="ui-text-align-right-dev"
+				                        		size="10"
+							                    value="#{quotedPrice.basePrice}" 										
+							                    decimalPlaces="2"
+							                    decimalSeparator="." 										
+							                    minValue="-999999.99" 
+							                    maxValue="999999.99" 
+							                    autocomplete="off"
+							                    onchange="setDirtyData(true);"
+							                    disabled="#{!maintainUpfitterQuoteBean.hasPermission() || maintainUpfitterQuoteBean.quoteBeenUsed}" /> 					                
+			                            <h:outputLabel rendered="false" style="float:right" value="#{quotedPrice.totalPrice}">
+										    <f:convertNumber type="currency" currencySymbol="$" />                               
+			                            </h:outputLabel>
+					                </p:column>						                	                        	        					                	
+					                
+					                <p:column headerText="Effective Date" width="*"  style="text-align: center">				                
+					                    <p:calendar id="accessoryEffectiveDate" 
+					                            size="10"
+						                        value="#{quotedPrice.effectiveDate}" 
+						                        pattern="MM/dd/yyyy"
+							                    maxdate="#{maintainUpfitterQuoteBean.maxDate}"						                         
+						                        style="width:20px" 
+						                        showOn="button" 
+						                        autocomplete="off"
+						                        onchange="formatDate(this); setDirtyData(true);"
+						                        disabled="#{!maintainUpfitterQuoteBean.hasPermission() || maintainUpfitterQuoteBean.quoteBeenUsed}" >
+											<f:convertDateTime pattern="MM/dd/yyyy" />		    									
+										</p:calendar>  					                
+			                            <h:outputLabel rendered="false" value="#{quotedPrice.effectiveDate}" >  
+			                                <f:convertDateTime pattern="MM/dd/yyyy" />                                                                 
+			                            </h:outputLabel>
+					                </p:column>	
+					                
+					                <p:column headerText="Lead Time" width="12%"  style="text-align: center">
+				                        <p:inputNumber id="accessoryLeadTimeTxt" 
+							                	size="3"
+							                	styleClass="ui-text-align-right-dev"								    							    
+							                    value="#{quotedPrice.leadTime}" 	
+							                    thousandSeparator=""									
+							                    decimalPlaces="0"
+							                    minValue="0"
+							                    maxValue="999"
+							                    autocomplete="off"
+							                    onchange="setDirtyData(true);"
+							                    disabled="#{!maintainUpfitterQuoteBean.hasPermission()}" />  					                
+			                            <h:outputLabel rendered="false" style="float:right" value="#{maintainUpfitterQuoteBean.determineLeadTime(quotedPrice)}" />                                                               
+					                </p:column>						                					                		                		                		                
+						                	                        	                        
+					            </p:dataTable>
+                            </p:panel>				            
+                        </p:column>
+                    </p:row>            
+                  	                        			                		                       
+                </p:panelGrid>		                	            	                     	                                                         
+                
+	            <p:panel>	            
+				    <p:commandButton id="saveQuoteBtn" value="Save"
+				        widgetVar="saveQuoteBtnWidgetVar"
+					    action="#{maintainUpfitterQuoteBean.saveQuoteListener}" 
+					    update="@form :maintainUpfitterQuoteForm:availableDealerAccessoriesDT :maintainUpfitterQuoteForm:dealerAccessoryDT"
+					    process="@form"
+					    onstart="PF('saveQuoteBtnWidgetVar').disable()"
+					    oncomplete="PF('saveQuoteBtnWidgetVar').enable()"
+					    onclick="lockScreen();"
+					    ajax="false"
+					    disabled="#{!maintainUpfitterQuoteBean.hasPermission()}" />	
+					    												    			          
+				    <p:spacer width="5" />
+				    				         	            
+				    <p:commandButton id="cancel" 
+				            value="Cancel" 
+				            action="#{maintainUpfitterQuoteBean.cancel}" 
+				            ajax="false" 
+				            immediate="true" 
+				            onclick="lockScreen();" />
+	            </p:panel>	                				           
+            </h:form>       
+            <style type="text/css">	
+				.ui-datatable-header-align-dev .ui-widget-header{
+					overflow:auto !important;
+				}	
+			
+				.ui-datatable-partition-dev .ui-datatable TBODY TD{
+					border-top-style: solid !important;
+					border-bottom-style: solid !important;
+					border-right-style: solid !important;
+					border-left-style: solid !important;				
+				}
+			</style>                                                                                                                                           
+            <script type="text/javascript">
+			    /**
+			     * Dirty Detection 
+				 */
+	             function initializeDirtyDetection() {
+				     registerIgnoreButton("saveQuoteBtn");
+				     registerIgnoreButton("addDealerAccessoryLnk");
+				     //setDirtyDataById("dirtyData");
+					 //saveDataForDirtyDetection();			    	
+				 }           
+			    
+			    /*
+			    * Add dealer accessory component's close event handler.
+			    * The callback parameters from the Add Dealer Accessory component are:
+			    *     The saved DealerAccessoryCode entity
+			    *     Base price  
+			    *     Effective date
+			    *     Lead time (optional)
+			    */
+			    function addDealerAccessoryOnCloseListener(xhr, status, args){
+			    	
+			    	if(args.dealerAccessoryCode){
+				    	if(args.dealerAccessoryLeadTime){
+					    	addDealerAccessories([{name:'dealerAccessoryCodeId', value:args.dealerAccessoryCode}, 
+					    	                      {name:'dealerAccessoryBasePrice', value:args.dealerAccessoryBasePrice}, 
+					    	                      {name:'dealerAccessoryEffectiveDate', value:args.dealerAccessoryEffectiveDate},
+					    	                      {name:'dealerAccessoryLeadTime', value:args.dealerAccessoryLeadTime}]);			    		
+				    	} else {
+					    	addDealerAccessories([{name:'dealerAccessoryCodeId', value:args.dealerAccessoryCode}, 
+					    	                      {name:'dealerAccessoryBasePrice', value:args.dealerAccessoryBasePrice}, 
+					    	                      {name:'dealerAccessoryEffectiveDate', value:args.dealerAccessoryEffectiveDate}]);			    		
+				    	}
+			    	}
+			    	
+			    	setDirtyData(true);			    	
+			    }
+				 
+				 /**
+				 * Navigates to the price field in the quote's price list at the specified index.
+				 *     param: the row number used as an index to locate the correct price field.
+				 */
+				 function goToPrice(index){
+					 setFocusPF('dealerAccessoryDT:' + index + ':accessoryPriceTxt_input');
+				 }
+				 
+				 /**
+				 * Used to clear the autocomplete selection and content.
+				 */
+				 function clearAutoCompletes(){
+					 clearAutoCompletesRC();		 
+				 }
+				 
+// 				 function clearUpfitterSelection(){
+// 					 var input = $('[id="maintainUpfitterQuoteTV:availableUpfittersAC_input"]').val();
+// 					 //alert(input.length);
+					 
+// 					 if(input.length == 0){
+// 						 clearAutoCompletesRC();
+// 					 }
+					 
+// 					 return false;
+// 				 } 
+			
+	     	$(window).load(function(){
+	     		initializeDirtyDetection();
+			});	
+		    </script>
+	</ui:define>
+	
+</ui:composition>

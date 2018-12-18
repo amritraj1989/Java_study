@@ -1,0 +1,1431 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	template="../../templates/ui.xhtml">
+	
+	<ui:define name="content">
+		
+			<h:form id="openEndQuoteRevisionBreadCrumbForm" prependId="false">
+				<p:breadCrumb style ="min-width:1300px;max-width:100%;width:auto" model="#{openEndQuoteRevisionBean.breadCrumbTrail}" ajax="false" immediate="true" styleClass="ui-layout"/>
+			</h:form>
+			
+			<!-- Error message display -->
+			<p:scrollPanel style="min-width:1300px;max-width:100%;width:auto;height:50px;" mode="native" styleClass="ui-layout" id="messagePanel" >
+				<p:messages id="messages" severity="info,error,fatal" showSummary="false" showDetail="true"	autoUpdate="true" />
+				 <h:outputText id = "splMsgforStep" value= "#{openEndQuoteRevisionBean.splMsgforStep}" rendered="#{empty openEndQuoteRevisionBean.splMsgforStep ? 'false' : 'true'}" styleClass="ui-messages-info" style="margin-left : 25px"/>
+			</p:scrollPanel>
+					
+			
+		 	<h:form id="openEndQuoteRevisionForm" prependId="false" >
+		 		<h:inputHidden id="dirtyData" value="#{openEndQuoteRevisionBean.dirtyData}"/>
+		 		<h:inputHidden id="newQuoteProfileId" value="#{openEndQuoteRevisionBean.newQuoteProfileId}"/>
+		 		<p:commandButton id="newProfileId" value="New" actionListener="#{openEndQuoteRevisionBean.storeNewQprAndRecalculateQuote()}" ajax="true" 
+		 			update=":quoteOverviewOEInformationPanel :messagePanel ,  :openEndQuoteRevisionForm:paymentDetailsPanel ,  :inRateInfoDialogForm:inRateInfoDialogPanel  , :openEndQuoteRevisionForm:controlPanel"
+		 			style="display:none"/>
+		 		
+				<p:panel id="quoteOverviewOEInformationPanel" style ="min-width:1300px;max-width:100%;width:auto">
+					<p:panel >
+						<p:panelGrid >
+							<p:row>
+								<p:column>
+									<h:outputLabel value="Client:"  styleClass="ui-label"/>			
+								</p:column>
+								<p:column>
+									<h:outputText value="#{openEndQuoteRevisionBean.currentOEQuoteVO.accountCode}"/>			
+								</p:column>
+								<p:column>
+									<h:outputText value="#{openEndQuoteRevisionBean.currentOEQuoteVO.accountName}"/>			
+								</p:column>
+								<p:column>
+									<h:outputLabel value="Current Quote Profile:"  styleClass="ui-label"/>			
+								</p:column>
+								<p:column>
+									<h:outputText  value="#{openEndQuoteRevisionBean.currentOEQuoteVO.quoteProfileDesc}"/>				
+								</p:column>
+								
+							</p:row>
+							<p:row>
+								<p:column>
+									<h:outputLabel value="Unit:"  styleClass="ui-label"/>			
+								</p:column>
+								<p:column>
+									<h:outputText value="#{openEndQuoteRevisionBean.currentOEQuoteVO.unitNo}"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{openEndQuoteRevisionBean.currentOEQuoteVO.unitDesc}"/>					
+								</p:column>
+								<p:column>
+									<h:outputLabel value="Revision Quote Profile:"  styleClass="ui-label"/>			
+								</p:column>
+								<p:column>
+									<h:outputText  value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.quoteProfileDesc}"/>
+									<p:spacer width="4" />
+								
+									<p:commandLink id="profileLOVLink" style="cursor: pointer;border:none"
+											oncomplete="showQuotationProfileLov()" immediate="true" disabled="#{!openEndQuoteRevisionBean.quoteEditable}"
+											actionListener="#{quotationProfilesLovBean.loadRows}" >
+										<p:graphicImage style="text-align:right;align:right;border-style:none;" 
+														value="/images/action_edit.png" 
+														title="Change Quote Profile" />
+										<f:param name="cId" value="#{openEndQuoteRevisionBean.currentOEQuoteVO.quotationModel.quotation.externalAccount.externalAccountPK.cId}"/>
+										<f:param name="accountType" value="#{openEndQuoteRevisionBean.currentOEQuoteVO.quotationModel.quotation.externalAccount.externalAccountPK.accountType}"/>
+										<f:param name="accountCode" value="#{openEndQuoteRevisionBean.currentOEQuoteVO.accountCode}"/>
+										<f:param name="accountName" value="#{openEndQuoteRevisionBean.currentOEQuoteVO.accountName}"/>
+										<f:param name="productCode" value="#{openEndQuoteRevisionBean.currentOEQuoteVO.quotationModel.quotation.quotationProfile.prdProductCode}"/>
+										<f:param name="profileId" value="#{openEndQuoteRevisionBean.currentOEQuoteVO.quotationModel.quotation.quotationProfile.qprId}"/>
+									</p:commandLink>
+								
+								
+								
+								
+											
+								</p:column>
+							</p:row>
+
+
+						</p:panelGrid>									
+										
+					</p:panel>	
+					<p:panel >
+						<p:panelGrid>
+							<p:row>
+								<p:column style="vertical-align: top !important;">
+									<p:panel style="min-height:130px;max-height:100%;height:auto">
+										<p:panelGrid styleClass="ui-panelgrid-small">
+											<p:row>
+												<p:column style="width:150px;">										
+												</p:column>								
+												<p:column style="width:80px;">
+													<h:outputLabel value="Current"  styleClass="ui-label"/>
+												</p:column>
+												<p:column style="width:20px;">
+													<p:spacer width="1" />
+												</p:column>								
+												<p:column style="width:100px;">
+													<h:outputLabel value="Revision"  styleClass="ui-label"/>
+												</p:column>								
+											</p:row>
+				
+											<p:row>
+												<p:column>
+													<h:outputLabel value="Quote:"  styleClass="ui-label"/>
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.currentOEQuoteVO.quote}"/>
+												</p:column>								
+												<p:column style="width:20px;">
+													<p:spacer width="1" />
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.quote}"/>
+												</p:column>								
+											</p:row>
+											<p:row>
+												<p:column>
+													<h:outputLabel value="Cost Treatment:"  styleClass="ui-label"/>
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.currentOEQuoteVO.costTreatment}"/>
+												</p:column>								
+												<p:column style="width:20px;">
+													<p:spacer width="1" />
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.costTreatment}"/>
+												</p:column>								
+											</p:row>
+											<p:row>
+												<p:column>
+													<h:outputLabel value="Interest Treatment:"  styleClass="ui-label"/>
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.currentOEQuoteVO.interestTreatment}"/>
+												</p:column>								
+												<p:column style="width:20px;">
+													<p:spacer width="1" />
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.interestTreatment}"/>
+												</p:column>								
+											</p:row>
+											<p:row>
+												<p:column>
+													<h:outputLabel value="Interest Index:"  styleClass="ui-label"/>
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.currentOEQuoteVO.interestIndex}"/>
+												</p:column>								
+												<p:column style="width:20px;">
+													<p:spacer width="1" />
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.interestIndex}"/>
+												</p:column>								
+											</p:row>
+											<p:row>
+												<p:column>
+													<h:outputLabel value="Float/Non-Float:"  styleClass="ui-label"/>
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.currentOEQuoteVO.floatType}"/>
+												</p:column>								
+												<p:column style="width:20px;">
+													<p:spacer width="1" />
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.floatType}"/>
+												</p:column>								
+											</p:row>
+
+										</p:panelGrid>									
+									</p:panel>								
+								</p:column>
+
+								<p:column style="vertical-align: top !important;">
+									<p:panel style="min-height:130px;max-height:100%;height:auto">
+										<p:panelGrid styleClass="ui-panelgrid-small">
+											<p:row>
+												<p:column>
+													<h:outputLabel value="Product Type:"  styleClass="ui-label"/>			
+												</p:column>
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.currentOEQuoteVO.productName}"/>			
+												</p:column>
+											</p:row>
+											<p:row>
+												<p:column>
+													<h:outputLabel value="Revision Status:"  styleClass="ui-label"/>			
+												</p:column>
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.quotationModel.quotationStatusCodes.description}"/>			
+												</p:column>
+											</p:row>
+											<p:row>
+												<p:column>										
+													<p:spacer width="1" />
+												</p:column>								
+											</p:row>
+											<p:row>
+												<p:column style="width:150px;">										
+													<h:outputLabel value="Total Cost - MAFS:"  styleClass="ui-label" title="Total Cost to Place Into Service"/>
+												</p:column>								
+												<p:column style="width:150px;">
+													<h:outputText id="mafsTotalCost" value="#{openEndQuoteRevisionBean.currentOEQuoteVO.dealCost}" styleClass="alignmentRight" >
+														<f:converter converterId="malDollarValueConverter" />
+													</h:outputText>
+												</p:column>								
+											</p:row>
+											<p:row>
+												<p:column >										
+													<h:outputLabel value="Curr. Capital Contr.:"  styleClass="ui-label" title="Current Capital Contribution"/>
+												</p:column>								
+												<p:column >
+													<h:outputText value="#{openEndQuoteRevisionBean.currentOEQuoteVO.capitalContribution}" styleClass="alignmentRight" >
+														<f:converter converterId="malDollarValueConverter" />
+													</h:outputText>
+													
+												</p:column>								
+											</p:row>
+											<p:row>
+												<p:column >										
+													<h:outputLabel value="Curr. Client Cap Cost:"  styleClass="ui-label" title="Current Client Cap Cost"/>
+												</p:column>								
+												<p:column >
+													<h:outputText value="#{openEndQuoteRevisionBean.currentCustomerCost}" styleClass="alignmentRight" >
+														<f:converter converterId="malDollarValueConverter" />
+													</h:outputText>
+													
+												</p:column>								
+											</p:row>
+
+										</p:panelGrid>									
+									</p:panel>
+								
+								</p:column>
+
+
+
+
+								<p:column style="vertical-align: top !important;">
+
+
+
+									<p:panel style="min-height:130px;max-height:100%;height:auto">
+										<p:panelGrid styleClass="ui-panelgrid-small">
+
+											<p:row>
+												<p:column style="width:180px;">
+													<h:outputLabel value="Vehicle In Service Date:"  styleClass="ui-label"/>
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.latestContractLine.inServDate}" >
+														<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+													</h:outputText>	
+												</p:column>								
+											</p:row>
+											<p:row>
+												<p:column>
+													<h:outputLabel value="Contract Start Date:"  styleClass="ui-label"/>
+													
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.latestContractLine.startDate}">
+														<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+													</h:outputText>	
+												</p:column>								
+											</p:row>															
+											<p:row>
+												<p:column >
+													<h:outputLabel value="Revision Quote Date:"  styleClass="ui-label"/>
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.quotationModel.revisionDate}" >
+														<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+													</h:outputText>	
+												</p:column>								
+											</p:row>
+											<p:row>
+												<p:column>
+													<h:outputLabel value="Revision Printed Date:"  styleClass="ui-label"/>
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.quotationModel.printedDate}" >
+														<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+													</h:outputText>	
+												</p:column>								
+											</p:row>
+											<p:row>
+												<p:column>
+													<h:outputLabel value="Revision Effective Date:"  styleClass="ui-label"/>
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.quotationModel.amendmentEffectiveDate}" >
+														<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+													</h:outputText>	
+												</p:column>	
+											<p:column>
+												<p:spacer width="1" />
+											</p:column>	
+												<p:column>
+												<h:outputLabel value="(Period: "  style="font-weight: normal;font-style: italic;"/>
+											</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.getConChangeEventPeriod()})" style="font-weight: normal;font-style: italic;" >
+													</h:outputText>	
+												</p:column>																			
+											</p:row>
+											<p:row>
+												<p:column>
+													<h:outputLabel value="Revision Expiration Date:"  styleClass="ui-label"/>
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.quotationModel.revisionExpDate}" >
+														<f:convertDateTime type="date" pattern="MM/dd/yyyy" />
+													</h:outputText>	
+												</p:column>								
+											</p:row>
+
+										</p:panelGrid>									
+									</p:panel>								
+								
+								</p:column>								
+							
+							
+							</p:row>
+
+							<p:row>
+								<p:column style="vertical-align: top !important;">
+									<p:panel style="min-height:160px;max-height:100%;height:auto">
+										<p:focus for="termId" />
+										<p:panelGrid styleClass="ui-panelgrid-small" >
+											<p:row>
+												<p:column style="width:140px;">
+													<h:outputLabel value="Term:"  styleClass="ui-label"/>
+												</p:column>								
+												<p:column style="width:70px;">
+													<h:outputText value="#{openEndQuoteRevisionBean.currentOEQuoteVO.term}" styleClass="alignmentRight"/>													
+												</p:column>
+												<p:column style="width:120px;">
+													<p:inputNumber id="termId" disabled="#{!openEndQuoteRevisionBean.quoteEditable}"
+	   					 								size="12" tabindex="10"
+	   					 								maxlength="3"
+                										decimalPlaces="0"  
+                										maxValue="999"
+                										minValue="0" 
+                                     					value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.term}"
+                                     					emptyValue="zero" 
+                                     					inputStyle="text-align:right"
+                                     					styleClass="alignmentRight trackDirtyChildValues"
+                                     					onchange="disableControldsOnChange(); " />
+												</p:column>								
+											</p:row>
+											<p:row>
+												<p:column>
+													<h:outputLabel value="Proj Repl Months:"  styleClass="ui-label"/>
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.currentOEQuoteVO.projectedReplacementMonths}" styleClass="alignmentRight"/>
+												</p:column>								
+												<p:column>
+													<p:inputNumber id="projectedReplacementMonthsId" disabled="#{!openEndQuoteRevisionBean.quoteEditable}"
+	   					 								size="12" tabindex="20"
+	   					 								maxlength="3"
+                										decimalPlaces="0"  
+                										maxValue="999" 
+                										minValue="0"
+                                     					value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.projectedReplacementMonths}"
+                                     					emptyValue="zero" 
+                                     					inputStyle="text-align:right"
+                                     					styleClass="alignmentRight trackDirtyChildValues"
+                                     					onchange="disableControldsOnChange();" />
+												</p:column>								
+											</p:row>
+											<p:row>
+												<p:column>
+													<h:outputLabel value="Expected Miles:"  styleClass="ui-label"/>
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.currentOEQuoteVO.distance}" styleClass="alignmentRight" >
+														<f:convertNumber type="number" pattern="#,##0" />
+													</h:outputText>
+												</p:column>								
+												<p:column>
+													<p:inputNumber id="expectedMilesId" disabled="#{!openEndQuoteRevisionBean.quoteEditable}"
+	   					 								size="12" tabindex="30"
+	   					 								maxlength="7"
+                										decimalPlaces="0"  
+                										maxValue="999999" 
+                                     					minValue="0"
+                                     					value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.distance}"
+                                     					emptyValue="zero" 
+                                     					inputStyle="text-align:right"
+                                     					styleClass="alignmentRight trackDirtyChildValues"
+                                     					onchange="disableControldsOnChange();" />
+												</p:column>								
+											</p:row>
+											<p:row>
+												<p:column>
+													<h:outputLabel value="Index Rate:"  styleClass="ui-label"/>
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.currentOEQuoteVO.interestBaseRate}%" styleClass="alignmentRight"/>
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.interestBaseRate}%" styleClass="alignmentRight"/>
+												</p:column>								
+											</p:row>
+											<p:row>
+												<p:column>
+													<h:outputLabel value="Interest Adj:"  styleClass="ui-label"/>
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.currentOEQuoteVO.interestAdjustment}%" styleClass="alignmentRight"/>
+												</p:column>								
+												<p:column>
+													<p:inputNumber disabled="#{!openEndQuoteRevisionBean.quoteEditable}" 
+					   					 				 size="12" tabindex="40"
+					   					 				 maxlength="9"
+				                						decimalPlaces="3"  thousandSeparator="," symbol= "%" symbolPosition= "s"
+				                						minValue="-999.999"
+				                						maxValue="999.999"
+				                						value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.interestAdjustment}"
+				                                     	emptyValue="zero" 
+                                     					inputStyle="text-align:right"
+                                     					styleClass="alignmentRight trackDirtyChildValues"
+                                     					onchange="disableControldsOnChange();" />
+													
+												</p:column>								
+											</p:row>
+											<p:row>
+												<p:column>
+													<h:outputLabel value="Interest Rate:"  styleClass="ui-label"/>
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.currentOEQuoteVO.interestTotalRate}%" styleClass="alignmentRight"/>
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.interestTotalRate}%" styleClass="alignmentRight"/>
+												</p:column>								
+											</p:row>
+
+
+										</p:panelGrid>									
+									</p:panel>								
+								</p:column>
+
+								<p:column style="width:430px;vertical-align: top !important;">
+									<p:panel style="min-height:160px;max-height:100%;height:auto">
+										<p:panelGrid styleClass="ui-panelgrid-small">
+											<p:row>
+												<p:column style="width:150px;">										
+													<h:outputLabel value="NBV as of Eff. Date:"  styleClass="ui-label"/>
+												</p:column>								
+												<p:column style="width:90px;">
+													<h:outputText value="#{openEndQuoteRevisionBean.currentOEQuoteVO.effDateNBV}" styleClass="alignmentRight">
+														<f:converter converterId="malDollarValueConverter" />
+													</h:outputText>
+												</p:column>								
+											</p:row>
+				
+											<p:row>
+												<p:column>
+													<h:outputLabel value="Revision Assessment:" for="revAssessment"  styleClass="ui-label"/>
+												</p:column>								
+												<p:column>
+													<p:inputNumber id="revAssessment"	style="text-align:right" maxlength="10" size="12" tabindex="100" 
+														disabled="#{!openEndQuoteRevisionBean.quoteEditable}"
+														decimalPlaces="2"  thousandSeparator="," symbol= "$" symbolPosition= "p" 
+					                					minValue="00.00" maxValue="99999.99"
+					                					emptyValue="zero" 
+														value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.revisedAssessment}"
+														styleClass="ui-text-align-right-dev trackDirtyChildValues" onchange="disableControldsOnChange();"  >
+													</p:inputNumber>
+												</p:column>								
+												<p:column>
+													 <p:selectOneMenu id="revAssType" style="width: 120px" tabindex="110" onchange="disableControldsOnChange();" disabled="#{!openEndQuoteRevisionBean.quoteEditable}"
+													 	styleClass="ui-select-dropdown trackDirtySelect"
+													 	value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.revisedAssessmentType}">
+										                 <f:selectItem itemLabel="In Rate" itemValue="IN_RATE" />
+										                 <f:selectItem itemLabel="One Time Charge" itemValue="ONE_TIME_CHARGE" />
+									                </p:selectOneMenu>
+												</p:column>								
+											</p:row>
+											<p:row>
+												<p:column>
+													<h:outputLabel value="Revision Interest Adj:" for="revIntAdj"  styleClass="ui-label"/>
+												</p:column>								
+												<p:column>
+													<p:inputNumber id="revIntAdj"	style="text-align:right" maxlength="13" size="12" tabindex="120"
+														disabled="#{!openEndQuoteRevisionBean.quoteEditable}"
+														decimalPlaces="2"  thousandSeparator="," symbol= "$" symbolPosition= "p" 
+					                					minValue="00.00" maxValue="9999999.99"
+					                					emptyValue="zero" 
+														value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.revisionInterestAdjustment}"
+														styleClass="ui-text-align-right-dev trackDirtyChildValues" onchange="disableControldsOnChange();"  >
+													</p:inputNumber>
+												</p:column>								
+												<p:column>
+													 <p:selectOneMenu id="revIntAdjType" style="width: 120px" tabindex="130"  onchange="disableControldsOnChange();" 
+													 	styleClass="ui-select-dropdown trackDirtySelect"
+													 	disabled="#{!openEndQuoteRevisionBean.quoteEditable}"
+													 	value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.revisedIntAdjType}">
+										                 <f:selectItem itemLabel="In Rate" itemValue="IN_RATE" />
+										                 <f:selectItem itemLabel="One Time Charge" itemValue="ONE_TIME_CHARGE" />
+									                </p:selectOneMenu>
+												</p:column>								
+											</p:row>
+											<p:row>
+												<p:column>
+													<h:outputLabel value="Rev. Capital Contr.:" for="capitalContribution"  styleClass="ui-label"/>
+												</p:column>								
+												<p:column>
+													<p:inputNumber	id="capitalContribution" style="text-align:right" maxlength="15" size="12" tabindex="140" 
+														disabled="#{!openEndQuoteRevisionBean.quoteEditable}"
+														decimalPlaces="2"  thousandSeparator="," symbol= "$" symbolPosition= "p" 
+					                					minValue="00.00" maxValue="999999999.99"
+														emptyValue="zero"
+														value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.capitalContribution}"
+														styleClass="ui-text-align-right-dev trackDirtyChildValues" onchange="disableControldsOnChange();" >
+									   				</p:inputNumber> 	
+												</p:column>								
+											</p:row>
+											<p:row>
+												<p:column>
+													<h:outputLabel value="Total Cost - Client:"  styleClass="ui-label" title="Total Cost to Place Into Service"/>													
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.customerCost}" styleClass="alignmentRight" >
+														<f:converter converterId="malDollarValueConverter" />
+													</h:outputText>
+													
+												</p:column>								
+											</p:row>
+
+										</p:panelGrid>									
+									</p:panel>
+								</p:column>
+
+
+								<p:column style="width:425px;vertical-align: top !important;">
+									<p:panel >
+										<f:facet name="header" >
+											<h:outputLabel value="Current Steps" />
+										</f:facet>
+										<p:dataTable var="step" value="#{openEndQuoteRevisionBean.currentSteps}" styleClass="ui-noBorder">
+				            				<p:column width="45" >
+				            					<f:facet name="header"  >  
+				         							<h:outputText value="Step"  style ="font-weight:bold"/>  
+				         						</f:facet>
+											<h:outputText value="#{step.fromPeriod}-#{step.toPeriod}"  styleClass="alignmentRight"/>
+				            					
+				            				</p:column>
+				            				<p:column  >
+				            					<f:facet name="header"  >  
+				         							<h:outputText value="Rate"  style ="font-weight:bold"/>  
+				         						</f:facet>  
+					           					<h:outputText value="#{step.leaseRate}" styleClass="alignmentRight">
+					            					<f:converter converterId="malDollarValueConverter"/>  
+					   							</h:outputText>
+				            				</p:column>
+				            				<p:column  >
+				            					<f:facet name="header"  >  
+				         							<h:outputText value="NBV"  style ="font-weight:bold"/>  
+				         						</f:facet> 
+					           					<h:outputText value="#{step.netBookValue}" styleClass="alignmentRight">
+					            					<f:converter converterId="malDollarValueConverter" />  
+					   							</h:outputText>
+				   							</p:column>
+				   							<p:column  >
+				   								<f:facet name="header"  >  
+				         							<h:outputText value="Lease Factor"  style ="font-weight:bold;white-space:pre-line;"/>  
+				         						</f:facet> 
+					           					<h:outputText value="#{step.leaseFactor}" > 
+					           						<f:convertNumber type="number" pattern="0.0000" />
+					           					</h:outputText>  
+				           					</p:column>
+										</p:dataTable>	
+										
+									
+									
+									</p:panel>
+								
+								</p:column>								
+
+
+							
+							
+							</p:row>
+
+							<p:row>
+								<p:column  style="vertical-align: top !important;">
+									<p:panel style="min-height:150px;max-height:100%;height:auto">
+										<p:panelGrid styleClass="ui-panelgrid-small">
+											<p:row>
+												<p:column style="width:136px;">
+													<h:outputLabel value="Invoice Adj:"  styleClass="ui-label"/>
+												</p:column>								
+												<p:column style="width:70px;">
+													<h:outputText value="#{openEndQuoteRevisionBean.currentOEQuoteVO.invoiceAdjustment}" styleClass="alignmentRight">
+														<f:converter converterId="malDollarValueConverter" />
+													</h:outputText>
+												</p:column>								
+												<p:column style="width:120px;">
+													<p:inputNumber	 maxlength="12" size="12" tabindex="50" disabled="#{!openEndQuoteRevisionBean.quoteEditable}"
+														value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.invoiceAdjustment}"
+														decimalPlaces="2"  thousandSeparator="," symbol= "$" symbolPosition= "p" 
+					                					minValue="-999999.99" maxValue="999999.99"
+					                					emptyValue="zero"
+														inputStyle="text-align:right" onchange="disableControldsOnChange();"
+                                     					styleClass="alignmentRight trackDirtyChildValues"/>
+												</p:column>								
+											</p:row>
+											<p:row>
+												<p:column>
+													<h:outputLabel value="Hide Inv Adj?:"  styleClass="ui-label"/>
+												</p:column>								
+												<p:column>
+													<h:selectBooleanCheckbox  
+														value="#{openEndQuoteRevisionBean.currentOEQuoteVO.hideInvoiceAdjustment}"
+														title="Hide the adjustment on documents seen by the client" 
+														styleClass="alignmentRight trackDirtyCheckbox"
+														disabled="true"/>
+												</p:column>								
+												<p:column>
+													<h:selectBooleanCheckbox  tabindex="60" disabled="#{!openEndQuoteRevisionBean.quoteEditable}"
+														value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.hideInvoiceAdjustment}"
+														title="Hide the adjustment on documents seen by the client" 
+														styleClass="alignmentRight trackDirtyCheckbox" onchange="disableControldsOnChange();" />								
+												</p:column>								
+											</p:row>
+											<p:row>
+												<p:column>
+													<h:outputLabel value="Admin Factor:"  styleClass="ui-label"/>
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.currentOEQuoteVO.adminFactor}" styleClass="alignmentRight">
+														<f:convertNumber minFractionDigits="2" />
+													</h:outputText>
+												</p:column>								
+												<p:column>
+													<p:inputNumber 
+	   					 								size="12" tabindex="70" disabled="#{!openEndQuoteRevisionBean.quoteEditable}"
+	   					 								maxlength="6"
+                										decimalPlaces="2"  
+                										minValue="-99.99"
+                										maxValue="99.99" 
+                										value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.adminFactor}"
+                                     					emptyValue="zero" 
+                                     					inputStyle="text-align:right"
+                                     					styleClass="alignmentRight trackDirtyChildValues" onchange="disableControldsOnChange();"/>
+												</p:column>								
+											</p:row>
+											<p:row>
+												<p:column>
+													<h:outputLabel value="Depr Factor:" for = "deprFactor" styleClass="ui-label"/>
+												</p:column>								
+												<p:column>
+													<h:outputText value="#{openEndQuoteRevisionBean.currentOEQuoteVO.depreciationFactor}%" styleClass="alignmentRight"/>			
+												</p:column>								
+												<p:column>
+													<p:inputNumber id= "deprFactor"
+					   					 				 size="12" tabindex="80" disabled="#{!openEndQuoteRevisionBean.quoteEditable}"
+					   					 				 maxlength="12"
+				                						decimalPlaces="7"  thousandSeparator="," symbol= "%" symbolPosition= "s"
+				                						minValue="-999.99999"
+				                						maxValue="999.99999"
+				                						onkeyup="return restrictUserInput('deprFactor',event);"
+				                						value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.depreciationFactor}"
+				                                     	emptyValue="zero" 
+                                     					inputStyle="text-align:right"
+                                     					styleClass="alignmentRight trackDirtyChildValues" onchange="disableControldsOnChange();" />
+												</p:column>								
+											</p:row>
+											<p:row>
+												<p:column>
+													<h:outputLabel value="Final NBV:"  for = "finalNBV" styleClass="ui-label"/>
+												</p:column>								
+												<p:column>
+													<h:outputText id="finalNBV" value="#{openEndQuoteRevisionBean.currentOEQuoteVO.finalNBV}" styleClass="alignmentRight">
+														<f:converter converterId="malDollarValueConverter" />
+													</h:outputText>
+												</p:column>								
+												<p:column>
+													<p:inputNumber id="finalRevNBV" maxlength="12" size="12" tabindex="90" disabled="#{!openEndQuoteRevisionBean.quoteEditable}"
+														decimalPlaces="2"  thousandSeparator="," symbol= "$" symbolPosition= "p" 
+					                					minValue="-99999999.99999" maxValue="999999999.99"
+					                					emptyValue="zero"
+					                					onkeyup="return restrictUserInput('finalRevNBV',event);"
+														value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.finalNBV}"
+                                     					inputStyle="text-align:right" onchange="disableControldsOnChange();"
+                                     					styleClass="alignmentRight trackDirtyChildValues"/>
+												</p:column>								
+											</p:row>
+										</p:panelGrid>									
+									</p:panel>								
+								</p:column>
+
+
+							<p:column style="width:425px;vertical-align: top !important;">
+
+								<p:panel style="min-height:150px;max-height:100%;height:auto">
+									<p:panelGrid styleClass="ui-panelgrid-small">
+										<p:row>
+											<p:column style="width:150px;">
+											</p:column>
+											<p:column style="width:60px;">
+												<h:outputLabel value="Current" styleClass="ui-label" />
+											</p:column>
+											<p:column style="width:10px;">
+												<p:spacer width="1" />
+											</p:column>
+											<p:column style="width:70px;">
+												<h:outputLabel value="Revision" styleClass="ui-label" />
+											</p:column>
+										</p:row>
+
+										<p:row>
+											<p:column>
+												<h:outputLabel value="Lease Rate:" styleClass="ui-label" />
+											</p:column>
+											<p:column>
+												<h:outputText
+													value="#{openEndQuoteRevisionBean.currentOEQuoteVO.actualLeaseRate}"
+													styleClass="alignmentRight">
+													<f:converter converterId="malDollarValueConverter" />
+												</h:outputText>
+											</p:column>
+											<p:column>
+												<p:spacer width="1" />
+											</p:column>
+											<p:column>
+												<h:outputText
+													value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.actualLeaseRate}"
+													styleClass="alignmentRight">
+													<f:converter converterId="malDollarValueConverter" />
+												</h:outputText>
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<h:outputLabel value="Service Elements:"
+													styleClass="ui-label" />
+											</p:column>
+											<p:column>
+												<h:outputText
+													value="#{openEndQuoteRevisionBean.currentOEQuoteVO.serviceElementRate}"
+													styleClass="alignmentRight">
+													<f:converter converterId="malDollarValueConverter" />
+												</h:outputText>
+											</p:column>
+											<p:column>
+												<p:spacer width="1" />
+											</p:column>
+											<p:column>
+												<p:commandLink
+													action="#{openEndQuoteRevisionBean.viewServiceElements}"
+													immediate="true" ajax="false" onclick="lockScreen()"
+													style="text-align : right;float: right;">
+													<h:outputText
+														value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.serviceElementRate}"
+														title="View Service Element Details">
+														<f:converter converterId="malDollarValueConverter" />
+													</h:outputText>
+												</p:commandLink>
+											</p:column>
+											<p:column>
+												<p:spacer width="6" />
+												<p:commandLink style="cursor: pointer;border:none"
+													update=":inRateInfoDialogForm:inRateInfoDialogPanel"
+ 													action="#{openEndQuoteRevisionBean.showInRateDialog}"> 
+													<p:graphicImage style="cursor: pointer;border:none"
+														onclick="" value="/images/button_in-rate.png"
+														title="In-Rate elements exist"
+														rendered="#{openEndQuoteRevisionBean.inRateElement}" />
+												</p:commandLink>
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<h:outputLabel value="Monthly Payment:"
+													styleClass="ui-label" />
+											</p:column>
+											<p:column>
+												<h:outputText
+													value="#{openEndQuoteRevisionBean.currentOEQuoteVO.monthlyPayment}"
+													styleClass="alignmentRight">
+													<f:converter converterId="malDollarValueConverter" />
+												</h:outputText>
+											</p:column>
+											<p:column>
+												<p:spacer width="1" />
+											</p:column>
+											<p:column>
+												<h:outputText
+													value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.monthlyPayment}"
+													styleClass="alignmentRight">
+													<f:converter converterId="malDollarValueConverter" />
+												</h:outputText>
+											</p:column>
+										</p:row>
+
+										<p:row>
+											<p:column>
+												<h:outputLabel value="Minimum IRR:" styleClass="ui-label" />
+											</p:column>
+											<p:column>
+												<h:panelGroup styleClass="alignmentRight">
+													<h:outputLabel
+														value="#{openEndQuoteRevisionBean.currentOEQuoteVO.minimumIrr}">
+														<f:convertNumber maxFractionDigits="5"
+															minFractionDigits="5" />
+													</h:outputLabel>
+													<p:outputLabel value="%" />
+												</h:panelGroup>
+											</p:column>
+											<p:column>
+												<p:spacer width="1" />
+											</p:column>
+											<p:column>
+												<h:panelGroup styleClass="alignmentRight">
+													<h:outputLabel
+														value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.minimumIrr}">
+														<f:convertNumber maxFractionDigits="5"
+															minFractionDigits="5" />
+													</h:outputLabel>
+													<p:outputLabel value="%" />
+												</h:panelGroup>
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<h:outputLabel value="IRR:" styleClass="ui-label" />
+											</p:column>
+											<p:column>
+												<h:panelGroup styleClass="alignmentRight">
+													<h:outputLabel
+														value="#{openEndQuoteRevisionBean.currentOEQuoteVO.actualIrrValue}">
+														<f:convertNumber maxFractionDigits="5"
+															minFractionDigits="5" />
+													</h:outputLabel>
+													<p:outputLabel value="%" />
+												</h:panelGroup>
+											</p:column>
+											<p:column>
+												<p:spacer width="1" />
+											</p:column>
+											<p:column>
+												<h:panelGroup styleClass="alignmentRight">
+													<h:outputLabel
+														value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.actualIrrValue}">
+														<f:convertNumber maxFractionDigits="5"
+															minFractionDigits="5" />
+													</h:outputLabel>
+													<p:outputLabel value="%"
+														rendered="#{openEndQuoteRevisionBean.revisionOEQuoteVO.actualIrrValue != null}" />
+												</h:panelGroup>
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<p:outputLabel id= "appMinIrrLabelId" value="Appr. Min. IRR:"  styleClass="ui-label"/>
+											</p:column>
+											<p:column>
+												<h:panelGroup styleClass="alignmentRight">
+													<h:outputLabel
+														value="#{openEndQuoteRevisionBean.currentOEQuoteVO.irrApprovedLimit}"
+														title="#{openEndQuoteRevisionBean.currentOEQuoteVO.irrApprovedUser} on #{openEndQuoteRevisionBean.currentOEQuoteVO.irrApprovedDate}">
+														<f:convertNumber maxFractionDigits="5"
+															minFractionDigits="5" />
+													</h:outputLabel>
+												</h:panelGroup>
+											</p:column>
+											<p:column>
+												<p:spacer width="1" />
+											</p:column>
+											<p:column>
+												<h:panelGroup styleClass="alignmentRight">
+													<h:outputLabel id="revisionApprovedIRRId"
+														value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.irrApprovedLimit}"
+														title="#{openEndQuoteRevisionBean.revisionOEQuoteVO.irrApprovedUser} on #{openEndQuoteRevisionBean.revisionOEQuoteVO.irrApprovedDate}">
+														<f:convertNumber maxFractionDigits="5"
+															minFractionDigits="5" />
+													</h:outputLabel>
+												</h:panelGroup>
+											</p:column>
+											<p:column style="float: left !important;">
+												
+													<p:commandLink style="cursor: pointer;border:none"
+														styleClass="#{openEndQuoteRevisionBean.revisionOEQuoteVO.disableApprovedMinIrr == true ? 'disabledTextButton' : 'enabledTextButton'}"
+														disabled="#{openEndQuoteRevisionBean.revisionOEQuoteVO.disableApprovedMinIrr}">
+														<p:graphicImage id="appIrrMinReImageId"
+															style="cursor: pointer;border:none"
+															onclick="PF('approveIRRDialogVar').show();"
+															value="/images/action_edit.png"
+															title="Add/Edit Approved Minimum IRR"
+															rendered="#{!openEndQuoteRevisionBean.revisionOEQuoteVO.disableApprovedMinIrr and openEndQuoteRevisionBean.quoteEditable}" />
+													</p:commandLink>
+											
+											</p:column>
+
+										</p:row>
+										
+
+									</p:panelGrid>
+
+								</p:panel>
+
+							</p:column>
+
+
+							<p:column style="width:425px;vertical-align: top !important;" rowspan="1" >
+									<p:panel  id="paymentDetailsPanel" >
+										<f:facet name="header" >
+											<h:outputLabel value="Revision Steps " /> <h:outputText value="( Starting period:#{openEndQuoteRevisionBean.getConChangeEventPeriod()} )" style="font-weight: normal;font-style: italic;" />
+									 		<p:commandButton  id="editStepsId"    title="Edit Steps" widgetVar="editStepsVar"
+										    	styleClass="#{openEndQuoteRevisionBean.quoteEditable =='false' ? 'disabledTextButton' : 'enabledTextButton'}"
+										    	actionListener="#{openEndQuoteRevisionBean.onEditStepsDefinition}" update=":stepForm:stepPanel"
+										    	oncomplete="PF('stepDialogVar').show();updateTotalStep();" 
+										    	disabled="#{openEndQuoteRevisionBean.quoteEditable =='false'}">	
+										    							         	            							            
+										    </p:commandButton>
+										    <p:spacer height="15px;"/>
+										    <p:spacer height="15px;"/>
+											
+										</f:facet>
+										<p:dataTable var="step" value="#{openEndQuoteRevisionBean.revStepsForUi}" styleClass="ui-noBorder" emptyMessage="" >
+				            				<p:column width="45" >
+				            					<f:facet name="header"  >  
+				         							<h:outputText value="Step"  style ="font-weight:bold"/>  
+				         						</f:facet>
+											<h:outputText value="#{step.fromPeriod}-#{step.toPeriod}"  styleClass="alignmentRight"/>
+				            					
+				            				</p:column>
+				            				<p:column  >
+				            					<f:facet name="header"  >  
+				         							<h:outputText value="Rate"  style ="font-weight:bold"/>  
+				         						</f:facet>  
+					           					<h:outputText value="#{step.leaseRate}" styleClass="alignmentRight">
+					            					<f:converter converterId="malDollarValueConverter"/>  
+					   							</h:outputText>
+				            				</p:column>
+				            				<p:column  >
+				            					<f:facet name="header"  >  
+				         							<h:outputText value="NBV"  style ="font-weight:bold"/>  
+				         						</f:facet> 
+					           					<h:outputText value="#{step.netBookValue}" styleClass="alignmentRight">
+					            					<f:converter converterId="malDollarValueConverter" />  
+					   							</h:outputText>
+				   							</p:column>
+				   							<p:column  >
+				   								<f:facet name="header"  >  
+				         							<h:outputText value="Lease Factor"  style ="font-weight:bold;white-space:pre-line;"/>  
+				         						</f:facet> 
+					           					<h:outputText value="#{step.leaseFactor}" > 
+					           						<f:convertNumber type="number" pattern="0.0000" />
+					           					</h:outputText>  
+				           					</p:column>
+										</p:dataTable>	
+									
+									
+									</p:panel>
+								
+								</p:column>								
+							
+							
+							</p:row>
+
+
+						</p:panelGrid>
+
+					</p:panel>	
+				
+				
+				
+				
+				</p:panel>	
+
+				<p:panel id="controlPanel" styleClass="ui-layout" style ="min-width:1300px;max-width:100%;width:auto">
+					<p:commandButton id="calc"  value="Recalculate"  tabindex="160"
+						action="#{openEndQuoteRevisionBean.calc}" ajax="false"
+						disabled="#{openEndQuoteRevisionBean.revisionQuote == null ? 'true': 'false' || openEndQuoteRevisionBean.quoteEditable =='false'}" />
+					<p:spacer width="10" />						
+					<p:commandButton id="saveOpenEndRevision" value="Save"  tabindex="170"
+						action="#{openEndQuoteRevisionBean.save}"  ajax="false" disabled="#{openEndQuoteRevisionBean.quoteEditable =='false' || openEndQuoteRevisionBean.quoteCalculated =='false' || !openEndQuoteRevisionBean.hasPermission()}"
+ 						onclick="lockScreen();"  />
+					<p:spacer width="10" />
+					<p:commandButton id="printOpenEndRevision" value="Print" widgetVar="printReqBtnVar"  tabindex="170"
+						action="#{openEndQuoteRevisionBean.inRateElement}" ajax="false" 
+						disabled="#{openEndQuoteRevisionBean.printBtnDisabled || !openEndQuoteRevisionBean.hasPermission('printOpenEndRevision')}"
+						onclick="lockScreen();"  />
+					<p:spacer width="10" />
+					<p:commandButton id="rejectOpenEndRevision" widgetVar="rejectReqBtnVar"  value="Reject Revision"  title="Reject Revision" 
+						action="#{openEndQuoteRevisionBean.onLoadRejectReason}" update="rejectReasonDialog" oncomplete="doShowRejectReason();" 
+						disabled="#{!openEndQuoteRevisionBean.hasPermission('rejectOpenEndRevision') || (openEndQuoteRevisionBean.revQuoteWasCalculatedAndSaved =='false')}" />
+					<p:spacer width="10" />
+					<p:commandButton id="oerCancelBtn"  value="Cancel" tabindex="170"
+						action="#{openEndQuoteRevisionBean.cancel}" ajax="false" immediate="true" />	
+				</p:panel>
+
+    		
+		</h:form>
+
+		<h:form prependId="false" target="_blank">
+			<p:commandButton id="showDoc" value="Show" actionListener="#{openEndQuoteRevisionBean.showDocument()}" ajax="false" style="display:none"/>
+		</h:form>
+
+
+		<p:confirmDialog id="confirmInRateDialogId"
+			message="Have in-rate service element amounts been reviewed/updated?"
+			appendTo="@(body)"
+			widgetVar="confirmInRateVar" resizable="false" style="min-width:450px;"
+            closeOnEscape="true"
+			height="60">
+
+			<h:form prependId="false">
+				<p:commandButton id="confirmYes" tabindex="400" value="Yes"
+					ajax="false" process="@this"
+					onclick="hideDialog('confirmInRateVar');lockScreen();"
+					actionListener="#{openEndQuoteRevisionBean.print}" />
+				<p:spacer width="10" />
+				<p:commandButton tabindex="410" value="No"
+					onclick="PF('confirmInRateVar').hide();" type="button" />
+
+			</h:form>
+		</p:confirmDialog>
+
+		<p:dialog id="depFnbvDialog"  widgetVar="depFnbvDialogVar" closable="false" severity="alert" dynamic="false" width="400"  height="100"  modal="true"  header="Invalid Action" resizable="false" appendTo="@(body)">
+			<h:form id = "depFnbvDialogForm" prependId="false">
+				
+							<h:panelGroup  style="display:block; text-align:center">			  
+		        			<h:outputText value="Only one change is allowed at a time. Depreciation Factor or Final NBV"/>
+        					</h:panelGroup>
+				
+							<br/>
+							<p/>
+	               			<h:panelGroup  style="display:block; text-align:center">			  
+		        			<p:commandButton id = "alertDepFnbvDialogOk" value="Ok" onclick="hideDepFnbvDialogDialog()"/>
+        					</h:panelGroup>
+			</h:form>
+	   	</p:dialog>
+	   	
+  		<p:dialog id="inRateInfoDialog" widgetVar="inRateInfoDialogVar" modal="true"
+              		header="In Rate Details" resizable="false" appendTo="@(body)" style="min-width:450px;"
+              		closeOnEscape="true" onShow="setFocus('inRateInfoDialogOkBtn');">
+              		
+           <h:form id="inRateInfoDialogForm" prependId="false">
+    		<p:panel id="inRateInfoDialogPanel">  
+			    <h:panelGrid  columns="2"  style="white-space:nowrap;">			    
+						<p:column>	
+		    				<p:outputLabel value="Unit Number: " styleClass="ui-label" style="white-space:nowrap;"/>
+		    			</p:column>
+		    			<p:column>	
+		    				<p:outputLabel value="#{openEndQuoteRevisionBean.currentOEQuoteVO.unitNo}"/>
+		    			</p:column>
+		    			<p:column>	
+		    				<p:outputLabel value="Driver Address: " styleClass="ui-label" style="white-space:nowrap;"/>
+		    			</p:column>
+		    			<p:column>	
+		    				<p:outputLabel value="#{openEndQuoteRevisionBean.currentOEQuoteVO.driverAddress}" escape="false"/>
+		    			</p:column>
+		    			<p:column>	
+		    				<p:outputLabel value="Remaining Months on Contract: " styleClass="ui-label" style="white-space:nowrap;"/>
+		    			</p:column>
+		    			<p:column>	
+		    				<p:outputLabel value="#{openEndQuoteRevisionBean.reviseContractRemainingPeriod}"/>
+		    			</p:column>
+		    			<p:column>	
+		    				<p:outputLabel value="Revised Client Cap Cost: " styleClass="ui-label" style="white-space:nowrap;"/>
+		    			</p:column>
+		    			<p:column>	
+		    				<h:outputText value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.customerCost}"  >
+								<f:converter converterId="malDollarValueConverter" />
+							</h:outputText>
+		    			</p:column>
+		    			<p:column>	
+		    				<p:outputLabel value="Revised Final NBV: " styleClass="ui-label" style="white-space:nowrap;"/>
+		    			</p:column>
+		    			<p:column>	
+		    				<h:outputText  value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.finalNBV}" >
+								<f:converter converterId="malDollarValueConverter" />
+							</h:outputText>
+		    			</p:column>
+		    			
+		    			<p:column>	
+		    				<p:outputLabel value="Other Lease Elements Amounts: " styleClass="ui-label" style="white-space:nowrap;"/>
+		    			</p:column>
+		    			<p:column>	
+		    					<h:outputText  value="#{openEndQuoteRevisionBean.revisionOEQuoteVO.serviceElementRate}" >
+									<f:converter converterId="malDollarValueConverter" />
+						 		</h:outputText>
+		    			</p:column>
+		    			<p:column>	
+		    				<p:outputLabel value="Revised Lease Rate: " styleClass="ui-label" style="white-space:nowrap;"/>
+		    			</p:column>
+		    			<p:column>	
+		    				 <p:dataList var="step" value="#{openEndQuoteRevisionBean.revisionSteps}" type="definition"> 
+	           					<h:outputText value="#{step.leaseRate}" >
+	            					<f:converter converterId="malDollarValueConverter"/>  
+	   							</h:outputText>
+	   							(<h:outputText value="#{step.toPeriod - step.fromPeriod + 1}"  /> Months)            				
+							</p:dataList>
+		    			</p:column>
+		    			
+                </h:panelGrid>
+               
+               </p:panel>
+               
+    	  	<br/><br/>	
+    	  	<p:spacer width="200" height="1"> </p:spacer>
+    	 	<p:commandButton id="inRateInfoDialogOkBtn" value="Ok" immediate="true" type="button" onclick="PF('inRateInfoDialogVar').hide();"  />               
+			              
+           </h:form>
+       </p:dialog>
+       
+
+		<p:dialog id="stepDialog" header=" Step  Definition" widgetVar="stepDialogVar"   onShow="updateTotalStep" modal="true"
+					appendTo="@(body)" resizable="false" style="min-width: 200px; max-width: 200px;"> 
+					  
+				<p:ajax event="close" listener="#{openEndQuoteRevisionBean.cancelStepsDefinition}"/>
+				<p:hotkey immediate="true" bind="esc" handler="PF('stepDialogVar').hide();"/>	
+				
+					
+			  	<h:form id="stepForm" prependId="false" >   	
+			  						  
+				<p:messages id="dialogErrorMsgID" showDetail="false" autoUpdate="true" showSummary="true" globalOnly="false"/>	
+				<p:panel id="stepPanel" style="min-width: 180px; max-width: 180px;border: none;">
+				<p:focus  context="stepPanel"/>
+				<p:dataList id="stepDialogDataTableId" value="#{openEndQuoteRevisionBean.definitionSteps}" var="step"  rowIndexVar="stepIndex"  type="definition">  
+				 	<p:panelGrid  columns="2" style="float:right; !important;">				 	 						 	 
+						 <h:outputText  value="  Step #{step.stepCount}:"  style="vertical-align: center;font-weight: bold;" />
+					 							
+   						 <p:inputText id="step#{stepIndex}"  onchange="updateTotalStep();" styleClass="stepDefinitionRowArray" maxlength="3" size="3" value="#{step.netPeriod}"
+   						 		disabled="#{step.isEditable() == 'false'}"	style="float:right;" > 
+   						  <p:keyFilter regEx="/[\d]/"/>
+	   					</p:inputText> 	
+	   			 	
+	   			 	</p:panelGrid>
+				</p:dataList>
+				<p:spacer width="35" height="1"> </p:spacer>
+				<h:panelGroup>
+					<h:outputText  value="Total: "  styleClass="ui-label" />
+					<p:spacer width="20" height="1"> </p:spacer>
+					<h:outputText id="tatalStepValue"   />
+				</h:panelGroup>
+				</p:panel>	
+				<p:spacer width="15" height="1"> </p:spacer>
+				<p:commandButton id="stepDialogSave" value="Ok" process="@form" ajax="true"
+								actionListener="#{openEndQuoteRevisionBean.updateStepsAndRecalculateQuote}" oncomplete="handlePopupDoneRequest(xhr, status, args);" 
+							 	update=":messagePanel ,  :openEndQuoteRevisionForm:paymentDetailsPanel ,  :inRateInfoDialogForm:inRateInfoDialogPanel  , :openEndQuoteRevisionForm:controlPanel" />
+				<p:spacer width="20" height="1"> </p:spacer>
+				<p:commandButton id="stepDialogSaveCancel" value="Cancel" oncomplete="PF('stepDialogVar').hide();" 
+								process="@none"	immediate="true" actionListener="#{openEndQuoteRevisionBean.cancelStepsDefinition}"  />
+				    	
+			</h:form>		
+		  </p:dialog> 
+		  
+		  <p:dialog id="rejectReasonDialog" widgetVar="rejectReasonDialogWidget" modal="true"
+              header="Choose Reject Reason " resizable="false" appendTo="@(body)" style="min-width:450px;"
+              closeOnEscape="true" onShow="setFocus('rejectReasonDialogSaveBtn');">
+           <h:form id="rejectReasonForm" prependId="false">
+           <p:messages id="rejectReasonDialogMsgID" showDetail="false" autoUpdate="true" showSummary="true" globalOnly="false"/>
+			<p:panel id="rejectReasonPanel">  
+			    <h:panelGrid  columns="2" cellpadding="5" style="white-space:nowrap;">			    
+						<p:column>	
+		    				<p:outputLabel value="Reject Reason: " styleClass="ui-label" style="white-space:nowrap;"/>
+		    			</p:column>
+		    			<p:column>	 
+	                      	<p:selectOneMenu id="rejectReasonId" style= "width:300px" value="#{openEndQuoteRevisionBean.selectedRejectReason}" converter="QuoteRejectConverter" >
+				            	
+				                <f:selectItems value="#{openEndQuoteRevisionBean.rejectReasonList}" var="rejectReasons"
+				                       			itemLabel="#{rejectReasons.rejectDescription}" itemValue="#{rejectReasons}"/>
+				            </p:selectOneMenu>
+	                    </p:column>
+                </h:panelGrid>
+               </p:panel>
+    	  	<br/><br/>		    	   
+    	  	<p:commandButton id="rejectReasonDialogSaveBtn" widgetVar="rejectReasonDialogSaveBtnVar"  value="Save" onclick="disableSaveButton();"
+    	  					 action="#{openEndQuoteRevisionBean.rejectRevision}" oncomplete="handleRejectRevisionSaveBtnClickRequest(xhr, status, args);"/>  
+			<p:spacer width="5"> </p:spacer>
+			<p:commandButton id="rejectReasonDialogCancelBtn" value="Cancel" immediate="true" type="button" onclick="PF('rejectReasonDialogWidget').hide();" />               
+			              
+           </h:form>
+       </p:dialog>
+		  
+		  
+		<p:dialog id="approveIRRDialogId" widgetVar="approveIRRDialogVar" modal="true"
+              		header="IRR" resizable="false" appendTo="@(body)" style="min-width:450px;"
+              		closeOnEscape="true" >
+              		
+           <p:ajax event="close" listener="#{openEndQuoteRevisionBean.cancelSaveAppIrrMin}" update="approveIRRDialogForm:appMinIrrTxtId" />   		
+              		
+           <h:form id="approveIRRDialogForm" prependId="false">
+
+           <p:messages id="approveIRRDialogMessagesId" severity="error,fatal" showDetail="false" autoUpdate="true" showSummary="true" globalOnly="false"/>
+
+    		<p:panel id="approveIRRDialogPanel">  
+			    <h:panelGrid  columns="2"  style="white-space:nowrap;">			    
+						<p:column>	
+		    				<p:outputLabel value="Approved Minimum IRR: " styleClass="ui-label" style="white-space:nowrap;"/>
+		    			</p:column>
+		    			<p:column>	
+		    				<p:inputText id="appMinIrrTxtId" style="text-align:right"
+								maxlength="10" size="10"
+								value="#{openEndQuoteRevisionBean.newIRRLimit}"
+								onblur="formatPercentValue('appMinIrrTxtId','Approved Minimum IRR')" >															
+								<p:keyFilter regEx="/[\d\-\.]/" />
+							</p:inputText>
+		    			</p:column>
+		    			
+                </h:panelGrid>
+               
+               </p:panel>
+               
+    	  	<br/><br/>	
+    	  	<p:spacer width="200" height="1" />
+    	  	<p:commandButton id="approveIRRDialogSaveBtnId" widgetVar="approveIRRDialogSaveBtnVar"  value="Save" process="@form" ajax="true"
+    	  					 action="#{openEndQuoteRevisionBean.saveAppIrrMin}" oncomplete="handleSaveAppIrrMinRequest(xhr, status, args);" 
+    	  					 update=":openEndQuoteRevisionForm:revisionApprovedIRRId, :messagePanel" />  
+			<p:spacer width="5"/>
+			<p:commandButton id="approveIRRDialogCancelBtn" value="Cancel" immediate="true" onclick="PF('approveIRRDialogVar').hide();" />               
+			              
+           </h:form>
+       </p:dialog>
+		  
+		  
+		<p:dialog widgetVar="documentWidgetVar"
+			modal="true" header= "Document"
+			appendTo="@(body)" 
+			closeOnEscape="true"
+	        height="auto" 
+	        width="100px">
+			<h:form prependId="false" target="_blank">
+
+				<p:commandButton value="Show" actionListener="#{openEndQuoteRevisionBean.showDocument()}" ajax="false" />
+                    
+			</h:form>
+			
+			
+		</p:dialog>
+		  
+		<div id="QUOTE_PROFILES_LOV_DIV">
+			<ui:include src="../lov/quotationProfiles.xhtml" />
+		</div>
+		  
+		  
+		<div id="inputTypePercent">
+			<ui:include src="../alert/inputTypePercent.xhtml" />
+		</div>	
+		  
+		<style>
+					
+		.ui-panelgrid-small td {
+    			padding: 2px !important;
+    			
+		</style>			
+		<script>	
+			var	origionalDepeciationFactor;
+			var origionalfinalRevNBV;
+			
+			function setOriginalValues(){
+				origionalDepeciationFactor = document.getElementById('deprFactor_input').value;
+				origionalfinalRevNBV  = document.getElementById('finalRevNBV_input').value;
+			}
+			function restrictUserInput(fieldName,event){
+				var keyCode = event.keyCode;
+				//allow non numeric/non alpha/non operators keys to act as they should be
+			
+				if(keyCode &lt;48){
+					if( keyCode != 46 	&#38;&#38; keyCode != 8){//delete key
+						return true;
+					}
+				}
+				if(keyCode &gt; 111){
+					if(keyCode &lt; 184){
+						return true;
+					}
+				}
+				if('deprFactor' == fieldName){
+					var currentVal = document.getElementById('finalRevNBV_input').value;
+					
+					if(origionalfinalRevNBV != currentVal){
+						document.getElementById('deprFactor_input').value = origionalDepeciationFactor;	
+						event.returnValue = false;
+						
+						setTimeout('showRestrictDialog()',50);
+						return false;
+						
+					}
+				}else if('finalRevNBV' == fieldName){
+					var currentVal = document.getElementById('deprFactor_input').value;
+					if(origionalDepeciationFactor != currentVal){
+						document.getElementById('finalRevNBV_input').value = origionalfinalRevNBV;	
+						event.returnValue = false;	
+						
+						setTimeout('showRestrictDialog()',50);
+						return false;	
+					}
+				}else{
+					return true;
+				}
+			}
+			
+			function hideDepFnbvDialogDialog(){
+				hideDialog('depFnbvDialogVar');
+				setElementFocus('deprFactor_input');
+			}
+			
+			
+			function showRestrictDialog(){
+				showDialog('depFnbvDialogVar');
+				setElementFocus('alertDepFnbvDialogOk');				
+			}	
+		
+			function disableControldsOnChange(){				
+					document.getElementById('saveOpenEndRevision').disabled = true;
+					document.getElementById('printOpenEndRevision').disabled = true;
+					$("[id$='profileLOVLink']").attr('onclick', 'return false;');
+					PF('editStepsVar').disable();
+			}
+			
+			function initializeDirtyDetection() {
+				registerIgnoreButton("calc");
+				registerIgnoreButton("saveOpenEndRevision");
+				registerIgnoreButton("printOpenEndRevision");
+				setDirtyDataById('dirtyData');
+				saveDataForDirtyDetection();
+			}
+			
+			$(window).load(function(){
+				initializeDirtyDetection();
+	     		setOriginalValues();
+	     		$("[id$='profileLOVLink']").unbind('click');
+			});	
+			
+			function doShowRejectReason(){               
+				PF('rejectReasonDialogWidget').show();
+            }
+			
+			function disableSaveButton(){
+				$('#rejectReasonDialogSaveBtn').attr("disabled", true);
+				return true;
+			}
+				
+			function handleSaveAppIrrMinRequest(xhr, status, args) { 
+                if(!args.failure) {         	
+                	setDirtyData(true);
+                	PF('approveIRRDialogVar').hide();
+                }
+			}
+
+			function showIcon(id){	
+				document.getElementById(id).style.display = "block";	
+			}
+			
+			function hideIcon(id){	
+				document.getElementById(id).style.display = "none";
+			}
+						
+			function handleRejectRevisionSaveBtnClickRequest(xhr, status, args) { 
+                if(!args.failure) {    
+                	PF('rejectReasonDialogWidget').hide();
+                	$('#oerCancelBtn').click();
+                }else{
+                	$('#rejectReasonDialogSaveBtn').attr("disabled", false);
+                }
+			} 
+			
+			function resetAppIrrMinAmt(){
+				$('#appMinIrrLabel').removeClass('ui-state-error');
+			}
+			
+			function handlePopupDoneRequest(xhr, status, args) { 
+                if(!args.failure) { 
+                	setDirtyData(true);
+                	PF('stepDialogVar').hide();                                
+                }
+			}
+			
+			function updateTotalStep()	{				
+				var dataRows = $('.stepDefinitionRowArray');    
+				var total = 0;				
+				var size = dataRows.size();				
+				for (var i=0; i &lt;  size; i++){
+					if(dataRows[i]) {
+						z = dataRows[i].id;
+						var value = document.getElementById(z).value;
+						if( parseInt(value) > 0)
+						total = total + parseInt(value);
+					}
+				}
+				
+			 $('#tatalStepValue').text(total);				
+			}
+			
+ 			function showDocument(){
+			    $('[id$=showDoc]').click();
+			} 			
+
+ 			
+ 		    /**
+ 		    * The LOV calls this function to pass back the selected
+ 		    * values to the view's controls.
+ 		    */
+ 			function setSelection( lovName, nameArray, valueArray)
+ 			{	
+ 				if(lovName == 'quoteProfileLOV'){
+					for(var i=0; i  &lt; nameArray.length ; i++){
+						if(nameArray[i] == 'QUOTE_PROFILE_ID'){
+							document.getElementById('newQuoteProfileId').value = valueArray[i];
+							$('[id$=newProfileId]').click();
+						}
+					}
+ 				} 					
+ 			}
+
+		</script>
+	</ui:define>
+
+</ui:composition>

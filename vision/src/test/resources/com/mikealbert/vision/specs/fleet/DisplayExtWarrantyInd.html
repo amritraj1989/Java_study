@@ -1,0 +1,28 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Fleet Maintenance / FM-541 Extended Warranty Indicator</title>
+    <body>
+    	<h1>Fleet Maintenance / FM-541 Extended Warranty Indicator</h1>
+    	<h2>Acceptance Tests (Automated)</h2>
+
+		    <ul concordion:execute="#extWarrantyInd = testExtWarrantyInd(#unitNo, #startDate)">
+		      <li>Search on <span concordion:set="#unitNo">00961638</span> and click on Create Purchase Order button.</li>
+		      The Vehicle Information section of Create Maint.PO screen is displayed the Extended Warranty Indicator as follows: 
+		      <span concordion:assertEquals="#extWarrantyInd">(Ext. Warranty)</span>
+		    </ul>
+		    
+		    <ul concordion:execute="#extWarrantyInd = testExtWarrantyInd(#unitNo, #startDate)">
+              <li>Search on <span concordion:set="#unitNo">00961638</span> and click on Service History button.</li>
+              The Vehicle Information section of Service History screen is displayed the Extended Warranty Indicator as follows: 
+              <span concordion:assertEquals="#extWarrantyInd">(Ext. Warranty)</span>
+            </ul>
+ 			
+    	<h2>Manual Tests</h2>
+    	    <ul type = "circle"><b>
+    	       <li>TODO: Verify the text of Extended Warranty Indicator in bold and red color.</li>
+    	    </b></ul>
+
+    	<h2>Untested (Out of Scope)</h2>
+    		<ul><li>TODO:</li></ul>
+    </body>
+</html>

@@ -1,0 +1,390 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	template="../../templates/ui.xhtml">
+	
+	<ui:define name="content">
+			<h:form id="breadCrumbForm" prependId="false">
+				<p:breadCrumb model="#{scheduleRulesBean.breadCrumbTrail}"  
+				 style="min-width:900px;max-width:100%;width:auto" 
+				ajax="false" immediate="true" styleClass="ui-layout"/>
+			</h:form>
+		
+			<!-- Error message display -->
+			<p:scrollPanel style="height:50px;max-width:100%;width:auto;" 
+				mode="native" styleClass="ui-layout">
+				<p:messages id="messages" showSummary="false" showDetail="true"	autoUpdate="true" />
+			</p:scrollPanel>			
+			
+			<h:form id="mainForm" prependId="false">
+
+	    		<p:panel id="resultsPanel" >
+	    		<h:inputHidden id="hiddenScrollPosition" value="#{scheduleRulesBean.scrollPosition}" />
+		    		<f:facet name="header" >
+	    				<h:outputText value="Rule List"/>
+		    		</f:facet>
+	    			 
+	                <p:dataTable  id="resultsTable" var="result" 
+	                	widgetVar="resultVar"
+	                	value="#{scheduleRulesBean.rowList}" 
+	                	scrollable="true"  
+	                	scrollHeight="#{scheduleRulesBean.dataTable.height}"
+						paginator= "true"
+						rows="500"
+						paginatorPosition="bottom" 
+						rowIndexVar="selectedRowIndex"
+						selection="#{scheduleRulesBean.selectedRule}" 
+						sortBy="#{result.maintScheduleRule.year}"
+						sortOrder="ascending"
+						rowKey="#{result.maintScheduleRule.mscId}" 
+						selectionMode="single">
+
+						<p:ajax event="sort" listener="#{scheduleRulesBean.sortEventListener}" />
+												
+	                   	<p:column width="#{scheduleRulesBean.dataTable.col1}" sortBy="#{result.maintScheduleRule.year}">
+	                    	<f:facet name="header">
+								<h:outputText value="Year" style ="font-weight:bold"/>
+								<p:spacer width="3" />
+								<p:commandLink  oncomplete="PF('filterDialogVar').show();" actionListener="#{scheduleRulesBean.processFilterRequest}" 
+	                    				  update=":filterDialog,:filterForm:filterPanel" >
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: top" 
+													value="/images/filtered-red.png"
+													rendered="#{scheduleRulesBean.yearFilter != 'ALL'}"
+													title="Filtered" />
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: top" 
+													value="/images/non-filtered.png"
+													rendered="#{scheduleRulesBean.yearFilter == 'ALL'}"
+													title="Unfiltered" />
+								</p:commandLink>
+								
+							</f:facet>
+	                    	<h:outputText value="#{result.maintScheduleRule.year}" />
+	                   	</p:column> 
+
+	                   	<p:column width="#{scheduleRulesBean.dataTable.col2}" style="text-align:center" sortBy="#{result.maintScheduleRule.baseSchedule}">
+	                    	<f:facet name="header">
+								<h:outputText id="currentHeading" value="Current" style ="font-weight:bold"/>
+								<p:spacer width="3" />
+								<p:commandLink  oncomplete="PF('filterDialogVar').show();" actionListener="#{scheduleRulesBean.processFilterRequest}" 
+	                    				  update=":filterDialog,:filterForm:filterPanel" >
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: top" 
+													value="/images/filtered-red.png"
+													rendered="#{scheduleRulesBean.currentFilter != 'ALL'}"
+													title="Filtered" />
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: top" 
+													value="/images/non-filtered.png"
+													rendered="#{scheduleRulesBean.currentFilter == 'ALL'}"
+													title="Unfiltered" />
+								</p:commandLink>
+								<p:tooltip for="currentHeading" value="Current" />
+							</f:facet>
+	                    	<h:outputText value="#{result.maintScheduleRule.baseSchedule == 'Y' ? 'Yes' : 'No'}" />
+	                   	</p:column> 
+
+	                   	<p:column width="#{scheduleRulesBean.dataTable.col3}" style="word-wrap: break-word" sortBy="#{result.makeDescription}">
+	                    	<f:facet name="header">
+								<h:outputText value="Make" style ="font-weight:bold"/>
+								<p:spacer width="3" />
+								<p:commandLink  oncomplete="PF('filterDialogVar').show();" actionListener="#{scheduleRulesBean.processFilterRequest}" 
+	                    				  update=":filterDialog,:filterForm:filterPanel" >
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: top" 
+													value="/images/filtered-red.png"
+													rendered="#{scheduleRulesBean.makeFilter != 'ALL'}"
+													title="Filtered" />
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: top" 
+													value="/images/non-filtered.png"
+													rendered="#{scheduleRulesBean.makeFilter == 'ALL'}"
+													title="Unfiltered" />
+								</p:commandLink>
+							</f:facet>
+	                    	<h:outputText id="makeDesc" value="#{result.makeDescription}" />
+	                    	<p:tooltip for="makeDesc" value="#{result.makeDescription}" />
+	                   	</p:column> 
+
+	                   	<p:column width="#{scheduleRulesBean.dataTable.col4}"  sortBy="#{result.maintScheduleRule.modelTypeDesc}">
+	                    	<f:facet name="header">
+								<h:outputText id="typeHeading" value="Model Type" style ="font-weight:bold"/>
+								<p:spacer width="3" />
+								<p:commandLink  oncomplete="PF('filterDialogVar').show();" actionListener="#{scheduleRulesBean.processFilterRequest}" 
+	                    				  update=":filterDialog,:filterForm:filterPanel" >
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: top" 
+													value="/images/filtered-red.png"
+													rendered="#{scheduleRulesBean.typeFilter != 'ALL'}"
+													title="Filtered" />
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: top" 
+													value="/images/non-filtered.png"
+													rendered="#{scheduleRulesBean.typeFilter == 'ALL'}"
+													title="Unfiltered" />
+								</p:commandLink>
+								<p:tooltip for="typeHeading" value="Model Type" />
+							</f:facet>
+	                    	<h:outputText id="modelType" value="#{result.maintScheduleRule.modelTypeDesc}" />
+	                    	<p:tooltip for="modelType" value="#{result.maintScheduleRule.modelTypeDesc}" />
+	                   	</p:column> 
+
+	                   	<p:column width="#{scheduleRulesBean.dataTable.col5}" style="word-wrap: break-word" sortBy="#{result.maintScheduleRule.makeModelDesc}">
+	                    	<f:facet name="header">
+								<h:outputText value="Model" style ="font-weight:bold"/>
+								<p:spacer width="3" />
+								<p:commandLink  oncomplete="PF('filterDialogVar').show();" actionListener="#{scheduleRulesBean.processFilterRequest}" 
+	                    				  update=":filterDialog,:filterForm:filterPanel" >
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: top" 
+													value="/images/filtered-red.png"
+													rendered="#{scheduleRulesBean.modelFilter != 'ALL'}"
+													title="Filtered" />
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: top" 
+													value="/images/non-filtered.png"
+													rendered="#{scheduleRulesBean.modelFilter == 'ALL'}"
+													title="Unfiltered" />
+								</p:commandLink>
+							</f:facet>
+	                    	<h:outputText id="modelDesc" value="#{result.maintScheduleRule.makeModelDesc}" />
+	                    	<p:tooltip for="modelDesc" value="#{result.maintScheduleRule.makeModelDesc}" />
+	                   	</p:column> 
+
+
+	                   	<p:column width="#{scheduleRulesBean.dataTable.col7}" sortBy="#{result.fuelDescription}">
+	                    	<f:facet name="header">
+								<h:outputText value="Fuel" style ="font-weight:bold"/>
+								<p:spacer width="3" />
+								<p:commandLink  oncomplete="PF('filterDialogVar').show();" actionListener="#{scheduleRulesBean.processFilterRequest}" 
+	                    				  update=":filterDialog,:filterForm:filterPanel" >
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: top" 
+													value="/images/filtered-red.png"
+													rendered="#{scheduleRulesBean.fuelFilter != 'ALL'}"
+													title="Filtered" />
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: top" 
+													value="/images/non-filtered.png"
+													rendered="#{scheduleRulesBean.fuelFilter == 'ALL'}"
+													title="Unfiltered" />
+								</p:commandLink>
+							</f:facet>
+	                    	<h:outputText id="fuelTypeGroup" value="#{result.fuelDescription}" />
+	                    	<p:tooltip for="fuelTypeGroup" value="#{result.fuelDescription}" />
+	                   	</p:column> 
+
+
+	                   	<p:column width="#{scheduleRulesBean.dataTable.col9}" sortBy="#{result.masterScheduleDescription}">
+	                    	<f:facet name="header">
+								<h:outputText value="Schedule" style ="font-weight:bold"/>
+								<p:spacer width="3" />
+								<p:commandLink  oncomplete="PF('filterDialogVar').show();" actionListener="#{scheduleRulesBean.processFilterRequest}" 
+	                    				  update=":filterDialog,:filterForm:filterPanel" >
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: top" 
+													value="/images/filtered-red.png"
+													rendered="#{scheduleRulesBean.nameFilter != 'ALL' or scheduleRulesBean.scheduleTypeFilter != 'ALL'}"
+													title="Filtered" />
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: top" 
+													value="/images/non-filtered.png"
+													rendered="#{scheduleRulesBean.nameFilter == 'ALL' and scheduleRulesBean.scheduleTypeFilter == 'ALL'}"
+													title="Unfiltered" />
+								</p:commandLink>
+							</f:facet>
+	                    	<h:outputText id="masterSchedule" value="#{result.masterScheduleDescription}" />
+	                    	<p:tooltip for="masterSchedule">
+	                    		<h:outputText value="#{result.masterScheduleDescription}" /> <br />
+	                    		<h:outputText value="#{result.maintScheduleRule.masterSchedule.description}" />
+	                    	</p:tooltip>
+	                   	</p:column> 
+	                   	
+	                   	<p:column width="#{scheduleRulesBean.dataTable.col10}" style="text-align:center" sortBy="#{result.maintScheduleRule.highMileage}">
+	                    	<f:facet name="header">
+								<h:outputText id="highMileage" value="High Miles" style ="font-weight:bold"/>
+								<p:spacer width="3" />
+								<p:commandLink  oncomplete="PF('filterDialogVar').show();" actionListener="#{scheduleRulesBean.processFilterRequest}" 
+	                    				  update=":filterDialog,:filterForm:filterPanel" >
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: top" 
+													value="/images/filtered-red.png"
+													rendered="#{scheduleRulesBean.highMileageFilter != 'ALL'}"
+													title="Filtered" />
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: top" 
+													value="/images/non-filtered.png"
+													rendered="#{scheduleRulesBean.highMileageFilter == 'ALL'}"
+													title="Unfiltered" />
+								</p:commandLink>
+								<p:tooltip for="highMileage" value="High Mile" />
+							</f:facet>
+	                    	<h:outputText value="#{result.maintScheduleRule.highMileage == 'Y' ? 'Yes' : 'No'}" />
+	                   	</p:column> 
+
+	                   	<p:column width="#{scheduleRulesBean.dataTable.col11}" sortBy="#{result.maintScheduleRule.scheduleAccount.externalAccountPK.accountCode}">
+	                    	<f:facet name="header">
+								<h:outputText value="Client" style ="font-weight:bold"/>
+								<p:spacer width="3" />
+								<p:commandLink  oncomplete="PF('filterDialogVar').show();" actionListener="#{scheduleRulesBean.processFilterRequest}" 
+	                    				  update=":filterDialog,:filterForm:filterPanel" >
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: top" 
+													value="/images/filtered-red.png"
+													rendered="#{scheduleRulesBean.accountFilter != 'ALL'}"
+													title="Filtered" />
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: top" 
+													value="/images/non-filtered.png"
+													rendered="#{scheduleRulesBean.accountFilter == 'ALL'}"
+													title="Unfiltered" />
+								</p:commandLink>
+							</f:facet>
+	                    	<h:outputText id="client" value="#{result.maintScheduleRule.scheduleAccount.externalAccountPK.accountCode}" />
+	                   		<p:tooltip for="client" 
+	                   			value="#{result.maintScheduleRule.scheduleAccount.externalAccountPK.accountCode} - #{result.maintScheduleRule.scheduleAccount.accountName}" />
+	                   	</p:column> 
+
+	                   	<p:column width="#{scheduleRulesBean.dataTable.col12}" style="text-align:center" sortBy="#{result.maintScheduleRule.activeFlag}">
+	                    	<f:facet name="header">
+								<h:outputText id="activeHeading" value="Active" style ="font-weight:bold"/>
+								<p:spacer width="3" />
+								<p:commandLink  oncomplete="PF('filterDialogVar').show();" actionListener="#{scheduleRulesBean.processFilterRequest}" 
+	                    				  update=":filterDialog,:filterForm:filterPanel" >
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: top" 
+													value="/images/filtered-red.png"
+													rendered="#{scheduleRulesBean.activeFilter != 'ALL'}"
+													title="Filtered" />
+									<p:graphicImage style="text-align:right;align:right;border-style:none;vertical-align: top" 
+													value="/images/non-filtered.png"
+													rendered="#{scheduleRulesBean.activeFilter == 'ALL'}"
+													title="Unfiltered" />
+								</p:commandLink>
+								<p:tooltip for="activeHeading" value="Active Flag" />
+							</f:facet>
+	                    	<h:outputText value="#{result.maintScheduleRule.activeFlag == 'Y' ? 'Yes' : 'No'}" />
+	                   	</p:column> 
+	                    
+						<f:facet name="footer" >
+							<h:outputText value="Total Records: #{scheduleRulesBean.totalRecords}" />
+						</f:facet>
+	                </p:dataTable>
+	    			
+
+              	</p:panel>
+
+	    		<p:panel id="buttonsPanel">
+					<h:panelGrid id="buttons">
+						<f:facet name="footer">
+							<p:commandButton disabled="#{!scheduleRulesBean.hasEditPermission}" id="addButton" tabindex="30" value="Add"
+								action="#{scheduleRulesBean.add}" ajax="false"
+								onclick="lockScreen();" />
+   							<p:spacer width="10" />
+   							<p:commandButton id="editButton" tabindex="40" value="View/Edit"
+								action="#{scheduleRulesBean.edit}" ajax="false" disabled="#{scheduleRulesBean.totalRecords == 0}"
+								onclick="lockScreen();saveScrollPosition('edit');" />
+							<p:spacer width="10" />
+							<p:commandButton id="deleteButton" tabindex="140" value="Delete" action="#{scheduleRulesBean.prepDelete}" 
+								oncomplete="showDialog('confirmVar');"
+								onclick="saveScrollPosition('delete');"
+								disabled="#{!scheduleRulesBean.hasEditPermission or scheduleRulesBean.totalRecords == 0}"/>
+							<p:spacer width="10" />
+							<p:commandButton id="cancelBtn" value="Cancel" action="#{scheduleRulesBean.cancel}" ajax="false" immediate="true" />
+							<!-- taking out preview button until further investigation for selected row not updating
+							<p:spacer width="10" />
+							<p:button id="preview" tabindex="43" value="Preview" disabled="#{scheduleRulesBean.totalRecords == 0}"
+								onclick="window.open('#{request.contextPath}/view/maintSchedules/report.xhtml?scheduleId=#{scheduleRulesBean.selectedRule.maintScheduleRule.masterSchedule.mschId}'); return false" />
+							-->
+						</f:facet>
+					</h:panelGrid>
+              	</p:panel>
+
+			</h:form>
+
+
+			<p:dialog id="filterDialog" header="Filters"  widgetVar="filterDialogVar"   
+					   modal="true" resizable="false" appendTo="@(body)" style="min-width: 425px; max-width: 725px;"> 
+			  	
+			  	<h:form id="filterForm" prependId="false">   					  
+				<p:hotkey immediate="true" bind="esc" handler="PF('filterDialogVar').hide();"/>	
+					<p:panel id="filterPanel">
+						
+						<p:panelGrid columns="2">
+							<h:outputText value="Year:" />
+							<h:selectOneMenu value="#{scheduleRulesBean.yearFilter}">
+					            <f:selectItems value="#{scheduleRulesBean.availableYears}" />
+					        </h:selectOneMenu>
+							<h:outputText value="Current:" />
+							<h:selectOneMenu value="#{scheduleRulesBean.currentFilter}">
+					            <f:selectItems value="#{scheduleRulesBean.availableCurrentFlags}" />
+					        </h:selectOneMenu>
+							<h:outputText value="Make:" />
+							<h:selectOneMenu value="#{scheduleRulesBean.makeFilter}">
+					            <f:selectItems value="#{scheduleRulesBean.availableMakes}" />
+					        </h:selectOneMenu>
+							<h:outputText value="Model Type:" />
+							<h:selectOneMenu value="#{scheduleRulesBean.typeFilter}">
+					            <f:selectItems value="#{scheduleRulesBean.availableTypes}" />
+					        </h:selectOneMenu>
+							<h:outputText value="Model:" />
+							<h:selectOneMenu value="#{scheduleRulesBean.modelFilter}">
+					            <f:selectItems value="#{scheduleRulesBean.availableModels}" />
+					        </h:selectOneMenu>
+					        <h:outputText value="Fuel:" />
+							<h:selectOneMenu value="#{scheduleRulesBean.fuelFilter}">
+					            <f:selectItems value="#{scheduleRulesBean.availableFuelTypes}" />
+					        </h:selectOneMenu>
+							<h:outputText value="Schedule Type:" />
+							<h:selectOneMenu value="#{scheduleRulesBean.scheduleTypeFilter}">
+					            <f:selectItems value="#{scheduleRulesBean.availableScheduleTypes}" />
+					        </h:selectOneMenu>
+							<h:outputText value="Schedule Name:" />
+							<h:selectOneMenu value="#{scheduleRulesBean.nameFilter}">
+					            <f:selectItems value="#{scheduleRulesBean.availableNames}" />
+					        </h:selectOneMenu>
+					        <h:outputText value="High Mile:" />
+							<h:selectOneMenu value="#{scheduleRulesBean.highMileageFilter}">
+					            <f:selectItems value="#{scheduleRulesBean.availableHighMileageFilters}" />
+					        </h:selectOneMenu>
+							<h:outputText value="Client:" />
+							<h:selectOneMenu value="#{scheduleRulesBean.accountFilter}">
+					            <f:selectItems value="#{scheduleRulesBean.availableAccounts}" />
+					        </h:selectOneMenu>
+							<h:outputText value="Active:" />
+							<h:selectOneMenu value="#{scheduleRulesBean.activeFilter}">
+					            <f:selectItems value="#{scheduleRulesBean.availableActiveFlags}" />
+					        </h:selectOneMenu>
+						</p:panelGrid>
+						<hr />
+
+						<p:commandButton value="Apply filters" ajax="true" update=":mainForm:resultsTable, :mainForm:buttonsPanel" process="@form" 
+							  		oncomplete="PF('filterDialogVar').hide();" actionListener="#{scheduleRulesBean.filterRowList}"/>
+						<p:spacer width="10"/>
+						<p:commandButton value="Clear filters" ajax="true" update=":mainForm:resultsTable, :mainForm:buttonsPanel, filterForm" process="@form" 
+					  		oncomplete="PF('filterDialogVar').hide();" actionListener="#{scheduleRulesBean.removeAllFilters}"/>
+						<p:spacer width="10"/>
+						<p:commandButton value="Cancel" onclick="PF('filterDialogVar').hide();"/>
+
+					</p:panel>	    	
+				</h:form>		
+		  	</p:dialog>  	
+		  	
+		  	<p:confirmDialog id="confirmDialogId" message="Are you sure?" header="Confirm Delete" appendTo="@(body)"
+				widgetVar="confirmVar" resizable="false" width="200" height="60" >    
+				
+	           <h:form prependId="false">
+       				<p:commandButton  value="Yes" ajax="false" process="@this"	onclick="hideDialog('confirmVar');lockScreen();" 
+       					actionListener="#{scheduleRulesBean.delete}"/>			  
+        			<p:spacer width="10" />
+        			<p:commandButton  value="No"  onclick="PF('confirmVar').hide();" type="button"/>
+        			
+        		</h:form>
+        	</p:confirmDialog>			 
+
+			<script>
+
+			function saveScrollPosition(btn) {
+				if(btn == "edit"){
+            	document.getElementById('hiddenScrollPosition').value = $('#resultsTable .ui-datatable-scrollable-body').scrollTop();
+				}else{
+					document.getElementById('hiddenScrollPosition').value = 0;
+				}
+            }
+            function setScrollPosition() {
+            	$('#resultsTable .ui-datatable-scrollable-body').scrollTop(document.getElementById('hiddenScrollPosition').value);
+            }
+            $(window).load(function(){
+       		 setScrollPosition();
+		  	});
+            
+			</script>
+			
+			
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,144 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:pe="http://primefaces.org/ui/extensions" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:comp="http://java.sun.com/jsf/composite/view/component" 
+    template="../../templates/ui.xhtml" >
+	
+    <ui:define name="content">
+    	<h:form id="addSupplierMaintCodeBreadCrumbForm" prependId="false">
+   				<p:breadCrumb model="#{addSupplierMaintCodeBean.breadCrumbTrail}" ajax="false" immediate="true" style="min-width:980px;max-width:100%;width:auto;"/>
+   		</h:form>
+    	<!-- Message display -->
+		<p:scrollPanel mode="native" styleClass="ui-layout" style="height:50px;min-width:980px;max-width:100%;width:auto;">
+			<p:messages id="messages" showSummary="false" showDetail="true" autoUpdate="false" />
+		</p:scrollPanel>
+
+		<h:form id="addServiceProviderMaintCodeForm" prependId="false">
+			<p:panel id="addServiceProviderMaintCode" header="Add New Provider Maint Code" > 
+
+			<h:panelGrid id="serviceProviderMaintCodeEntry" columns="3" cellpadding="5" >	
+
+
+			<p:outputLabel for="providerAdd" value="Service Provider : *"  styleClass="ui-label" />	
+			<h:panelGroup style="white-space:nowrap;">							
+				<h:inputHidden id="providerAddId" name="providerAddId" value="#{addSupplierMaintCodeBean.serviceProvider.serviceProviderId}" />
+				<h:inputHidden id="providerAddDesc" name="providerAddId" value="#{addSupplierMaintCodeBean.serviceProvider.serviceProviderName}" />
+				<p:inputText id="providerAdd" styleClass="trackDirtyValue" disabled="#{!addSupplierMaintCodeBean.hasPermission()}" name="providerAdd" title="Service Provider " tabindex="10" value="#{addSupplierMaintCodeBean.serviceProvider.serviceProviderNumber}" />
+				
+				<p:commandButton id='serviceProviderLOV' icon="icon-lov" title="lov" tabindex="20"
+                            oncomplete="showServiceProviderLov();" immediate="true" disabled="#{!addSupplierMaintCodeBean.hasPermission()}"
+                            actionListener="#{serviceProviderLovBean.fetchLOVDataByServiceProviderName}"
+                            process="@this,providerAdd" dynamic="true" async="true"
+                            update=":serviceProviderLovToolbarForm:searchToolbar :serviceProviderLovForm:serviceProviderDataTableId  :serviceProviderLovForm:serviceProviderSelectPanel">
+                            <f:param name="SERVICEPROVIDER_LOV_INPUT" value="providerAdd" />
+                            <f:param name="INCLUDEPARENTSONLY_LOV_INPUT" value="Y" />
+                </p:commandButton>
+				
+	        </h:panelGroup>
+			<h:outputText id="providerAddName" name="providerName" value="#{addSupplierMaintCodeBean.serviceProvider.serviceProviderName}" escape="false" style="white-space: normal"/>
+			
+			<p:outputLabel for="providerMaintCode" value="Service Provider Code : *"  styleClass="ui-label" /> 
+            	<p:inputText  id="providerMaintCode" styleClass="trackDirtyValue" disabled="#{!addSupplierMaintCodeBean.hasPermission()}" name="providerMaintCode" style="width:300px" tabindex="30" maxlength="80" value="#{addSupplierMaintCodeBean.providerMaintenanceCode.code}" /> 
+          	<h:outputText value=""/>
+				
+            			
+            <p:outputLabel for="providerMaintDesc" value="Service Provider Description : *"  styleClass="ui-label" /> 
+            	<p:inputText  id="providerMaintDesc" styleClass="trackDirtyValue" disabled="#{!addSupplierMaintCodeBean.hasPermission()}" name="providerMaintDesc" style="width:300px" tabindex="40" maxlength="80" value="#{addSupplierMaintCodeBean.providerMaintenanceCode.description}" /> 
+            <h:outputText value=""/>
+
+			<p:outputLabel for="maintCode" value="Maintenance Code : *"  styleClass="ui-label" />
+		    <h:panelGroup style="white-space:nowrap;">
+		    	<p:inputText id="maintCode" styleClass="trackDirtyValue" disabled="#{!addSupplierMaintCodeBean.hasPermission()}" name="maintCode" tabindex="50" value="#{addSupplierMaintCodeBean.maintenanceCode.code}"/>
+		    	
+   				<p:commandButton id="maintCodeLOV" icon="icon-lov" title="lov" tabindex="60" disabled="#{!addSupplierMaintCodeBean.hasPermission()}"
+						oncomplete="showMaintenanceCodeLov();" immediate="true" process="@this,maintCode"  dynamic="true" async="true"
+						actionListener="#{maintenanceCodeLovBean.fetchLOVDataByMaintenanceCodeDescription}"
+						update=":MaintLovForm:MAINTENANCE_CODE_GRID">
+						<f:param name="MAINTENANCE_CODE_LOV_INPUT" value="maintCode" />
+				</p:commandButton>
+		    
+		    </h:panelGroup>
+		    <h:outputText id="maintDesc" name="maintDesc" value="#{addSupplierMaintCodeBean.maintenanceCode.description}" escape="false" style="white-space: normal"/>
+		    <h:inputHidden id="maintCodeId" name="maintCodeId" value="#{addSupplierMaintCodeBean.maintenanceCode.mcoId}" escape="false" style="white-space: normal"/>
+			
+			</h:panelGrid>
+
+   			<p:panel id="commandPanel" style="min-width:980px;max-width:100%;width:auto;">
+   				<p:commandButton ajax="false" id="saveMaintCode"
+	   				 tabindex="70" value="Save" process="addServiceProviderMaintCodeForm"
+	   				 onclick="lockScreen();" 
+	   				 disabled="#{!addSupplierMaintCodeBean.hasPermission()}"
+	   				 action="#{addSupplierMaintCodeBean.save}" 
+	   				  />
+	   			<p:spacer width="10" />
+	   			<p:commandButton ajax="false" id="cancelMaintCode" immediate="true"
+	   				 tabindex="80" value="Cancel" 
+	   				 onclick="lockScreen();" 
+	   				 action="#{addSupplierMaintCodeBean.cancel}" 
+	   				  />
+
+			</p:panel>
+		</p:panel>
+
+		</h:form>
+		
+		<div id="SERVICEPROVIDER_LOV_DIV">
+            <ui:include src="../lov/serviceProviders.xhtml" />
+        </div>
+		
+		<div id="MAINTENANCE_LOV_DIV">
+            <ui:include src="../lov/maintenanceCode.xhtml" />
+        </div>
+		
+		<script type="text/javascript">
+		
+		function setSelection( lovName, nameArray, valueArray){	
+			if(lovName == 'maintenanceCodeLOV') {
+			    for(var i=0; i  &lt; nameArray.length ; i++) {	
+				    if(nameArray[i] == "MAINTENANCE_CODE") {	
+				   		document.getElementById('maintCode').value =  valueArray[i];	
+					} else if(nameArray[i] == "MAINTENANCE_DESCRIPTION") {
+						document.getElementById('maintDesc').innerHTML=valueArray[i];	
+					} else if(nameArray[i] == "MAINTENANCE_CODE_ID") {
+						document.getElementById('maintCodeId').value=valueArray[i];	
+					}
+				}	
+			    setFocus('saveMaintCode');
+			}else if(lovName == 'serviceProviderLOV'){
+                for(var i=0; i  &lt; nameArray.length ; i++){
+                    if(nameArray[i] == 'SERVICE_PROVIDER_NAME'){
+                        $('[id$=providerAddName]').html(valueArray[i]);
+                        $('[id$=providerAddDesc]').val(valueArray[i]);
+                    }
+                    if(nameArray[i] == 'SERVICE_PROVIDER_NUMBER'){
+                        $('[id$=providerAdd]').val(valueArray[i]);
+                        
+                    }
+                    if(nameArray[i] == 'SERVICE_PROVIDER_ID'){
+                        $('[id$=providerAddId]').val(valueArray[i]);   
+                    }
+                }
+                setFocus('providerMaintCode');
+            } 	 					 				
+		}
+		
+		
+		function initializeDirtyDetection() {
+			registerIgnoreButton("saveMaintCode");
+			saveDataForDirtyDetection();
+		}
+		
+     	$(window).load(function(){
+     		initializeDirtyDetection();
+     		setFocus('providerAdd');
+		});			
+	
+		</script>
+
+	</ui:define>
+	
+	
+</ui:composition>

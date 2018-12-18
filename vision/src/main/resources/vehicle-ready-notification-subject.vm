@@ -1,0 +1,1 @@
+Unit# $emailVO.unitNo #if("$!emailVO.fleetReferenceNo" != "") Fleet Ref # $emailVO.fleetReferenceNo #end - Vehicle Ready for Delivery Notification

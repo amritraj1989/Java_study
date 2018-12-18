@@ -1,0 +1,54 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+	
+	<p:dialog id="maintCategoryInfoDialog"
+			  header="#{maintenanceCategoryInfoBean.dialogHeader}" 
+			  widgetVar="maintCategoryInfoDialogWidget" 
+			  appendTo="@(body)" 
+			  dynamic="true" 
+			  resizable="true" 
+			  closeOnEscape="true"
+			  height="#{maintenanceCategoryInfoBean.dialogHeight}" 
+			  width="#{maintenanceCategoryInfoBean.dialogWidth}"
+			  onHide="setFocus('qty_input');">
+		<h:form id="maintCategoryInfoForm" prependId="false">						
+			<p:panel id="maintCategoryInfoPanel">
+				<p:dataTable id="maintCategoryInfoDataTable" value="#{maintenanceCategoryInfoBean.maintReqTask.maintenanceCategoryPropertyValues}" var="rows">
+			        <p:column>
+			        	<h:outputLabel styleClass="ui-label" value="#{rows.maintenanceCategoryProperty.maintenanceProperty.name}"/> 
+		        	</p:column>
+  	 				<p:column> 
+						<p:inputText id="maintCategoryInfoTextVal" value="#{rows.value}" maxlength="100" rendered="#{rows.maintenanceCategoryProperty.maintenanceProperty.controlType == 'TEXT'}"
+									disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.isEditTaskDisabled(-1)}"/>
+						<p:inputTextarea id="maintCategoryInfoTextareaVal" value="#{rows.value}" maxlength="100" rendered="#{rows.maintenanceCategoryProperty.maintenanceProperty.controlType == 'TEXTAREA'}"
+									disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.isEditTaskDisabled(-1)}"/>
+			  			<h:selectOneRadio id="maintCategoryInfoRadioVal" value="#{rows.value}" styleClass="ui-noBorder" rendered="#{rows.maintenanceCategoryProperty.maintenanceProperty.controlType == 'RADIO'}"
+			  						disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.isEditTaskDisabled(-1)}">
+							<f:selectItem itemLabel="Yes" itemValue="Y" />
+							<f:selectItem itemLabel="No" itemValue="N" />
+						</h:selectOneRadio>	
+			  			<p:selectOneMenu id="maintCategoryInfoMenuVal" value="#{rows.value}" styleClass="ui-noBorder" rendered="#{rows.maintenanceCategoryProperty.maintenanceProperty.controlType == 'UOM'}"
+			  						disabled="#{!maintenancePOBean.hasPermission() or maintenancePOBean.isReadMode() or maintenancePOBean.isEditTaskDisabled(-1)}">
+							<f:selectItems
+								value="#{maintenanceCategoryInfoBean.maintCatUOM}"
+							    var="uom" 
+								itemLabel="#{uom.uomCode.description}"
+								itemValue="#{uom.uomCode.uomCode}"/>
+						</p:selectOneMenu>							
+			        </p:column>	
+				</p:dataTable>
+				<f:facet name="footer">
+					<p:commandButton id="saveMaintCategoryInfoDialog" value="Done" actionListener="#{maintenanceCategoryInfoBean.done}" oncomplete="PF('maintCategoryInfoDialogWidget').hide();"/>
+	       			<p:spacer width="20"/>
+					<p:commandButton id="cancelMaintCategoryInfoDialog" value="Cancel" update=":maintCategoryInfoForm:maintCategoryInfoPanel" process="@this" oncomplete="PF('maintCategoryInfoDialogWidget').hide();">
+						<p:resetInput target=":maintCategoryInfoForm:maintCategoryInfoPanel" />
+					</p:commandButton>
+				</f:facet>
+	       	</p:panel>       		
+		</h:form>
+		<p:ajax event="close" listener="#{maintenanceCategoryInfoBean.resetMaintCateogryPropertyValues}" />        	
+	</p:dialog>	
+</ui:composition>			        	

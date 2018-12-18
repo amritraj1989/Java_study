@@ -1,0 +1,152 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Fleet Maintenance / FM-148 Recent Odometer Readings</title>
+    <body>
+    	<h1>Fleet Maintenance / FM-148 Recent Odometer Readings</h1>
+    	<h2>Acceptance Tests (Automated)</h2>
+    	<h4>When clicking on a unit's most recent odometer reading, the unit's last five odometer readings will display in order of date descending.</h4>
+			<table concordion:execute="#result = testRecentOdometerReadings(#unitNo,#rownum)">
+                <tr>
+                	<th concordion:set="#unitNo">Unit</th>
+                	<th concordion:set="#rownum">Index</th>
+                    <th concordion:assertEquals="#result.getOdoReadingDate()">Odometer Date</th>
+                    <th concordion:assertEquals="#result.getOdoReading()">Odometer Reading</th>
+                    <th concordion:assertEquals="#result.getOdoReadingType()">Odometer Type</th>
+                </tr>
+                <tr>
+                	<td>00948563</td>
+                	<td>0</td>
+                    <td>2012-06-30 00:00:00.0</td>
+                    <td>100000</td>
+                    <td>TERMINATE</td>
+                </tr>
+                <tr>
+                	<td>00948563</td>
+                	<td>1</td>
+                    <td>2012-06-29 00:00:00.0</td>
+                    <td>100000</td>
+                    <td>EARLYTERM</td>
+                </tr>      
+                <tr>
+                	<td>00948563</td>
+                	<td>2</td>
+                    <td>2012-06-29 00:00:00.0</td>
+                    <td>100000</td>
+                    <td>OUT_SERVIC</td>
+                </tr> 
+                <tr>
+                	<td>00948563</td>
+                	<td>3</td>
+                    <td>2012-05-07 00:00:00.0</td>
+                    <td>83040</td>
+                    <td>FUEL</td>
+                </tr>
+                <tr>
+                	<td>00948563</td>
+                	<td>4</td>
+                    <td>2012-05-02 00:00:00.0</td>
+                    <td>82668</td>
+                    <td>FUEL</td>
+                </tr>                
+			</table>
+			
+    	<h4>When clicking on a unit's most recent odometer reading, the unit's last five odometer readings displays in order of date descending.</h4>			
+			<table concordion:execute="#result = testRecentOdometerReadings(#unitNo,#rownum)">
+                <tr>
+                	<th concordion:set="#unitNo">Unit</th>
+                	<th concordion:set="#rownum">Index</th>
+                    <th concordion:assertEquals="#result.getOdoReadingDate()">Odometer Date</th>
+                    <th concordion:assertEquals="#result.getOdoReading()">Odometer Reading</th>
+                    <th concordion:assertEquals="#result.getOdoReadingType()">Odometer Type</th>
+                </tr>
+                <tr>
+                	<td>00934815</td>
+                	<td>0</td>
+                    <td>2012-06-13 00:00:00.0</td>
+                    <td>77650</td>
+                    <td>SALE</td>
+                </tr>
+                <tr>
+                	<td>00934815</td>
+                	<td>1</td>
+                    <td>2012-06-07 00:00:00.0</td>
+                    <td>77650</td>
+                    <td>TERMINATE</td>
+                </tr>      
+                <tr>
+                	<td>00934815</td>
+                	<td>2</td>
+                    <td>2012-06-02 00:00:00.0</td>
+                    <td>77650</td>
+                    <td>OUT_SERVIC</td>
+                </tr> 
+                <tr>
+                	<td>00934815</td>
+                	<td>3</td>
+                    <td>2011-03-01 00:00:00.0</td>
+                    <td>54307</td>
+                    <td>GRNODO</td>
+                </tr>
+                <tr>
+                	<td>00934815</td>
+                	<td>4</td>
+                    <td>2011-02-15 00:00:00.0</td>
+                    <td>54307</td>
+                    <td>TERMINATE</td>
+                </tr>                
+			</table>	
+			
+    	<h4>When clicking on a unit's most recent odometer reading, the unit's last five odometer readings displays in order of date descending.</h4>			
+			<table concordion:execute="#result = testRecentOdometerReadings(#unitNo,#rownum)">
+                <tr>
+                	<th concordion:set="#unitNo">Unit</th>
+                	<th concordion:set="#rownum">Index</th>
+                    <th concordion:assertEquals="#result.getOdoReadingDate()">Odometer Date</th>
+                    <th concordion:assertEquals="#result.getOdoReading()">Odometer Reading</th>
+                    <th concordion:assertEquals="#result.getOdoReadingType()">Odometer Type</th>
+                </tr>
+                <tr>
+                	<td>00938573</td>
+                	<td>0</td>
+                    <td>2012-07-14 00:00:00.0</td>
+                    <td>84859</td>
+                    <td>TERM_STMT</td>
+                </tr>
+                <tr>
+                	<td>00938573</td>
+                	<td>1</td>
+                    <td>2012-06-22 00:00:00.0</td>
+                    <td>85617</td>
+                    <td>SERVICE</td>
+                </tr>      
+                <tr>
+                	<td>00938573</td>
+                	<td>2</td>
+                    <td>2012-06-20 00:00:00.0</td>
+                    <td>85617</td>
+                    <td>SALE</td>
+                </tr> 
+                <tr>
+                	<td>00938573</td>
+                	<td>3</td>
+                    <td>2012-06-14 00:00:00.0</td>
+                    <td>84859</td>
+                    <td>SERVICE</td>
+                </tr>
+                <tr>
+                	<td>00938573</td>
+                	<td>4</td>
+                    <td>2012-05-31 00:00:00.0</td>
+                    <td>84859</td>
+                    <td>TERMINATE</td>
+                </tr>                
+			</table>					
+     	<h2>Manual Tests</h2>
+    	    <ul type = "circle"><b>
+    	       <li>TODO:</li>
+    	    </b></ul>
+
+    	<h2>Untested (Out of Scope)</h2>
+    		<ul><li>TODO:</li></ul>
+    </body>
+</html>			

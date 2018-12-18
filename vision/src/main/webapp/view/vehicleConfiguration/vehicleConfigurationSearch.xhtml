@@ -1,0 +1,374 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+xmlns:f="http://java.sun.com/jsf/core" 
+xmlns:h="http://java.sun.com/jsf/html" 
+xmlns:p="http://primefaces.org/ui" 
+xmlns:ui="http://java.sun.com/jsf/facelets" 
+xmlns:pe="http://primefaces.org/ui/extensions"
+xmlns:comp="http://java.sun.com/jsf/composite/view/component"
+template="../../templates/ui.xhtml">
+
+	<ui:define name="content">
+			<h:form id="vehicleConfigurationSearchBreadCrumbForm" prependId="false">
+				<p:breadCrumb model="#{vehicleConfigurationSearchBean.breadCrumbTrail}" ajax="false" immediate="true" style="min-width:1200px;max-width:100%;width:auto;" />
+			</h:form>
+			<!-- Message display -->
+			<p:scrollPanel id="messagePanel" mode="native" styleClass="ui-layout" style="height:50px;min-width:1200px;max-width:100%;width:auto;">
+				<p:messages id="messages" showSummary="false" showDetail="true" autoUpdate="true" />
+			</p:scrollPanel>
+
+			<h:form id="vehicleConfigurationSearchForm" prependId="false">
+				<p:panel id="searchPanel" header="Search Criteria" style="min-width:1200px;max-width:100%;width:auto;">
+					<p:focus context="searchPanel" />
+					<h:panelGrid columns="10" cellspacing="5" >
+						<h:outputLabel for="availableClientsAC" value="Client:" styleClass="ui-label" />
+						<p:column colspan="3">
+							<p:autoComplete id="availableClientsAC" title="Client" 
+						    	widgetVar="availableClientsACWidgetVar"
+								value="#{vehicleConfigurationSearchBean.searchCriteria.clientAccountCode}"
+							    var="client"
+							    completeMethod="#{vehicleConfigurationSearchBean.autoCompleteClientListener}"
+							    itemLabel="#{client}"
+							    itemValue="#{client}"
+							    forceSelection="true" size="30" maxlength="100" autocomplete="off" scrollHeight="100">
+							  <p:ajax event="query" process="@this" />									        		
+					    	</p:autoComplete>
+						</p:column>
+						
+						<h:outputLabel for="configurationDesc" value="Application:" styleClass="ui-label"/>
+						<h:panelGroup style="white-space:nowrap;">
+							<p:inputText id="configurationDesc" title="Application" value="#{vehicleConfigurationSearchBean.searchCriteria.configDescription}" onkeypress="return doKeypressSearch(event)" style="width:150px;" />
+						</h:panelGroup>
+					
+						<h:outputLabel for="availableMfgCodesAC" value="Mfg. Code:" style="white-space:nowrap;" styleClass="ui-label" />
+						<p:column>
+							<h:panelGroup>
+								<p:autoComplete id="availableMfgCodesAC" title="Mfg. Code"
+									widgetVar="availableMfgCodesACWidgetVar"
+									value="#{vehicleConfigurationSearchBean.searchCriteria.mfgCode}"
+									var="mfgCode"
+									completeMethod="#{vehicleConfigurationSearchBean.autoCompleteMfgCodeListener}"
+									itemLabel="#{mfgCode}"
+									itemValue="#{mfgCode}"
+									forceSelection="true" size="25" maxlength="100" autocomplete="off" scrollHeight="100">
+							      <p:ajax event="query" process="@this" />
+								</p:autoComplete>
+							</h:panelGroup>
+						</p:column>
+					    
+					    <h:outputLabel for="make" value="Make: " styleClass="ui-label" />
+						<h:panelGroup style="white-space:nowrap;">
+							<p:selectOneMenu id="make" value="#{vehicleConfigurationSearchBean.searchCriteria.make}" style="width:160px" >
+								<f:selectItem itemLabel=" " />
+								<f:selectItems var="make" value="#{vehicleConfigurationSearchBean.makes}" itemLabel="#{make}" itemValue="#{make}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+					    
+					    <h:outputLabel value=""/>
+					    <h:outputLabel value=""/>
+						<h:outputLabel for="model" value="Model: " styleClass="ui-label" />
+						<h:panelGroup style="white-space:nowrap;">
+							<p:inputText id="model" title="Model" value="#{vehicleConfigurationSearchBean.searchCriteria.model}" onkeypress="return doKeypressSearch(event)" />
+							<p:commandButton id='modelLOV' icon="icon-lov" title="lov" oncomplete="showModelLOV();" immediate="true" actionListener="#{modelLOVBean.fetchLOVDataByModelDescription}" process="@parent" dynamic="true" async="true" onstart="return hasMinAlphaNumericCharacters($('#model'));"
+								update=":modelLovForm:MODEL_GRID">
+								<f:param name="MODEL_LOV_INPUT_MFG_CODE" value="mfgCode" />
+								<f:param name="MODEL_LOV_INPUT_YEAR" value="year_input" />
+								<f:param name="MODEL_LOV_INPUT_MAKE" value="make_input" />
+								<f:param name="MODEL_LOV_INPUT_MODEL" value="model" />
+								<f:param name="MODEL_LOV_SOURCE" value="VEHICLE_CONFIG_MODEL_LOV" />
+							</p:commandButton>
+						</h:panelGroup>
+					    
+						<h:outputLabel for="year" value="Year: " styleClass="ui-label" />
+						<h:panelGroup style="white-space:nowrap;">
+							<p:selectOneMenu id="year" widgetVar="yearWidget" value="#{vehicleConfigurationSearchBean.searchCriteria.year}" style="width:80px" >
+								<f:selectItem itemLabel=" " />
+								<f:selectItems value="#{vehicleConfigurationSearchBean.years}" var="year" itemLabel="#{year}" itemValue="#{year}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						
+						<h:outputLabel for="availableTrimsAC" value="Trim: " styleClass="ui-label" />
+						<h:panelGroup style="white-space:nowrap;">
+								<p:autoComplete id="availableTrimsAC" title="Trim"
+							            widgetVar="trimsACWidgetVar"
+								        value="#{vehicleConfigurationSearchBean.searchCriteria.trim}"
+								        var="trim" 
+								        completeMethod="#{vehicleConfigurationSearchBean.autoCompleteTrimListener}"
+								        itemLabel="#{trim}"
+								        itemValue="#{trim}"
+								        forceSelection="true" 
+								        size="30" 
+								        maxlength="100" 
+								        autocomplete="off" 
+								        scrollHeight="100">
+									<p:ajax event="query" process="@this" />	
+							    </p:autoComplete>
+							</h:panelGroup>
+
+					    <p:outputLabel for="availableVendorsAC" value="Vendor: " styleClass="ui-label" />
+					    <p:autoComplete id="availableVendorsAC" title="Vendor"
+					            widgetVar="availableVendorsACWidgetVar"
+						        value="#{vehicleConfigurationSearchBean.searchCriteria.vendorAccountCode}"
+						        var="vendor" 
+						        completeMethod="#{vehicleConfigurationSearchBean.autoCompleteVendorsListener}"
+						        itemLabel="#{vendor}"
+						        itemValue="#{vendor}"
+						        forceSelection="false" 
+						        size="30" 
+						        maxlength="100" 
+						        autocomplete="off" 
+						        scrollHeight="100">
+						    <p:ajax event="query" process="@this" />									        		
+					    </p:autoComplete> 	
+
+						<h:outputLabel value="" />
+						<h:outputLabel value="" />
+						
+						<h:outputLabel value="Status" styleClass="ui-label"/>
+						<p:selectOneMenu id="statusInd"  styleClass="ui-select-dropdown" value="#{vehicleConfigurationSearchBean.searchCriteria.vehConfingObsoleteInd}" 
+											onkeydown="return doKeypressSearch(event);" style="width:70px; height:22px" >
+							<f:selectItem itemLabel="Active" itemValue="N" />
+							<f:selectItem itemLabel="Obsolete" itemValue="Y" />
+							<f:selectItem itemLabel="All" itemValue=" " />		
+							
+						</p:selectOneMenu>
+						
+						<h:outputLabel value="" />
+						<h:outputLabel value="" />
+						<h:outputLabel value="" />
+						<h:outputLabel value="" />
+						<h:outputLabel value="" />
+						
+						<p:commandButton id="search" widgetVar="searchButtonWidgetVar" title="Search" value="Search" onstart="return validateSearch(event);" style="float:right" onmouseover="handleSearch = true;" onmouseout="handleSearch = false;"
+							actionListener="#{vehicleConfigurationSearchBean.performSearch}" oncomplete="PF('searchButtonWidgetVar').enable();adjustBtnState();" update="resultsPanel,:messages" />
+					</h:panelGrid>
+				</p:panel>
+
+				<p:panel id="resultsPanel" header="Configuration" style="min-width:1200px;max-width:100%;width:auto;">
+					<p:dataTable id="searchResultDataTable" widgetVar="searchResultDataTableWidgetVar" lazy="true" 
+						var="element" value="#{vehicleConfigurationSearchBean.lazyVehicleConfigurationSearchResults}" 
+						scrollable="true" scrollHeight="#{vehicleConfigurationSearchBean.dataTable.height}"
+						selection="#{vehicleConfigurationSearchBean.selectedSearchResultVO}" 
+						emptyMessage="#{vehicleConfigurationSearchBean.dataTableMessage}" 
+						rows="#{vehicleConfigurationSearchBean.resultPerPage}" resizableColumns="true"
+						paginator="true" paginatorPosition="bottom" selectionMode="single">
+
+						<p:ajax event="rowSelect" onstart="adjustBtnState(); return false"  />
+						
+						<p:column headerText="Client" sortBy="#{element.client}" width="#{vehicleConfigurationSearchBean.dataTable.col1}">
+						    <h:outputText id="clientName" value="#{element.clientName}" />
+						</p:column>
+						
+						<p:column headerText="Application" sortBy="#{element.configDescription}" width="#{vehicleConfigurationSearchBean.dataTable.col2}">				
+						    <h:outputText id="configDescId" value="#{element.configDescription}" />
+						</p:column>
+						
+						<p:column headerText="Mfg Codes" width="#{vehicleConfigurationSearchBean.dataTable.col3}">
+							<ui:repeat value="#{element.vehicleConfigModelVOs}" var="vehConfModel">	
+								<h:panelGroup rendered="#{not empty vehConfModel.mfgCode}">
+									<h:outputText value="&#8226;"/> <h:outputText value="&#160;"/> <h:outputText value="#{vehConfModel.mfgCode}"/><br/>
+								</h:panelGroup>
+								<h:panelGroup rendered="#{empty vehConfModel.mfgCode}">
+									<h:outputText value="&#8226;"/> <h:outputText value="&#160;"/> <h:outputText value="&#8211;"/><br/>
+								</h:panelGroup>
+						    </ui:repeat>
+					    </p:column>
+						
+						<p:column headerText="Makes" width="#{vehicleConfigurationSearchBean.dataTable.col4}">
+							<ui:repeat value="#{element.vehicleConfigModelVOs}" var="vehConfModel">
+								<h:panelGroup rendered="#{not empty vehConfModel.make}">	
+									<h:outputText value="&#8226;"/> <h:outputText value="&#160;"/> <h:outputText value="#{vehConfModel.make}"/><br/>
+								</h:panelGroup>	
+								<h:panelGroup rendered="#{empty vehConfModel.make}">	
+									<h:outputText value="&#8226;"/> <h:outputText value="&#160;"/> <h:outputText value="&#8211;"/><br/>
+								</h:panelGroup>	
+						    </ui:repeat>
+					    </p:column>
+					    
+					    <p:column headerText="Models" width="#{vehicleConfigurationSearchBean.dataTable.col5}">
+						    <ui:repeat value="#{element.vehicleConfigModelVOs}" var="vehConfModel">	
+						    	<h:panelGroup rendered="#{not empty vehConfModel.model}">
+									<h:outputText value="&#8226;"/> <h:outputText value="&#160;"/> <h:outputText value="#{vehConfModel.model}"/><br/>
+								</h:panelGroup>	
+								<h:panelGroup rendered="#{empty vehConfModel.model}">
+									<h:outputText value="&#8226;"/> <h:outputText value="&#160;"/> <h:outputText value="&#8211;"/><br/>
+								</h:panelGroup>	
+						    </ui:repeat>
+					    </p:column>
+					    
+					    <p:column headerText="Years" width="#{vehicleConfigurationSearchBean.dataTable.col6}">
+						    <ui:repeat value="#{element.vehicleConfigModelVOs}" var="vehConfModel">
+						    	<h:panelGroup rendered="#{not empty vehConfModel.year}">	
+									<h:outputText value="&#8226;"/> <h:outputText value="&#160;"/> <h:outputText value="#{vehConfModel.year}"/><br/>
+								</h:panelGroup>
+								<h:panelGroup rendered="#{empty vehConfModel.year}">	
+									<h:outputText value="&#8226;"/> <h:outputText value="&#160;"/> <h:outputText value="&#8211;"/><br/>
+								</h:panelGroup>		
+						    </ui:repeat>
+					    </p:column>
+					    
+					    <p:column headerText="Trims" width="#{vehicleConfigurationSearchBean.dataTable.col7}">
+						    <ui:repeat value="#{element.vehicleConfigModelVOs}" var="vehConfModel">	
+						    	<h:panelGroup rendered="#{not empty vehConfModel.trim}">
+						    		<h:outputText value="&#8226;"/> <h:outputText value="&#160;"/> <h:outputText id="trimValue" value="#{vehConfModel.trim.length() > 27 ? vehConfModel.trim.substring(0,27).concat('...') : vehConfModel.trim}"/><br/>
+						    		<p:tooltip value="#{vehConfModel.trim}" for="trimValue"/>
+						    	</h:panelGroup>
+						    	<h:panelGroup rendered="#{empty vehConfModel.trim}">
+						    		<h:outputText value="&#8226;"/> <h:outputText value="&#160;"/> <h:outputText value="&#8211;"/><br/>
+						    	</h:panelGroup>
+						    </ui:repeat>
+					    </p:column>
+					    
+					    <p:column headerText="Vendors" width="#{vehicleConfigurationSearchBean.dataTable.col8}">
+						    <ui:repeat value="#{element.vendorName}" var="vendor">	
+								<h:outputText value="&#8226;"/> <h:outputText value="&#160;"/> <h:outputText value="#{vendor}"/><br/>
+						    </ui:repeat>
+					    </p:column>
+						
+						<p:column headerText="Locate" width="#{vehicleConfigurationSearchBean.dataTable.col9}">				
+						    <h:outputText id="locateFlagId" value="#{element.locateFlag == 'Locate' ? 'Yes' : ''}" />
+						</p:column>
+						
+						<p:column headerText="Status" width="#{vehicleConfigurationSearchBean.dataTable.col10}">				
+						    <h:outputText id="statusId" value="#{element.vehConfingObsoleteInd == 'Y' ? 'Obsolete' : ''}" />
+						</p:column>
+						
+						<f:facet name="footer">
+							Record Count: <h:outputText value="#{vehicleConfigurationSearchBean.lazyVehicleConfigurationSearchResults.rowCount}" />
+						</f:facet>
+					</p:dataTable>
+
+					<h:inputHidden id="rowCount" name="rowCount" value="#{vehicleConfigurationSearchBean.lazyVehicleConfigurationSearchResults.rowCount}" />
+
+				</p:panel>
+
+				<p:panel id="commandPanel" style="min-width:1200px;max-width:100%;width:auto;">
+					<p:commandButton id="add" widgetVar="addBtnVar" value="Add Configuration" actionListener="#{vehicleConfigurationSearchBean.addConfiguration}" ajax="false" onclick="lockScreen();" disabled="#{!vehicleConfigurationSearchBean.hasManageVehConfigPermission}" />
+					<p:spacer width="5"/>
+					<p:commandButton id="viewEdit" widgetVar="viewEditBtnVar" value="View/Edit Configuration" actionListener="#{vehicleConfigurationSearchBean.editConfiguration}" ajax="false" onclick="lockScreen();"/>
+					<p:spacer width="5"/>
+					<p:commandButton id="done" value="Cancel" action="#{vehicleConfigurationSearchBean.cancel}" ajax="false" immediate="true" onclick="lockScreen();" />
+				</p:panel>
+
+			</h:form>
+			
+			<div id="MODEL_LOV_DIV">
+				<ui:include src="../lov/model.xhtml" />
+			</div>
+
+			<div id="inputFieldChecks">
+				<ui:include src="../alert/inputFieldChecks.xhtml" />
+			</div>
+
+		<style type="text/css">
+			.column1 {
+			    width: 5%;
+			    text-align: center;
+			    padding:0px !important;
+			    border: none !important;
+			}
+			
+			.column2 {
+			    width: 95%;
+			    text-align: left;
+			    border: none !important;
+			}
+			
+			.textWrap {
+				white-space: normal;
+			}
+			
+			.ui-datatable thead th {
+				white-space: normal;
+				text-align: center;
+			}
+			
+			
+		</style>
+
+		<script type="text/javascript"> 
+		
+		var source;
+		var handleSearch = false;
+		var UI_ID_MFG_CODE = 'availableMfgCodesAC';
+		
+		function moveScrollbarToTop(){					
+			setScrollDivAtTop();	
+		}
+		
+		/**
+		* Handles the search button's client side validation before the ajax search happens. A minimum alphanumric character 
+		* check is performed. The search process either continues or not based on
+		* on the check's boolean result.
+		*/
+		function validateSearch(event){			
+			var searchCriteria = "";
+			searchCriteria += $('#availableClientsAC_input').val()
+			searchCriteria += $('#configurationDesc').val()
+			searchCriteria += $('#availableMfgCodesAC_input').val()
+			searchCriteria += $('#year_input').val();
+			searchCriteria += $('#make_input').val();
+			searchCriteria += $('#model').val();
+			searchCriteria += $('#availableTrimsAC_input').val();
+			searchCriteria += $('#availableVendorsAC_input').val();
+			
+			if(!hasMinAlphaNumericCharacters(event.srcElement, searchCriteria)) {		
+				return false;
+			} else {
+				return true;
+			}
+
+		}
+		
+				
+		/**
+		* Detects the Enter key and programatically clicks
+		* the search button. The search button event handler
+		* will perform the min. alphanumeric check.
+		*/
+		function doKeypressSearch(event){
+			if (event.keyCode == 13) {
+				source = event.srcElement.id;
+			   $('#search').click();
+			   focus();
+			   return false;
+			}
+			return true;	
+		}
+		
+	    /**
+	    * The LOV calls this function to pass back the selected
+	    * values to the view's controls.
+	    */
+		function setSelection( lovName, nameArray, valueArray){	
+			if(lovName == 'modelLOV'){
+				for(var i=0; i  &lt; nameArray.length ; i++){
+					if(nameArray[i] == 'MODEL_DESCRIPTION'){
+						document.getElementById('model').value = valueArray[i];
+					}
+					/* if(nameArray[i] == 'MODEL_CODE'){
+						document.getElementById('hiddenModel').value = valueArray[i];						
+					} */
+				}
+				setFocus('model');
+			}				
+		}
+	    
+	    function selectCurrentRow(table,index){
+            PF(table).unselectAllRows();
+          	PF(table).selectRow(index ,false);
+        }
+	    
+	    function adjustBtnState(){
+        	if(PF('searchResultDataTableWidgetVar').selection.length == 1){        	
+        		PF('viewEditBtnVar').enable();
+			}else{
+				PF('viewEditBtnVar').disable();
+			}
+        }
+	    
+     	$(window).load(function(){
+     		adjustBtnState();
+		});	
+		</script>
+	</ui:define>
+</ui:composition>

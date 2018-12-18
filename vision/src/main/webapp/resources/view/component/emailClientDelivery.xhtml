@@ -1,0 +1,75 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	>
+	
+	  <!-- INTERFACE -->
+	  <composite:interface>
+	    <composite:attribute name="email" required="true" type="com.mikealbert.service.util.email.Email" /> 
+	    <composite:attribute name="titleText" required="true" type="java.lang.String" />         
+	  </composite:interface>
+	
+	  <!-- IMPLEMENTATION -->          
+	  <composite:implementation>
+	  	<div id = "#{cc.clientId}">
+	  	<div id="sendEmailDialog">
+	  		<p:dialog id="sendEmailDialogId" widgetVar="sendEmailDialogWidget" resizable="false" dynamic="true"  width="750" height="450"  modal="true" closeOnEscape="true"  header="#{emailClientDeliveryBean.titleText}" appendTo="@(body)" draggable="true">				
+				<h:form id="sendEmailForm" prependId="false" onkeypress="return doSendMail();">
+	  			 		<p:panel style="min-width:450px;max-width:100%;width:auto; height:380px">					
+							<h:panelGrid columns="2">	
+								<h:outputLabel value="From:"/>
+								<h:outputLabel id="from" value="#{emailClientDeliveryBean.fromAddrSimple}" size="80" />
+													
+								<h:outputLabel value="To:"/>
+								<h:inputText id="to" value="#{emailClientDeliveryBean.toAddrSimple}" size="80" />
+								
+								<h:outputLabel value="Cc:"/>
+								<h:inputText id="cc" value="#{emailClientDeliveryBean.ccAddrSimple}" size="80" />
+								
+								<h:outputLabel value="Subject:"/>
+								<h:inputText id="subject" value="#{emailClientDeliveryBean.email.subject}" size="100" />
+								
+								<h:outputLabel value="Body:"/>
+								
+								<h:inputTextarea id="bodyText" rendered="#{!emailClientDeliveryBean.email.htmlFmt}" value="#{emailClientDeliveryBean.email.message}" cols="100" rows="22" style="width:auto;overflow-x:scroll" />		
+								<p:editor id="bodyHtml" width="450" rendered="#{emailClientDeliveryBean.email.htmlFmt}" value="#{emailClientDeliveryBean.email.message}" controls="bold italic underline strikethrough highlight alignleft center alignright outdent indent" />
+								
+												
+							</h:panelGrid>																																												
+						</p:panel>
+						<p:panel id="emailButtonsPanel" style="min-width:450px;max-width:100%;">
+								<h:panelGroup>
+									<p:commandButton id="SendBtnId" value="Send" action="#{emailClientDeliveryBean.send}" ajax="false" immediate="false"/>	
+									<p:commandButton id="CancelBtnId" value="Cancel" process="@none" immediate="true" onclick="hideDialog('sendEmailDialogWidget')"/>
+								</h:panelGroup>
+						</p:panel>		
+				</h:form>	
+			</p:dialog>
+	  	</div>
+	  	</div>
+		
+	  	<script type="text/javascript">
+	  	
+			function showEmailPopup(){
+				showDialog('sendEmailDialogWidget');
+			}
+			
+			function doSendMail(event){
+				if (event.keyCode == 13) {
+					document.getElementById('SendBtnId').click(); return false; 
+				}
+			}
+			
+            $(document).ready(function() {
+                $('#form\\:bodyHtml').find('iframe').contents().find('body').css({
+                    'font-family': 'arial,sans-serif'
+                });
+            });
+			
+		</script>
+	  	
+	  </composite:implementation>
+</html>

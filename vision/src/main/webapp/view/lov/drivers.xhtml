@@ -1,0 +1,145 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	
+				 <h:form id ="drvLovForm" name="drvLovForm" prependId = "false"  dynamic="true">
+				 	
+				 <p:dialog  header="Select driver" widgetVar="driverLOV" id="DRIVER_GRID" resizable="true" dynamic="true" appendTo="@(body)"
+						 width="1050" height="400" modal="true" onShow="setFirstPageDrvDataTableWidget();setFocus('driverSelectButton');setDefaultDrvLovRowSelection();">
+					
+						<p:hotkey immediate="true" bind="esc" handler="PF('driverLOV').hide();"/>
+					
+				      	<h:inputHidden id="clickDrvLovIndex" name ="clickDrvLovIndex" value = "#{driverLovBean.selectionIndex}"/>
+				      	<h:form id="drvLovDataTblForm" onkeydown="body_onkeydown(event,'drvLovDataTblForm:driverSelectButton','driverLOV');">		
+						<p:dataTable widgetVar="drvDataTableWidget" var="driver" scrollable="true" scrollHeight="300"  
+							value="#{driverLovBean.drivers}" rows="#{driverLovBean.rowsPerPage}" paginator="true" paginatorPosition="bottom" 
+							selection = "#{driverLovBean.selectedDriver}" lazy="true" 
+							emptyMessage = "#{driverLovBean.dataTableMessage}" resizableColumns="true"
+							selectionMode="single">
+							<p:ajax event="rowDblselect" listener="#{driverLovBean.onRowSelect}" 
+									update=":drvLovForm:selectedDriverId_lov,:drvLovForm:allocatedFleetMaster_lov,:drvLovForm:selectedDriverFullname_lov,:drvLovForm:selectedDriverUnitNumber_lov,:drvLovForm:selectedClientName_lov"
+									oncomplete="hideDriverLov(); setDriverValues();"  />
+							<p:ajax event="rowSelect" listener="#{driverLovBean.onRowSelect}" oncomplete="setSelectedDrvLovRecord();" update=":drvLovForm:clickDrvLovIndex" />
+							<p:ajax event="page" onstart="clearDataTableSelection('drvDataTableWidget');" oncomplete="setScrollDivAtTop();setDefaultDrvLovRowSelection();"/>
+							<h:messages />
+							<p:column  width="120">
+								<f:facet name="header">
+									<h:outputText value="Driver Name" style ="font-weight:bold" />
+								</f:facet>
+								<h:outputText value="#{driver.driverSurname}, #{driver.driverForename}"></h:outputText><br/>
+								<h:outputText value="#{driver.poolManager}" converter="PoolManagerConverter"></h:outputText>
+							</p:column>
+							<p:column   width="240">
+								<f:facet name="header" >
+									<h:outputText value="Client" style ="font-weight:bold"/>
+								</f:facet>
+								<h:outputText value="#{driver.accountName}"></h:outputText><br></br>
+								<h:outputText value="Client No: #{driver.accountId}"></h:outputText>
+							</p:column>
+							<p:column  width="240">
+								<f:facet name="header" >
+									<h:outputText value="Garaged Address" style ="font-weight:bold"/>
+								</f:facet>
+								<h:outputText value="#{driver.businessAddressLine}" />
+								<h:outputText value=" &lt;br /&gt; "  rendered="#{driver.businessAddressLine != null ? 'true': 'false'}"  escape="false" />
+								<h:outputText value="#{driver.addressLine1}" /> <br />								
+								<h:outputText value="#{driver.addressLine2}" /> 
+								<h:outputText value=" &lt;br /&gt; "  rendered="#{driver.addressLine2 != null ? 'true': 'false'}"  escape="false" />
+								<h:outputText value="#{driver.townCity},  
+													#{driver.region}
+													#{driver.postcode} " /> <br />
+							</p:column>
+							<p:column  width="160">
+								<f:facet name="header" >
+									<h:outputText value="Email" style ="font-weight:bold"/>
+								</f:facet>
+								<h:outputText value="#{driver.email}"></h:outputText>
+							</p:column>
+							
+							<p:column  width="70">
+								<f:facet name="header" >
+									<h:outputText value="Active Ind" style ="font-weight:bold"/>
+								</f:facet>
+								<h:outputText value="ACTIVE" rendered="#{driver.activeInd == 'Y'}" />
+								<h:outputText value="INACTIVE" rendered="#{driver.activeInd == 'N'}" />
+							</p:column>
+							
+						</p:dataTable>
+						
+						<div style="text-align:center;">
+								
+									<h:outputText style="font-weight:bold;" 
+										value="Record Count: #{driverLovBean.drivers.rowCount}">
+									</h:outputText>	
+									<p:commandButton style="float:right;"  value="Select" id = "driverSelectButton" name="driverSelectButton"
+									update=":drvLovForm:selectedDriverId_lov,:drvLovForm:allocatedFleetMaster_lov,:drvLovForm:selectedDriverFullname_lov,:drvLovForm:selectedDriverUnitNumber_lov,:drvLovForm:selectedClientName_lov" 
+									oncomplete="hideDriverLov(); setDriverValues();"  action="#{driverLovBean.setSelectedDriver}">
+									</p:commandButton>
+									
+									
+             			</div>
+             			</h:form>
+					</p:dialog>
+					
+						<h:inputHidden id ="selectedDrvIndex"  />
+				        <h:inputHidden id="selectedDriverId_lov" value="#{driverLovBean.driverId}" />
+				        <h:inputHidden id="allocatedFleetMaster_lov" value="#{driverLovBean.fleetMasterId}" />
+				        <h:inputHidden id="selectedDriverFullname_lov" value="#{driverLovBean.driverFullName}" />
+				        <h:inputHidden id="selectedDriverUnitNumber_lov" value="#{driverLovBean.unitNumber}" />
+				        <h:inputHidden id="selectedClientName_lov" value="#{driverLovBean.customerName}" />
+				        <h:inputHidden id="lovRecordsPerPageDriver" value="#{driverLovBean.lovRecordsPerPage}" />
+				        	
+					</h:form>
+	<script type="text/javascript">
+		
+		function setDriverValues(){
+			var lovNameArray = new Array();
+			var lovValueArray = new Array();
+			lovNameArray[0]='DRIVER_ID';
+			lovValueArray[0]=document.getElementById('selectedDriverId_lov').value;
+			
+			lovNameArray[1]='FLEET_MASTER_ID';
+			lovValueArray[1]= document.getElementById('allocatedFleetMaster_lov').value;
+
+			lovNameArray[2]='DRIVER_FULLNAME';
+			lovValueArray[2]=document.getElementById('selectedDriverFullname_lov').value;
+			
+			lovNameArray[3]='UNIT_NUMBER';
+			lovValueArray[3]=document.getElementById('selectedDriverUnitNumber_lov').value;
+			
+			lovNameArray[4]='CLIENT_NAME';
+			lovValueArray[4]=document.getElementById('selectedClientName_lov').value;
+
+			<!-- This method need to implement in parent page to populate LOV seletion-->
+			setSelection('driverLOV',lovNameArray,lovValueArray);
+		}
+		<!-- This method need to call while integarting LOV to any page-->		
+		function showDriverLov(){
+			showDialog('driverLOV');
+		}	
+		
+		function hideDriverLov(){
+			hideDialog('driverLOV');
+		}
+		
+		function setSelectedDrvLovRecord() {	
+		    	var iRow  = document.getElementById('clickDrvLovIndex').value;
+				document.getElementById('selectedDrvIndex').value = iRow;
+		}
+		
+		function setDefaultDrvLovRowSelection() {	
+			setSelectedDrvLovRecord();
+	    }
+		
+				
+		function setFirstPageDrvDataTableWidget(){
+			setDataTableToFirstPage('drvDataTableWidget');
+			// also select the first row, but only if we have data
+			setDataTableToFirstRow('drvDataTableWidget');
+		}
+	
+		
+	</script>
+</ui:composition>

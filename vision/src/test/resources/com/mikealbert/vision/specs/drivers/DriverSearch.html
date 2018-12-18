@@ -1,0 +1,30 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Driver Search</title>
+    <body>
+    	<h1>Driver Search</h1>
+    	<h2>Acceptance Tests (Automated)</h2>
+    		<ul concordion:execute="#result = searchForDriversByDriverName_FuncTest(#driverName)"><li>When searching for a driver name (last,first) of <b><span concordion:set="#driverName">Jackson,Ammon</span></b> <span concordion:assertTrue="#result"> the search results show at least one driver returning. </span></li></ul>
+			<ul concordion:execute="#result = searchForDriversByVinNumber_FuncTest(#vin)"><li>When searching for a vin last six of <b><span concordion:set="#vin">9999</span></b> <span concordion:assertTrue="#result"> the search results show at least one unit returning. </span></li></ul>
+			<ul concordion:execute="#result = searchForDriversByClientNo_FuncTest(#clientNo)"><li>When searching for a client number of <b><span concordion:set="#clientNo">00019919</span></b> <span concordion:assertTrue="#result"> the search results show at least one driver returning. </span></li></ul>
+			<ul concordion:execute="#result = searchForDriversByTALPlate_FuncTest(#talPlate)"><li>When searching for a tal plate of <b><span concordion:set="#talPlate">MAL2185</span></b> <span concordion:assertTrue="#result"> the search results show at least one unit returning. </span></li></ul>
+			<ul concordion:execute="#result = searchForDriversByWillowPlate_FuncTest(#willowPlate)"><li>When searching for a willow plate of <b><span concordion:set="#willowPlate">1HA59116</span></b> <span concordion:assertTrue="#result"> the search results show at least one unit returning. </span></li></ul>
+			<ul concordion:execute="#result = searchForDriversByFleetRef_FuncTest(#fleetRefNo)"><li>When searching for a fleet ref no of <b><span concordion:set="#fleetRefNo">138</span></b> <span concordion:assertTrue="#result"> the search results show at least one unit returning. </span></li></ul>
+			<ul concordion:execute="#result = searchForUnallocatedDriversByName_FuncTest(#unallocatedDriverName)"><li>When searching for a driver name (last,first) of <b><span concordion:set="#unallocatedDriverName">Foultz,Carl</span></b> <span concordion:assertTrue="#result"> the search results show at least one driver returning. </span></li></ul>
+			<ul concordion:execute="#result = searchForActiveInactiveBothByDriverName_FuncTest(#driverName, #activeInactiveBoth)"><li>When searching for an active driver(<b><span concordion:set="#activeInactiveBoth">Y</span></b>) using the name (last,first) of <b><span concordion:set="#driverName">Foultz,Carl</span></b> who is an active driver <span concordion:assertTrue="#result"> the search results show at least one driver returning. </span></li></ul>
+			<ul concordion:execute="#result = searchForActiveInactiveBothByDriverName_FuncTest(#driverName, #activeInactiveBoth)"><li>When searching for an inactive driver(<b><span concordion:set="#activeInactiveBoth">N</span></b>) using the name (last,first) of <b><span concordion:set="#driverName">Foultz,Carl</span></b> who is an active driver <span concordion:assertFalse="#result"> the search results show no drivers returning. </span></li></ul>
+			<ul concordion:execute="#result = searchForDisposedUnit_FuncTest(#unitNo)"><li>When searching for a disposed unit number of <b><span concordion:set="#unitNo">00016662</span></b> <span concordion:assertTrue="#result"> the search results show one driver returning. </span></li></ul>
+			
+    	<h2>Manual Tests</h2>
+    		<ul><li>Story #35 - Order of search criteria:  Driver Last,First; Unit; VIN; Fleet Ref; Plate, Account;</li></ul>
+    		<ul><li>Story #59 - For any unit displayed in EQ001 that is On Order, the system retrieves and displays only the driver information on the Search Driver page.</li></ul>
+    		<ul><li>Story #59 - For any unit/fleet ref/plate/VIN entered in the Search Driver page that is On Order, the system displays "No data found".  The user must search by driver name or client name to update driver data when his/her unit is in this status.</li></ul>
+    		<ul><li>Story #59 - When unit is displayed, if unit does not have a current allocation, I can edit the driver and view the driver allocation history but I cannot allocate/deallocate a driver to it.</li></ul>
+    		<ul><li></li></ul>
+    		
+    	<h2>Untested (Out of Scope)</h2>
+    	<ul><li>Story #6 - Acceptance criteria that is not a part of the Driver Search screen</li></ul>
+
+    </body>
+</html>
+

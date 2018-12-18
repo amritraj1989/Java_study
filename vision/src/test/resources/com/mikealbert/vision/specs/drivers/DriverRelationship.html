@@ -1,0 +1,37 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Related Drivers</title>
+    <body>
+    	<h1>Related Drivers</h1>
+    	<h2>Acceptance Tests (Automated)</h2>
+    		<ul concordion:execute="#result = testCannotRelateDriver(#driverNameParent, #driverNameChild)"><li>When attempting to relate an allocated driver(last,first) <b><span concordion:set="#driverNameChild">Alvarenge Martell,Fransheska</span></b> to another driver(last,first) <b><span concordion:set="#driverNameParent">Bryan,Susan</span></b> <span concordion:assertTrue="#result">an error will result. Acceptance Criteria - 'I cannot relate (or establish as a Related Driver) a driver who is already allocated.'</span></li></ul>
+			<ul concordion:execute="#result = testCannotRelateDriver(#driverNameParent, #driverNameChild)"><li>When attempting to relate a related driver(last,first) <b><span concordion:set="#driverNameChild">Carter,Wray</span></b> to another driver(last,first) <b><span concordion:set="#driverNameParent">Davenport,Dudley</span></b> <span concordion:assertTrue="#result">an error will result. Acceptance Criteria - 'I cannot relate a related driver.'</span></li></ul>
+			<ul><li>When using a parent driver(last,first) of <b><span concordion:set="#driverNameParent">Digioia,Michael</span></b> who is part of customer number <b><span concordion:set="#customerNo">00003182</span></b>, the following related drivers are returned: Acceptance Criteria - 'I can call up the main driver in inquiry and view the related drivers. '</li></ul>
+			<p align="center">
+    		<table concordion:verifyRows="#drivers : testGetRelatedDrivers(#driverNameParent, #customerNo)">
+		        <tr>
+		        	<th concordion:assertEquals="#drivers.driverForename">First Name</th>
+		        	<th concordion:assertEquals="#drivers.driverSurname">Last Name</th>
+		        </tr>
+		        <tr>
+		        	<td>Jane</td>
+		        	<td>Digioia</td>
+		        </tr>
+            </table>
+            </p>
+            
+            <ul concordion:execute="#result = testGetActiveDriversOnlyInAvailableDriversList(#parentDriverName, #possibleRelatedDriverLastName, #customerNo)"><li>Story #6 - When attempting to relate an inactive driver to the parent driver (last,first) <b><span concordion:set="#driverNameParent">Digioia,Michael</span></b> who is part of the customer number <b><span concordion:set="#customerNo">00003182</span></b>. Using the last name search value of <b><span concordion:set="#possibleRelatedDriverLastName">Remillard #2</span></b> to find possible related drivers<span concordion:assertTrue="#result">, the result shows zero possible related drivers. Acceptance Criteria - 'Can't relate a deactivated driver.'</span></li></ul>
+			
+    	<h2>Manual Tests</h2>
+    		<ul><li>Story #40 - Search criteria should only contain drivers from client accounts and related accounts as the parent driver's account.  </li></ul>
+    		<ul><li>Story #40 - If the driver's last name is not the same as the relation's last name, display a warning like:  "Related driver does not have the same last name as the current driver.  Relationship is for family members or significant others only.  Continue?"</li></ul>
+    		<ul><li>Story #40 - The view will show the driver first name, last name the type of relationship and I can access the full driver record (name, address) of the related driver.</li></ul>
+    		<ul><li>Story #61 - Copy company driver info to related drivers - All acceptance criteria</li></ul>
+    		
+    		
+    	<h2>Untested (Out of Scope)</h2>
+    		<ul><li></li></ul>
+    		
+    </body>
+</html>
+

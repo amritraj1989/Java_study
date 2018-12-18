@@ -1,0 +1,119 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	
+		<p:dialog header="#{vehicleDescriptionLovBean.dialogHeader}"  
+				widgetVar="vehicleDescLOV"
+				id="VEH_DESC_USER_GRID" 
+				dynamic="true" 
+				resizable="false" 
+				appendTo="@(body)"
+				width="600"
+				height="355" 
+				modal="true"
+				onShow="setFirstPageVehicleDescDataTableWidget();setFocus('vehDescSelectButton');">
+
+		<h:form id="vehicleDescLovForm" name="vehicleDescLovForm" 
+			onkeydown="body_onkeydown(event,'vehicleDescLovForm:vehDescSelectButton','vehicleDescLOV');">
+			
+			<p:hotkey immediate="true" bind="esc" handler="PF('vehicleDescLOV').hide();"/>
+			
+			<p:dataTable widgetVar="vehDescDataTableWidget" 
+					var="vehicleDescription"
+					scrollable="true" 
+					scrollHeight="270" 
+					resizableColumns="true"
+					value="#{vehicleDescriptionLovBean.vehicleDescriptions}" 
+					rows="#{vehicleDescriptionLovBean.rowsPerPage}"
+					paginator="true" 
+					paginatorPosition="bottom" 
+					lazy="true"
+					selection="#{vehicleDescriptionLovBean.lovSelectedVehicleDescription}" 
+					selectionMode="single"
+					rowKey="#{vehicleDescription.mdlId}">
+
+
+				<p:ajax event="page" oncomplete="clearDataTableSelection('vehDescDataTableWidget'); disableVehDescSelectBtn(); setScrollDivAtTop();" />
+				
+				<p:ajax event="rowDblselect" 
+						listener="#{vehicleDescriptionLovBean.onRowSelect}"
+						update=":lovVehicleDesc"
+						oncomplete="hideVehicleDescLov();setVehicleDescValues();" />
+						
+				<p:ajax event="rowSelect" 
+						listener="#{vehicleDescriptionLovBean.onRowSelect}"
+						update=":lovVehicleDesc"
+						oncomplete="enableVehDescSelectBtn();"/>
+				<h:messages />
+				
+				<p:column width="100%">
+					<f:facet name="header">
+						<h:outputText value="Vehicle Description" style="font-weight:bold" />
+					</f:facet>
+					<h:outputText value="#{vehicleDescription.trim}"></h:outputText>
+				</p:column>
+			</p:dataTable>
+			
+			<div style="text-align: center;">
+				<h:outputText style="font-weight:bold;" value="Record Count: #{vehicleDescriptionLovBean.vehicleDescriptions.rowCount}"/>
+				<p:commandButton style="float:right;" value="Select"
+					id="vehDescSelectButton" name="vehDescSelectButton" widgetVar="vehDescSelectButtonWidgetVar"
+					actionListener="#{vehicleDescriptionLovBean.performLovSelection}"
+					update=":lovVehicleDesc"
+					oncomplete="hideVehicleDescLov();setVehicleDescValues();">
+				</p:commandButton>
+			</div>
+			
+			
+			</h:form>
+			<h:inputHidden id="targetVehDescLov" value="#{vehicleDescriptionLovBean.lovName}"/>
+			<h:inputHidden id="lovVehicleDesc" value="#{vehicleDescriptionLovBean.lovSelectedVehicleDescription.trim}" />
+		</p:dialog>
+
+		
+	
+	<script language="javascript">
+		
+		function setVehicleDescValues(){
+			var lovParamArray = new Array();
+			var lovParamValueArray = new Array();
+			lovParamArray[0]='VEH_DESC';
+			lovParamValueArray[0]=document.getElementById('lovVehicleDesc').value;
+			<!-- This method need to implement in parent page to populate LOV seletion-->
+			setSelection(document.getElementById('targetVehDescLov').value, lovParamArray, lovParamValueArray);
+		}
+		
+		function showVehicleDescLov(){
+			showDialog('vehicleDescLOV');
+		}
+		
+		function hideVehicleDescLov(){
+			hideDialog('vehicleDescLOV');
+		}
+		
+		function resetSelection(){
+			jQuery("div").scrollTop(0);
+			jQuery("div").scrollLeft(0);
+			disableVehDescSelectBtn();
+		}
+		
+		function enableVehDescSelectBtn() {
+			PF('vehDescSelectButtonWidgetVar').enable();
+		}
+		
+		function disableVehDescSelectBtn() {
+			PF('vehDescSelectButtonWidgetVar').disable();
+		}
+		
+		function setFirstPageVehicleDescDataTableWidget(){
+			setDataTableToFirstPage('vehDescDataTableWidget');
+			// also select the first row, but only if we have data
+			setDataTableToFirstRow('vehDescDataTableWidget');
+			
+		}
+		
+		</script>
+</ui:composition>

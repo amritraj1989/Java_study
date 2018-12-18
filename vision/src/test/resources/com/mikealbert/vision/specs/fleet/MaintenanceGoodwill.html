@@ -1,0 +1,48 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+    <link href="../concordion.css" rel="stylesheet" type="text/css" />
+    <title>Fleet Maintenance / FM 150  and 539 Goodwill PO's</title>
+    <body>
+    	<h1>Fleet Maintenance / FM 150  and 539 Goodwill PO's</h1>
+    	<h2>Acceptance Tests (Automated)</h2>					            
+			<ul>
+			    <li>When creating a Goodwill PO for <b><span concordion:set="#jobNo">J00269429</span></b> (unit 00950962)</li>
+		        <ul>
+	                <li>Given that the Goodwill PO is generated</li>
+	                    <ul concordion:execute="#result = testCreateGoodwillPO(#jobNo)">
+	                        <li>Goodwill PO Job number is appended with <b><span concordion:assertEquals="#result.hasSuffix">CRn</span></b></li>
+	                        <li>PO Total = <b>$<span concordion:assertEquals="#result.poTotal">0.00</span></b></li>
+	                        <li>Mark Up Total = <b>$<span concordion:assertEquals="#result.poMarkupTotal">0.00</span></b></li>
+	                        <li>Recharge Total = <b>$<span concordion:assertEquals="#result.poRechargeTotal">0.00</span></b></li>
+	                    </ul>
+	                <li>Given that a task item Cost Avoidance is set to No</li>
+	                    <ul concordion:execute="#result2 = testGoodwillPOUpdateNonCostAvoidanceTask()">
+	                        <li>Cost Avoidance Reason is <b><span concordion:assertEquals="#result2.costAvoidanceReason">(null)</span></b></li>
+	                        <li>Cost Avoidance Amount = <b>$<span concordion:assertEquals="#result2.costAvoidanceAmount">0</span></b></li>
+	                        <li>Goodwill Reason is <b><span concordion:assertEquals="#result2.goodwillReason">(null)</span></b></li>
+	                        <li>Goodwill Amount = <b>$<span concordion:assertEquals="#result2.goodwillAmount">0</span></b></li>
+	                        <li>Goodwill Percent = <b>%<span concordion:assertEquals="#result2.goodwillPercent">0</span></b></li>	                        
+	                    </ul>	                
+	                <li>Given that the PO has a single task item which is a Cost Avoidance/Goodwill</li>
+	                    <ul concordion:execute="#result3 = testGoodwillPOAddCostAvoidanceTask()">
+	                        <li>Cost Avoidance Reason is <b><span concordion:assertEquals="#result3.costAvoidanceReason">GOODWILL</span></b></li>
+	                        <li>Cost Avoidance Amount = <b>$<span concordion:assertEquals="#result3.costAvoidanceAmount">639.25</span></b></li>
+	                        <li>Goodwill Reason is <b><span concordion:assertEquals="#result3.goodwillReason">Received goodwill from GM for Torque converter replacement</span></b></li>
+	                        <li>Goodwill Amount = <b>$<span concordion:assertEquals="#result3.goodwillAmount">639.25</span></b></li>
+	                        <li>Goodwill Percent = <b>%<span concordion:assertEquals="#result3.goodwillPercent">100</span></b></li>	
+	                        <li>PO Total = <b>$<span concordion:assertEquals="#result3.poTotal">0.00</span></b></li>
+	                        <li>PO Mark Up Total = <b>$<span concordion:assertEquals="#result3.poMarkupTotal">0.00</span></b></li>
+	                        <li>PO Recharge Total = <b>$<span concordion:assertEquals="#result3.poRechargeTotal">0.00</span></b></li>	                        	                                                
+	                        <li>PO Cost Avoidance Total = <b>$<span concordion:assertEquals="#result3.poGoodwillTotal">639.25</span></b></li>
+	                        <li>PO Goodwill Total = <b>$<span concordion:assertEquals="#result3.poCostAvoidanceTotal">639.25</span></b></li>	                        
+	                    </ul>	  	                            	            	            	            	            
+			    </ul>
+            </ul>			
+    	<h2>Manual Tests</h2>
+    	    <ul type = "circle"><b>
+    	       <li>TODO: </li>
+    	    </b></ul>
+
+    	<h2>Untested (Out of Scope)</h2>
+    		<ul><li>TODO:</li></ul>
+    </body>
+</html>

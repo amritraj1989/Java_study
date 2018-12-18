@@ -1,0 +1,37 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="quoteProfileFinanceParamDialog"
+        header="Quotation Profile Finance Parameters"
+		widgetVar="quoteProfileFinanceParamDialogWidget" modal="true"
+        appendTo="@(body)" dynamic="true" resizable="true" height="250" width="700"
+        onShow="setFocus('cancelQuoteProfileFinanceParamDialog')">
+        <h:form id="quoteProfileFinanceParamForm" prependId="false">
+            <p:hotkey immediate="true" bind="esc"
+                handler="PF('quoteProfileFinanceParamDialogWidget').hide();" />
+			<p:panel id="profileFinancesPanel">
+				<p:dataTable var="profileFinances"
+					value="#{quoteProfileFinanceBean.quotationProfileFinanceList}">
+					<p:column headerText="Profile Code">
+						<h:outputText value="#{profileFinances.profileCode}" />
+					</p:column>
+					<p:column headerText="Description">
+						<h:outputText value="#{profileFinances.profileDescription}" />
+					</p:column>
+					<p:column headerText="Value">
+						<h:outputText
+							value="#{profileFinances.profileFinanceNumericValue != null ? profileFinances.profileFinanceNumericValue : profileFinances.profileFinanceCharValue}" style="float:right"/>
+					</p:column>
+				</p:dataTable>
+            </p:panel>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="cancelQuoteProfileFinanceParamDialog"
+                value="Cancel"
+                onclick="PF('quoteProfileFinanceParamDialogWidget').hide();" />
+        </f:facet>
+    </p:dialog>
+</ui:composition>
