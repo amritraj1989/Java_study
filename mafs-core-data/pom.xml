@@ -1,0 +1,301 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.mikealbert.data</groupId>
+  <artifactId>mafs-core-data</artifactId>
+  <version>2.n.n.n.J8-SNAPSHOT</version> 
+  
+  <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> 
+      <mafs.core.infra.version>2.n.n.n.J8-SNAPSHOT</mafs.core.infra.version>
+      <mafs.core.testing.version>2.n.n.n.J8-SNAPSHOT</mafs.core.testing.version>
+      <spring.version>5.0.5.RELEASE</spring.version>                    
+  </properties>  
+
+  <dependencies>
+      <!-- Spring framework --> 
+      <!--  upgraded -->
+	<dependency>
+    	<groupId>org.springframework</groupId>
+    	<artifactId>spring-context-support</artifactId>
+    	<version>${spring.version}</version>
+	</dependency>
+	<!--  upgraded -->
+	<dependency>
+    	<groupId>org.springframework</groupId>
+    	<artifactId>spring-core</artifactId>
+    	<version>${spring.version}</version>
+	</dependency>
+<!--  upgraded -->
+	<dependency>
+    	<groupId>org.springframework</groupId>
+    	<artifactId>spring-expression</artifactId>
+    	<version>${spring.version}</version>
+	</dependency>
+	<dependency>
+    	<groupId>org.springframework</groupId>
+    	<artifactId>spring-beans</artifactId>
+    	<version>${spring.version}</version>
+	</dependency>
+	<dependency>
+    	<groupId>org.springframework</groupId>
+    	<artifactId>spring-aop</artifactId>
+    	<version>${spring.version}</version>
+	</dependency>
+	
+
+
+
+    <!-- Date Parsing -->
+    <!--  upgraded -->
+    <dependency> 
+	  <groupId>com.joestelmach</groupId>
+	  <artifactId>natty</artifactId>
+	  <version>0.13</version>
+	</dependency>
+	    
+    <!-- Spring Data JPA -->
+    <!--  upgraded -->
+    <dependency>
+         <groupId>org.springframework.data</groupId>
+         <artifactId>spring-data-jpa</artifactId>
+         <version>2.0.5.RELEASE</version>
+    </dependency>
+    <!-- Hibernate -->
+    <!--  upgraded -->
+	 <dependency>
+	    <groupId>org.hibernate</groupId>
+	    <artifactId>hibernate-validator</artifactId>
+	    <version>6.0.7.Final</version>
+	</dependency>
+	<!--  upgraded -->
+	<dependency>
+	 	<groupId>org.hibernate.javax.persistence</groupId>
+	 	<artifactId>hibernate-jpa-2.1-api</artifactId>
+	 	<version>1.0.2.Final</version>
+	 </dependency>
+	 <!--  upgraded -->
+	 <dependency>
+    	<groupId>org.hibernate</groupId>
+    	<artifactId>hibernate-core</artifactId>
+    	<version>5.3.0.CR1</version>
+	</dependency>
+	<!--  upgraded -->
+	<dependency>
+		<groupId>org.hibernate</groupId>
+		<artifactId>hibernate-entitymanager</artifactId>
+		<version>5.3.0.CR1</version>
+	</dependency>
+	<!--  upgraded -->
+	<dependency>
+	 	<groupId>org.springframework</groupId>
+	 	<artifactId>spring-orm</artifactId>
+	 	<version>${spring.version}</version>
+	</dependency>
+	<dependency>
+		<groupId>com.mikealbert</groupId>
+	 	<artifactId>mafs-core-infra</artifactId>
+	 	<version>${mafs.core.infra.version}</version>
+	</dependency>
+	
+	<!-- Testing -->
+	<dependency>
+		<groupId>com.mikealbert.testing</groupId>
+	 	<artifactId>mafs-core-testing</artifactId>
+	 	<version>${mafs.core.testing.version}</version>
+	 	<scope>test</scope>
+	</dependency>
+	<!--  seems to be the newest version but we've patched it? -->
+	<dependency>
+	 	<groupId>com.oracle</groupId>
+	 	<artifactId>ojdbc7_PATCHED</artifactId>
+	 	<version>12.1.0.2.0</version>
+	 </dependency>
+	 <!--  upgraded -->
+	<dependency>
+		<groupId>cglib</groupId>
+		<artifactId>cglib</artifactId>
+		<version>3.2.6</version>
+	</dependency>
+	<!--  upgraded -->
+	 <dependency>
+		<groupId>org.aspectj</groupId>
+		<artifactId>aspectjweaver</artifactId>
+		<version>1.8.13</version>
+	</dependency>	
+	<!--  upgraded -->
+	 <dependency>
+		<groupId>org.aspectj</groupId>
+		<artifactId>aspectjrt</artifactId>
+		<version>1.8.13</version>
+	</dependency>
+	<!--  upgraded -->
+	 <dependency>
+		<groupId>org.aspectj</groupId>
+		<artifactId>aspectjtools</artifactId>
+		<version>1.8.13</version>
+	</dependency>	
+	<!--  upgraded -->	
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-instrument</artifactId>
+		<version>${spring.version}</version>
+	</dependency>
+
+	<!-- Security -->
+	<dependency>
+		<groupId>org.springframework.security</groupId>
+		<artifactId>spring-security-core</artifactId>
+		<version>5.0.4.RELEASE</version>
+	</dependency>
+			<dependency>
+    <groupId>org.apache.maven.plugin-tools</groupId>
+    <artifactId>maven-plugin-annotations</artifactId>
+    <version>3.5.1</version>
+    <scope>provided</scope>
+</dependency>
+	<!--  upgraded -->
+  </dependencies>
+  <build>
+    <plugins>
+       <plugin>
+           <groupId>org.apache.maven.plugins</groupId>
+           <artifactId>maven-compiler-plugin</artifactId>
+           <version>3.7.0</version>
+           <configuration>
+               <source>1.8</source>
+               <target>1.8</target>
+           </configuration>
+       </plugin>
+       <!--  upgraded -->
+       <plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-source-plugin</artifactId>
+			<version>3.0.1</version>
+			<executions>
+				<execution>
+					<id>attach-sources</id>
+					<goals>
+						<goal>jar</goal>
+					</goals>
+				</execution>
+			</executions>
+		</plugin>
+
+
+		<!--  upgraded -->
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>aspectj-maven-plugin</artifactId>
+            <version>1.11</version>
+            <configuration>    
+            	<complianceLevel>1.8</complianceLevel>       
+                <source>1.8</source>
+                <target>1.8</target>
+            </configuration>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>compile</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>		
+	   <plugin>
+       <groupId>org.apache.maven.plugins</groupId>
+       <artifactId>maven-jar-plugin</artifactId>
+       <version>3.0.2</version>
+       <configuration>
+           <source>1.8</source>
+           <target>1.8</target>
+       </configuration>
+       <executions>
+         <execution>
+           <goals>
+             <goal>test-jar</goal>
+           </goals>
+         </execution>
+       </executions>
+     </plugin>
+    </plugins>
+    <pluginManagement>
+    	<plugins>
+    		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+    		<plugin>
+    			<groupId>org.eclipse.m2e</groupId>
+    			<artifactId>lifecycle-mapping</artifactId>
+    			<version>1.0.0</version>
+    			<configuration>
+    				<lifecycleMappingMetadata>
+    					<pluginExecutions>
+    						<pluginExecution>
+    							<pluginExecutionFilter>
+    								<groupId>org.codehaus.mojo</groupId>
+    								<artifactId>
+    									aspectj-maven-plugin
+    								</artifactId>
+    								<versionRange>[1.4,)</versionRange>
+    								<goals>
+    									<goal>compile</goal>
+    								</goals>
+    							</pluginExecutionFilter>
+    							<action>
+    								<ignore></ignore>
+    							</action>
+    						</pluginExecution>
+    					</pluginExecutions>
+    				</lifecycleMappingMetadata>
+    			</configuration>
+    		</plugin>
+    	</plugins>
+    </pluginManagement>
+  </build>
+  <reporting>
+  	<plugins>
+		<plugin>
+           <groupId>org.apache.maven.plugins</groupId>
+           <artifactId>maven-javadoc-plugin</artifactId>
+           <version>3.0</version>
+              <configuration>
+                    <outputDirectory>${project.build.directory}/apidocs</outputDirectory>
+                    <overview>overview.html</overview>
+                    <javadocDirectory>Source/Javadoc</javadocDirectory>
+                    <excludedocfilessubdir>CVS</excludedocfilessubdir>
+                    <docfilessubdirs>true</docfilessubdirs>
+                    <source>1.8</source>
+                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <id>html</id>
+                        <configuration>
+                            <doctitle>API for ${project.name} ${project.version}</doctitle>
+                            <windowtitle>API for ${project.name} ${project.version}</windowtitle>
+                        </configuration>
+                        <reports>
+                            <report>javadoc</report>
+                        </reports>
+                    </reportSet>
+                    <reportSet>
+                        <id>test-html</id>
+                        <configuration>
+                            <testDoctitle>Testware API for ${project.name} ${project.version}</testDoctitle>
+                            <testWindowtitle>Testware API for ${project.name} ${project.version}</testWindowtitle>
+                        </configuration>
+                        <reports>
+                            <report>test-javadoc</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+        </plugin>
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>findbugs-maven-plugin</artifactId>
+            <version>3.0.5</version>
+            <configuration>
+                <findbugsXmlOutput>true</findbugsXmlOutput>
+                <findbugsXmlWithMessages>true</findbugsXmlWithMessages>
+                <xmlOutput>true</xmlOutput>
+            </configuration>
+        </plugin>         
+  	</plugins>
+  </reporting>
+</project>
